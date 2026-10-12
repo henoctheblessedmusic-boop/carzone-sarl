@@ -1,0 +1,1327 @@
+/* Dark (default) — liquid ice */
+:root,
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --ice-bg-deep: #071018;
+  --ice-bg-mid: #0c1a24;
+  --ice-bg-glow: #1a4a5c;
+  --ice-glass: rgba(180, 220, 240, 0.06);
+  --ice-glass-strong: rgba(200, 230, 250, 0.12);
+  --ice-border: rgba(160, 210, 230, 0.18);
+  --ice-border-hover: rgba(180, 230, 255, 0.38);
+  --ice-text: #e8f2f8;
+  --ice-text-strong: #ffffff;
+  --ice-text-muted: rgba(210, 230, 240, 0.68);
+  --ice-highlight: #7ec8e3;
+  --ice-highlight-soft: rgba(126, 200, 227, 0.22);
+  --ice-input-bg: rgba(8, 20, 30, 0.45);
+  --ice-input-bg-hover: rgba(12, 28, 40, 0.55);
+  --ice-input-bg-focus: rgba(10, 26, 38, 0.7);
+  --ice-table-bg: rgba(180, 220, 240, 0.04);
+  --ice-table-head: rgba(126, 200, 227, 0.06);
+  --ice-row-hover: rgba(126, 200, 227, 0.1);
+  --ice-hero-bg: linear-gradient(135deg, rgba(15, 31, 46, 0.9) 0%, rgba(10, 22, 34, 0.96) 100%);
+  --ice-hero-border: rgba(160, 210, 230, 0.22);
+  --ice-hero-text: #ffffff;
+  --ice-hero-text-muted: rgba(210, 230, 240, 0.75);
+  --ice-card-inner: rgba(255, 255, 255, 0.03);
+  --ice-card-inner-border: rgba(255, 255, 255, 0.07);
+  --ice-modal-bg: #0d1b28;
+  --ice-modal-border: rgba(160, 210, 230, 0.2);
+  --ice-aside-bg: linear-gradient(
+    180deg,
+    rgba(180, 220, 240, 0.08) 0%,
+    rgba(10, 24, 34, 0.72) 40%,
+    rgba(8, 18, 26, 0.85) 100%
+  );
+  --ice-layout-bg:
+    radial-gradient(900px 500px at 8% -5%, rgba(80, 160, 190, 0.22) 0%, transparent 55%),
+    radial-gradient(700px 400px at 95% 10%, rgba(0, 120, 212, 0.1) 0%, transparent 50%),
+    linear-gradient(165deg, #071018 0%, #0c1a24 40%, #0a1820 70%, #081410 100%);
+  --ice-login-bg:
+    radial-gradient(900px 500px at 8% -5%, rgba(80, 160, 190, 0.28) 0%, transparent 55%),
+    radial-gradient(700px 400px at 95% 10%, rgba(0, 120, 212, 0.14) 0%, transparent 50%),
+    linear-gradient(165deg, #071018 0%, #0c1a24 50%, #081410 100%);
+  --ice-nav-active-fg: #fff;
+  --ice-glass-shadow: 0 8px 28px rgba(0, 20, 40, 0.25);
+  /* Brand accent — official OXCAR X blue; gold kept as secondary warm accent */
+  --brand: #e11d48;
+  --brand-deep: #be123c;
+  --brand-glow: rgba(225, 29, 72, 0.42);
+  --gold: #c4a35a;
+  --gold-deep: #8b6914;
+  --gold-glow: rgba(196, 163, 90, 0.35);
+  --ok: #3dba8a;
+  --warn: #d2a028;
+  --bad: #d45a5a;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 220ms;
+  --dur-slow: 380ms;
+  --prefs-menu-bg: rgba(12, 28, 40, 0.96);
+  --prefs-btn-bg: rgba(126, 200, 227, 0.1);
+  color-scheme: dark;
+
+  /* Chat System Variables (Dark Mode) */
+  --ice-card-bg: #111a24;
+  --ice-chat-container-bg: #0c1520;
+  --ice-chat-container-border: rgba(160, 210, 230, 0.16);
+  --ice-chat-container-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  --ice-chat-sidebar-bg: #081018;
+  --ice-chat-sidebar-border: rgba(160, 210, 230, 0.12);
+  --ice-chat-sidebar-header-bg: #0a131e;
+  --ice-chat-pane-bg: #0c1520;
+  --ice-chat-header-bg: #0e1824;
+  --ice-chat-messages-bg: #070e16;
+  --ice-chat-composer-bg: #0e1824;
+  --ice-chat-input-bg: rgba(6, 16, 26, 0.7);
+  --ice-chat-input-border: rgba(160, 210, 230, 0.18);
+  --ice-chat-input-text: #ffffff;
+  --ice-chat-input-placeholder: rgba(210, 230, 240, 0.45);
+  --ice-chat-bubble-peer-bg: #132230;
+  --ice-chat-bubble-peer-border: rgba(160, 210, 230, 0.15);
+  --ice-chat-bubble-peer-text: #e8f2f8;
+  --ice-chat-bubble-peer-meta: rgba(210, 230, 240, 0.65);
+  --ice-chat-bubble-me-bg: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(180, 140, 30, 0.35));
+  --ice-chat-bubble-me-border: rgba(212, 175, 55, 0.45);
+  --ice-chat-bubble-me-text: #ffffff;
+  --ice-chat-bubble-me-meta: rgba(255, 255, 255, 0.7);
+  --ice-chat-item-hover: rgba(126, 200, 227, 0.08);
+  --ice-chat-item-active-bg: rgba(212, 175, 55, 0.15);
+  --ice-chat-item-active-text: var(--gold, #d4af37);
+  --ice-chat-nav-text: rgba(210, 230, 240, 0.85);
+  --ice-chat-section-title: rgba(210, 230, 240, 0.5);
+}
+
+/* Lisibilité absolue des menus déroulants et options sur tous navigateurs (Brave, Chrome, Edge, Windows) */
+select {
+  color-scheme: dark !important;
+}
+
+html[data-theme="dark"] select option,
+:root select option,
+select option {
+  background-color: #161b22 !important;
+  color: #f8fafc !important;
+  padding: 8px 12px !important;
+}
+
+select optgroup {
+  background-color: #0d1117 !important;
+  color: #c4a35a !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] select {
+  color-scheme: light !important;
+}
+
+html[data-theme="light"] select option {
+  background-color: #ffffff !important;
+  color: #0e2233 !important;
+}
+
+/* Light — polished ice / brand / gold (readable, high contrast, radiant) */
+html[data-theme="light"] {
+  --ice-bg-deep: #f2f7fa;
+  --ice-bg-mid: #e8f1f6;
+  --ice-bg-glow: #b8d4e2;
+  --ice-glass: rgba(255, 255, 255, 0.88);
+  --ice-glass-strong: rgba(255, 255, 255, 0.98);
+  --ice-border: rgba(30, 80, 115, 0.16);
+  --ice-border-hover: rgba(0, 120, 212, 0.45);
+  --ice-text: #0e2233;
+  --ice-text-strong: #051422;
+  --ice-text-muted: #3a5368;
+  --ice-highlight: #0078d4;
+  --ice-highlight-soft: rgba(0, 120, 212, 0.12);
+  --ice-input-bg: rgba(255, 255, 255, 0.95);
+  --ice-input-bg-hover: #ffffff;
+  --ice-input-bg-focus: #ffffff;
+  --ice-table-bg: rgba(255, 255, 255, 0.88);
+  --ice-table-head: rgba(0, 120, 212, 0.08);
+  --ice-row-hover: rgba(0, 120, 212, 0.05);
+  --ice-hero-bg: linear-gradient(135deg, #ffffff 0%, #e9f4fb 100%);
+  --ice-hero-border: rgba(0, 120, 212, 0.22);
+  --ice-hero-text: #051422;
+  --ice-hero-text-muted: #3a5368;
+  --ice-card-inner: rgba(255, 255, 255, 0.85);
+  --ice-card-inner-border: rgba(30, 80, 115, 0.12);
+  --ice-modal-bg: #ffffff;
+  --ice-modal-border: rgba(30, 80, 115, 0.18);
+  --ice-aside-bg: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(242, 248, 252, 0.98) 50%,
+    rgba(232, 243, 250, 0.99) 100%
+  );
+  --ice-layout-bg:
+    radial-gradient(900px 500px at 8% -5%, rgba(126, 200, 227, 0.25) 0%, transparent 55%),
+    radial-gradient(700px 400px at 95% 10%, rgba(0, 120, 212, 0.1) 0%, transparent 50%),
+    linear-gradient(165deg, #f5fafc 0%, #e8f1f6 45%, #eef4f2 100%);
+  --ice-nav-active-fg: #0078d4;
+  --ice-glass-shadow: 0 8px 24px rgba(20, 50, 80, 0.08);
+  --brand: #e11d48;
+  --brand-deep: #be123c;
+  --brand-glow: rgba(0, 120, 212, 0.28);
+  --gold: #b38b2d;
+  --gold-deep: #7a5c12;
+  --gold-glow: rgba(179, 139, 45, 0.28);
+  --ok: #15803d;
+  --warn: #b45309;
+  --bad: #b91c1c;
+  --prefs-menu-bg: rgba(255, 255, 255, 0.98);
+  --prefs-btn-bg: rgba(0, 120, 212, 0.08);
+  color-scheme: light;
+
+  /* Chat System Variables (Light Mode) */
+  --ice-card-bg: #ffffff;
+  --ice-chat-container-bg: #ffffff;
+  --ice-chat-container-border: rgba(30, 80, 115, 0.16);
+  --ice-chat-container-shadow: 0 10px 40px rgba(15, 40, 70, 0.08);
+  --ice-chat-sidebar-bg: #f8fafc;
+  --ice-chat-sidebar-border: rgba(30, 80, 115, 0.12);
+  --ice-chat-sidebar-header-bg: #ffffff;
+  --ice-chat-pane-bg: #ffffff;
+  --ice-chat-header-bg: #ffffff;
+  --ice-chat-messages-bg: #f1f5f9;
+  --ice-chat-composer-bg: #ffffff;
+  --ice-chat-input-bg: #ffffff;
+  --ice-chat-input-border: #cbd5e1;
+  --ice-chat-input-text: #0f172a;
+  --ice-chat-input-placeholder: #64748b;
+  --ice-chat-bubble-peer-bg: #ffffff;
+  --ice-chat-bubble-peer-border: #e2e8f0;
+  --ice-chat-bubble-peer-text: #0f172a;
+  --ice-chat-bubble-peer-meta: #64748b;
+  --ice-chat-bubble-me-bg: linear-gradient(135deg, #0078d4, #005a9e);
+  --ice-chat-bubble-me-border: #005a9e;
+  --ice-chat-bubble-me-text: #ffffff;
+  --ice-chat-bubble-me-meta: rgba(255, 255, 255, 0.85);
+  --ice-chat-item-hover: rgba(0, 120, 212, 0.06);
+  --ice-chat-item-active-bg: rgba(0, 120, 212, 0.12);
+  --ice-chat-item-active-text: #0078d4;
+  --ice-chat-nav-text: #334155;
+  --ice-chat-section-title: #64748b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: var(--ice-bg-deep);
+  color: var(--ice-text);
+}
+
+button {
+  cursor: pointer;
+  transition:
+    filter var(--dur) var(--ease),
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    background var(--dur) var(--ease);
+}
+
+button:hover {
+  filter: brightness(1.06);
+}
+
+button:active {
+  transform: translateY(1px);
+  filter: brightness(0.97);
+}
+
+a {
+  color: inherit;
+  transition: color var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+
+/* ——— Liquid ice surfaces ——— */
+.ox-glass {
+  background: linear-gradient(
+    145deg,
+    rgba(200, 230, 250, 0.1) 0%,
+    rgba(120, 180, 200, 0.04) 45%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  border: 1px solid var(--ice-border);
+  border-radius: 14px;
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 8px 28px rgba(0, 20, 40, 0.25);
+  transition:
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    background var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.ox-glass:hover {
+  border-color: var(--ice-border-hover);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.1) inset,
+    0 12px 32px rgba(30, 80, 110, 0.28),
+    0 0 0 1px rgba(126, 200, 227, 0.08);
+  background: linear-gradient(
+    145deg,
+    rgba(200, 230, 250, 0.14) 0%,
+    rgba(120, 180, 200, 0.06) 45%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+}
+
+.ox-glass:active {
+  transform: translateY(1px);
+}
+
+/* ——— Buttons ——— */
+.ox-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, var(--brand), var(--brand-deep));
+  color: #fff;
+  font-weight: 650;
+  font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    filter var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+  box-shadow: 0 2px 8px rgba(0, 40, 80, 0.28);
+}
+
+.ox-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px var(--brand-glow);
+}
+
+.ox-btn:active {
+  transform: translateY(0);
+  filter: brightness(0.96);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.ox-btn:focus-visible {
+  outline: 2px solid var(--ice-highlight);
+  outline-offset: 2px;
+}
+
+.ox-btn-ghost {
+  background: rgba(126, 200, 227, 0.08);
+  color: var(--ice-text);
+  border-color: var(--ice-border);
+  box-shadow: none;
+}
+
+.ox-btn-ghost:hover {
+  background: rgba(126, 200, 227, 0.16);
+  border-color: var(--ice-border-hover);
+  filter: none;
+  box-shadow: 0 4px 16px rgba(30, 90, 120, 0.2);
+}
+
+.ox-btn-danger {
+  background: linear-gradient(135deg, #c45a5a, #8b3030);
+  color: #fff;
+}
+
+.ox-btn-sm {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  border-radius: 8px;
+}
+
+/* ——— Forms ——— */
+.ox-input,
+.ox-select,
+.ox-textarea {
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--ice-border);
+  background: var(--ice-input-bg);
+  color: var(--ice-text);
+  min-width: 120px;
+  backdrop-filter: blur(8px);
+  transition:
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    background var(--dur) var(--ease);
+}
+
+.ox-input:hover,
+.ox-select:hover,
+.ox-textarea:hover {
+  border-color: var(--ice-border-hover);
+  background: var(--ice-input-bg-hover);
+}
+
+.ox-input:focus,
+.ox-select:focus,
+.ox-textarea:focus {
+  outline: none;
+  border-color: var(--ice-highlight);
+  box-shadow: 0 0 0 3px var(--ice-highlight-soft);
+  background: var(--ice-input-bg-focus);
+}
+
+.ox-input::placeholder {
+  color: var(--ice-text-muted);
+}
+
+/* Form Dropdown Universal Dark Styling (fixes illegible white-on-white native Windows select) */
+select,
+.ox-select {
+  color-scheme: dark !important;
+  background-color: #0d1b28 !important;
+  color: #f8fafc !important;
+}
+
+select option,
+select optgroup,
+.ox-select option,
+.ox-select optgroup {
+  background-color: #0d1b28 !important;
+  color: #f8fafc !important;
+  padding: 8px 12px !important;
+}
+
+select option:checked,
+.ox-select option:checked {
+  background-color: #0078d4 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.ox-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+/* ——— Tables ——— */
+.ox-table-wrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid var(--ice-border);
+  background: var(--ice-table-bg);
+  backdrop-filter: blur(12px);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+.ox-table-wrap:hover {
+  border-color: var(--ice-border-hover);
+  box-shadow: 0 8px 24px rgba(20, 60, 90, 0.2);
+}
+
+.ox-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.ox-table th {
+  text-align: left;
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid var(--ice-border);
+  color: var(--ice-text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--ice-table-head);
+}
+
+.ox-table td {
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid rgba(160, 210, 230, 0.08);
+  vertical-align: top;
+  transition: background var(--dur) var(--ease);
+}
+
+.ox-table tbody tr {
+  transition: background var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+.ox-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.ox-table tbody tr:hover {
+  background: var(--ice-row-hover);
+  box-shadow: inset 3px 0 0 var(--ice-highlight);
+}
+
+/* ——— Badges ——— */
+.ox-badge {
+  display: inline-block;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  border: 1px solid transparent;
+  transition:
+    transform var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    filter var(--dur) var(--ease);
+}
+
+.ox-badge:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.ox-badge--ok {
+  background: rgba(61, 186, 138, 0.22);
+  border-color: rgba(61, 186, 138, 0.35);
+}
+.ox-badge--warn {
+  background: rgba(210, 160, 40, 0.22);
+  border-color: rgba(210, 160, 40, 0.35);
+}
+.ox-badge--bad {
+  background: rgba(212, 90, 90, 0.22);
+  border-color: rgba(212, 90, 90, 0.35);
+}
+.ox-badge--neutral {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--ice-border);
+}
+.ox-badge--ice {
+  background: rgba(126, 200, 227, 0.18);
+  border-color: rgba(126, 200, 227, 0.35);
+}
+
+/* ——— App shell / sticky nav ——— */
+.ox-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 268px 1fr;
+  background: var(--ice-layout-bg);
+  color: var(--ice-text);
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+.ox-aside {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  border-right: 1px solid var(--ice-border);
+  padding: 1.25rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: var(--ice-aside-bg);
+  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+  z-index: 20;
+}
+
+.ox-nav {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 4px;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(126, 200, 227, 0.35) transparent;
+}
+
+/* Inner list that rubber-bands on overscroll (logo/footer stay fixed) */
+.ox-nav-stretch {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transform-origin: center top;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ox-nav-stretch {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+.ox-nav-link {
+  position: relative;
+  color: var(--ice-text-muted);
+  text-decoration: none;
+  padding: 0.55rem 0.8rem 0.55rem 0.95rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  border: 1px solid transparent;
+  background: transparent;
+  font-weight: 450;
+  transition:
+    color var(--dur) var(--ease),
+    background var(--dur) var(--ease);
+}
+
+/* Hover: quiet ice lift only — never selected look */
+.ox-nav-link:hover:not(.is-active) {
+  color: var(--ice-text);
+  background: rgba(126, 200, 227, 0.08);
+}
+
+.ox-nav-link:focus-visible {
+  outline: 2px solid rgba(126, 200, 227, 0.55);
+  outline-offset: 2px;
+}
+
+/* Active: pathname only — brand blue accent bar + filled surface */
+.ox-nav-link.is-active {
+  color: var(--ice-nav-active-fg);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 120, 212, 0.22) 0%,
+    rgba(126, 200, 227, 0.12) 100%
+  );
+  font-weight: 600;
+}
+
+.ox-nav-link.is-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--brand);
+  box-shadow: 0 0 10px var(--brand-glow);
+}
+
+.ox-nav-link.is-active:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 120, 212, 0.28) 0%,
+    rgba(126, 200, 227, 0.16) 100%
+  );
+}
+
+.ox-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-start;
+  padding: 0.15rem 0.35rem 0.35rem;
+}
+
+/* Official OXCAR mark — white+blue on black; dark nest on light theme */
+.carzone-logo, .oxcar-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  overflow: hidden;
+  line-height: 0;
+  flex-shrink: 0;
+  background: #000;
+  transition: transform var(--dur-slow) var(--ease), box-shadow var(--dur-slow) var(--ease);
+}
+
+.carzone-logo, .oxcar-logo:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px var(--brand-glow);
+}
+
+.carzone-logo, .oxcar-logo__img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+}
+
+.carzone-logo, .oxcar-logo--sm {
+  max-width: 132px;
+}
+
+.carzone-logo, .oxcar-logo--md {
+  max-width: 168px;
+}
+
+.carzone-logo, .oxcar-logo--lg {
+  max-width: 228px;
+}
+
+[data-theme="light"] .carzone-logo, .oxcar-logo {
+  background: #0a0a0a;
+  padding: 6px 8px;
+  border-radius: 14px;
+  box-shadow: 0 2px 14px rgba(0, 40, 80, 0.16);
+}
+
+.ox-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.75rem;
+  border-bottom: 1px solid var(--ice-border);
+  background: rgba(180, 220, 240, 0.04);
+  backdrop-filter: blur(10px);
+  overflow: visible;
+  position: relative;
+  z-index: 30;
+}
+
+.ox-content {
+  padding: 1.5rem 1.75rem 2.5rem;
+  overflow: auto;
+}
+
+/* ——— Callouts / policy ——— */
+.ox-callout {
+  padding: 1rem 1.15rem;
+  border-radius: 14px;
+  border: 1px solid rgba(196, 163, 90, 0.35);
+  background: linear-gradient(
+    135deg,
+    rgba(196, 163, 90, 0.12) 0%,
+    rgba(126, 200, 227, 0.08) 100%
+  );
+  backdrop-filter: blur(10px);
+  margin-bottom: 16px;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+.ox-callout:hover {
+  border-color: rgba(196, 163, 90, 0.55);
+  box-shadow: 0 6px 20px rgba(196, 163, 90, 0.12);
+}
+
+.ox-callout h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  color: var(--gold);
+}
+
+.ox-callout p,
+.ox-callout li {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ice-text-muted);
+  line-height: 1.45;
+}
+
+.ox-callout ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.15rem;
+}
+
+/* ——— Onboarding ——— */
+.ox-onboarding {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  width: min(360px, calc(100vw - 2rem));
+  z-index: 50;
+  padding: 1rem 1.1rem;
+  max-height: min(70vh, 480px);
+  overflow-y: auto;
+}
+
+.ox-onboarding-fab {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 50;
+  border-radius: 999px;
+  padding: 0.7rem 1.1rem;
+}
+
+.ox-check-item {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  padding: 0.45rem 0.35rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: background var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.ox-check-item:hover {
+  background: rgba(126, 200, 227, 0.12);
+  transform: translateX(2px);
+}
+
+.ox-check-item.done {
+  opacity: 0.55;
+}
+
+/* ——— Print ——— */
+@media print {
+  .ox-aside,
+  .ox-header,
+  .ox-onboarding,
+  .ox-onboarding-fab,
+  .no-print {
+    display: none !important;
+  }
+  .ox-layout {
+    display: block;
+    background: #fff;
+    color: #111;
+  }
+  .ox-content {
+    padding: 0;
+  }
+  .ox-glass,
+  .ox-table-wrap {
+    background: none;
+    border: 1px solid #ccc;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+}
+
+/* ——— Responsive Layout & Drawer ——— */
+.ox-mobile-header-bar {
+  display: none;
+}
+
+.ox-menu-btn {
+  display: none;
+}
+
+.ox-drawer-backdrop {
+  display: none;
+}
+
+.ox-aside-close-btn {
+  display: none;
+}
+
+.ox-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.ox-header-title {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 650;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ox-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ox-user-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.ox-aside-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .ox-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .ox-header {
+    padding: 0.75rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 80;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+  }
+
+  .ox-header-title {
+    font-size: 1.15rem;
+  }
+
+  .ox-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--ice-border);
+    background: var(--prefs-btn-bg);
+    color: var(--ice-text);
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  }
+
+  .ox-menu-btn:hover {
+    background: var(--ice-highlight-soft);
+    border-color: var(--ice-border-hover);
+  }
+
+  .ox-aside {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(320px, 86vw);
+    height: 100vh;
+    z-index: 1000;
+    transform: translateX(-105%);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease;
+    box-shadow: none;
+    overflow-y: auto;
+    background: var(--ice-aside-bg);
+    border-right: 1px solid var(--ice-border);
+  }
+
+  .ox-aside.is-open {
+    transform: translateX(0);
+    box-shadow: 0 0 50px rgba(0, 15, 30, 0.5);
+  }
+
+  .ox-aside-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--ice-border);
+    background: transparent;
+    color: var(--ice-text);
+    cursor: pointer;
+  }
+
+  .ox-drawer-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(3, 10, 18, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 990;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .ox-drawer-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .ox-content {
+    padding: 1rem 0.85rem 2rem;
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+}
+
+@media (max-width: 640px) {
+  .ox-user-meta {
+    display: none;
+  }
+}
+
+/* ——— Login ——— */
+.ox-login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  position: relative;
+  background: var(--ice-login-bg);
+  color: var(--ice-text);
+  font-family: "Segoe UI", sans-serif;
+  padding: 24px;
+}
+
+.ox-login-prefs {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+}
+
+/* ——— Theme / language prefs ——— */
+.ox-prefs-menu {
+  position: relative;
+}
+
+.ox-prefs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 0.45rem;
+  border-radius: 10px;
+  border: 1px solid var(--ice-border);
+  background: var(--prefs-btn-bg);
+  color: var(--ice-text);
+  box-shadow: none;
+}
+
+.ox-prefs-btn:hover {
+  border-color: var(--ice-border-hover);
+  filter: none;
+  background: var(--ice-highlight-soft);
+}
+
+.ox-prefs-btn:focus-visible {
+  outline: 2px solid var(--ice-highlight);
+  outline-offset: 2px;
+}
+
+.ox-prefs-lang-code {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+
+.ox-prefs-dropdown {
+  position: fixed;
+  min-width: 176px;
+  padding: 0.4rem;
+  border-radius: 12px;
+  border: 1px solid var(--ice-border);
+  background: var(--prefs-menu-bg);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--ice-glass-shadow);
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ox-prefs-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 36px;
+  padding: 0.5rem 0.7rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ice-text);
+  font-size: 0.85rem;
+  text-align: left;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.ox-prefs-item:hover {
+  background: var(--ice-highlight-soft);
+  filter: none;
+}
+
+.ox-prefs-item.is-active {
+  background: rgba(0, 120, 212, 0.16);
+  font-weight: 600;
+}
+
+html[data-theme="light"] .ox-glass {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.94) 0%,
+    rgba(238, 246, 252, 0.88) 55%,
+    rgba(255, 255, 255, 0.82) 100%
+  );
+  border: 1px solid rgba(30, 80, 115, 0.16);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 8px 24px rgba(20, 50, 80, 0.07);
+}
+
+html[data-theme="light"] .ox-badge--neutral {
+  background: rgba(20, 50, 70, 0.08);
+  color: #0b2233;
+  border-color: rgba(30, 80, 115, 0.18);
+}
+
+html[data-theme="light"] .ox-btn-ghost {
+  background: rgba(255, 255, 255, 0.85);
+  color: #0b2233;
+  border-color: rgba(30, 80, 115, 0.22);
+}
+
+html[data-theme="light"] .ox-btn-ghost:hover {
+  background: #ffffff;
+  color: var(--brand);
+  border-color: var(--brand);
+  box-shadow: 0 4px 14px rgba(0, 120, 212, 0.15);
+}
+
+/* ——— Component Surfaces & Metric Tokens ——— */
+.ox-hero-card {
+  background: var(--ice-hero-bg);
+  border: 1px solid var(--ice-hero-border);
+  color: var(--ice-hero-text);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--ice-glass-shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+.ox-hero-card-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--ice-hero-text);
+}
+
+.ox-hero-card-sub {
+  font-size: 0.85rem;
+  color: var(--ice-hero-text-muted);
+  margin-top: 4px;
+}
+
+.ox-modal-box {
+  background: var(--ice-modal-bg);
+  border: 1px solid var(--ice-modal-border);
+  color: var(--ice-text);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+  border-radius: 16px;
+}
+
+.ox-card-row {
+  background: var(--ice-card-inner);
+  border: 1px solid var(--ice-card-inner-border);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.ox-card-row:hover {
+  border-color: var(--ice-border-hover);
+}
+
+.ox-metric-val {
+  font-weight: 800;
+  color: var(--ice-text-strong);
+  line-height: 1.15;
+}
+
+/* ——— Chat View Responsive Layout ——— */
+.ox-chat-container {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 0;
+  height: calc(100vh - 120px);
+  height: calc(100dvh - 110px);
+  background: var(--ice-chat-container-bg, #0c1520);
+  border: 1px solid var(--ice-chat-container-border, rgba(160, 210, 230, 0.16));
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--ice-chat-container-shadow, 0 10px 40px rgba(0, 0, 0, 0.3));
+}
+
+.ox-chat-sidebar {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--ice-chat-sidebar-border, rgba(160, 210, 230, 0.12));
+  background: var(--ice-chat-sidebar-bg, #081018);
+  height: 100%;
+  min-width: 0;
+}
+
+.ox-chat-pane {
+  display: flex;
+  flex-direction: column;
+  background: var(--ice-chat-pane-bg, #0c1520);
+  height: 100%;
+  min-width: 0;
+}
+
+.ox-chat-pane-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--ice-chat-sidebar-border, rgba(160, 210, 230, 0.12));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--ice-chat-header-bg, #0e1824);
+  gap: 8px;
+}
+
+.ox-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--ice-chat-messages-bg, #070e16);
+}
+
+.ox-chat-composer {
+  padding: 14px 18px;
+  border-top: 1px solid var(--ice-chat-sidebar-border, rgba(160, 210, 230, 0.12));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--ice-chat-composer-bg, #0e1824);
+}
+
+.ox-chat-back-btn {
+  display: none !important;
+}
+
+/* Hide onboarding guide and fab on chat page so it never covers mobile buttons */
+body:has(.ox-chat-container) .ox-onboarding,
+body:has(.ox-chat-container) .ox-onboarding-fab {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .ox-content:has(.ox-chat-container) {
+    padding: 0.25rem 0.35rem 0.5rem !important;
+  }
+
+  .ox-chat-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 75px);
+    border-radius: 12px;
+    margin: 0;
+    width: 100% !important;
+    max-width: 100vw !important;
+  }
+
+  .ox-chat-sidebar {
+    border-right: none;
+  }
+
+  .ox-chat-container.show-list .ox-chat-sidebar {
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .ox-chat-container.show-list .ox-chat-pane {
+    display: none !important;
+  }
+
+  .ox-chat-container.show-chat .ox-chat-sidebar {
+    display: none !important;
+  }
+  .ox-chat-container.show-chat .ox-chat-pane {
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .ox-chat-pane-header {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  .ox-chat-messages {
+    padding: 12px 10px;
+    gap: 10px;
+  }
+
+  .ox-chat-composer {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .ox-chat-back-btn {
+    display: inline-flex !important;
+  }
+
+  .ox-header-desktop-only {
+    display: none !important;
+  }
+
+  .ox-header-title {
+    font-size: 1.15rem !important;
+  }
+}
+
+/* ========================================================================= */
+/* MODALS & OVERLAYS SYSTEM (OX-MODAL) */
+/* ========================================================================= */
+.ox-modal-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.78) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 99999 !important;
+  padding: 1rem !important;
+  overflow-y: auto !important;
+  animation: oxFadeIn 0.2s ease-out;
+}
+
+.ox-modal {
+  position: relative !important;
+  background: var(--ice-bg-mid, #0c1a24) !important;
+  border: 1px solid var(--ice-border, rgba(160, 210, 230, 0.25)) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 120, 212, 0.15) !important;
+  color: var(--ice-text, #e8f2f8) !important;
+  width: 100% !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  animation: oxScaleUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes oxFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes oxScaleUp {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+

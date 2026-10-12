@@ -1,0 +1,13 @@
+node_modules
+.next
+.vercel
+.env
+.env*.local
+*.db
+*.db-journal
+*.db-wal
+.DS_Store
+dist
+coverage
+
+.vercel

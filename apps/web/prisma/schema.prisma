@@ -1,0 +1,809 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Site {
+  id        String            @id @default(cuid())
+  name      String
+  code      String            @unique
+  address   String?
+  city      String            @default("Cotonou")
+  createdAt DateTime          @default(now())
+  vehicles  Vehicle[]
+  stations  ChargingStation[]
+  users     User[]
+  expenses  Expense[]
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  passwordHash  String
+  fullName      String
+  role          String
+  active        Boolean        @default(true)
+  visiblePassword String?
+  lastPasswordChange DateTime?
+  customPermissions String[]   @default([])
+  lastSeenAt        DateTime?
+  siteId        String?
+  site          Site?          @relation(fields: [siteId], references: [id])
+  installerId   String?
+  installer     Installer?     @relation(fields: [installerId], references: [id])
+  employeeId    String?        @unique
+  employee      Employee?      @relation(fields: [employeeId], references: [id])
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  assignedLeads Lead[]         @relation("LeadAssignee")
+  opportunities Opportunity[]  @relation("OppOwner")
+  workOrders    WorkOrder[]    @relation("Technician")
+  tasks         Task[]
+}
+
+model Customer {
+  id               String                 @id @default(cuid())
+  companyName      String?
+  contactName      String
+  email            String?
+  phone            String?
+  city             String?                @default("Cotonou")
+  address          String?
+  ifu              String?
+  category         String?
+  active           Boolean                @default(true)
+  notes            String?
+  showroomNotes    String?
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+  documents        CustomerDocument[]
+  leads            Lead[]
+  opportunities    Opportunity[]
+  quotes           Quote[]
+  invoices         Invoice[]
+  rentals          Rental[]
+  installRequests  ChargeInstallRequest[]
+  subscriptions    ChargingSubscription[]
+  chargingInvoices ChargingInvoice[]
+  mailMessages     MailMessage[]
+  fleetVehicles    FleetVehicle[]
+  importOrders     ImportOrder[]
+  workshopEntries  WorkshopEntry[]
+}
+
+model CustomerDocument {
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  title      String
+  docType    String
+  fileName   String
+  fileSize   Int?
+  fileUrl    String
+  mimeType   String?
+  status     String   @default("VALIDE")
+  notes      String?
+  uploadedAt DateTime @default(now())
+}
+
+model Lead {
+  id            String         @id @default(cuid())
+  source        String         @default("showroom")
+  status        String         @default("NEW")
+  contactName   String
+  email         String?
+  phone         String?
+  interest      String?
+  energyPref    String?
+  budgetMin     Int?
+  budgetMax     Int?
+  notes         String?
+  customerId    String?
+  customer      Customer?      @relation(fields: [customerId], references: [id])
+  assigneeId    String?
+  assignee      User?          @relation("LeadAssignee", fields: [assigneeId], references: [id])
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  opportunities Opportunity[]
+}
+
+model VehicleBrand {
+  id        String         @id @default(cuid())
+  name      String         @unique
+  active    Boolean        @default(true)
+  sortOrder Int            @default(0)
+  createdAt DateTime       @default(now())
+  models    VehicleModel[]
+}
+
+model VehicleModel {
+  id          String       @id @default(cuid())
+  brandId     String
+  brand       VehicleBrand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  name        String
+  /// SUV | PICKUP | BERLINE | VAN
+  vehicleType String?
+  energy      String?
+  active      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+
+  @@unique([brandId, name])
+}
+
+/// Fournisseur véhicule / port d'import (Anvers, Dubaï, Livourne, dealer…).
+model Supplier {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  country      String?
+  city         String?
+  contact      String?
+  email        String?
+  phone        String?
+  notes        String?
+  /// IMPORT_PORT | DEALER | OTHER
+  type         String        @default("OTHER")
+  active       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  vehicles     Vehicle[]
+  importOrders ImportOrder[]
+}
+
+model Vehicle {
+  id            String         @id @default(cuid())
+  vin           String?        @unique
+  brand         String
+  model         String
+  variant       String?
+  year          Int?
+  energy        String
+  /// SUV | PICKUP | BERLINE | VAN — copie catalogue à l'entrée stock
+  vehicleType   String?
+  transmission  String?
+  color         String?
+  mileage       Int            @default(0)
+  priceXof      Int
+  costXof       Int?
+  status        String         @default("EN_STOCK")
+  siteId        String?
+  site          Site?          @relation(fields: [siteId], references: [id])
+  supplierId    String?
+  supplier      Supplier?      @relation(fields: [supplierId], references: [id])
+  description   String?
+  technicalSheetJson String?
+  mainPhotoUrl       String?
+  interiorPhotoUrl   String?
+  exteriorPhotoUrl   String?
+  rearPhotoUrl       String?
+  hasTechSheet       Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  opportunities Opportunity[]
+  quoteLines    QuoteLine[]
+  rentals       Rental[]
+  workOrders      WorkOrder[]
+  fleetLinks      FleetVehicle[]
+  importOrderId   String?
+  importOrder     ImportOrder?   @relation(fields: [importOrderId], references: [id])
+  workshopEntries WorkshopEntry[]
+}
+
+model Opportunity {
+  id         String      @id @default(cuid())
+  title      String
+  stage      String      @default("LEAD")
+  customerId String?
+  customer   Customer?   @relation(fields: [customerId], references: [id])
+  leadId     String?
+  lead       Lead?       @relation(fields: [leadId], references: [id])
+  vehicleId  String?
+  vehicle    Vehicle?    @relation(fields: [vehicleId], references: [id])
+  ownerId    String?
+  owner      User?       @relation("OppOwner", fields: [ownerId], references: [id])
+  amountXof  Int?
+  notes      String?
+  closedAt   DateTime?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  quotes     Quote[]
+  testDrives TestDrive[]
+}
+
+model TestDrive {
+  id            String      @id @default(cuid())
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id])
+  scheduledAt   DateTime
+  completed     Boolean     @default(false)
+  feedback      String?
+  createdAt     DateTime    @default(now())
+}
+
+/// Proforma / bon de commande commercial.
+/// Statuts: BROUILLON → PROFORMA_ENVOYEE → COMMANDE_CONFIRMEE → FACTURE_NORMALISEE
+/// Annulation client unilatérale interdite après envoi/confirmation.
+/// Annulation staff uniquement: ANNULEE_INTERNE (+ motif + audit).
+model Quote {
+  id               String       @id @default(cuid())
+  number           String       @unique
+  status           String       @default("BROUILLON")
+  docKind          String       @default("PROFORMA")
+  customerId       String
+  customer         Customer     @relation(fields: [customerId], references: [id])
+  opportunityId    String?
+  opportunity      Opportunity? @relation(fields: [opportunityId], references: [id])
+  validUntil       DateTime?
+  /// HT = prix saisis hors taxe ; TTC = prix saisis toutes taxes comprises
+  taxMode          String       @default("HT")
+  taxRatePct       Float        @default(0)
+  subtotalHtXof    Int          @default(0)
+  taxXof           Int          @default(0)
+  totalXof         Int          @default(0)
+  notes            String?
+  cgvType          String       @default("VEHICULE")
+  customCgv        String?
+  sentAt           DateTime?
+  emailSentAt      DateTime?
+  emailTo          String?
+  approvedAt       DateTime?
+  orderConfirmedAt DateTime?
+  cancelReason     String?
+  cancelledAt      DateTime?
+  cancelledByName  String?
+  auditNotes       String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  lines            QuoteLine[]
+  invoice          Invoice?
+}
+
+model QuoteLine {
+  id           String   @id @default(cuid())
+  quoteId      String
+  quote        Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  description  String
+  quantity     Int      @default(1)
+  unitPriceXof Int
+  vehicleId    String?
+  vehicle      Vehicle? @relation(fields: [vehicleId], references: [id])
+}
+
+model Invoice {
+  id           String    @id @default(cuid())
+  number       String    @unique
+  status       String    @default("BROUILLON")
+  /// NORMALISEE = facture fiscale ; PROFORMA = rare / legacy
+  kind         String    @default("NORMALISEE")
+  customerId   String
+  customer     Customer  @relation(fields: [customerId], references: [id])
+  quoteId      String?   @unique
+  quote        Quote?    @relation(fields: [quoteId], references: [id])
+  dueDate      DateTime?
+  taxMode      String    @default("HT")
+  taxRatePct   Float     @default(0)
+  subtotalHtXof Int      @default(0)
+  taxXof       Int       @default(0)
+  totalXof     Int       @default(0)
+  paidXof      Int       @default(0)
+  notes        String?
+  cgvType      String    @default("VEHICULE")
+  customCgv    String?
+  cancelReason String?
+  cancelledAt  DateTime?
+  cancelledByName String?
+  mecefNim        String?
+  mecefCode       String?
+  mecefQrCode     String?
+  mecefCounters   String?
+  mecefDateTime   DateTime?
+  isFiscalCertified Boolean @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  payments     Payment[]
+  rental       Rental?
+  workOrder    WorkOrder?
+}
+
+model Payment {
+  id        String   @id @default(cuid())
+  invoiceId String
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id])
+  amountXof Int
+  method    String   @default("VIREMENT")
+  reference String?
+  paidAt    DateTime @default(now())
+  notes     String?
+  createdAt DateTime @default(now())
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  title       String
+  done        Boolean   @default(false)
+  dueAt       DateTime?
+  assigneeId  String?
+  assignee    User?     @relation(fields: [assigneeId], references: [id])
+  relatedType String?
+  relatedId   String?
+  createdAt   DateTime  @default(now())
+}
+
+model Rental {
+  id         String    @id @default(cuid())
+  type       String
+  status     String    @default("BROUILLON")
+  customerId String
+  customer   Customer  @relation(fields: [customerId], references: [id])
+  vehicleId  String
+  vehicle    Vehicle   @relation(fields: [vehicleId], references: [id])
+  startDate  DateTime
+  endDate    DateTime?
+  monthlyXof Int?
+  depositXof Int?
+  invoiceId  String?   @unique
+  invoice    Invoice?  @relation(fields: [invoiceId], references: [id])
+  notes      String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model FleetAccount {
+  id        String         @id @default(cuid())
+  name      String
+  company   String?
+  notes     String?
+  createdAt DateTime       @default(now())
+  vehicles  FleetVehicle[]
+}
+
+model FleetVehicle {
+  id             String       @id @default(cuid())
+  fleetAccountId String
+  fleetAccount   FleetAccount @relation(fields: [fleetAccountId], references: [id])
+  vehicleId      String?
+  vehicle        Vehicle?     @relation(fields: [vehicleId], references: [id])
+  customerId     String?
+  customer       Customer?    @relation(fields: [customerId], references: [id])
+  plateNumber    String?
+  driverName     String?
+  active         Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+}
+
+model WorkOrder {
+  id           String    @id @default(cuid())
+  number       String    @unique
+  status       String    @default("OUVERT")
+  vehicleId    String?
+  vehicle      Vehicle?  @relation(fields: [vehicleId], references: [id])
+  customerName String?
+  description  String
+  diagnosis    String?
+  laborXof     Int       @default(0)
+  partsXof     Int       @default(0)
+  technicianId String?
+  technician   User?     @relation("Technician", fields: [technicianId], references: [id])
+  invoiceId    String?   @unique
+  invoice      Invoice?  @relation(fields: [invoiceId], references: [id])
+  openedAt      DateTime       @default(now())
+  closedAt      DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  workshopEntry WorkshopEntry?
+}
+
+model ImportOrder {
+  id            String     @id @default(cuid())
+  reference     String     @unique
+  originPort    String
+  status        String     @default("COMMANDE")
+  etaDate       DateTime?
+  customerId    String?
+  customer      Customer?  @relation(fields: [customerId], references: [id])
+  supplierId    String?
+  supplier      Supplier?  @relation(fields: [supplierId], references: [id])
+  costXof       Int?
+  /// Marque / modèle attendus (notes catalogue)
+  expectedBrand String?
+  expectedModel String?
+  notes         String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  vehicles      Vehicle[]
+}
+
+model Installer {
+  id          String           @id @default(cuid())
+  companyName String
+  contactName String
+  email       String?
+  phone       String?
+  city        String?          @default("Cotonou")
+  specialties String?
+  active      Boolean          @default(true)
+  rating      Float?
+  createdAt   DateTime         @default(now())
+  users       User[]
+  quotes      InstallerQuote[]
+}
+
+model ChargeInstallRequest {
+  id              String           @id @default(cuid())
+  status          String           @default("NOUVELLE")
+  customerId      String
+  customer        Customer         @relation(fields: [customerId], references: [id])
+  address         String
+  city            String           @default("Cotonou")
+  powerKw         Float?
+  vehicleBrand    String?
+  vehicleModel    String?
+  notes           String?
+  preferredAt     DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  installerQuotes InstallerQuote[]
+}
+
+model InstallerQuote {
+  id          String               @id @default(cuid())
+  requestId   String
+  request     ChargeInstallRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  installerId String
+  installer   Installer            @relation(fields: [installerId], references: [id])
+  status      String               @default("EN_ATTENTE")
+  amountXof   Int?
+  leadDays    Int?
+  notes       String?
+  submittedAt DateTime?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@unique([requestId, installerId])
+}
+
+model ChargingPlan {
+  id                String                 @id @default(cuid())
+  name              String
+  description       String?
+  monthlyFeeXof     Int                    @default(0)
+  kwhPriceXof       Int
+  publicKwhPriceXof Int                    @default(125)
+  active            Boolean                @default(true)
+  createdAt         DateTime               @default(now())
+  subscriptions     ChargingSubscription[]
+}
+
+model ChargingSubscription {
+  id         String       @id @default(cuid())
+  customerId String
+  customer   Customer     @relation(fields: [customerId], references: [id])
+  planId     String
+  plan       ChargingPlan @relation(fields: [planId], references: [id])
+  active     Boolean      @default(true)
+  startedAt  DateTime     @default(now())
+  endsAt     DateTime?
+  createdAt  DateTime     @default(now())
+}
+
+model ChargingStation {
+  id         String            @id @default(cuid())
+  code       String            @unique
+  name       String
+  address    String?
+  siteId     String?
+  site       Site?             @relation(fields: [siteId], references: [id])
+  powerKw    Float?
+  active     Boolean           @default(true)
+  terminalId String?           @unique
+  createdAt  DateTime          @default(now())
+  sessions   ChargingSession[]
+}
+
+model ChargingSession {
+  id            String           @id @default(cuid())
+  stationId     String
+  station       ChargingStation  @relation(fields: [stationId], references: [id])
+  customerId    String?
+  status        String           @default("EN_COURS")
+  kwhDelivered  Float            @default(0)
+  pricePerKwh   Int
+  totalXof      Int              @default(0)
+  paymentMethod String?
+  paymentRef    String?
+  startedAt     DateTime         @default(now())
+  endedAt       DateTime?
+  invoice       ChargingInvoice?
+}
+
+model ChargingInvoice {
+  id         String          @id @default(cuid())
+  number     String          @unique
+  status     String          @default("OUVERTE")
+  customerId String?
+  customer   Customer?       @relation(fields: [customerId], references: [id])
+  sessionId  String          @unique
+  session    ChargingSession @relation(fields: [sessionId], references: [id])
+  totalXof   Int
+  paidAt     DateTime?
+  createdAt  DateTime        @default(now())
+}
+
+
+model Article {
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  unitPriceXof Int
+  taxRatePct   Float    @default(0)
+  unit         String?  @default("1")
+  category     String?  @default("SERVICE")
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model MailMessage {
+  id         String    @id @default(cuid())
+  folder     String    @default("INBOX")
+  from       String
+  to         String
+  subject    String
+  snippet    String?
+  body       String
+  isRead     Boolean   @default(false)
+  starred    Boolean   @default(false)
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  quoteId    String?
+  invoiceId  String?
+  createdAt  DateTime  @default(now())
+}
+
+model WorkshopEntry {
+  id                     String     @id @default(cuid())
+  entryDate              String?
+  entryTime              String?
+  orNumber               String?
+  immatriculation        String
+  chassis                String?
+  brand                  String?
+  model                  String?
+  mileage                Int?
+  clientName             String
+  clientType             String?    @default("Client")
+  fuelLevel              String?
+  phone                  String?
+  receptionist           String?
+  immobilizationDuration String?
+  observations           String?
+  presenceSav            String?    @default("NON")
+  statusCode             String     @default("C")
+  endWorksAt             String?
+  executionDuration      String?
+  worksDone              String?
+  exitDate               String?
+  exitTime               String?
+  deliverer              String?
+  paymentMode            String?
+  customerId             String?
+  customer               Customer?  @relation(fields: [customerId], references: [id])
+  vehicleId              String?
+  vehicle                Vehicle?   @relation(fields: [vehicleId], references: [id])
+  workOrderId            String?    @unique
+  workOrder              WorkOrder? @relation(fields: [workOrderId], references: [id])
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
+}
+
+model AdminNotification {
+  id          String    @id @default(cuid())
+  type        String    @default("PASSWORD_CHANGED") // PASSWORD_CHANGED, BROADCAST, CALL, etc.
+  title       String
+  message     String
+  userId      String?
+  userName    String?
+  oldValue    String?
+  newValue    String?
+  readBy      String[]  @default([])
+  createdAt   DateTime  @default(now())
+}
+
+model ChatMessage {
+  id           String    @id @default(cuid())
+  senderId     String
+  senderName   String
+  senderRole   String?
+  receiverId   String?   // null for channel/broadcast, or specific userId for 1-to-1
+  channel      String?   @default("GENERAL") // "GENERAL", "WORKSHOP", "COMMERCIAL", "DIRECT", "BROADCAST"
+  recipientIds String[]  @default([]) // For multi-user broadcast / group selection
+  content      String
+  sticker      String?   // Sticker name / code or emoji
+  reactions    Json?     @default("{}") // e.g. { "👍": ["userId1"], "❤️": ["userId2"] }
+  isBroadcast  Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+}
+
+model CallSession {
+  id            String    @id @default(cuid())
+  callerId      String
+  callerName    String
+  callerRole    String?
+  receiverId    String
+  receiverName  String
+  status        String    @default("RINGING") // "RINGING", "ACCEPTED", "REJECTED", "ENDED"
+  offerSdp      String?   @db.Text
+  answerSdp     String?   @db.Text
+  iceCandidates Json?     @default("[]")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+// ==========================================
+// RESSOURCES HUMAINES (GRH) & GESTION DU PERSONNEL
+// ==========================================
+
+model Employee {
+  id                String             @id @default(cuid())
+  employeeNumber    String             @unique
+  firstName         String
+  lastName          String
+  gender            String?            // "M", "F"
+  email             String?
+  phone             String?
+  address           String?
+  city              String?            @default("Cotonou")
+  birthDate         DateTime?
+  hireDate          DateTime           @default(now())
+  jobTitle          String             // Poste occupé
+  departmentId      String?
+  department        Department?        @relation(fields: [departmentId], references: [id])
+  contractType      String             @default("CDI") // "CDI", "CDD", "STAGE", "PRESTATION", "ESSAI"
+  contractStart     DateTime?
+  contractEnd       DateTime?
+  baseSalaryXof     Int?               // Salaire de base XOF
+  status            String             @default("ACTIF") // "ACTIF", "CONGE", "SUSPENDU", "DEMISSION", "LICENCIE"
+  emergencyContact  String?            // Nom & Tél contact d'urgence
+  cnssNumber        String?            // N° Sécurité Sociale CNSS Bénin
+  ifuNumber         String?            // N° IFU individuel
+  bankName          String?            // Banque (BOA, Ecobank, etc.)
+  bankAccountNumber String?            // N° compte bancaire
+  notes             String?
+  user              User?
+  leaveRequests     LeaveRequest[]
+  leaveBalances     LeaveBalance[]
+  documents         EmployeeDocument[]
+  salaryPayments    SalaryPayment[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+}
+
+model Department {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  code        String     @unique
+  description String?
+  color       String?    @default("#38bdf8")
+  employees   Employee[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model LeaveType {
+  id                 String         @id @default(cuid())
+  name               String         @unique
+  code               String         @unique
+  daysAllowedPerYear Int            @default(24) // 24 jours ouvrables (Code du travail béninois)
+  isPaid             Boolean        @default(true)
+  color              String         @default("#38bdf8")
+  leaveRequests      LeaveRequest[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+}
+
+model LeaveRequest {
+  id              String    @id @default(cuid())
+  employeeId      String
+  employee        Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  leaveTypeId     String
+  leaveType       LeaveType @relation(fields: [leaveTypeId], references: [id])
+  startDate       DateTime
+  endDate         DateTime
+  daysCount       Float     @default(1)
+  reason          String?
+  status          String    @default("EN_ATTENTE") // "EN_ATTENTE", "APPROUVE", "REFUSE", "ANNULE"
+  rejectionReason String?
+  approvedBy      String?   // Nom ou rôle du valideur
+  approvedAt      DateTime?
+  attachmentUrl   String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model LeaveBalance {
+  id            String   @id @default(cuid())
+  employeeId    String
+  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  year          Int      @default(2026)
+  leaveTypeCode String   @default("ANNUEL")
+  allocatedDays Float    @default(24)
+  usedDays      Float    @default(0)
+  remainingDays Float    @default(24)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([employeeId, year, leaveTypeCode])
+}
+
+model EmployeeDocument {
+  id         String   @id @default(cuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  title      String
+  docType    String   @default("CONTRAT") // "CONTRAT", "CV", "PIECE_IDENTITE", "DIPLOME", "BULLETIN", "AUTRE"
+  fileUrl    String
+  fileSize   Int?
+  uploadedAt DateTime @default(now())
+}
+
+/// Suivi des paiements de salaires mensuels (Livre de paie / Comptabilité & RH)
+model SalaryPayment {
+  id              String    @id @default(cuid())
+  employeeId      String
+  employee        Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  month           Int       // 1 à 12
+  year            Int       // ex: 2026
+  amountXof       Int       // Montant net payé en FCFA
+  paymentDate     DateTime  @default(now())
+  paymentMethod   String    @default("VIREMENT") // "VIREMENT", "CHEQUE", "ESPECES", "MOBILE_MONEY"
+  reference       String?   // N° virement, n° chèque
+  status          String    @default("PAYE") // "PAYE", "EN_ATTENTE"
+  notes           String?
+  paidByUserId    String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([employeeId, year, month])
+}
+
+/// Dépenses d'exploitation, factures prestataires & bons de commande
+model Expense {
+  id               String    @id @default(cuid())
+  expenseNumber    String    @unique // e.g. "DEP-2026-001" ou "BC-2026-001"
+  category         String    // "PRESTATAIRE_SERVICE", "ELECTRICITE_SBEE", "EAU_SONEB", "LOYER", "INTERNET_TELECOM", "CARBURANT", "ENTRETIEN_BATIMENT", "FOURNITURES", "ACHAT_IMPORT", "AUTRE"
+  title            String    // ex: "Installation & Maintenance Climatisation Showroom", "Facture SBEE"
+  description      String?
+  supplierName     String    // Nom du prestataire / fournisseur (ex: "Artisan Froid & Clim SARL", "SBEE", "MTN Bénin")
+  supplierPhone    String?
+  supplierEmail    String?
+  proformaRef      String?   // Référence de la proforma soumise par le prestataire
+  purchaseOrderNo  String?   // Numéro du Bon de Commande émis par l'entreprise
+  amountHtXof      Int       @default(0)
+  taxXof           Int       @default(0)
+  amountTtcXof     Int       // Montant TTC en FCFA
+  status           String    @default("A_PAYER") // "A_PAYER", "PAYE", "ANNULE"
+  paymentMethod    String?   // "VIREMENT", "CHEQUE", "ESPECES", "MOBILE_MONEY"
+  paymentDate      DateTime?
+  paymentReference String?   // N° de transaction / chèque
+  invoiceFileUrl   String?   // Pièce jointe / Facture ou Proforma du prestataire
+  serviceDate      DateTime  @default(now()) // Date de réalisation de la prestation
+  dueDate          DateTime?
+  siteId           String?
+  site             Site?     @relation(fields: [siteId], references: [id])
+  registeredBy     String?   // Utilisateur qui a saisi la dépense
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model SystemSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  category  String   @default("GENERAL") // "AI", "BILLING", "COMPANY", etc.
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}

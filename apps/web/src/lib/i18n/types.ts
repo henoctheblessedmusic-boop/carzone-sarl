@@ -1,0 +1,130 @@
+import type { Role } from "@/lib/roles";
+
+export type StepCopy = { label: string; hint: string };
+
+export type Messages = {
+  brand: {
+    name: string;
+    tagline: string;
+    subtitle: string;
+  };
+  nav: {
+    dashboard: string;
+    clients: string;
+    leads: string;
+    vehicles: string;
+    catalog: string;
+    opportunities: string;
+    quotes: string;
+    invoices: string;
+    rentals: string;
+    fleet: string;
+    workshop: string;
+    imports: string;
+    installers: string;
+    chargeRequests: string;
+    charging: string;
+    terminal: string;
+    services: string;
+    mailbox: string;
+    chat?: string;
+    users?: string;
+    hr?: string;
+    expenses?: string;
+    aria: string;
+  };
+  pages: {
+    dashboard: string;
+    clients: string;
+    leads: string;
+    vehicles: string;
+    catalog: string;
+    opportunities: string;
+    quotes: string;
+    invoices: string;
+    rentals: string;
+    fleet: string;
+    workshop: string;
+    imports: string;
+    installers: string;
+    chargeRequests: string;
+    charging: string;
+    services: string;
+    mailbox: string;
+    chat?: string;
+    users?: string;
+    hr?: string;
+    expenses?: string;
+  };
+  common: {
+    logout: string;
+    logoutTitle: string;
+    save: string;
+    cancel: string;
+    create: string;
+    search: string;
+    actions: string;
+    status: string;
+    loading: string;
+    back: string;
+    close: string;
+    yes: string;
+    no: string;
+  };
+  login: {
+    email: string;
+    password: string;
+    submit: string;
+    submitTitle: string;
+    error: string;
+    demo: string;
+    emailTitle: string;
+    passwordTitle: string;
+  };
+  theme: {
+    label: string;
+    dark: string;
+    light: string;
+    auto: string;
+    menuAria: string;
+  };
+  lang: {
+    label: string;
+    fr: string;
+    en: string;
+    menuAria: string;
+  };
+  roles: Record<Role, string>;
+  dashboard: {
+    firstStepsTitle: string;
+    firstStepsHint: string;
+    clients: string;
+    leads: string;
+    vehiclesInStock: string;
+    firmOrders: string;
+    openInvoices: string;
+    overdueHint: string;
+    openTasks: string;
+    chargeRequests: string;
+    chargingSessions: string;
+    recentInvoices: string;
+    recentLeads: string;
+    colNumber: string;
+    colClient: string;
+    colAmount: string;
+    colStatus: string;
+    colContact: string;
+    colSource: string;
+    colInterest: string;
+  };
+  onboarding: {
+    title: string;
+    fab: string;
+    fabTitle: string;
+    hide: string;
+    hideTitle: string;
+    intro: string;
+    dialogAria: string;
+    steps: Partial<Record<Role, Record<string, StepCopy>>> & { DG: Record<string, StepCopy> };
+  };
+};

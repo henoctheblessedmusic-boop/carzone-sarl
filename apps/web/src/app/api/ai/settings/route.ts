@@ -11,14 +11,14 @@ export async function GET() {
     }
     const masked = `${key.slice(0, 6)}...${key.slice(-4)}`;
     return NextResponse.json({ configured: true, maskedKey: masked });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Erreur" }, { status: 401 });
+  } catch (err: unknown) {
+    return NextResponse.json({ error: (err as Error)?.message || "Erreur" }, { status: 401 });
   }
 }
 
 export async function POST(req: Request) {
   try {
-    const user = await requireUser(["PDG", "DG", "ADMIN", "ADV", "RTA"]);
+    await requireUser(["PDG", "DG", "ADMIN", "ADV", "RTA"]);
     const body = await req.json();
     const apiKey = (body.apiKey || "").trim();
 
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
       message: "Clé OpenAI enregistrée et vérifiée avec succès.",
       maskedKey: `${apiKey.slice(0, 6)}...${apiKey.slice(-4)}`,
     });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Erreur" }, { status: 500 });
+  } catch (err: unknown) {
+    return NextResponse.json({ error: (err as Error)?.message || "Erreur" }, { status: 500 });
   }
 }

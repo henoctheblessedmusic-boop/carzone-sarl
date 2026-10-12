@@ -56,10 +56,10 @@ export async function POST(req: Request) {
       sheet: updatedSheet,
       vehicle: updatedVehicle,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Erreur génération fiche technique OpenAI:", err);
     return NextResponse.json(
-      { error: err.message || "Erreur interne lors de la génération avec OpenAI" },
+      { error: (err as Error)?.message || "Erreur interne lors de la génération avec OpenAI" },
       { status: 500 }
     );
   }

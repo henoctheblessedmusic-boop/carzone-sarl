@@ -53,8 +53,8 @@ export function TechSheetAIActions({
       setFeedback({ text: "✅ Fiche technique mise à jour avec succès via OpenAI !", isError: false });
       setShowModal(false);
       router.refresh();
-    } catch (err: any) {
-      setFeedback({ text: err.message || "Erreur inconnue", isError: true });
+    } catch (err: unknown) {
+      setFeedback({ text: (err as Error)?.message || "Erreur inconnue", isError: true });
     } finally {
       setLoading(false);
     }
@@ -84,8 +84,8 @@ export function TechSheetAIActions({
 
       // 2. Générer
       await handleGenerate(apiKeyInput.trim());
-    } catch (err: any) {
-      setFeedback({ text: err.message || "Erreur lors de l'enregistrement", isError: true });
+    } catch (err: unknown) {
+      setFeedback({ text: (err as Error)?.message || "Erreur lors de l'enregistrement", isError: true });
       setLoading(false);
     }
   };

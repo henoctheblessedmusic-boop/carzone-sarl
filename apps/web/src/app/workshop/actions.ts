@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { parseWorkshopExcel } from "@/lib/excel-workshop";
-import { REAL_WORKSHOP_RECORDS } from "@/lib/workshop-seed-data";
 
 const WORKSHOP_ALLOWED_ROLES = [
   "PDG",
@@ -286,74 +285,7 @@ export async function deleteWorkshopEntry(id: string) {
   revalidatePath("/workshop");
 }
 
-// Les données de démonstration réelles sont gérées dans @/lib/workshop-seed-data
 
 export async function seedRealWorkshopData() {
-  await requireUser([...WORKSHOP_ALLOWED_ROLES]);
-
-  const count = await prisma.workshopEntry.count();
-  if (count > 0) {
-    return { success: true, message: `La base contient déjà ${count} passages.` };
-  }
-
-  for (const row of REAL_WORKSHOP_RECORDS) {
-    let customer = await prisma.customer.findFirst({
-      where: { contactName: { equals: row.clientName, mode: "insensitive" } },
-    });
-    if (!customer) {
-      customer = await prisma.customer.create({
-        data: {
-          contactName: row.clientName,
-          phone: row.phone || null,
-          category: row.clientType === "Interne" ? "Interne" : "Particulier",
-          city: "Cotonou",
-        },
-      });
-    }
-
-    let vehicle = null;
-    if (row.chassis) {
-      vehicle = await prisma.vehicle.findFirst({
-        where: { vin: row.chassis },
-      });
-    }
-    // Règle Métier : les véhicules d'atelier ne sont jamais injectés dans le stock.
-
-    await prisma.workshopEntry.create({
-      data: {
-        entryDate: row.entryDate || null,
-        entryTime: row.entryTime || null,
-        orNumber: row.orNumber || null,
-        immatriculation: row.immatriculation,
-        chassis: row.chassis || null,
-        brand: row.brand || null,
-        model: row.model || null,
-        mileage: row.mileage || null,
-        clientName: row.clientName,
-        clientType: row.clientType || "Client",
-        fuelLevel: row.fuelLevel || null,
-        phone: row.phone || null,
-        receptionist: row.receptionist || null,
-        immobilizationDuration: row.immobilizationDuration || null,
-        observations: row.observations || null,
-        presenceSav: row.presenceSav || "NON",
-        statusCode: row.statusCode || "C",
-        endWorksAt: row.endWorksAt || null,
-        executionDuration: row.executionDuration || null,
-        worksDone: row.worksDone || null,
-        exitDate: row.exitDate || null,
-        exitTime: row.exitTime || null,
-        deliverer: row.deliverer || null,
-        paymentMode: row.paymentMode || null,
-        customerId: customer.id,
-        vehicleId: vehicle ? vehicle.id : null,
-      },
-    });
-  }
-
-  revalidatePath("/workshop");
-  revalidatePath("/clients");
-  revalidatePath("/vehicles");
-
-  return { success: true, count: REAL_WORKSHOP_RECORDS.length };
+  return { success: false, message: "Le chargement de données de test est désactivé sur Carzone." };
 }

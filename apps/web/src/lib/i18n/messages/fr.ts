@@ -3,8 +3,8 @@ import type { Messages } from "../types";
 export const fr: Messages = {
   brand: {
     name: "CARZONE",
-    tagline: "SARL · Cotonou",
-    subtitle: "Showroom Automobile & SAV Multimarques",
+    tagline: "DRIVE YOUR DREAM",
+    subtitle: "Concession de Véhicules Multi Marques · +229 01 92 61 61 61",
   },
   nav: {
     dashboard: "Tableau de bord",
@@ -18,6 +18,7 @@ export const fr: Messages = {
     rentals: "Location",
     fleet: "Flotte",
     workshop: "Atelier",
+    parts: "Pièces & Références",
     imports: "Import",
     installers: "Installateurs bornes",
     chargeRequests: "Devis bornes",
@@ -43,6 +44,7 @@ export const fr: Messages = {
     rentals: "Location (LCD / LLD / LOA)",
     fleet: "Gestion de flotte",
     workshop: "Atelier SAV",
+    parts: "Gestion des Pièces & Références Croisées",
     imports: "Import / logistique",
     installers: "Panel installateurs bornes",
     chargeRequests: "Devis installation borne",

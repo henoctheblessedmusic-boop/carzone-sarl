@@ -181,6 +181,11 @@ model Vehicle {
   exteriorPhotoUrl   String?
   rearPhotoUrl       String?
   hasTechSheet       Boolean        @default(false)
+  shippingOriginPort String?
+  etaDate            DateTime?
+  containerNumber    String?
+  orderReference     String?
+  productionWeek     String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   opportunities Opportunity[]
@@ -395,6 +400,7 @@ model WorkOrder {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   workshopEntry WorkshopEntry?
+  partUsages    WorkOrderPartUsage[]
 }
 
 model ImportOrder {
@@ -596,6 +602,7 @@ model WorkshopEntry {
   vehicle                Vehicle?   @relation(fields: [vehicleId], references: [id])
   workOrderId            String?    @unique
   workOrder              WorkOrder? @relation(fields: [workOrderId], references: [id])
+  partUsages             WorkOrderPartUsage[]
   createdAt              DateTime   @default(now())
   updatedAt              DateTime   @updatedAt
 }
@@ -807,3 +814,96 @@ model SystemSetting {
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
 }
+
+// ==============================================================
+// GESTION DES PIÈCES DÉTACHÉES, RÉFÉRENCES CROISÉES & COMPATIBILITÉS
+// ==============================================================
+
+model PartItem {
+  id               String                 @id @default(cuid())
+  partNumber       String                 @unique // Réf interne ou code CARZONE (ex: CZ-BRK-35011)
+  oemNumber        String?                // Réf constructeur OEM d'origine (ex: 3501110-M01)
+  name             String                 // Désignation (ex: Plaquettes de frein avant / Patin)
+  category         String                 @default("FREINAGE") // FREINAGE, FILTRATION, SUSPENSION, MOTEUR, ELECTRICITE, CARROSSERIE, ECLAIRAGE, FLUIDES, AUTRE
+  manufacturer     String?                // Marque fabriquant (OEM Changan, Bosch, Brembo, Valeo, Torch, etc.)
+  description      String?
+  unit             String                 @default("JEU") // PIECE, JEU, PAIRE, LITRE, KIT
+  location         String?                // Emplacement magasin (ex: Rayon B - Casier 14)
+  stockQuantity    Int                    @default(0) // Quantité en stock physique
+  minStockAlert    Int                    @default(2) // Seuil d'alerte réapprovisionnement
+  purchasePriceXof Int                    @default(0) // Prix d'achat en FCFA
+  sellingPriceXof  Int                    @default(0) // Prix de vente public/atelier en FCFA
+  taxRatePct       Float                  @default(0)
+  active           Boolean                @default(true)
+  imageUrl         String?
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  crossReferences  PartCrossReference[]
+  compatibilities  PartCompatibility[]
+  movements        PartStockMovement[]
+  workOrderUsages  WorkOrderPartUsage[]
+}
+
+/// Références croisées (cross-references) : correspondances entre constructeurs et équipementiers
+model PartCrossReference {
+  id             String    @id @default(cuid())
+  partItemId     String
+  partItem       PartItem  @relation(fields: [partItemId], references: [id], onDelete: Cascade)
+  crossReference String    // Référence équivalente (ex: T15-3501080 ou 0 986 494 567)
+  brand          String    // Marque ou équipementier lié (JETOUR, CHERY, BOSCH, BREMBO, VALEO, etc.)
+  isDirectFit    Boolean   @default(true) // 100% interchangeable
+  notes          String?   // Remarque technique (ex: Même étrier de frein et même dimension)
+  createdAt      DateTime  @default(now())
+
+  @@index([crossReference])
+  @@index([brand])
+}
+
+/// Compatibilité Véhicule Multi-marques / Multi-modèles (pour recherche : quel patin va sur quel modèle ?)
+model PartCompatibility {
+  id             String    @id @default(cuid())
+  partItemId     String
+  partItem       PartItem  @relation(fields: [partItemId], references: [id], onDelete: Cascade)
+  vehicleBrand   String    // CHANGAN, JETOUR, CHERY, BAIC, FORTHING, BYD, GEELY, TOYOTA, KAIYI, EXEED
+  vehicleModel   String    // CS35 PLUS, DASHING, TIGGO 7, X55, etc.
+  years          String?   // Ex: "2021-2026"
+  engine         String?   // Ex: "1.4T / 1.5T"
+  position       String?   // Avant, Arrière, Gauche, Droite
+  notes          String?
+  createdAt      DateTime  @default(now())
+
+  @@index([vehicleBrand, vehicleModel])
+}
+
+/// Mouvements et traçabilité du stock pièces (Entrées, Sorties Atelier, Retours, Ajustements)
+model PartStockMovement {
+  id            String    @id @default(cuid())
+  partItemId    String
+  partItem      PartItem  @relation(fields: [partItemId], references: [id], onDelete: Cascade)
+  type          String    // ENTREE_ACHAT, SORTIE_ATELIER, RETOUR_STOCK, AJUSTEMENT_INVENTAIRE
+  quantity      Int       // Variation de quantité (+ ou -)
+  unitPriceXof  Int       @default(0)
+  totalPriceXof Int       @default(0)
+  referenceDoc  String?   // N° OR (ex: OR-2026-08), N° Bon de Commande ou Facture
+  reason        String?
+  performedBy   String?   // Utilisateur qui a opéré le mouvement
+  createdAt     DateTime  @default(now())
+}
+
+/// Pièces imputées sur un Ordre de Réparation / Entrée Atelier
+model WorkOrderPartUsage {
+  id              String         @id @default(cuid())
+  partItemId      String
+  partItem        PartItem       @relation(fields: [partItemId], references: [id])
+  workshopEntryId String?
+  workshopEntry   WorkshopEntry? @relation(fields: [workshopEntryId], references: [id], onDelete: Cascade)
+  workOrderId     String?
+  workOrder       WorkOrder?     @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  quantity        Int            @default(1)
+  unitPriceXof    Int            @default(0)
+  totalPriceXof   Int            @default(0)
+  notes           String?
+  createdAt       DateTime       @default(now())
+}
+

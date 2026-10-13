@@ -20,6 +20,7 @@ export type Messages = {
     rentals: string;
     fleet: string;
     workshop: string;
+    parts?: string;
     imports: string;
     installers: string;
     chargeRequests: string;
@@ -45,6 +46,7 @@ export type Messages = {
     rentals: string;
     fleet: string;
     workshop: string;
+    parts?: string;
     imports: string;
     installers: string;
     chargeRequests: string;

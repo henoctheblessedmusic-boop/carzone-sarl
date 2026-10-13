@@ -44,6 +44,12 @@ export async function createVehicle(formData: FormData) {
   }
 
   const supplierId = String(formData.get("supplierId") || "").trim() || null;
+  const status = String(formData.get("status") || "EN_MAGASIN").trim();
+  const shippingOriginPort = String(formData.get("shippingOriginPort") || "").trim() || null;
+  const etaDate = formData.get("etaDate") ? new Date(String(formData.get("etaDate"))) : null;
+  const containerNumber = String(formData.get("containerNumber") || "").trim() || null;
+  const orderReference = String(formData.get("orderReference") || "").trim() || null;
+  const productionWeek = String(formData.get("productionWeek") || "").trim() || null;
 
   const vehicle = await prisma.vehicle.create({
     data: {
@@ -55,9 +61,14 @@ export async function createVehicle(formData: FormData) {
       energy,
       vehicleType,
       priceXof: Number(formData.get("priceXof") || 0),
-      status: "EN_STOCK",
+      status,
       siteId: site?.id || siteIdInput || null,
       supplierId,
+      shippingOriginPort,
+      etaDate,
+      containerNumber,
+      orderReference,
+      productionWeek,
     },
   });
 
@@ -88,6 +99,21 @@ export async function regenerateVehicleTechSheetAction(vehicleId: string) {
   return res;
 }
 
+export async function quickChangeVehicleStatus(formData: FormData) {
+  await requireUser([...VEHICLE_MANAGERS]);
+  const id = String(formData.get("id") || "").trim();
+  const status = String(formData.get("status") || "EN_MAGASIN").trim();
+  if (!id) throw new Error("ID véhicule requis");
+
+  await prisma.vehicle.update({
+    where: { id },
+    data: { status },
+  });
+
+  revalidatePath("/vehicles");
+  revalidatePath("/dashboard");
+}
+
 export async function updateVehicle(formData: FormData) {
   await requireUser([...VEHICLE_MANAGERS]);
   const id = String(formData.get("id") || "").trim();
@@ -99,12 +125,17 @@ export async function updateVehicle(formData: FormData) {
   const energy = String(formData.get("energy") || "ESSENCE");
   const vehicleType = String(formData.get("vehicleType") || "").trim() || null;
   const priceXof = Number(formData.get("priceXof") || 0);
-  const status = String(formData.get("status") || "EN_STOCK");
+  const status = String(formData.get("status") || "EN_MAGASIN");
   const mileage = Number(formData.get("mileage") || 0);
   const color = String(formData.get("color") || "").trim() || null;
   const supplierId = String(formData.get("supplierId") || "").trim() || null;
   const rawSiteId = String(formData.get("siteId") || "").trim();
   const siteId = rawSiteId || null;
+  const shippingOriginPort = String(formData.get("shippingOriginPort") || "").trim() || null;
+  const etaDate = formData.get("etaDate") ? new Date(String(formData.get("etaDate"))) : null;
+  const containerNumber = String(formData.get("containerNumber") || "").trim() || null;
+  const orderReference = String(formData.get("orderReference") || "").trim() || null;
+  const productionWeek = String(formData.get("productionWeek") || "").trim() || null;
 
   await prisma.vehicle.update({
     where: { id },
@@ -120,6 +151,11 @@ export async function updateVehicle(formData: FormData) {
       color,
       supplierId,
       siteId,
+      shippingOriginPort,
+      etaDate,
+      containerNumber,
+      orderReference,
+      productionWeek,
     },
   });
 

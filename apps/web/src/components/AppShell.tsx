@@ -10,6 +10,7 @@ const navDefs = [
   { href: "/dashboard", roles: null as string[] | null },
   { href: "/clients", roles: null },
   { href: "/workshop", roles: ["PDG", "SG", "DG", "ADV", "RF", "RTA", "DC", "CHEF_ATELIER", "ASSISTANTE_COMPTABLE", "ATELIER", "COMPTA", "ADMIN"] },
+  { href: "/parts", roles: ["PDG", "SG", "DG", "ADV", "RF", "RTA", "DC", "CHEF_ATELIER", "ATELIER", "STOCK", "COMPTA", "ADMIN", "COMMERCIAL"] },
   { href: "/vehicles", roles: ["PDG", "SG", "DG", "ADV", "RF", "RTA", "DC", "COMMERCIAL", "HOTESSE", "CHEF_ATELIER", "ASSISTANTE_COMPTABLE", "STOCK", "COMPTA", "ADMIN"] },
   { href: "/quotes", roles: ["PDG", "SG", "DG", "ADV", "RF", "RTA", "DC", "COMMERCIAL", "HOTESSE", "CHEF_ATELIER", "ASSISTANTE_COMPTABLE", "COMPTA", "ADMIN"] },
   { href: "/invoices", roles: ["PDG", "SG", "DG", "ADV", "RF", "COMMERCIAL", "HOTESSE", "CHEF_ATELIER", "ASSISTANTE_COMPTABLE", "COMPTA", "ADMIN"] },
@@ -57,9 +58,7 @@ export async function AppShell({
       };
     });
 
-  const tagline = messages.brand.tagline.includes("·")
-    ? messages.brand.tagline.split("·")[0].trim()
-    : "Giani & Partners";
+  const tagline = "DRIVE YOUR DREAM";
 
   return (
     <AppShellClient

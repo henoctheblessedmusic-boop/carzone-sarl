@@ -55,6 +55,7 @@ export const NAV_KEYS_BY_HREF: Record<string, Exclude<NavKey, "aria">> = {
   "/rentals": "rentals",
   "/fleet": "fleet",
   "/workshop": "workshop",
+  "/parts": "parts",
   "/imports": "imports",
   "/installers": "installers",
   "/charge-requests": "chargeRequests",

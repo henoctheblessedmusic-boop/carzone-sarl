@@ -16,13 +16,13 @@ import {
   Trash2,
   RefreshCw,
   Phone,
+  Wrench,
 } from "lucide-react";
 import {
   importWorkshopExcel,
   createWorkshopEntry,
   updateWorkshopEntry,
   deleteWorkshopEntry,
-  seedRealWorkshopData,
 } from "./actions";
 
 export type WorkshopItem = {
@@ -342,19 +342,6 @@ export function WorkshopView({
     });
   };
 
-  const handleSeedReal = () => {
-    if (!confirm("Voulez-vous charger les 25+ passages réels de l'atelier issus du fichier Excel ?")) return;
-    startTransition(async () => {
-      try {
-        const res = await seedRealWorkshopData();
-        alert(res.message || `Chargement réussi : ${res.count} passages enregistrés dans la base !`);
-        window.location.reload();
-      } catch (err: unknown) {
-        alert(err instanceof Error ? err.message : "Erreur");
-      }
-    });
-  };
-
   const handleDelete = (id: string, immat: string) => {
     if (!confirm(`Supprimer le passage du véhicule ${immat} ?`)) return;
     startTransition(async () => {
@@ -487,6 +474,27 @@ export function WorkshopView({
             Gabarit
           </a>
 
+          {/* Lien direct Magasin Pièces & Réf. Croisées */}
+          <a
+            href="/parts"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "9px 14px",
+              borderRadius: 10,
+              border: "1px solid rgba(225, 29, 72, 0.4)",
+              background: "rgba(225, 29, 72, 0.12)",
+              color: "#fda4af",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            <Wrench size={16} />
+            Pièces & Réf. Croisées
+          </a>
+
           {/* Nouvelle Entrée */}
           <button
             onClick={() => {
@@ -512,29 +520,7 @@ export function WorkshopView({
             Nouvelle Entrée
           </button>
 
-          {/* Bouton restauration / injection rapide si vide */}
-          {entries.length === 0 && (
-            <button
-              onClick={handleSeedReal}
-              disabled={isPending}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "9px 14px",
-                borderRadius: 10,
-                border: "1px solid #c4a35a",
-                background: "rgba(196, 163, 90, 0.1)",
-                color: "#c4a35a",
-                fontSize: "0.85rem",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              <RefreshCw size={15} />
-              Charger données réelles atelier
-            </button>
-          )}
+          
         </div>
       </div>
 

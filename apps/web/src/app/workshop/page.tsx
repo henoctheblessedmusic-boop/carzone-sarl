@@ -2,7 +2,6 @@ import { AppShell } from "@/components/AppShell";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { WorkshopView, type WorkshopItem } from "./WorkshopView";
-import { REAL_WORKSHOP_RECORDS } from "@/lib/workshop-seed-data";
 
 export default async function WorkshopPage() {
   const user = await requireUser([
@@ -19,68 +18,6 @@ export default async function WorkshopPage() {
     "COMPTA",
     "ADMIN",
   ]);
-
-  const count = await prisma.workshopEntry.count();
-
-  // Auto-seed avec les 25+ passages réels de l'atelier issus du fichier Excel
-  if (count === 0) {
-    for (const row of REAL_WORKSHOP_RECORDS) {
-      let customer = await prisma.customer.findFirst({
-        where: { contactName: { equals: row.clientName, mode: "insensitive" } },
-      });
-      if (!customer) {
-        customer = await prisma.customer.create({
-          data: {
-            contactName: row.clientName,
-            phone: row.phone || null,
-            category: row.clientType === "Interne" ? "Interne" : "Particulier",
-            city: "Cotonou",
-            notes: "Importé depuis historique Excel atelier",
-          },
-        });
-      }
-
-      let vehicle = null;
-      if (row.chassis) {
-        vehicle = await prisma.vehicle.findFirst({
-          where: { vin: row.chassis },
-        });
-      }
-      // Règle Métier : Les véhicules immatriculés clients sont des réparations / prestations atelier,
-      // ils ne sont JAMAIS créés dans le stock concession (véhicules neufs de vente).
-
-      await prisma.workshopEntry.create({
-        data: {
-          entryDate: row.entryDate || null,
-          entryTime: row.entryTime || null,
-          orNumber: row.orNumber || null,
-          immatriculation: row.immatriculation,
-          chassis: row.chassis || null,
-          brand: row.brand || null,
-          model: row.model || null,
-          mileage: row.mileage || null,
-          clientName: row.clientName,
-          clientType: row.clientType || "Client",
-          fuelLevel: row.fuelLevel || null,
-          phone: row.phone || null,
-          receptionist: row.receptionist || null,
-          immobilizationDuration: row.immobilizationDuration || null,
-          observations: row.observations || null,
-          presenceSav: row.presenceSav || "NON",
-          statusCode: row.statusCode || "C",
-          endWorksAt: row.endWorksAt || null,
-          executionDuration: row.executionDuration || null,
-          worksDone: row.worksDone || null,
-          exitDate: row.exitDate || null,
-          exitTime: row.exitTime || null,
-          deliverer: row.deliverer || null,
-          paymentMode: row.paymentMode || null,
-          customerId: customer.id,
-          vehicleId: vehicle ? vehicle.id : null,
-        },
-      });
-    }
-  }
 
   const entries = await prisma.workshopEntry.findMany({
     orderBy: { createdAt: "desc" },
@@ -142,7 +79,7 @@ export default async function WorkshopPage() {
   }
   customerOptions.sort((a, b) => a.name.localeCompare(b.name));
 
-  // Récupérer les réceptionnaires (utilisateurs + existants + standards atelier)
+  // Récupérer les réceptionnaires (utilisateurs actifs + existants)
   const users = await prisma.user.findMany({
     where: { active: true },
     select: { fullName: true, role: true },
@@ -157,8 +94,6 @@ export default async function WorkshopPage() {
 
   const receptionistList = Array.from(
     new Set([
-      "Madochée",
-      "TYCHIQUE",
       ...existingReceptionists.map((r) => r.receptionist?.trim()).filter(Boolean),
       ...users.map((u) => u.fullName?.trim()).filter(Boolean),
     ])

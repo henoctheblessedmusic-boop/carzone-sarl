@@ -104,7 +104,7 @@ export function PartsView({
   workshopEntries: WorkshopSelectOption[];
   canManage: boolean;
 }) {
-  const [activeTab, setActiveTab] = useState<"cross-ref" | "inventory" | "movements" | "autodata-tecdoc">("cross-ref");
+  const [activeTab, setActiveTab] = useState<"inventory" | "cross-ref" | "movements">("inventory");
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
   const [stockStatusFilter, setStockStatusFilter] = useState<string>("ALL");
@@ -319,7 +319,32 @@ export function PartsView({
         </div>
       </div>
 
-      {/* NAVIGATION TABS */}
+      {/* GUIDE RAPIDE DE FORMATION & UTILISATION */}
+      <div
+        className="ox-glass"
+        style={{
+          padding: "0.9rem 1.25rem",
+          borderRadius: "12px",
+          background: "rgba(15, 23, 42, 0.5)",
+          border: "1px solid rgba(56, 189, 248, 0.2)",
+          display: "flex",
+          alignItems: "center",
+          gap: "1rem",
+          flexWrap: "wrap",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#38bdf8", fontWeight: 700, fontSize: "0.85rem" }}>
+          <Info size={16} />
+          <span>Guide opérationnel :</span>
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "1.2rem", fontSize: "0.82rem", color: "#cbd5e1" }}>
+          <div><strong>1. Trouver :</strong> Tapez le modèle (ex: <em>Jetour Dashing</em>) ou le type de pièce (ex: <em>Patin frein</em>).</div>
+          <div><strong>2. Vérifier :</strong> Les badges bleus indiquent sur quelles autres voitures la pièce se monte.</div>
+          <div><strong>3. Actionner :</strong> Cliquez sur <em>Entrée/Sortie</em> pour mettre à jour le stock en temps réel.</div>
+        </div>
+      </div>
+
+      {/* NAVIGATION TABS (2 VUES CLAIRES + HISTORIQUE) */}
       <div
         style={{
           display: "flex",
@@ -329,27 +354,6 @@ export function PartsView({
           overflowX: "auto",
         }}
       >
-        <button
-          type="button"
-          onClick={() => setActiveTab("cross-ref")}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            padding: "0.6rem 1.2rem",
-            borderRadius: "8px",
-            border: "none",
-            background: activeTab === "cross-ref" ? "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)" : "transparent",
-            color: activeTab === "cross-ref" ? "#fff" : "var(--ice-text-muted)",
-            fontWeight: 600,
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-          }}
-        >
-          <ArrowRightLeft size={16} />
-          Croisement des Références & Recherche Multi-Modèles
-        </button>
-
         <button
           type="button"
           onClick={() => setActiveTab("inventory")}
@@ -373,6 +377,27 @@ export function PartsView({
 
         <button
           type="button"
+          onClick={() => setActiveTab("cross-ref")}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            padding: "0.6rem 1.2rem",
+            borderRadius: "8px",
+            border: "none",
+            background: activeTab === "cross-ref" ? "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)" : "transparent",
+            color: activeTab === "cross-ref" ? "#fff" : "var(--ice-text-muted)",
+            fontWeight: 600,
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+          }}
+        >
+          <ArrowRightLeft size={16} />
+          Fiches d&apos;Interchangeabilité Multi-Modèles
+        </button>
+
+        <button
+          type="button"
           onClick={() => setActiveTab("movements")}
           style={{
             display: "flex",
@@ -389,28 +414,7 @@ export function PartsView({
           }}
         >
           <History size={16} />
-          Traçabilité & Mouvements Atelier
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("autodata-tecdoc")}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            padding: "0.6rem 1.2rem",
-            borderRadius: "8px",
-            border: "none",
-            background: activeTab === "autodata-tecdoc" ? "linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)" : "transparent",
-            color: activeTab === "autodata-tecdoc" ? "#fff" : "var(--ice-text-muted)",
-            fontWeight: 600,
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-          }}
-        >
-          <Sparkles size={16} />
-          AutoData, TecDoc & Catalogues Constructeurs
+          Historique Entrées & Sorties
         </button>
       </div>
 
@@ -1009,24 +1013,42 @@ export function PartsView({
               justifyContent: "space-between",
             }}
           >
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "center" }}>
-              <div style={{ position: "relative", minWidth: 260 }}>
-                <Search size={16} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "center", width: "100%" }}>
+              <div style={{ position: "relative", flex: "1 1 320px" }}>
+                <Search size={18} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
                 <input
                   type="text"
-                  placeholder="Recherche pièce, code, marque..."
+                  placeholder="Tapez un modèle (ex: Jetour Dashing), un nom (ex: Patin) ou une référence..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="ox-input"
-                  style={{ paddingLeft: "2rem", width: "100%", fontSize: "0.85rem" }}
+                  style={{ paddingLeft: "2.3rem", width: "100%", fontSize: "0.92rem", borderRadius: "10px" }}
                 />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      background: "none",
+                      border: "none",
+                      color: "#94a3b8",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <X size={16} />
+                  </button>
+                )}
               </div>
 
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
                 className="ox-select"
-                style={{ fontSize: "0.85rem" }}
+                style={{ fontSize: "0.85rem", minWidth: 160 }}
               >
                 <option value="ALL">Toutes les catégories</option>
                 {categories.filter((c) => c !== "ALL").map((c) => (
@@ -1040,7 +1062,7 @@ export function PartsView({
                 value={stockStatusFilter}
                 onChange={(e) => setStockStatusFilter(e.target.value)}
                 className="ox-select"
-                style={{ fontSize: "0.85rem" }}
+                style={{ fontSize: "0.85rem", minWidth: 160 }}
               >
                 <option value="ALL">Tous les statuts de stock</option>
                 <option value="IN_STOCK">En Stock uniquement</option>
@@ -1049,8 +1071,54 @@ export function PartsView({
               </select>
             </div>
 
-            <div style={{ fontSize: "0.82rem", color: "var(--ice-text-muted)" }}>
-              Affichage de {filteredParts.length} sur {parts.length} pièces
+            {/* BOUTONS DE FILTRAGE RAPIDE PAR VOITURE DE COTONOU */}
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.4rem", marginTop: "0.6rem", width: "100%", fontSize: "0.8rem" }}>
+              <span style={{ color: "var(--ice-text-muted)", fontSize: "0.78rem", marginRight: "0.3rem" }}>Filtres rapides :</span>
+              {[
+                { label: "Patin frein", query: "Patin" },
+                { label: "Jetour Dashing", query: "Jetour Dashing" },
+                { label: "Changan CS35", query: "CS35" },
+                { label: "Kaiyi X3 Pro", query: "Kaiyi" },
+                { label: "BAIC X35/X55", query: "BAIC" },
+                { label: "Filtres 1.5T", query: "Filtre" },
+                { label: "Bougies", query: "Bougie" },
+              ].map((btn) => (
+                <button
+                  key={btn.label}
+                  type="button"
+                  onClick={() => setSearchQuery(btn.query)}
+                  style={{
+                    padding: "0.2rem 0.55rem",
+                    borderRadius: "6px",
+                    background: searchQuery === btn.query ? "rgba(225, 29, 72, 0.25)" : "rgba(255,255,255,0.06)",
+                    border: searchQuery === btn.query ? "1px solid rgba(225, 29, 72, 0.5)" : "1px solid rgba(255,255,255,0.1)",
+                    color: searchQuery === btn.query ? "#fb7185" : "#cbd5e1",
+                    fontSize: "0.75rem",
+                    cursor: "pointer",
+                    fontWeight: searchQuery === btn.query ? 700 : 500,
+                  }}
+                >
+                  {btn.label}
+                </button>
+              ))}
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  style={{
+                    padding: "0.2rem 0.55rem",
+                    borderRadius: "6px",
+                    background: "rgba(244, 63, 94, 0.15)",
+                    border: "1px solid rgba(244, 63, 94, 0.3)",
+                    color: "#fb7185",
+                    fontSize: "0.75rem",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                  }}
+                >
+                  Effacer le filtre ✕
+                </button>
+              )}
             </div>
           </div>
 
@@ -1167,52 +1235,65 @@ export function PartsView({
                         {formatXof(p.sellingPriceXof)}
                       </td>
                       <td>
-                        <div style={{ display: "flex", gap: "0.4rem" }}>
+                        <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
                           <button
                             type="button"
                             onClick={() => setMovementPart(p)}
-                            title="Mouvement stock"
+                            title="Entrée ou sortie de stock"
                             style={{
-                              padding: "0.35rem 0.5rem",
+                              padding: "0.35rem 0.65rem",
                               borderRadius: "6px",
                               background: "rgba(34, 197, 94, 0.15)",
-                              border: "1px solid rgba(34, 197, 94, 0.3)",
+                              border: "1px solid rgba(34, 197, 94, 0.35)",
                               color: "#4ade80",
                               cursor: "pointer",
+                              fontSize: "0.78rem",
+                              fontWeight: 600,
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.3rem",
                             }}
                           >
-                            <Boxes size={14} />
+                            <Boxes size={13} /> ± Stock
                           </button>
                           <button
                             type="button"
                             onClick={() => setSelectedPartForDetails(p)}
-                            title="Gérer références & compatibilité"
+                            title="Voir et associer des voitures compatibles ou références croisées"
                             style={{
-                              padding: "0.35rem 0.5rem",
+                              padding: "0.35rem 0.65rem",
                               borderRadius: "6px",
                               background: "rgba(56, 189, 248, 0.15)",
-                              border: "1px solid rgba(56, 189, 248, 0.3)",
+                              border: "1px solid rgba(56, 189, 248, 0.35)",
                               color: "#38bdf8",
                               cursor: "pointer",
+                              fontSize: "0.78rem",
+                              fontWeight: 600,
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.3rem",
                             }}
                           >
-                            <ArrowRightLeft size={14} />
+                            <ArrowRightLeft size={13} /> Voitures ({p.compatibilities.length})
                           </button>
                           {canManage && (
                             <button
                               type="button"
                               onClick={() => setEditingPart(p)}
-                              title="Modifier"
+                              title="Modifier la fiche pièce"
                               style={{
-                                padding: "0.35rem 0.5rem",
+                                padding: "0.35rem 0.55rem",
                                 borderRadius: "6px",
                                 background: "rgba(255,255,255,0.06)",
                                 border: "1px solid rgba(255,255,255,0.15)",
                                 color: "#cbd5e1",
                                 cursor: "pointer",
+                                fontSize: "0.78rem",
+                                display: "inline-flex",
+                                alignItems: "center",
                               }}
                             >
-                              <Tag size={14} />
+                              <Tag size={13} />
                             </button>
                           )}
                         </div>
@@ -1332,212 +1413,7 @@ export function PartsView({
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* TAB 4: AUTODATA, TECDOC & CATALOGUES CONSTRUCTEURS */}
-      {/* ========================================================================= */}
-      {activeTab === "autodata-tecdoc" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          {/* ANALYSE STRATÉGIQUE RÉDIGÉE POUR LE DIRECTEUR */}
-          <div
-            className="ox-glass"
-            style={{
-              padding: "1.6rem",
-              borderRadius: "16px",
-              background: "linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%)",
-              border: "1px solid rgba(56, 189, 248, 0.3)",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 36,
-                  height: 36,
-                  borderRadius: "10px",
-                  background: "linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)",
-                  color: "#fff",
-                }}
-              >
-                <BookOpen size={20} />
-              </span>
-              <div>
-                <h2 style={{ fontSize: "1.3rem", fontWeight: 700, margin: 0, color: "#f8fafc" }}>
-                  Analyse Stratégique & Intégration Catalogues Pièces Auto (AutoData vs TecDoc vs EPC Chinois)
-                </h2>
-                <div style={{ fontSize: "0.85rem", color: "var(--ice-text-muted)" }}>
-                  Recommandations et options techniques pour le Directeur Général de CARZONE SARL
-                </div>
-              </div>
-            </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.2rem", marginTop: "1rem" }}>
-              {/* CARTE 1: AUTODATA */}
-              <div
-                style={{
-                  background: "rgba(15, 23, 42, 0.6)",
-                  padding: "1.2rem",
-                  borderRadius: "12px",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.6rem" }}>
-                  <ShieldCheck size={18} color="#fbbf24" />
-                  <h4 style={{ margin: 0, color: "#f8fafc", fontSize: "1rem" }}>AutoData (Solera)</h4>
-                </div>
-                <p style={{ fontSize: "0.85rem", color: "var(--ice-text-muted)", lineHeight: 1.5 }}>
-                  <strong>Vocation :</strong> Données techniques d&apos;atelier (schémas électriques, calages de distribution, couples de serrage, capacités des fluides, barèmes de temps).
-                </p>
-                <div
-                  style={{
-                    fontSize: "0.8rem",
-                    padding: "0.6rem",
-                    borderRadius: "8px",
-                    background: "rgba(251, 191, 36, 0.1)",
-                    border: "1px solid rgba(251, 191, 36, 0.25)",
-                    color: "#fde68a",
-                  }}
-                >
-                  <strong>Attention pour CARZONE :</strong> AutoData n&apos;est PAS un catalogue de références croisées de pièces détachées. De plus, sa couverture des marques chinoises récentes (Changan, Jetour, BAIC, Forthing 2024-2026) est quasi inexistante en Afrique.
-                </div>
-              </div>
-
-              {/* CARTE 2: TECDOC */}
-              <div
-                style={{
-                  background: "rgba(15, 23, 42, 0.6)",
-                  padding: "1.2rem",
-                  borderRadius: "12px",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.6rem" }}>
-                  <ShieldCheck size={18} color="#38bdf8" />
-                  <h4 style={{ margin: 0, color: "#f8fafc", fontSize: "1rem" }}>TecDoc (TecAlliance)</h4>
-                </div>
-                <p style={{ fontSize: "0.85rem", color: "var(--ice-text-muted)", lineHeight: 1.5 }}>
-                  <strong>Vocation :</strong> La référence mondiale absolue des pièces de rechange et des correspondances d&apos;équipementiers (OE vs Bosch, Valeo, Brembo, Febi, Mann...).
-                </p>
-                <div
-                  style={{
-                    fontSize: "0.8rem",
-                    padding: "0.6rem",
-                    borderRadius: "8px",
-                    background: "rgba(56, 189, 248, 0.1)",
-                    border: "1px solid rgba(56, 189, 248, 0.25)",
-                    color: "#bae6fd",
-                  }}
-                >
-                  <strong>Accès API :</strong> TecDoc Data API (REST / JSON). Coût élevé (plusieurs milliers d&apos;euros/an de licence entreprise). Idéal à moyen terme si CARZONE ouvre un comptoir de distribution généraliste.
-                </div>
-              </div>
-
-              {/* CARTE 3: EPC CHINOIS */}
-              <div
-                style={{
-                  background: "rgba(15, 23, 42, 0.6)",
-                  padding: "1.2rem",
-                  borderRadius: "12px",
-                  border: "1px solid rgba(225, 29, 72, 0.25)",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.6rem" }}>
-                  <ShieldCheck size={18} color="#f43f5e" />
-                  <h4 style={{ margin: 0, color: "#f8fafc", fontSize: "1rem" }}>EPC Chinois & Fabricants</h4>
-                </div>
-                <p style={{ fontSize: "0.85rem", color: "var(--ice-text-muted)", lineHeight: 1.5 }}>
-                  <strong>Vocation :</strong> Catalogues électroniques officiels des constructeurs (Changan EPC, Chery/Jetour EPC, BAIC Parts System, Dongfeng Parts).
-                </p>
-                <div
-                  style={{
-                    fontSize: "0.8rem",
-                    padding: "0.6rem",
-                    borderRadius: "8px",
-                    background: "rgba(225, 29, 72, 0.1)",
-                    border: "1px solid rgba(225, 29, 72, 0.25)",
-                    color: "#fecdd3",
-                  }}
-                >
-                  <strong>Solution Gagnante CARZONE :</strong> Les constructeurs chinois partagent leurs catalogues sous format Excel/CSV avec les éclatés. Le présent module CARZONE permet de les importer directement sans frais récurrents !
-                </div>
-              </div>
-            </div>
-
-            {/* SYNTHÈSE DES 3 PHASES PROPOSÉES */}
-            <div
-              style={{
-                marginTop: "1.5rem",
-                padding: "1.2rem",
-                borderRadius: "12px",
-                background: "rgba(34, 197, 94, 0.08)",
-                border: "1px solid rgba(34, 197, 94, 0.25)",
-              }}
-            >
-              <h4 style={{ margin: "0 0 0.5rem", color: "#4ade80", fontSize: "1.05rem" }}>
-                ✅ La Stratégie Opérationnelle Recommandée pour CARZONE SARL
-              </h4>
-              <ul style={{ margin: 0, paddingLeft: "1.2rem", fontSize: "0.88rem", color: "#e2e8f0", lineHeight: 1.6 }}>
-                <li>
-                  <strong>Phase 1 (Actuelle & Opérationnelle) :</strong> Le module interne de CARZONE gère en toute autonomie le stock physique, les croisements de références et les véhicules compatibles des modèles vendus sur <code>topcarzone.com</code>.
-                </li>
-                <li>
-                  <strong>Phase 2 (Importation Massive) :</strong> Utilisation de l&apos;importateur Excel/CSV intégré ci-dessous pour injecter en 1 clic les nomenclatures complètes des arrivages Anvers, Dubaï et Chine.
-                </li>
-                <li>
-                  <strong>Phase 3 (Option API TecAlliance) :</strong> Si CARZONE souhaite souscrire au flux TecDoc WebService, le connecteur API est déjà pré-architecturé dans notre modèle de données (champ <code>PartCrossReference</code>).
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* SIMULATEUR DÉCODEUR DE RÉFÉRENCE OEM */}
-          <div
-            className="ox-glass"
-            style={{ padding: "1.5rem", borderRadius: "16px" }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.8rem" }}>
-              <Tag size={18} color="#c084fc" />
-              <h3 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 700 }}>
-                Décodeur de Nomenclature Pièces Voitures Chinoises
-              </h3>
-            </div>
-            <p style={{ fontSize: "0.88rem", color: "var(--ice-text-muted)", margin: "0 0 1rem" }}>
-              Règles de codification pour identifier instantanément la famille de pièce sur les marques vendues par CARZONE :
-            </p>
-
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1rem" }}>
-              <div style={{ padding: "1rem", borderRadius: "10px", background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                <strong style={{ color: "#38bdf8" }}>Famille 35xx (Freinage) :</strong>
-                <p style={{ fontSize: "0.82rem", margin: "0.4rem 0 0", color: "#cbd5e1" }}>
-                  Ex: <code>3501xxx</code> = Plaquettes/Étriers avant, <code>3502xxx</code> = Plaquettes/Disques arrière (Standard Changan, BAIC, Chery).
-                </p>
-              </div>
-
-              <div style={{ padding: "1rem", borderRadius: "10px", background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                <strong style={{ color: "#34d399" }}>Famille 10xx & 11xx (Moteur & Filtration) :</strong>
-                <p style={{ fontSize: "0.82rem", margin: "0.4rem 0 0", color: "#cbd5e1" }}>
-                  Ex: <code>1012xxx</code> = Filtre à huile, <code>1109xxx</code> = Filtre à air moteur, <code>1117xxx</code> = Filtre à essence.
-                </p>
-              </div>
-
-              <div style={{ padding: "1rem", borderRadius: "10px", background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                <strong style={{ color: "#f43f5e" }}>Famille 29xx (Suspension & Train roulant) :</strong>
-                <p style={{ fontSize: "0.82rem", margin: "0.4rem 0 0", color: "#cbd5e1" }}>
-                  Ex: <code>2905xxx</code> = Amortisseur avant, <code>2906xxx</code> = Biellette stabilisatrice, <code>2915xxx</code> = Amortisseur arrière.
-                </p>
-              </div>
-
-              <div style={{ padding: "1rem", borderRadius: "10px", background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                <strong style={{ color: "#fbbf24" }}>Famille 81xx (Climatisation & Habitacle) :</strong>
-                <p style={{ fontSize: "0.82rem", margin: "0.4rem 0 0", color: "#cbd5e1" }}>
-                  Ex: <code>8100xxx</code> = Filtre d&apos;habitacle / climatisation, <code>8104xxx</code> = Compresseur de clim.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ========================================================================= */}
       {/* MODAL 1: CRÉER UNE NOUVELLE PIÈCE */}

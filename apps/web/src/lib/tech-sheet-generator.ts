@@ -112,6 +112,8 @@ const OBSOLETE_FALLBACK_URLS = [
   "photo-1549399542-7e3f8b79c341", // Blue dodge coupe
   "photo-1552519507-da3b142c6e3d", // Generic cockpit
   "photo-1619682817481-e994891cd1f5", // White generic car
+  "Toyota_Corolla_Cross", // Ancien fallback générique non désiré
+  "Corolla_Cross",
 ];
 
 function isObsoletePhoto(url?: string | null): boolean {
@@ -149,13 +151,21 @@ export function buildStandardTechnicalSheet(vehicle: {
       vehicle.variant && !isLicensePlate ? vehicle.variant : catalogEntry.variant;
 
     const mainPhoto =
-      !isObsoletePhoto(vehicle.mainPhotoUrl) ? vehicle.mainPhotoUrl : catalogEntry.photos.mainPhotoUrl;
+      vehicle.mainPhotoUrl && !isObsoletePhoto(vehicle.mainPhotoUrl) && !vehicle.mainPhotoUrl.includes("Corolla_Cross")
+        ? vehicle.mainPhotoUrl
+        : catalogEntry.photos.mainPhotoUrl;
     const interiorPhoto =
-      !isObsoletePhoto(vehicle.interiorPhotoUrl) ? vehicle.interiorPhotoUrl : catalogEntry.photos.interiorPhotoUrl;
+      vehicle.interiorPhotoUrl && !isObsoletePhoto(vehicle.interiorPhotoUrl) && !vehicle.interiorPhotoUrl.includes("Corolla_Cross")
+        ? vehicle.interiorPhotoUrl
+        : catalogEntry.photos.interiorPhotoUrl;
     const exteriorPhoto =
-      !isObsoletePhoto(vehicle.exteriorPhotoUrl) ? vehicle.exteriorPhotoUrl : catalogEntry.photos.exteriorPhotoUrl;
+      vehicle.exteriorPhotoUrl && !isObsoletePhoto(vehicle.exteriorPhotoUrl) && !vehicle.exteriorPhotoUrl.includes("Corolla_Cross")
+        ? vehicle.exteriorPhotoUrl
+        : catalogEntry.photos.exteriorPhotoUrl;
     const rearPhoto =
-      !isObsoletePhoto(vehicle.rearPhotoUrl) ? vehicle.rearPhotoUrl : catalogEntry.photos.rearPhotoUrl;
+      vehicle.rearPhotoUrl && !isObsoletePhoto(vehicle.rearPhotoUrl) && !vehicle.rearPhotoUrl.includes("Corolla_Cross")
+        ? vehicle.rearPhotoUrl
+        : catalogEntry.photos.rearPhotoUrl;
 
     return {
       title: `${catalogEntry.brand} ${catalogEntry.model} ${cleanVariant ? cleanVariant.toUpperCase() : ""}`.trim(),
@@ -203,19 +213,19 @@ export function buildStandardTechnicalSheet(vehicle: {
   const isElectric = (vehicle.energy || "").toUpperCase().includes("ELEC");
   const isDiesel = (vehicle.energy || "").toUpperCase().includes("DIESEL");
 
-  // Photos propres adaptées sans utiliser l'AMG GT
+  // Photos propres adaptées de la concession Carzone SARL
   const fallbackMain = !isObsoletePhoto(vehicle.mainPhotoUrl)
     ? vehicle.mainPhotoUrl!
-    : "https://upload.wikimedia.org/wikipedia/commons/4/43/2023_Toyota_Corolla_Cross_XLE_4WD_in_Wind_Chill_Pearl%2C_front_left.jpg";
+    : "/images/vehicles/rich7-main.jpg";
   const fallbackInterior = !isObsoletePhoto(vehicle.interiorPhotoUrl)
     ? vehicle.interiorPhotoUrl!
-    : "https://upload.wikimedia.org/wikipedia/commons/0/0f/2020_Toyota_Corolla_Cross_Hybrid_Premium_Safety_%28Cockpit%29.jpg";
+    : "/images/vehicles/rich7-interior.jpg";
   const fallbackExterior = !isObsoletePhoto(vehicle.exteriorPhotoUrl)
     ? vehicle.exteriorPhotoUrl!
-    : "https://upload.wikimedia.org/wikipedia/commons/1/1c/Toyota_Corolla_Cross_GR_Sport_in_Cape_Town.jpg";
+    : "/images/vehicles/rich7-exterior.jpg";
   const fallbackRear = !isObsoletePhoto(vehicle.rearPhotoUrl)
     ? vehicle.rearPhotoUrl!
-    : "https://upload.wikimedia.org/wikipedia/commons/6/63/2023_Toyota_Corolla_Cross_XLE_4WD_in_Wind_Chill_Pearl%2C_rear_left.jpg";
+    : "/images/vehicles/rich7-rear.jpg";
 
   return {
     title: `${brandDisplay} ${modelDisplay} ${variantDisplay}`.trim(),

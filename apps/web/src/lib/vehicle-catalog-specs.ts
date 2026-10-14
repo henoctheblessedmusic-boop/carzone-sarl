@@ -115,10 +115,10 @@ export const OFFICIAL_VEHICLE_CATALOG: ModelCatalogEntry[] = [
     energy: "ESSENCE",
     title: "JETOUR DASHING LUXE 1.6L TGDI 7DCT",
     photos: {
-      mainPhotoUrl: "https://upload.wikimedia.org/wikipedia/commons/4/4d/Moscow%2C_black_Jetour_Dashing%2C_April_2025_02.jpg",
-      interiorPhotoUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2f/2025_Jetour_Dashing_interior_%28Malaysia%29_02.png",
-      exteriorPhotoUrl: "https://upload.wikimedia.org/wikipedia/commons/4/49/Jetour_Dashing_photo3.jpg",
-      rearPhotoUrl: "https://upload.wikimedia.org/wikipedia/commons/a/af/Moscow%2C_grey_Jetour_Dashing_03.jpg",
+      mainPhotoUrl: "/images/vehicles/dashing-main.jpg",
+      interiorPhotoUrl: "/images/vehicles/dashing-interior.jpg",
+      exteriorPhotoUrl: "/images/vehicles/dashing-exterior.jpg",
+      rearPhotoUrl: "/images/vehicles/dashing-rear.jpg",
     },
     dimensions: {
       lengthWidthHeight: "4590x1900x1685",
@@ -177,10 +177,10 @@ export const OFFICIAL_VEHICLE_CATALOG: ModelCatalogEntry[] = [
     energy: "ESSENCE",
     title: "JETOUR T2 TRAVELLER 2.0L TGDI 4x4 XWD",
     photos: {
-      mainPhotoUrl: "https://upload.wikimedia.org/wikipedia/commons/8/84/Jetour_T2_Lightning_i-DM_Panda_White.jpg",
-      interiorPhotoUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e9/Jetour_T2_interior.jpg",
-      exteriorPhotoUrl: "https://upload.wikimedia.org/wikipedia/commons/8/83/Jetour_Traveller_008.jpg",
-      rearPhotoUrl: "https://upload.wikimedia.org/wikipedia/commons/3/30/Jetour_Traveller_009.jpg",
+      mainPhotoUrl: "/images/vehicles/t2-main.jpg",
+      interiorPhotoUrl: "/images/vehicles/t2-interior.jpg",
+      exteriorPhotoUrl: "/images/vehicles/t2-exterior.jpg",
+      rearPhotoUrl: "/images/vehicles/t2-rear.jpg",
     },
     dimensions: {
       lengthWidthHeight: "4785x2006x1880",
@@ -226,6 +226,569 @@ export const OFFICIAL_VEHICLE_CATALOG: ModelCatalogEntry[] = [
       "Contrôle de stabilité du véhicule et assistance en descente (HDC)",
       "Système antivol moteur codé par transpondeur",
       "Structure de caisse renforcée haute rigidité torsionnelle",
+    ],
+  },
+
+  // =========================================================================
+  // FLOTTE CONCESSION CARZONE SARL - MODÈLES OFFICIELS & PHOTOS CERTIFIÉES
+  // =========================================================================
+
+  // 4. FORTHING RICH 7 DC 4X4 (DONGFENG / FORTHING)
+  {
+    brand: "FORTHING",
+    model: "RICH 7",
+    variant: "Double Cabine 4x4 8AT Diesel",
+    category: "PICKUP",
+    year: 2024,
+    energy: "DIESEL",
+    title: "FORTHING RICH 7 DC 4X4 DOUBLE CABINE 8AT DIESEL",
+    photos: {
+      mainPhotoUrl: "/images/vehicles/rich7-main.jpg",
+      interiorPhotoUrl: "/images/vehicles/rich7-interior.jpg",
+      exteriorPhotoUrl: "/images/vehicles/rich7-exterior.jpg",
+      rearPhotoUrl: "/images/vehicles/rich7-rear.jpg",
+    },
+    dimensions: {
+      lengthWidthHeight: "5290x1850x1830",
+      wheelbase: "3150",
+      doors: 4,
+      seats: 5,
+      tankOrBattery: "73L",
+    },
+    motorisation: {
+      displacementOrMotor: "2298 cm3 (Renault-Nissan M9T Turbo Diesel 2.3L)",
+      cylinders: "4 en ligne 16V Turbo Intercooler",
+      transmission: "Automatique 8 rapports ZF avec boîte de transfert 4WD (2H, 4H, 4L)",
+      fuelType: "Diesel",
+      maxPower: "122 kW (166 ch) à 3500 tr/min",
+      maxTorque: "420 Nm à 1600-2600 tr/min",
+    },
+    equipementConfort: [
+      "Habitacle grand confort avec sellerie cuir microperforé surpiqué",
+      "Écran tactile central multimédia HD 12,8 pouces avec connectivité smartphone",
+      "Combiné d'instruments haute définition numérique 7 pouces",
+      "Climatisation automatique bizone avec diffuseurs d'air aux places arrière",
+      "Sièges avant à réglages électriques 8 voies et soutien lombaire",
+      "Démarrage mains libres Push-Start et verrouillage centralisé sans clé",
+      "Volant multifonction 3 branches gainé de cuir Nappa",
+      "Système audio surround haute fidélité 6 haut-parleurs",
+    ],
+    exterieur: [
+      "Benne arrière renforcée avec revêtement de protection projeté haute densité",
+      "Arceau de sécurité benne en acier chromé et marchepieds latéraux intégrés",
+      "Calandre avant imposante 'Eagle Wing' avec finitions chrome satiné",
+      "Projecteurs avant Full LED à réglage de hauteur automatique",
+      "Jantes alliage bicolores diamantées 18 pouces chaussées de pneus tout-terrain",
+      "Rétroviseurs extérieurs électriques rabattables et dégivrants",
+      "Plaque de protection de carter moteur renforcée tout-terrain",
+      "Crochets d'arrimage de benne robustes et feux arrière verticaux LED",
+    ],
+    securite: [
+      "Transmission 4x4 enclenchable avec blocage de différentiel arrière Eaton",
+      "Contrôle dynamique de trajectoire ESP Bosch 9.3 et antipatinage TCS",
+      "Caméras panoramiques 360° HD avec lignes de guidage dynamiques",
+      "Système d'assistance au démarrage en côte (HAC) et contrôle en descente (HDC)",
+      "6 Airbags de sécurité (frontaux, latéraux avant et rideaux de pavillon)",
+      "Freinage ABS 4 disques avec répartiteur électronique EBD et assistance BAS",
+      "Système de surveillance de pression des pneumatiques TPMS en temps réel",
+      "Radar de recul sonore et capteurs de proximité avant",
+    ],
+  },
+
+  // 5. FORTHING T5 EVO
+  {
+    brand: "FORTHING",
+    model: "T5 EVO",
+    variant: "Mach Edition 1.5T 7DCT",
+    category: "SUV",
+    year: 2024,
+    energy: "ESSENCE",
+    title: "FORTHING T5 EVO MACH EDITION 1.5T 7DCT",
+    photos: {
+      mainPhotoUrl: "/images/vehicles/t5evo-main.jpg",
+      interiorPhotoUrl: "/images/vehicles/t5evo-interior.jpg",
+      exteriorPhotoUrl: "/images/vehicles/t5evo-exterior.jpg",
+      rearPhotoUrl: "/images/vehicles/t5evo-rear.jpg",
+    },
+    dimensions: {
+      lengthWidthHeight: "4565x1860x1690",
+      wheelbase: "2715",
+      doors: 5,
+      seats: 5,
+      tankOrBattery: "55L",
+    },
+    motorisation: {
+      displacementOrMotor: "1481 cm3 (Mitsubishi 4A95TD Mach Power Turbo)",
+      cylinders: "4 en ligne 16V Turbo GDI",
+      transmission: "Automatique 7 rapports Magna à double embrayage humide 7DCT",
+      fuelType: "Essence",
+      maxPower: "145 kW (197 ch) à 5600 tr/min",
+      maxTorque: "285 Nm à 1500-4000 tr/min",
+    },
+    equipementConfort: [
+      "Cockpit sport avec double écran panoramique numérique 10,25 pouces incurvé",
+      "Sellerie cuir rouge bordeaux surpiquée esprit grand tourisme",
+      "Sièges sport chauffants, ventilés et massants côté conducteur",
+      "Toit ouvrant panoramique XXL de 1,18 m² avec vélum électrique",
+      "Climatisation automatique avec purificateur d'air CN95 et ioniseur d'ions négatifs",
+      "Éclairage d'ambiance 64 couleurs interactif synchronisé",
+      "Hayon arrière motorisé avec ouverture intelligente sans les mains",
+      "Chargeur smartphone à induction rapide 15W",
+    ],
+    exterieur: [
+      "Design félin 'Lion Face' avec calandre avant noire agressive sculptée",
+      "Projecteurs scindés ultra-effilés Full LED 'Hunting Eye'",
+      "Jantes sport noir laqué 19 pouces avec étriers de freins peints",
+      "Quatre véritables sorties d'échappement sportives chromées à l'arrière",
+      "Bandeau lumineux arrière horizontal 3D Full LED traversant",
+      "Rétroviseurs extérieurs noir brillant profilés aérodynamiques",
+      "Becquet de toit aérodynamique à double bossage sport",
+      "Poignées de portes ergonomiques couleur carrosserie avec capteurs tactiles",
+    ],
+    securite: [
+      "Système de conduite assistée autonome ADAS L2+ (ACC, maintien de voie)",
+      "Freinage d'urgence autonome d'évitement avec détection piétons",
+      "Caméras 360° vue d'oiseau HD avec enregistreur de conduite intégré",
+      "6 Airbags haute sécurité avec cellule en acier thermoformé à 76%",
+      "Système de surveillance des angles morts (BSD) et alerte de changement de voie",
+      "Contrôle de trajectoire Bosch ESP 9.3 et aide au démarrage en pente",
+      "Régulateur et limiteur de vitesse adaptatif intelligent",
+      "Système de surveillance TPMS de pression et température des pneus",
+    ],
+  },
+
+  // 6. CHANGAN CS75 PLUS
+  {
+    brand: "CHANGAN",
+    model: "CS75",
+    variant: "Plus Luxury 1.5T BlueCore 8AT",
+    category: "SUV",
+    year: 2024,
+    energy: "ESSENCE",
+    title: "CHANGAN CS75 PLUS LUXURY 1.5T BLUECORE 8AT",
+    photos: {
+      mainPhotoUrl: "/images/vehicles/cs75-main.jpg",
+      interiorPhotoUrl: "/images/vehicles/cs75-interior.jpg",
+      exteriorPhotoUrl: "/images/vehicles/cs75-exterior.jpg",
+      rearPhotoUrl: "/images/vehicles/cs75-rear.jpg",
+    },
+    dimensions: {
+      lengthWidthHeight: "4710x1865x1710",
+      wheelbase: "2710",
+      doors: 5,
+      seats: 5,
+      tankOrBattery: "58L",
+    },
+    motorisation: {
+      displacementOrMotor: "1494 cm3 (Changan BlueCore 1.5 TGDI Turbo Haute Pression 350 bar)",
+      cylinders: "4 en ligne 16V injection directe",
+      transmission: "Automatique 8 rapports Aisin de nouvelle génération",
+      fuelType: "Essence",
+      maxPower: "138 kW (188 ch) à 5500 tr/min",
+      maxTorque: "300 Nm à 1500-4000 tr/min",
+    },
+    equipementConfort: [
+      "Double dalle numérique 12,3 pouces combinée haute résolution",
+      "Sellerie cuir Nappa surpiqué avec finitions moussées haut de gamme",
+      "Système audio Pioneer Haute Fidélité 8 haut-parleurs",
+      "Toit ouvrant panoramique vitré électrique avec rideau pare-soleil",
+      "Climatisation automatique avec système de purification d'air Forest Air",
+      "Sièges électriques avant chauffants et ventilés avec mémoires de position",
+      "Sélecteur de mode de conduite électronique (Eco, Normal, Sport, Custom)",
+      "Affichage tête haute en couleur HUD et commandes vocales intelligentes",
+    ],
+    exterieur: [
+      "Calandre avant majestueuse paramétrique sans bordure 'V-Shape'",
+      "Projecteurs avant Full LED adaptatifs avec signature lumineuse continue",
+      "Jantes en alliage bicolores sport 19 pouces",
+      "Feux arrière Full LED verticaux 3D signature Changan Phoenix",
+      "Vitrage arrière surteinté anti-UV avec insonorisation acoustique",
+      "Rétroviseurs électriques chauffants, rabattables avec répétiteurs LED",
+      "Hayon arrière motorisé avec détection au pied",
+      "Barres de toit longitudinales en aluminium satiné intégrées",
+    ],
+    securite: [
+      "Freinage automatique d'urgence AEB avec détection des véhicules et piétons",
+      "Régulateur de vitesse adaptatif intégré IACC avec centrage dans la voie",
+      "Système de caméras panoramiques 540° HD (360° + châssis transparent)",
+      "6 Airbags de sécurité rideaux et latéraux grand volume",
+      "Surveillance d'angle mort BSD et avertisseur de trafic arrière RCTA",
+      "Contrôle de stabilité ESP 9.3 et assistance au freinage d'urgence BA",
+      "Aide au stationnement automatique APA 5.0 à distance",
+      "Capteur de pression et température des pneus TPMS",
+    ],
+  },
+
+  // 7. CHANGAN CS35 PLUS
+  {
+    brand: "CHANGAN",
+    model: "CS35 PLUS",
+    variant: "Luxe 1.4T BlueCore 7DCT",
+    category: "SUV",
+    year: 2024,
+    energy: "ESSENCE",
+    title: "CHANGAN CS35 PLUS LUXE 1.4T BLUECORE 7DCT",
+    photos: {
+      mainPhotoUrl: "/images/vehicles/cs35-main.jpg",
+      interiorPhotoUrl: "/images/vehicles/cs35-interior.jpg",
+      exteriorPhotoUrl: "/images/vehicles/cs35-exterior.jpg",
+      rearPhotoUrl: "/images/vehicles/cs35-rear.jpg",
+    },
+    dimensions: {
+      lengthWidthHeight: "4330x1825x1660",
+      wheelbase: "2600",
+      doors: 5,
+      seats: 5,
+      tankOrBattery: "53L",
+    },
+    motorisation: {
+      displacementOrMotor: "1392 cm3 (Changan BlueCore 1.4T GDI Turbo)",
+      cylinders: "4 en ligne 16V",
+      transmission: "Automatique 7 rapports double embrayage humide 7DCT",
+      fuelType: "Essence",
+      maxPower: "118 kW (160 ch) à 5500 tr/min",
+      maxTorque: "260 Nm à 1500-4000 tr/min",
+    },
+    equipementConfort: [
+      "Cockpit moderne avec écran tactile central 10,25 pouces HD",
+      "Combiné d'instruments conducteur numérique 7 pouces personnalisable",
+      "Sellerie similicuir haut de gamme bicolore avec surpiqûres rouges",
+      "Climatisation automatique avec filtre à particules CN95",
+      "Toit ouvrant panoramique électrique avec store occultant",
+      "Volant cuir multifonction réglable en hauteur et profondeur",
+      "Connectivité smartphone MirrorLink et Bluetooth audio HD",
+      "Démarrage sans clé Push-Start et verrouillage centralisé",
+    ],
+    exterieur: [
+      "Calandre avant noire facettée géométrique avec inserts rouges sport",
+      "Projecteurs Full LED horizontaux avec signature lumineuse d'accueil",
+      "Jantes alliage bicolores 18 pouces au design dynamique",
+      "Bandeau de feux arrière LED continu sur toute la largeur",
+      "Double sortie d'échappement chromée sportive",
+      "Rétroviseurs électriques dégivrants rabattables électriquement",
+      "Barres de pavillon de toit en aluminium",
+      "Protections de carrosserie latérales et passages de roues baroudeurs",
+    ],
+    securite: [
+      "Système de caméras 360° HD panoramiques d'aide au stationnement",
+      "Freinage automatique d'urgence avant (AEB)",
+      "Régulateur de vitesse adaptatif (ACC)",
+      "4 Airbags de sécurité frontaux et latéraux",
+      "Contrôle électronique de stabilité ESP Bosch et antipatinage TCS",
+      "Assistance au démarrage en côte (HHC) et contrôle en descente (HDC)",
+      "Système de fixation ISOFIX pour sièges enfants",
+      "Contrôle de la pression des pneus (TPMS)",
+    ],
+  },
+
+  // 8. CHANGAN UNI-K
+  {
+    brand: "CHANGAN",
+    model: "UNI-K",
+    variant: "Prestige 2.0T AWD 8AT Aisin",
+    category: "SUV",
+    year: 2024,
+    energy: "ESSENCE",
+    title: "CHANGAN UNI-K PRESTIGE 2.0T AWD 8AT",
+    photos: {
+      mainPhotoUrl: "/images/vehicles/unik-main.jpg",
+      interiorPhotoUrl: "/images/vehicles/unik-interior.jpg",
+      exteriorPhotoUrl: "/images/vehicles/unik-exterior.jpg",
+      rearPhotoUrl: "/images/vehicles/unik-rear.jpg",
+    },
+    dimensions: {
+      lengthWidthHeight: "4865x1948x1690",
+      wheelbase: "2890",
+      doors: 5,
+      seats: 5,
+      tankOrBattery: "70L",
+    },
+    motorisation: {
+      displacementOrMotor: "1998 cm3 (Changan BlueCore 2.0 TGDI Turbo)",
+      cylinders: "4 en ligne 16V injection directe haute pression",
+      transmission: "Automatique 8 rapports Aisin avec transmission intégrale AWD intelligente",
+      fuelType: "Essence",
+      maxPower: "171 kW (233 ch) à 5500 tr/min",
+      maxTorque: "390 Nm à 1900-3300 tr/min",
+    },
+    equipementConfort: [
+      "Cockpit futuriste Quad-Screen : instrumentation 3 écrans (3,5\" + 10,25\" + 9,2\") + central 12,3\"",
+      "Sellerie cuir Nappa grand luxe 'Zero Gravity' avec assise ultra-moelleuse",
+      "Système audio Sony Surround 12 Haut-Parleurs avec haut-parleurs intégrés dans l'appuie-tête conducteur",
+      "Sièges avant électriques, massants, ventilés et chauffants avec mémoire",
+      "Toit panoramique vitré géant de 1,31 m² avec velum électrique athermique",
+      "Climatisation automatique trizone avec ioniseur d'air et diffuseur de parfum",
+      "Double vitrage feuilleté acoustique haute performance pour un silence absolu",
+      "Reconnaissance faciale Face-ID pour réglage automatique du profil conducteur",
+    ],
+    exterieur: [
+      "Calandre avant iconique sans cadre 'Border-Free' à hexagones matriciels",
+      "Poignées de portes entièrement affleurantes à déploiement électrique automatique",
+      "Projecteurs avant Full LED Starship ultra-fins et feux de jour trilobes",
+      "Jantes sport en alliage forgé 21 pouces chaussées en 265/45 R21",
+      "Bandeau de feux arrière LED 3D traversant avec aileron arrière sport à double dérive",
+      "Quatre sorties d'échappement arrière rondes grand diamètre chromées",
+      "Hayon arrière électrique motorisé à ouverture mains libres par balayage",
+      "Rétroviseurs électriques chauffants électrochromes à mémoire",
+    ],
+    securite: [
+      "Transmission intégrale AWD BorgWarner Next-Gen avec verrouillage 4WD",
+      "Pilotage autonome ADAS L2+ : conduite automatisée en embouteillage (TJA) et maintien de voie (ICA)",
+      "Caméras panoramiques 540° HD avec affichage transparent du châssis sous le véhicule",
+      "Freinage d'urgence autonome avec détection piétons, vélos et intersections",
+      "8 Airbags de sécurité rideaux et latéraux intégrals",
+      "Alerte de trafic transversal arrière RCTA avec freinage actif",
+      "Stationnement automatique télécommandé via smartphone APA 6.0",
+      "Surveillance de vigilance du conducteur par caméra infrarouge DMS",
+    ],
+  },
+
+  // 9. BAIC B40 PRO (BEIJING BJ40 PRO)
+  {
+    brand: "BAIC",
+    model: "B40 PRO",
+    variant: "Tout-Terrain 2.0T ZF 8AT 4x4",
+    category: "SUV",
+    year: 2024,
+    energy: "ESSENCE",
+    title: "BAIC B40 PRO TOUT-TERRAIN 2.0T ZF 8AT 4X4",
+    photos: {
+      mainPhotoUrl: "/images/vehicles/b40-main.jpg",
+      interiorPhotoUrl: "/images/vehicles/b40-interior.jpg",
+      exteriorPhotoUrl: "/images/vehicles/b40-exterior.jpg",
+      rearPhotoUrl: "/images/vehicles/b40-rear.jpg",
+    },
+    dimensions: {
+      lengthWidthHeight: "4645x1925x1871",
+      wheelbase: "2745",
+      doors: 5,
+      seats: 5,
+      tankOrBattery: "75L",
+    },
+    motorisation: {
+      displacementOrMotor: "1967 cm3 (2.0L Turbo DACT 16V injection directe)",
+      cylinders: "4 en ligne 16V Turbo",
+      transmission: "Automatique 8 rapports ZF avec boîte de transfert BorgWarner 4x4 (2H, 4H, 4L)",
+      fuelType: "Essence",
+      maxPower: "165 kW (224 ch) à 5500 tr/min",
+      maxTorque: "380 Nm à 1800-3600 tr/min",
+    },
+    equipementConfort: [
+      "Toit rigide modulable et démontable 'Freedom Top' (panneaux avant et arrière)",
+      "Écran tactile central 10 pouces multimédia tout-terrain",
+      "Combiné d'instruments conducteur 12,3 pouces haute définition personnalisable",
+      "Sellerie cuir robuste résistant aux intempéries avec surpiqûres tout-terrain",
+      "Climatisation automatique bizone avec aérateurs circulaires style aviation",
+      "Système audio Hi-Fi 8 haut-parleurs avec caisson de basses intégré",
+      "Volant multifonction gainé cuir chauffant",
+      "Rétroviseur intérieur électrochrome avec boussole et altimètre intégrés",
+    ],
+    exterieur: [
+      "Châssis échelle séparé ultra-rigide en acier à très haute résistance",
+      "Calandre avant chromée iconique 5 fentes verticales BAIC Beijing",
+      "Arceau de sécurité intégré 'Roll Bar' tubulaire haute résistance",
+      "Garde au sol exceptionnelle de 220 mm avec angle d'attaque 37° et fuite 31°",
+      "Jantes tout-terrain forgées 17 pouces avec pneus All-Terrain AT",
+      "Roue de secours arrière montée sur hayon à ouverture latérale",
+      "Marchepieds tubulaires latéraux acier haute protection",
+      "Crochets de remorquage renforcés avant et arrière peints en rouge",
+    ],
+    securite: [
+      "Véritable transmission 4x4 enclenchable avec boîte courte et blocages de différentiels avant et arrière",
+      "Contrôle de stabilité dynamique ESP Bosch 9.3 et antipatinage tout-terrain",
+      "Assistance au démarrage en côte HAC et contrôle de vitesse en forte descente HDC",
+      "Caméras panoramiques 360° avec lignes de trajectoire d'angle de braquage",
+      "6 Airbags de sécurité frontaux et latéraux",
+      "Barres de protection anti-encastrement latérales et plaques sous carter en acier",
+      "Système de surveillance TPMS de la pression des pneus avec jauge de température",
+      "Freins à disques ventilés avant et arrière avec ABS et EBD",
+    ],
+  },
+
+  // 10. BAIC X55 (BEIJING MOFANG / X55 PREMIUM)
+  {
+    brand: "BAIC",
+    model: "X55",
+    variant: "Premium 1.5T VGT 7DCT",
+    category: "SUV",
+    year: 2024,
+    energy: "ESSENCE",
+    title: "BAIC X55 PREMIUM 1.5T VGT 7DCT",
+    photos: {
+      mainPhotoUrl: "/images/vehicles/x55-main.jpg",
+      interiorPhotoUrl: "/images/vehicles/x55-interior.jpg",
+      exteriorPhotoUrl: "/images/vehicles/x55-exterior.jpg",
+      rearPhotoUrl: "/images/vehicles/x55-rear.jpg",
+    },
+    dimensions: {
+      lengthWidthHeight: "4620x1886x1680",
+      wheelbase: "2735",
+      doors: 5,
+      seats: 5,
+      tankOrBattery: "53L",
+    },
+    motorisation: {
+      displacementOrMotor: "1498 cm3 (Magic Core 1.5T VGT Turbo à géométrie variable)",
+      cylinders: "4 en ligne 16V Miller Cycle",
+      transmission: "Automatique 7 rapports à double embrayage humide 7DCT",
+      fuelType: "Essence",
+      maxPower: "138 kW (188 ch) à 5500 tr/min",
+      maxTorque: "305 Nm à 1500-4250 tr/min",
+    },
+    equipementConfort: [
+      "Habitacle futuriste 'Spacecraft' avec écran tactile central 10,1 pouces",
+      "Combiné d'instruments conducteur 10,25 pouces entièrement digital",
+      "Sellerie cuir synthétique perforé sport avec sièges baquets ergonomiques",
+      "Toit ouvrant panoramique vitré géant de 0,81 m² avec capteur de pluie",
+      "Climatisation automatique bizone avec diffuseurs arrière et filtration PM2.5",
+      "Éclairage d'ambiance LED dynamique personnalisable multicolore",
+      "Sièges avant électriques chauffants et ventilés",
+      "Système d'accès mains libres et démarrage par bouton Push-Start",
+    ],
+    exterieur: [
+      "Face avant futuriste sans calandre 'Diamond Matrix' avant-gardiste",
+      "Poignées de portes escamotables affleurantes électroniques",
+      "Projecteurs Full LED biseautés et feux diurnes 'Wing of Light'",
+      "Jantes en alliage d'aluminium bicolores diamantées 19 pouces",
+      "Aileron arrière sport scindé inspiré de l'aéronautique",
+      "Rétroviseurs extérieurs électriques chauffants et rabattables automatiquement",
+      "Feux arrière LED traversants à effet tridimensionnel",
+      "Vitres arrière surteintées athermiques",
+    ],
+    securite: [
+      "Système de caméras 360° panoramiques 3D haute définition",
+      "Régulateur de vitesse adaptatif intelligent avec maintien au centre de la voie",
+      "Freinage d'urgence automatique autonome d'évitement de collision",
+      "6 Airbags de sécurité frontaux, latéraux et rideaux",
+      "Surveillance des angles morts BSD et alerte d'ouverture de porte",
+      "Système de contrôle électronique de stabilité ESP Bosch 9.3",
+      "Aide au démarrage en côte et contrôle en descente",
+      "Surveillance de pression des pneus TPMS",
+    ],
+  },
+
+  // 11. GEELY STARSHIP 7 (GALAXY STARSHIP 7 PHEV)
+  {
+    brand: "GEELY",
+    model: "STARSHIP 7",
+    variant: "Galaxy Starship 7 PHEV NordThor EM-i",
+    category: "SUV",
+    year: 2024,
+    energy: "HYBRIDE",
+    title: "GEELY GALAXY STARSHIP 7 PHEV NORDTHOR EM-I",
+    photos: {
+      mainPhotoUrl: "/images/vehicles/starship7-main.jpg",
+      interiorPhotoUrl: "/images/vehicles/starship7-interior.jpg",
+      exteriorPhotoUrl: "/images/vehicles/starship7-exterior.jpg",
+      rearPhotoUrl: "/images/vehicles/starship7-rear.jpg",
+    },
+    dimensions: {
+      lengthWidthHeight: "4740x1905x1685",
+      wheelbase: "2755",
+      doors: 5,
+      seats: 5,
+      tankOrBattery: "Batterie Aegis 19,09 kWh + Réservoir 51L",
+    },
+    motorisation: {
+      displacementOrMotor: "Système Hybride Rechargeable NordThor EM-i 1.5L Atmosphérique + Double Moteur électrique P1+P3",
+      cylinders: "4 en ligne thermique + moteurs synchrones à aimants permanents",
+      transmission: "Transmission hybride dédiée E-DHT haute efficacité",
+      fuelType: "Hybride Essence / Électrique",
+      maxPower: "Puissance combinée système : 160 kW (218 ch) / Thermique 82 kW (111 ch)",
+      maxTorque: "Couple combiné système : 338 Nm",
+      rangeKm: "Autonomie 100% électrique CLTC : 120 km · Autonomie combinée totale : 1420 km",
+    },
+    equipementConfort: [
+      "Cockpit numérique intelligent Galaxy Flyme Auto avec écran tactile 2.5K 14,6 pouces",
+      "Combiné d'instruments haute clarté 10,2 pouces tout numérique",
+      "Système audio Flyme Sound Haute Résolution 16 Haut-Parleurs avec appuie-tête acoustique",
+      "Sellerie cuir écologique 'Marshmallow' ultra-moelleuse avec surpiqûres géométriques",
+      "Sièges avant électriques, massants, chauffants et ventilés avec fonction couchette",
+      "Chargeur smartphone sans fil haute vitesse 50W avec ventilation active",
+      "Toit panoramique vitré immense avec store pare-soleil électrique",
+      "Climatisation automatique avec pompe à chaleur et système de filtration d'air antibactérien",
+    ],
+    exterieur: [
+      "Face avant épurée moderne avec bandeau LED lumineux 'Ripple of Light'",
+      "Calandre pleine aérodynamique à coefficient de traînée record Cx 0,288",
+      "Poignées de portes profilées ergonomiques et projecteurs avant Full LED matriciels",
+      "Jantes alliage aérodynamiques bicolores 19 pouces",
+      "Bandeau de feux arrière LED traversant 'Milky Way' sur toute la largeur",
+      "Hayon arrière motorisé avec fonction mémoire de hauteur",
+      "Vitrage feuilleté acoustique à haute insonorisation",
+      "Rétroviseurs électriques dégivrants rabattables automatiquement avec caméras intégrées",
+    ],
+    securite: [
+      "Système de batterie ultra-sécurisée Geely Aegis résistante au feu et aux chocs",
+      "Conduite autonome de niveau 2+ (ACC intelligent, centrage de voie, changement de voie assisté)",
+      "Caméras panoramiques 540° HD avec vue transparente du sous-châssis",
+      "Freinage d'urgence autonome AEB avec détection des usagers vulnérables",
+      "7 Airbags de sécurité incluant airbag central entre les passagers avant",
+      "Alerte de collision avant et arrière avec freinage automatique",
+      "Système de surveillance active de la fatigue du conducteur",
+      "Structure de caisse en acier au bore thermoformé ultra-résistant",
+    ],
+  },
+
+  // 12. TOYOTA LAND CRUISER PRADO
+  {
+    brand: "TOYOTA",
+    model: "LAND CRUISER PRADO",
+    variant: "TX-L Package 2.8L D-4D 4x4 6AT",
+    category: "SUV",
+    year: 2024,
+    energy: "DIESEL",
+    title: "TOYOTA LAND CRUISER PRADO TX-L 2.8L DIESEL 4X4",
+    photos: {
+      mainPhotoUrl: "/images/vehicles/prado-main.jpg",
+      interiorPhotoUrl: "/images/vehicles/prado-interior.jpg",
+      exteriorPhotoUrl: "/images/vehicles/prado-exterior.jpg",
+      rearPhotoUrl: "/images/vehicles/prado-rear.jpg",
+    },
+    dimensions: {
+      lengthWidthHeight: "4840x1885x1890",
+      wheelbase: "2790",
+      doors: 5,
+      seats: 7,
+      tankOrBattery: "87L + Réservoir auxiliaire 63L (150L total)",
+    },
+    motorisation: {
+      displacementOrMotor: "2755 cm3 (Toyota 1GD-FTV D-4D Turbo Diesel Common Rail)",
+      cylinders: "4 en ligne 16V DACT Turbo Intercooler",
+      transmission: "Automatique 6 rapports Super ECT avec réducteur 4WD permanent",
+      fuelType: "Diesel",
+      maxPower: "150 kW (204 ch) à 3000-3400 tr/min",
+      maxTorque: "500 Nm à 1600-2800 tr/min",
+    },
+    equipementConfort: [
+      "Configuration 7 vraies places avec 3e rangée de sièges rabattable électriquement à plat",
+      "Sellerie cuir véritable de haute qualité avec réglages électriques conducteur et passager",
+      "Écran central multimédia tactile Toyota Touch 2 avec Apple CarPlay et Android Auto",
+      "Console centrale avec compartiment réfrigéré 'Cool Box' pour boissons",
+      "Climatisation automatique trizone avec commandes indépendantes aux 2e et 3e rangées",
+      "Système audio JBL Premium 14 Haut-Parleurs Haute Fidélité Surround",
+      "Volant cuir et bois multifonction à réglage électrique de hauteur et profondeur",
+      "Système d'accès et de démarrage intelligent Smart Entry & Push Start",
+    ],
+    exterieur: [
+      "Châssis en échelle traditionnel ultra-robuste légendaire Toyota Land Cruiser",
+      "Calandre avant imposante chromée à 5 barres verticales emblématiques",
+      "Projecteurs avant Full LED avec lave-phares haute pression intégrés",
+      "Jantes en alliage bicolores 18 pouces chaussées de pneumatiques mixtes tout-terrain",
+      "Marchepieds latéraux éclairés intégrés et barres de toit longitudinales aluminium",
+      "Porte de coffre arrière à ouverture latérale avec lunette arrière à ouverture indépendante",
+      "Roue de secours sous châssis (ou sur porte arrière selon configuration)",
+      "Bavettes garde-boue avant et arrière renforcées",
+    ],
+    securite: [
+      "Transmission 4x4 permanente avec différentiel central Torsen à glissement limité et blocage 100%",
+      "Système de sélection multiterrain MTS (Multi-Terrain Select) et régulateur tout-terrain Crawl Control",
+      "Système de suspension dynamique cinétique KDSS pour un confort royal sur route et débattement maximal en piste",
+      "Caméras panoramiques Multi-Terrain Monitor 360° avec vue sous le véhicule",
+      "Pack de sécurité Toyota Safety Sense (PCS détection piétons, régulateur adaptatif ACC, LDA)",
+      "7 Airbags de sécurité (frontaux, latéraux, rideaux couvrant les 3 rangées et protège-genoux)",
+      "Contrôle de stabilité du véhicule (VSC) et système d'assistance au remorquage (TSC)",
+      "Système de freinage ABS multiterrain avec assistance au freinage d'urgence BA",
     ],
   },
 
@@ -1413,53 +1976,79 @@ export const OFFICIAL_VEHICLE_CATALOG: ModelCatalogEntry[] = [
 
 /**
  * Recherche et résout la fiche technique officielle exacte pour un véhicule donné
+ * avec gestion avancée des alias constructeurs et modèles de la flotte Carzone.
  */
 export function findCatalogSpecs(brand: string, model: string, variant?: string | null): ModelCatalogEntry | null {
   const b = (brand || "").trim().toUpperCase();
   const m = (model || "").trim().toUpperCase();
   const v = (variant || "").trim().toUpperCase();
 
-  // 1. Match par marque et modèle exacts ou partiels
+  // Nettoyage intelligent du nom de modèle (retirer les années, DC 4X4, transmissions)
+  const cleanM = m
+    .replace(/\b20\d\d\b/g, "")
+    .replace(/\bDC\s*4X4\b/g, "")
+    .replace(/\b4X4\b/g, "")
+    .replace(/\bAWD\b/g, "")
+    .replace(/\b8AT\b/g, "")
+    .replace(/\b7DCT\b/g, "")
+    .replace(/\bI-DM\b/g, "")
+    .replace(/\bPHEV\b/g, "")
+    .replace(/\bEV\b/g, "")
+    .trim();
+
+  // 1. Match par marque (avec alias) et modèle
   for (const entry of OFFICIAL_VEHICLE_CATALOG) {
     const entryBrand = entry.brand.toUpperCase();
     const entryModel = entry.model.toUpperCase();
 
-    // Check brand match
-    const brandMatches =
-      (b.includes("MERCEDES") || b.includes("BENZ")) ? entryBrand.includes("MERCEDES") :
-      (b.includes("BAIC") || b.includes("BEIJING")) ? (entryBrand.includes("BAIC") || entryBrand.includes("BEIJING")) :
-      b.includes(entryBrand) || entryBrand.includes(b);
+    // Gestion des alias de constructeurs
+    const isBrandMatch =
+      b.includes(entryBrand) || entryBrand.includes(b) ||
+      ((b.includes("FORTHING") || b.includes("DONGFENG")) && (entryBrand.includes("FORTHING") || entryBrand.includes("DONGFENG"))) ||
+      ((b.includes("BAIC") || b.includes("BEIJING") || b.includes("SENOVA")) && (entryBrand.includes("BAIC") || entryBrand.includes("BEIJING"))) ||
+      ((b.includes("GEELY") || b.includes("GALAXY")) && (entryBrand.includes("GEELY") || entryBrand.includes("GALAXY"))) ||
+      ((b.includes("MERCEDES") || b.includes("BENZ")) && entryBrand.includes("MERCEDES")) ||
+      ((b.includes("CHANGAN") || b.includes("CHANG'AN")) && entryBrand.includes("CHANGAN")) ||
+      ((b.includes("JETOUR") || b.includes("CHERY")) && entryBrand.includes("JETOUR"));
 
-    if (!brandMatches) continue;
+    if (!isBrandMatch) continue;
 
-    // Check model match
-    const modelMatches =
-      m.includes(entryModel) || entryModel.includes(m) ||
-      (m.includes("CHEROKEE") && entryModel.includes("CHEROKEE")) ||
-      (m.includes("CROSS") && entryModel.includes("CROSS")) ||
-      (m.includes("T2") && entryModel.includes("T2")) ||
-      (m.includes("TRAVELLER") && entryModel.includes("T2")) ||
-      (m.includes("NAMMI") && entryModel.includes("NAMMI")) ||
-      (m.includes("RICH") && entryModel.includes("RICH")) ||
-      (m.includes("06") && entryModel.includes("06")) ||
-      (m.includes("X55") && entryModel.includes("X55")) ||
-      (m.includes("L200") && entryModel.includes("L200")) ||
-      (m.includes("TRITON") && entryModel.includes("L200")) ||
-      (m.includes("SONG") && entryModel.includes("SONG"));
+    // Correspondance modèle précise ou par mot-clé
+    const isModelMatch =
+      entryModel === cleanM ||
+      cleanM.includes(entryModel) ||
+      entryModel.includes(cleanM) ||
+      (cleanM.includes("RICH") && entryModel.includes("RICH")) ||
+      (cleanM.includes("T5") && entryModel.includes("T5")) ||
+      (cleanM.includes("CS75") && entryModel.includes("CS75")) ||
+      (cleanM.includes("CS35") && entryModel.includes("CS35")) ||
+      (cleanM.includes("UNI-K") && entryModel.includes("UNI-K")) ||
+      (cleanM.includes("B40") && (entryModel.includes("B40") || entryModel.includes("BJ40"))) ||
+      (cleanM.includes("X55") && entryModel.includes("X55")) ||
+      (cleanM.includes("STARSHIP") && entryModel.includes("STARSHIP")) ||
+      (cleanM.includes("PRADO") && entryModel.includes("PRADO")) ||
+      (cleanM.includes("DASHING") && entryModel.includes("DASHING")) ||
+      (cleanM.includes("T2") && entryModel.includes("T2")) ||
+      (cleanM.includes("TRAVELLER") && entryModel.includes("T2"));
 
-    if (modelMatches) {
+    if (isModelMatch) {
       return entry;
     }
   }
 
-  // 2. Si pas de modèle spécifié mais marque reconnue (ex: "MERCEDES" ou "BENZ" seul)
-  if (b.includes("MERCEDES") || b.includes("BENZ")) {
-    if (m.includes("C") || v.includes("C")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "CLASSE C") || null;
-    return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "GLE") || null;
+  // 2. Fallbacks spécifiques par marque connue
+  if (b.includes("FORTHING") || b.includes("DONGFENG")) {
+    if (m.includes("RICH")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "RICH 7") || null;
+    if (m.includes("T5")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "T5 EVO") || null;
+    if (m.includes("NAMMI")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "NAMMI") || null;
+    return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "T5 EVO") || null;
   }
 
-  if (b.includes("JEEP")) {
-    return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "GRAND CHEROKEE") || null;
+  if (b.includes("CHANGAN")) {
+    if (m.includes("75")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "CS75") || null;
+    if (m.includes("35")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "CS35 PLUS") || null;
+    if (m.includes("UNI")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "UNI-K") || null;
+    return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "CS75") || null;
   }
 
   if (b.includes("JETOUR")) {
@@ -1467,7 +2056,17 @@ export function findCatalogSpecs(brand: string, model: string, variant?: string 
     return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "DASHING") || null;
   }
 
+  if (b.includes("BAIC") || b.includes("BEIJING")) {
+    if (m.includes("40") || m.includes("B40")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "B40 PRO") || null;
+    return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "X55") || null;
+  }
+
+  if (b.includes("GEELY")) {
+    return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "STARSHIP 7") || null;
+  }
+
   if (b.includes("TOYOTA")) {
+    if (m.includes("PRADO") || m.includes("LAND CRUISER")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "LAND CRUISER PRADO") || null;
     if (m.includes("CROSS")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "COROLLA CROSS") || null;
     if (m.includes("CAMRY")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "CAMRY") || null;
     if (m.includes("FORTUNER")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "FORTUNER") || null;
@@ -1475,25 +2074,6 @@ export function findCatalogSpecs(brand: string, model: string, variant?: string 
     if (m.includes("HIACE")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "HIACE") || null;
   }
 
-  if (b.includes("MITSUBISHI")) {
-    if (m.includes("L200")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "L200") || null;
-    if (m.includes("XPANDER")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "XPANDER") || null;
-    return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "OUTLANDER") || null;
-  }
-
-  if (b.includes("DONGFENG")) {
-    if (m.includes("NAMMI")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "NAMMI") || null;
-    return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "RICH 7") || null;
-  }
-
-  if (b.includes("BAIC") || b.includes("BEIJING")) {
-    return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "X55") || null;
-  }
-
-  if (b.includes("KIA")) {
-    if (m.includes("SELTOS")) return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "SELTOS") || null;
-    return OFFICIAL_VEHICLE_CATALOG.find(e => e.model === "SPORTAGE") || null;
-  }
-
   return null;
 }
+

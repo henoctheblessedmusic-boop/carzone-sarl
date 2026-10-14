@@ -189,10 +189,10 @@ Année : ${vehicle.year || 2026}
 
   // Association des photos officielles constructeur (haute définition, cadrage sans rognage)
   const officialPhotos = catalogEntry?.photos || {
-    mainPhotoUrl: "https://upload.wikimedia.org/wikipedia/commons/4/43/2023_Toyota_Corolla_Cross_XLE_4WD_in_Wind_Chill_Pearl%2C_front_left.jpg",
-    interiorPhotoUrl: "https://upload.wikimedia.org/wikipedia/commons/0/0f/2020_Toyota_Corolla_Cross_Hybrid_Premium_Safety_%28Cockpit%29.jpg",
-    exteriorPhotoUrl: "https://upload.wikimedia.org/wikipedia/commons/1/1c/Toyota_Corolla_Cross_GR_Sport_in_Cape_Town.jpg",
-    rearPhotoUrl: "https://upload.wikimedia.org/wikipedia/commons/6/63/2023_Toyota_Corolla_Cross_XLE_4WD_in_Wind_Chill_Pearl%2C_rear_left.jpg",
+    mainPhotoUrl: "/images/vehicles/rich7-main.jpg",
+    interiorPhotoUrl: "/images/vehicles/rich7-interior.jpg",
+    exteriorPhotoUrl: "/images/vehicles/rich7-exterior.jpg",
+    rearPhotoUrl: "/images/vehicles/rich7-rear.jpg",
   };
 
   return {

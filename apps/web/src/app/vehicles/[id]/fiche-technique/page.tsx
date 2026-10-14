@@ -4,7 +4,6 @@ import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { PrintButton } from "@/components/PrintButton";
 import { VehicleTechSheetPrint } from "@/components/VehicleTechSheetPrint";
-import { TechSheetAIActions } from "@/components/TechSheetAIActions";
 import { buildStandardTechnicalSheet, type TechnicalSheet } from "@/lib/tech-sheet-generator";
 
 export default async function VehicleTechSheetPage({
@@ -26,8 +25,14 @@ export default async function VehicleTechSheetPage({
   if (vehicle.technicalSheetJson) {
     try {
       sheet = JSON.parse(vehicle.technicalSheetJson);
-      // Auto-heal if sheet has obsolete generic photo
-      if (!sheet.mainPhotoUrl || sheet.mainPhotoUrl.includes("photo-1617814076367-b759c7d7e738")) {
+      // Auto-heal si la fiche a une photo corolla cross ou unsplash ou incomplète
+      const hasObsoletePhoto =
+        !sheet.mainPhotoUrl ||
+        sheet.mainPhotoUrl.includes("Toyota_Corolla_Cross") ||
+        sheet.mainPhotoUrl.includes("Corolla_Cross") ||
+        sheet.mainPhotoUrl.includes("photo-1617814076367");
+
+      if (hasObsoletePhoto) {
         sheet = buildStandardTechnicalSheet(vehicle);
         prisma.vehicle
           .update({
@@ -93,16 +98,11 @@ export default async function VehicleTechSheetPage({
             ← Retour Stock
           </Link>
           <div style={{ fontWeight: 700, fontSize: "0.95rem" }}>
-            Fiche Technique : {sheet.title}
+            Fiche Technique Officielle : {sheet.title}
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap" }}>
-          <TechSheetAIActions
-            vehicleId={vehicle.id}
-            brand={vehicle.brand}
-            model={vehicle.model}
-          />
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
           <PrintButton />
         </div>
       </div>

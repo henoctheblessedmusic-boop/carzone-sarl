@@ -63,29 +63,22 @@ export function VehicleTechSheetPrint({
           }}
         >
           {/* Identité Concessionnaire Bénin */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/carzone-logo.png"
+              alt="Carzone SARL"
               style={{
-                width: "40px",
-                height: "40px",
-                borderRadius: "10px",
-                background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#ffffff",
-                fontWeight: 900,
-                fontSize: "1.15rem",
-                letterSpacing: "0.05em",
-                boxShadow: "0 4px 12px rgba(15, 23, 42, 0.2)",
+                height: "46px",
+                width: "auto",
+                objectFit: "contain",
+                borderRadius: "6px",
               }}
-            >
-              OX
-            </div>
+            />
             <div>
               <div
                 style={{
-                  fontSize: "1.05rem",
+                  fontSize: "1.08rem",
                   fontWeight: 900,
                   letterSpacing: "0.06em",
                   color: "#0f172a",
@@ -217,7 +210,7 @@ export function VehicleTechSheetPrint({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={sheet.mainPhotoUrl || "https://upload.wikimedia.org/wikipedia/commons/4/4c/2020_Toyota_Corolla_Cross_-_Front.jpg"}
+            src={sheet.mainPhotoUrl || "/images/vehicles/rich7-main.jpg"}
             alt={sheet.title}
             referrerPolicy="no-referrer"
             style={{
@@ -550,7 +543,7 @@ export function VehicleTechSheetPrint({
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={sheet.interiorPhotoUrl || "https://upload.wikimedia.org/wikipedia/commons/0/0f/2020_Toyota_Corolla_Cross_Hybrid_Premium_Safety_%28Cockpit%29.jpg"}
+                src={sheet.interiorPhotoUrl || "/images/vehicles/rich7-interior.jpg"}
                 alt="Intérieur & Habitacle officiel"
                 referrerPolicy="no-referrer"
                 style={{ width: "100%", height: "100%", maxHeight: "100%", maxWidth: "100%", objectFit: "contain", objectPosition: "center center" }}

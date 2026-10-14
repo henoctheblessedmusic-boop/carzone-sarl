@@ -12,6 +12,8 @@ export type TechnicalSheet = {
   energy: string;
   mainPhotoUrl?: string | null;
   interiorPhotoUrl?: string | null;
+  interiorSeatsPhotoUrl?: string | null;
+  interiorDetailPhotoUrl?: string | null;
   exteriorPhotoUrl?: string | null;
   rearPhotoUrl?: string | null;
   dimensions: {
@@ -177,6 +179,11 @@ export function buildStandardTechnicalSheet(vehicle: {
       energy: vehicle.energy || catalogEntry.energy,
       mainPhotoUrl: mainPhoto,
       interiorPhotoUrl: interiorPhoto,
+      interiorSeatsPhotoUrl:
+        catalogEntry.photos.interiorSeatsPhotoUrl ||
+        (interiorPhoto?.includes("-interior.jpg")
+          ? interiorPhoto.replace("-interior.jpg", "-seats.jpg")
+          : "/images/vehicles/x55-seats.jpg"),
       exteriorPhotoUrl: exteriorPhoto,
       rearPhotoUrl: rearPhoto,
       dimensions: {

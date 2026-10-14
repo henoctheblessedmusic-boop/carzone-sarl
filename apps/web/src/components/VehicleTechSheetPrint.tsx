@@ -527,27 +527,31 @@ export function VehicleTechSheetPrint({
           </div>
         </div>
 
-        {/* GRANDE PHOTOGRAPHIE MAJESTUEUSE DE L'INTÉRIEUR AU FORMAT 4:3 CLAIR ET SANS DÉFORMATION */}
-        <div style={{ margin: "2mm 0" }}>
+        {/* DUO PHOTOGRAPHIES DE L'HABITACLE AU FORMAT 4:3 : POSTE DE PILOTAGE & SELLERIE CUIR */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "14px",
+            margin: "2mm 0",
+          }}
+        >
+          {/* Photo 1 : Cockpit Numérique 4:3 */}
           <div
             style={{
               position: "relative",
-              width: "100%",
-              height: "116mm",
-              borderRadius: "12px",
+              height: "72mm",
+              borderRadius: "10px",
               overflow: "hidden",
               border: "1.5px solid #cbd5e1",
-              boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
               background: "#f8fafc",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={sheet.interiorPhotoUrl || "/images/vehicles/prado-interior.jpg"}
-              alt="Habitacle & Cockpit officiel"
+              src={sheet.interiorPhotoUrl || "/images/vehicles/x55-interior.jpg"}
+              alt="Cockpit & Poste de Pilotage Officiel"
               referrerPolicy="no-referrer"
               style={{
                 width: "100%",
@@ -556,24 +560,70 @@ export function VehicleTechSheetPrint({
                 objectPosition: "center center",
               }}
             />
-            {/* Badge élégant sur la photo */}
             <div
               style={{
                 position: "absolute",
-                bottom: "10px",
-                left: "12px",
-                background: "rgba(15, 23, 42, 0.78)",
+                bottom: "6px",
+                left: "8px",
+                background: "rgba(15, 23, 42, 0.82)",
                 backdropFilter: "blur(4px)",
                 color: "#ffffff",
-                padding: "5px 14px",
-                borderRadius: "20px",
-                fontSize: "0.70rem",
+                padding: "3px 10px",
+                borderRadius: "12px",
+                fontSize: "0.62rem",
                 fontWeight: 700,
-                letterSpacing: "0.06em",
-                border: "1px solid rgba(255,255,255,0.25)",
+                letterSpacing: "0.04em",
               }}
             >
-              Cockpit &amp; Sellerie Cuir Haut de Gamme · Format d&apos;Origine Constructeur
+              Poste de Pilotage &amp; Cockpit Digital
+            </div>
+          </div>
+
+          {/* Photo 2 : Sellerie Cuir & Confort Passagers 4:3 */}
+          <div
+            style={{
+              position: "relative",
+              height: "72mm",
+              borderRadius: "10px",
+              overflow: "hidden",
+              border: "1.5px solid #cbd5e1",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+              background: "#f8fafc",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={
+                sheet.interiorSeatsPhotoUrl ||
+                (sheet.interiorPhotoUrl?.includes("-interior")
+                  ? sheet.interiorPhotoUrl.replace("-interior.jpg", "-seats.jpg")
+                  : "/images/vehicles/x55-seats.jpg")
+              }
+              alt="Sellerie Cuir & Confort Passagers"
+              referrerPolicy="no-referrer"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "center center",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                bottom: "6px",
+                left: "8px",
+                background: "rgba(15, 23, 42, 0.82)",
+                backdropFilter: "blur(4px)",
+                color: "#ffffff",
+                padding: "3px 10px",
+                borderRadius: "12px",
+                fontSize: "0.62rem",
+                fontWeight: 700,
+                letterSpacing: "0.04em",
+              }}
+            >
+              Sellerie Cuir &amp; Espace Passagers de Luxe
             </div>
           </div>
         </div>

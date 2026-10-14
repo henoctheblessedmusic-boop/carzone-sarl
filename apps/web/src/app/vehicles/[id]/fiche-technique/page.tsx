@@ -25,9 +25,10 @@ export default async function VehicleTechSheetPage({
   if (vehicle.technicalSheetJson) {
     try {
       sheet = JSON.parse(vehicle.technicalSheetJson);
-      // Auto-heal si la fiche a une photo corolla cross ou unsplash ou incomplète
+      // Auto-heal si la fiche a une photo obsolète ou manque la photo de sellerie 4:3
       const hasObsoletePhoto =
         !sheet.mainPhotoUrl ||
+        !sheet.interiorSeatsPhotoUrl ||
         sheet.mainPhotoUrl.includes("Toyota_Corolla_Cross") ||
         sheet.mainPhotoUrl.includes("Corolla_Cross") ||
         sheet.mainPhotoUrl.includes("photo-1617814076367");

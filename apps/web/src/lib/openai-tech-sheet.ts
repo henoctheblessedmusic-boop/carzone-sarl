@@ -3,13 +3,42 @@ import type { TechnicalSheet } from "@/lib/tech-sheet-generator";
 import { findCatalogSpecs } from "./vehicle-catalog-specs";
 import { normalizeBrandName } from "./brand-logos";
 
+// Marques automobiles chinoises partenaires de Carzone SARL
+const CHINESE_BRANDS = new Set([
+  "CHANGAN",
+  "BAIC",
+  "JETOUR",
+  "FORTHING",
+  "DONGFENG",
+  "GEELY",
+  "BYD",
+  "HAVAL",
+  "CHERY",
+  "GWM",
+  "TANK",
+  "JAC",
+  "FAW",
+  "VOYAH",
+  "LI AUTO",
+  "NIO",
+  "XPENG",
+  "ZEEKR",
+  "MAXUS",
+  "WULING",
+  "MG",
+  "OMODA",
+  "JAECOO",
+]);
+
+export function isChineseBrand(brand: string): boolean {
+  const norm = normalizeBrandName(brand).toUpperCase();
+  return CHINESE_BRANDS.has(norm);
+}
+
 export async function getOpenAIApiKey(): Promise<string | null> {
-  // 1. Priorité à la variable d'environnement si présente
   if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.trim().startsWith("sk-")) {
     return process.env.OPENAI_API_KEY.trim();
   }
-
-  // 2. Sinon, clé configurée depuis l'application web dans SystemSetting
   try {
     const setting = await prisma.systemSetting.findUnique({
       where: { key: "OPENAI_API_KEY" },
@@ -20,7 +49,23 @@ export async function getOpenAIApiKey(): Promise<string | null> {
   } catch (err) {
     console.error("Erreur lecture OPENAI_API_KEY en BDD:", err);
   }
+  return null;
+}
 
+export async function getDeepSeekApiKey(): Promise<string | null> {
+  if (process.env.DEEPSEEK_API_KEY && process.env.DEEPSEEK_API_KEY.trim().startsWith("sk-")) {
+    return process.env.DEEPSEEK_API_KEY.trim();
+  }
+  try {
+    const setting = await prisma.systemSetting.findUnique({
+      where: { key: "DEEPSEEK_API_KEY" },
+    });
+    if (setting && setting.value && setting.value.trim().startsWith("sk-")) {
+      return setting.value.trim();
+    }
+  } catch (err) {
+    console.error("Erreur lecture DEEPSEEK_API_KEY en BDD:", err);
+  }
   return null;
 }
 
@@ -28,24 +73,29 @@ export async function setOpenAIApiKey(apiKey: string): Promise<void> {
   const cleanKey = apiKey.trim();
   await prisma.systemSetting.upsert({
     where: { key: "OPENAI_API_KEY" },
-    create: {
-      key: "OPENAI_API_KEY",
-      value: cleanKey,
-      category: "AI",
-    },
-    update: {
-      value: cleanKey,
-      category: "AI",
-    },
+    create: { key: "OPENAI_API_KEY", value: cleanKey, category: "AI" },
+    update: { value: cleanKey, category: "AI" },
+  });
+}
+
+export async function setDeepSeekApiKey(apiKey: string): Promise<void> {
+  const cleanKey = apiKey.trim();
+  await prisma.systemSetting.upsert({
+    where: { key: "DEEPSEEK_API_KEY" },
+    create: { key: "DEEPSEEK_API_KEY", value: cleanKey, category: "AI" },
+    update: { value: cleanKey, category: "AI" },
   });
 }
 
 /**
- * Génère une fiche technique officielle 100% conforme et sans incohérence via l'API OpenAI
- * Utilise le modèle avancé 'gpt-4o' d'OpenAI avec sourcing officiel constructeur.
+ * Génère une fiche technique officielle via le Moteur IA Hybride Carzone :
+ * - Marques Chinoises (Changan, Jetour, BAIC, Haval, Geely, BYD, etc.) -> DeepSeek API (deepseek-chat)
+ * - Marques Internationales (Toyota, Mercedes, Land Rover, etc.) -> OpenAI API (gpt-4o / gpt-4o-mini)
+ * - Tolérance aux pannes : Fallback croisé automatique entre DeepSeek et OpenAI.
  */
 export async function generateTechSheetWithAI(
   vehicle: {
+    id?: string;
     brand: string;
     model: string;
     variant?: string | null;
@@ -54,14 +104,6 @@ export async function generateTechSheetWithAI(
   },
   customApiKey?: string
 ): Promise<TechnicalSheet> {
-  const apiKey = customApiKey?.trim() || (await getOpenAIApiKey());
-
-  if (!apiKey) {
-    throw new Error(
-      "Clé d'API OpenAI non configurée. Veuillez renseigner votre clé OpenAI (sk-...) sur la plateforme."
-    );
-  }
-
   const normalizedBrand = normalizeBrandName(vehicle.brand);
   const catalogEntry = findCatalogSpecs(vehicle.brand, vehicle.model, vehicle.variant);
 
@@ -70,19 +112,21 @@ export async function generateTechSheetWithAI(
     vehicle.variant && /\b[A-Z]{2}\s*\d{3,4}\s*([A-Z]{2})?\b/i.test(vehicle.variant);
   const cleanVariant = !isPlate ? vehicle.variant || (catalogEntry ? catalogEntry.variant : "") : "";
 
-  const systemPrompt = `Tu es l'ingénieur en chef d'homologation automobile pour la concession CARZONE SARL Bénin.
-Tu es directement connecté aux portails et fiches techniques des constructeurs automobiles officiels (Changan Global, Jetour Global, BYD Auto, Great Wall Motor, BAIC International, Dongfeng / Forthing, Chery International, Geely Global, Toyota Global, etc.).
+  const systemPrompt = `Tu es l'ingénieur en chef d'homologation automobile pour la concession CARZONE SARL Bénin (concessionnaire agréé de véhicules 100% neufs).
+Tu es directement connecté aux portails techniques et EPC officiels des constructeurs (Changan Global, Jetour Global, BAIC International, BYD Auto, Great Wall Motor, Dongfeng / Forthing, Geely Global, Toyota Global, etc.).
 
 MISSION CRITIQUE :
-Générer une fiche technique officielle irréprochable qui met en valeur le véhicule neuf, avec les caractéristiques exactes publiées par le constructeur et des visuels sans compromis.
+Générer une fiche technique officielle irréprochable mettant en valeur le véhicule neuf, avec les caractéristiques exactes publiées par le constructeur.
 
-RÈGLES STRICTES DE COHÉRENCE CONSTRUCTEUR :
-1. CARBURANT : Choisis STRICTEMENT UN SEUL type réel (ex: "Diesel", "Essence", "100% Électrique" ou "Hybride"). NE JAMAIS écrire "Essence / Diesel" ou deux énergies opposées.
-2. TITRE & FINITION : Utilise la véritable dénomination commerciale officielle du constructeur (ex: "Dynamic 1.5T DCT", "Summit Reserve 4x4", "Mach Edition 1.5T", "PHEV Qihang"). Ne jamais inclure de numéro d'immatriculation.
-3. MOTORISATION : Fournis les caractéristiques officielles certifiées : cylindrée exacte en cm3, nombre de cylindres, puissance réelle en kW/ch, couple maximal en Nm, type précis de boîte de vitesses (ex: DCT 7 rapports, BVA 8AT Aisin, Réducteur EV).
-4. DIMENSIONS OFFICIELLES : Longueur x Largeur x Hauteur en mm exacts, empattement en mm, nombre de portes, nombre de places, capacité du réservoir en L ou batterie en kWh.
-5. ÉQUIPEMENTS DE POINTE : 8 points d'équipements de confort modernes, 8 points extérieurs valorisants, 8 points de sécurité active/passive réels (ADAS, ESP, Airbags).
-6. LANGUE : 100% en français professionnel de haute concession automobile.
+RÈGLES STRICTES :
+1. VÉHICULE NEUF SANS PLAQUE : Ne jamais mentionner de plaque d'immatriculation ni de statut d'occasion.
+2. CARBURANT RÉEL UNIQUE : "Essence", "Diesel", "100% Électrique" ou "Hybride Rechargeable".
+3. TITRE & FINITION : Dénomination commerciale officielle d'origine constructeur (ex: "Premium 1.5T VGT 7DCT", "Summit Reserve 4x4", "Mach Edition 1.5T").
+4. MOTORISATION : Caractéristiques officielles : cylindrée exacte en cm3, architecture cylindres, puissance réelle en kW/ch, couple max en Nm, transmission exacte (ex: 7DCT humide, 8AT Aisin, e-CVT).
+5. DIMENSIONS : L x l x h en mm, empattement en mm, portes, places, capacité réservoir ou batterie.
+6. ÉQUIPEMENTS DE CONFORT : 8 points d'équipements réels (écrans tactiles, volant cuir, sièges massants/ventilés, climatisation bizone, etc.).
+7. EXTÉRIEUR & SÉCURITÉ : 8 points extérieurs valorisants et 8 aides à la conduite / sécurité ADAS.
+8. LANGUE : 100% en français professionnel automobile de prestige.
 
 Format JSON requis :
 {
@@ -117,91 +161,170 @@ Format JSON requis :
   const userPrompt = `Génère la fiche technique officielle constructeur pour :
 Marque officielle : ${normalizedBrand}
 Modèle exact : ${vehicle.model}
-Finition constructeur demandée : ${cleanVariant || "Version d'origine constructeur"}
-Année : ${vehicle.year || 2026}
+Finition constructeur : ${cleanVariant || "Version d'origine constructeur"}
+Année modèle : ${vehicle.year || 2026}
 Énergie déclarée : ${vehicle.energy || (catalogEntry ? catalogEntry.energy : "Automatique selon motorisation officielle")}`;
 
+  const deepseekKey = await getDeepSeekApiKey();
+  const openaiKey = customApiKey?.trim() || (await getOpenAIApiKey());
+  const useDeepSeekFirst = isChineseBrand(normalizedBrand) && !!deepseekKey;
+
   let parsed: any = null;
+  let usedEngine = "CATALOGUE_D_ORIGINE";
 
-  // 1. Essai avec le modèle avancé 'gpt-4o'
-  try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.2,
-      }),
-    });
+  // 1. Appel DeepSeek pour les marques chinoises
+  if (useDeepSeekFirst && deepseekKey) {
+    try {
+      const res = await fetch("https://api.deepseek.com/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${deepseekKey}`,
+        },
+        body: JSON.stringify({
+          model: "deepseek-chat",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.2,
+        }),
+      });
 
-    if (response.ok) {
-      const json = await response.json();
-      const rawContent = json.choices?.[0]?.message?.content;
-      if (rawContent) {
-        parsed = JSON.parse(rawContent);
+      if (res.ok) {
+        const json = await res.json();
+        const raw = json.choices?.[0]?.message?.content;
+        if (raw) {
+          parsed = JSON.parse(raw);
+          usedEngine = "DEEPSEEK_OFFICIAL_CHINESE_EPC";
+        }
+      } else {
+        console.warn("DeepSeek API status:", res.status, "bascule sur OpenAI...");
       }
-    } else {
-      console.warn("gpt-4o status:", response.status, "tentative de bascule sur gpt-4o-mini...");
+    } catch (err) {
+      console.warn("Erreur DeepSeek API:", err);
     }
-  } catch (err) {
-    console.warn("Erreur appel gpt-4o:", err);
   }
 
-  // 2. Fallback automatique sur 'gpt-4o-mini' si gpt-4o indisponible
+  // 2. Appel OpenAI (pour marques internationales ou fallback DeepSeek)
+  if (!parsed && openaiKey) {
+    try {
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${openaiKey}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.2,
+        }),
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        const raw = json.choices?.[0]?.message?.content;
+        if (raw) {
+          parsed = JSON.parse(raw);
+          usedEngine = "OPENAI_GPT4O_OFFICIAL";
+        }
+      } else {
+        // Fallback gpt-4o-mini
+        const fallbackRes = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${openaiKey}`,
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+            response_format: { type: "json_object" },
+            temperature: 0.2,
+          }),
+        });
+        if (fallbackRes.ok) {
+          const json = await fallbackRes.json();
+          const raw = json.choices?.[0]?.message?.content;
+          if (raw) {
+            parsed = JSON.parse(raw);
+            usedEngine = "OPENAI_GPT4O_MINI";
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Erreur OpenAI API:", err);
+    }
+  }
+
+  // 3. Fallback catalogue usine officiel si aucune IA n'a répondu
   if (!parsed) {
-    const fallbackResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.2,
-      }),
-    });
-
-    if (!fallbackResponse.ok) {
-      const errBody = await fallbackResponse.text();
-      throw new Error(`Erreur OpenAI API (${fallbackResponse.status}): ${errBody}`);
+    if (catalogEntry) {
+      parsed = {
+        title: catalogEntry.title,
+        subtitle: "SPÉCIFICATIONS TECHNIQUES OFFICIELLES CONSTRUCTEUR",
+        brand: catalogEntry.brand,
+        model: catalogEntry.model,
+        variant: catalogEntry.variant,
+        year: catalogEntry.year,
+        energy: catalogEntry.energy,
+        dimensions: catalogEntry.dimensions,
+        motorisation: catalogEntry.motorisation,
+        equipementConfort: catalogEntry.equipementConfort,
+        exterieur: catalogEntry.exterieur,
+        securite: catalogEntry.securite,
+      };
+      usedEngine = "OFFICIAL_FACTORY_CATALOG";
+    } else {
+      throw new Error(
+        "Impossible de générer la fiche technique : configurez une clé DeepSeek ou OpenAI valide."
+      );
     }
-
-    const json = await fallbackResponse.json();
-    const rawContent = json.choices?.[0]?.message?.content;
-    if (!rawContent) {
-      throw new Error("Réponse vide de l'API OpenAI.");
-    }
-    parsed = JSON.parse(rawContent);
   }
 
-  // Association des photos officielles constructeur (haute définition, cadrage sans rognage)
+  // Association des photographies de studio officielles (zéro plaque civile, format 4:3)
   const officialPhotos = catalogEntry?.photos || {
-    mainPhotoUrl: "/images/vehicles/rich7-main.jpg",
-    interiorPhotoUrl: "/images/vehicles/rich7-interior.jpg",
-    exteriorPhotoUrl: "/images/vehicles/rich7-exterior.jpg",
-    rearPhotoUrl: "/images/vehicles/rich7-rear.jpg",
+    mainPhotoUrl: "/images/vehicles/x55-main.jpg",
+    interiorPhotoUrl: "/images/vehicles/x55-interior.jpg",
+    interiorSeatsPhotoUrl: "/images/vehicles/x55-seats.jpg",
+    exteriorPhotoUrl: "/images/vehicles/x55-exterior.jpg",
+    rearPhotoUrl: "/images/vehicles/x55-rear.jpg",
   };
 
-  return {
+  const finalSheet: TechnicalSheet = {
     ...parsed,
     mainPhotoUrl: officialPhotos.mainPhotoUrl,
     interiorPhotoUrl: officialPhotos.interiorPhotoUrl,
+    interiorSeatsPhotoUrl: officialPhotos.interiorSeatsPhotoUrl || officialPhotos.interiorPhotoUrl?.replace(".jpg", "-seats.jpg"),
     exteriorPhotoUrl: officialPhotos.exteriorPhotoUrl,
     rearPhotoUrl: officialPhotos.rearPhotoUrl,
+    sourceChinese: usedEngine,
     translatedAt: new Date().toISOString(),
   };
-}
 
+  // Sauvegarde automatique en base de données si un identifiant de véhicule est fourni
+  if (vehicle.id) {
+    try {
+      await prisma.vehicle.update({
+        where: { id: vehicle.id },
+        data: {
+          technicalSheetJson: JSON.stringify(finalSheet),
+          mainPhotoUrl: finalSheet.mainPhotoUrl,
+        },
+      });
+    } catch (dbErr) {
+      console.error("Erreur enregistrement fiche technique en BDD:", dbErr);
+    }
+  }
+
+  return finalSheet;
+}

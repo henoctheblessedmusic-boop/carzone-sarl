@@ -42,7 +42,7 @@ export default async function QuotePrintPage({
     if (vehicle.technicalSheetJson) {
       try {
         sheet = JSON.parse(vehicle.technicalSheetJson);
-        if (!sheet.mainPhotoUrl || sheet.mainPhotoUrl.includes("photo-1617814076367-b759c7d7e738")) {
+        if (!sheet.mainPhotoUrl || !sheet.interiorSeatsPhotoUrl || sheet.mainPhotoUrl.includes("photo-1617814076367-b759c7d7e738")) {
           sheet = buildStandardTechnicalSheet(vehicle);
         }
       } catch {

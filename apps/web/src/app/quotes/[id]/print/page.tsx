@@ -134,15 +134,14 @@ export default async function QuotePrintPage({
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element -- print-friendly static asset */}
             <img
-              src="/brand/carzone-logo.svg"
-              alt="CARZONE"
-              width={140}
-              height={105}
+              src="/brand/carzone-logo.png"
+              alt="CARZONE SARL"
+              width={72}
+              height={72}
               style={{
                 display: "block",
-                background: "#000",
-                borderRadius: 10,
-                padding: 6,
+                borderRadius: "50%",
+                objectFit: "contain",
                 marginBottom: 6,
               }}
             />

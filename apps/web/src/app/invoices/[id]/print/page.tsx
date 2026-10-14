@@ -94,15 +94,14 @@ export default async function InvoicePrintPage({
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element -- print-friendly static asset */}
             <img
-              src="/brand/carzone-logo.svg"
+              src="/brand/carzone-logo.png"
               alt="CARZONE SARL"
-              width={140}
-              height={105}
+              width={75}
+              height={75}
               style={{
                 display: "block",
-                background: "#000",
-                borderRadius: 8,
-                padding: 6,
+                borderRadius: "50%",
+                objectFit: "contain",
                 marginBottom: 8,
               }}
             />

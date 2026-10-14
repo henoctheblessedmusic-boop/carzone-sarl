@@ -98,15 +98,14 @@ export default async function PaymentReceiptPage({
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element -- print-friendly static asset */}
             <img
-              src="/brand/carzone-logo.svg"
+              src="/brand/carzone-logo.png"
               alt="CARZONE SARL"
-              width={130}
-              height={98}
+              width={70}
+              height={70}
               style={{
                 display: "block",
-                background: "#000",
-                borderRadius: 8,
-                padding: 6,
+                borderRadius: "50%",
+                objectFit: "contain",
                 marginBottom: 6,
               }}
             />

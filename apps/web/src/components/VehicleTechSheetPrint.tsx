@@ -17,17 +17,32 @@ export function VehicleTechSheetPrint({
   const brandMeta = BRAND_METADATA[normBrand] || {
     displayName: sheet.brand,
     primaryColor: "#0f172a",
-    accentColor: "#dc2626",
+    accentColor: "#f59e0b",
     badgeTextColor: "#0f172a",
   };
 
   // Détection si la variante correspond à une immatriculation béninoise (ex: "CJ 0291 RB")
   const isBeninPlate = sheet.variant && /\b[A-Z]{2}\s*\d{4}\s*RB\b/i.test(sheet.variant);
 
+  // Synthèse intelligente de la motorisation pour la carte page 1
+  const motorSummary = sheet.motorisation.displacementOrMotor || sheet.motorisation.fuelType || "Moteur Haute Performance";
+  const powerSummary = sheet.motorisation.maxPower ? sheet.motorisation.maxPower.split("à")[0].trim() : "Puissance Optimisée";
+  const transSummary = sheet.motorisation.transmission
+    ? `${sheet.motorisation.transmission.split(" ")[0]} ${
+        sheet.motorisation.transmission.includes("4WD") ||
+        sheet.motorisation.transmission.includes("4x4") ||
+        sheet.motorisation.transmission.includes("4MATIC") ||
+        sheet.motorisation.transmission.includes("AWD")
+          ? "· 4WD"
+          : "· 2WD"
+      }`
+    : "Transmission Assistée";
+  const seatsSummary = `${sheet.dimensions.seats || 5} Places · ${sheet.dimensions.doors || 5} Portes`;
+
   return (
-    <div className="ox-tech-sheet-wrapper" style={{ color: "#111827", background: "#f8fafc" }}>
+    <div className="ox-tech-sheet-wrapper" style={{ color: "#111827", background: "#f1f5f9" }}>
       {/* ========================================================================= */}
-      {/* PAGE 1 : PRÉSENTATION OFFICIELLE EN STUDIO SHOWROOM (1ÈRE DE COUVERTURE) */}
+      {/* PAGE 1 : PRÉSENTATION OFFICIELLE EN STUDIO SHOWROOM (PAGE DE GARDE)        */}
       {/* ========================================================================= */}
       <section
         className="ox-tech-sheet-page ox-tech-sheet-page-1"
@@ -35,16 +50,16 @@ export function VehicleTechSheetPrint({
           width: "210mm",
           height: "297mm",
           maxHeight: "297mm",
-          margin: "0 auto 2rem",
+          margin: "0 auto 2.5rem",
           background: "#ffffff",
           position: "relative",
           overflow: "hidden",
-          boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
+          boxShadow: "0 10px 35px rgba(0,0,0,0.08)",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
           boxSizing: "border-box",
-          padding: "10mm 15mm 8mm",
+          padding: "10mm 15mm 9mm",
           fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
           pageBreakInside: "avoid",
           breakInside: "avoid",
@@ -52,7 +67,7 @@ export function VehicleTechSheetPrint({
           breakAfter: "page",
         }}
       >
-        {/* 1. TOP HEADER : CONCESSIONNAIRE CARZONE SARL + LOGO OFFICIEL CONSTRUCTEUR */}
+        {/* 1. TOP HEADER : BADGE OFFICIEL CARZONE SARL + LOGO CONSTRUCTEUR CERTIFIÉ */}
         <header
           style={{
             display: "flex",
@@ -67,18 +82,19 @@ export function VehicleTechSheetPrint({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/brand/carzone-logo.png"
-              alt="Carzone SARL"
+              alt="Logo Officiel Carzone SARL"
               style={{
-                height: "46px",
-                width: "auto",
+                height: "52px",
+                width: "52px",
+                borderRadius: "50%",
                 objectFit: "contain",
-                borderRadius: "6px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.18)",
               }}
             />
             <div>
               <div
                 style={{
-                  fontSize: "1.08rem",
+                  fontSize: "1.15rem",
                   fontWeight: 900,
                   letterSpacing: "0.06em",
                   color: "#0f172a",
@@ -87,8 +103,11 @@ export function VehicleTechSheetPrint({
               >
                 CARZONE SARL
               </div>
-              <div style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748b", letterSpacing: "0.04em" }}>
-                ATELIER &amp; CONCESSIONNAIRE AUTOMOBILE AGRÉÉ · RÉPUBLIQUE DU BÉNIN
+              <div style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748b", letterSpacing: "0.04em", marginTop: "2px" }}>
+                CONCESSIONNAIRE AUTOMOBILE MULTI-MARQUES &amp; ATELIER AGRÉÉ · BÉNIN
+              </div>
+              <div style={{ fontSize: "0.65rem", fontWeight: 800, color: "#b45309", letterSpacing: "0.06em" }}>
+                SERVICE CLIENT &amp; VENTES : +229 01 92 61 61 61
               </div>
             </div>
           </div>
@@ -96,21 +115,21 @@ export function VehicleTechSheetPrint({
           {/* Logo officiel constructeur */}
           <div
             style={{
-              padding: "6px 14px",
+              padding: "7px 14px",
               background: "#ffffff",
               borderRadius: "10px",
-              border: `1.5px solid ${brandMeta.primaryColor}22`,
-              boxShadow: "0 4px 16px rgba(0, 0, 0, 0.06)",
+              border: `1.5px solid ${brandMeta.primaryColor}25`,
+              boxShadow: "0 4px 14px rgba(0, 0, 0, 0.05)",
               display: "flex",
               alignItems: "center",
               gap: "10px",
             }}
           >
-            <BrandLogoSvg brand={sheet.brand} size={28} />
+            <BrandLogoSvg brand={sheet.brand} size={30} />
             <div style={{ textAlign: "right" }}>
               <div
                 style={{
-                  fontSize: "0.95rem",
+                  fontSize: "0.98rem",
                   fontWeight: 900,
                   letterSpacing: "0.08em",
                   color: brandMeta.primaryColor,
@@ -119,7 +138,7 @@ export function VehicleTechSheetPrint({
               >
                 {sheet.brand}
               </div>
-              <div style={{ fontSize: "0.6rem", fontWeight: 800, color: "#94a3b8", letterSpacing: "0.08em" }}>
+              <div style={{ fontSize: "0.58rem", fontWeight: 800, color: "#94a3b8", letterSpacing: "0.08em" }}>
                 VÉHICULE CERTIFIÉ
               </div>
             </div>
@@ -133,20 +152,20 @@ export function VehicleTechSheetPrint({
               display: "inline-block",
               background: `${brandMeta.primaryColor}12`,
               color: brandMeta.primaryColor,
-              padding: "3px 10px",
+              padding: "4px 12px",
               borderRadius: "20px",
-              fontSize: "0.66rem",
+              fontSize: "0.68rem",
               fontWeight: 800,
               letterSpacing: "0.12em",
               textTransform: "uppercase",
-              marginBottom: "4px",
+              marginBottom: "5px",
             }}
           >
-            FICHE TECHNIQUE OFFICIELLE · ATELIER &amp; CONCESSION
+            FICHE TECHNIQUE OFFICIELLE · CONCESSION &amp; ATELIER
           </div>
           <div
             style={{
-              fontSize: "1.7rem",
+              fontSize: "1.65rem",
               fontWeight: 900,
               color: "#0f172a",
               letterSpacing: "-0.02em",
@@ -160,10 +179,10 @@ export function VehicleTechSheetPrint({
               display: "flex",
               flexWrap: "wrap",
               alignItems: "center",
-              gap: "14px",
+              gap: "16px",
               fontSize: "0.78rem",
               color: "#475569",
-              marginTop: "4px",
+              marginTop: "5px",
               fontWeight: 600,
             }}
           >
@@ -184,7 +203,7 @@ export function VehicleTechSheetPrint({
             )}
             {vehicleInfo?.color && (
               <span>
-                <strong style={{ color: "#0f172a" }}>Teinte d&apos;origine :</strong> {vehicleInfo.color}
+                <strong style={{ color: "#0f172a" }}>Teinte constructeur :</strong> {vehicleInfo.color}
               </span>
             )}
           </div>
@@ -194,7 +213,7 @@ export function VehicleTechSheetPrint({
         <div
           style={{
             width: "100%",
-            height: "142mm",
+            height: "138mm",
             position: "relative",
             borderRadius: "14px",
             border: "1.5px solid #e2e8f0",
@@ -210,7 +229,7 @@ export function VehicleTechSheetPrint({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={sheet.mainPhotoUrl || "/images/vehicles/rich7-main.jpg"}
+            src={sheet.mainPhotoUrl || "/images/vehicles/prado-main.jpg"}
             alt={sheet.title}
             referrerPolicy="no-referrer"
             style={{
@@ -230,86 +249,185 @@ export function VehicleTechSheetPrint({
             style={{
               position: "absolute",
               bottom: "7mm",
-              left: "12%",
-              right: "12%",
+              left: "10%",
+              right: "10%",
               height: "15mm",
-              background: "radial-gradient(ellipse at center, rgba(15, 23, 42, 0.22) 0%, rgba(15, 23, 42, 0) 70%)",
+              background: "radial-gradient(ellipse at center, rgba(15, 23, 42, 0.24) 0%, rgba(15, 23, 42, 0) 70%)",
               zIndex: 1,
               filter: "blur(4px)",
             }}
           />
         </div>
 
-        {/* 4. CARTES SYNTHÈSE DES SPÉCIFICATIONS CLÉS (4 COLONNES) */}
+        {/* 4. CARTES SYNTHÈSE DES SPÉCIFICATIONS CLÉS (100% RESPONSIVE · SANS DÉBORDEMENT NI COUPURE) */}
         <div
+          className="ox-tech-specs-grid"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
+            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
             gap: "10px",
             margin: "3mm 0",
+            width: "100%",
+            boxSizing: "border-box",
           }}
         >
+          {/* Motorisation */}
           <div
             style={{
-              padding: "7px 10px",
-              background: "#f8fafc",
-              border: "1px solid #e2e8f0",
-              borderRadius: "8px",
+              padding: "9px 12px",
+              background: "#ffffff",
+              border: `1.5px solid ${brandMeta.primaryColor}30`,
+              borderRadius: "10px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.03)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              minWidth: 0,
+              boxSizing: "border-box",
             }}
           >
-            <div style={{ fontSize: "0.62rem", fontWeight: 800, color: brandMeta.primaryColor, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <div
+              style={{
+                fontSize: "0.62rem",
+                fontWeight: 800,
+                color: brandMeta.primaryColor,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                marginBottom: "3px",
+              }}
+            >
               Motorisation
             </div>
-            <div style={{ fontSize: "0.76rem", fontWeight: 900, color: "#0f172a", marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {sheet.motorisation.displacementOrMotor || sheet.motorisation.fuelType}
+            <div
+              style={{
+                fontSize: "0.78rem",
+                fontWeight: 900,
+                color: "#0f172a",
+                lineHeight: 1.25,
+                wordBreak: "break-word",
+              }}
+            >
+              {motorSummary}
             </div>
           </div>
 
+          {/* Puissance Max */}
           <div
             style={{
-              padding: "7px 10px",
-              background: "#f8fafc",
-              border: "1px solid #e2e8f0",
-              borderRadius: "8px",
+              padding: "9px 12px",
+              background: "#ffffff",
+              border: `1.5px solid ${brandMeta.primaryColor}30`,
+              borderRadius: "10px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.03)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              minWidth: 0,
+              boxSizing: "border-box",
             }}
           >
-            <div style={{ fontSize: "0.62rem", fontWeight: 800, color: brandMeta.primaryColor, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <div
+              style={{
+                fontSize: "0.62rem",
+                fontWeight: 800,
+                color: brandMeta.primaryColor,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                marginBottom: "3px",
+              }}
+            >
               Puissance Max
             </div>
-            <div style={{ fontSize: "0.76rem", fontWeight: 900, color: "#0f172a", marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {sheet.motorisation.maxPower.split("à")[0].trim()}
+            <div
+              style={{
+                fontSize: "0.78rem",
+                fontWeight: 900,
+                color: "#0f172a",
+                lineHeight: 1.25,
+                wordBreak: "break-word",
+              }}
+            >
+              {powerSummary}
             </div>
           </div>
 
+          {/* Transmission */}
           <div
             style={{
-              padding: "7px 10px",
-              background: "#f8fafc",
-              border: "1px solid #e2e8f0",
-              borderRadius: "8px",
+              padding: "9px 12px",
+              background: "#ffffff",
+              border: `1.5px solid ${brandMeta.primaryColor}30`,
+              borderRadius: "10px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.03)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              minWidth: 0,
+              boxSizing: "border-box",
             }}
           >
-            <div style={{ fontSize: "0.62rem", fontWeight: 800, color: brandMeta.primaryColor, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <div
+              style={{
+                fontSize: "0.62rem",
+                fontWeight: 800,
+                color: brandMeta.primaryColor,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                marginBottom: "3px",
+              }}
+            >
               Transmission
             </div>
-            <div style={{ fontSize: "0.76rem", fontWeight: 900, color: "#0f172a", marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {sheet.motorisation.transmission.split(" ")[0]} {sheet.motorisation.transmission.includes("4WD") || sheet.motorisation.transmission.includes("4x4") || sheet.motorisation.transmission.includes("4MATIC") ? "· 4WD" : "· 2WD"}
+            <div
+              style={{
+                fontSize: "0.78rem",
+                fontWeight: 900,
+                color: "#0f172a",
+                lineHeight: 1.25,
+                wordBreak: "break-word",
+              }}
+            >
+              {transSummary}
             </div>
           </div>
 
+          {/* Configuration */}
           <div
             style={{
-              padding: "7px 10px",
-              background: "#f8fafc",
-              border: "1px solid #e2e8f0",
-              borderRadius: "8px",
+              padding: "9px 12px",
+              background: "#ffffff",
+              border: `1.5px solid ${brandMeta.primaryColor}30`,
+              borderRadius: "10px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.03)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              minWidth: 0,
+              boxSizing: "border-box",
             }}
           >
-            <div style={{ fontSize: "0.62rem", fontWeight: 800, color: brandMeta.primaryColor, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <div
+              style={{
+                fontSize: "0.62rem",
+                fontWeight: 800,
+                color: brandMeta.primaryColor,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                marginBottom: "3px",
+              }}
+            >
               Configuration
             </div>
-            <div style={{ fontSize: "0.76rem", fontWeight: 900, color: "#0f172a", marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {sheet.dimensions.seats} Places · {sheet.dimensions.doors} Portes
+            <div
+              style={{
+                fontSize: "0.78rem",
+                fontWeight: 900,
+                color: "#0f172a",
+                lineHeight: 1.25,
+                wordBreak: "break-word",
+              }}
+            >
+              {seatsSummary}
             </div>
           </div>
         </div>
@@ -325,17 +443,17 @@ export function VehicleTechSheetPrint({
           }}
         >
           <div>
-            <div style={{ fontSize: "0.72rem", fontWeight: 800, color: "#0f172a" }}>
-              CARZONE SARL · Importateur Agréé &amp; Atelier Concessionnaire Bénin
+            <div style={{ fontSize: "0.74rem", fontWeight: 800, color: "#0f172a" }}>
+              CARZONE SARL · Concessionnaire Multi-Marques Agréé &amp; Atelier Bénin
             </div>
-            <div style={{ fontSize: "0.62rem", color: "#64748b" }}>
-              Fiche certifiée conforme aux spécifications d&apos;usine · Destinée au marché Afrique de l&apos;Ouest
+            <div style={{ fontSize: "0.64rem", color: "#64748b" }}>
+              Fiche certifiée conforme aux spécifications d&apos;usine · Destinée au marché Afrique de l&apos;Ouest · Tél: +229 01 92 61 61 61
             </div>
           </div>
           <div style={{ textAlign: "right" }}>
             <div
               style={{
-                fontSize: "0.68rem",
+                fontSize: "0.70rem",
                 fontWeight: 800,
                 color: brandMeta.primaryColor,
                 letterSpacing: "0.08em",
@@ -344,15 +462,15 @@ export function VehicleTechSheetPrint({
             >
               Fiche Technique Conforme
             </div>
-            <div style={{ fontSize: "0.66rem", fontWeight: 700, color: "#94a3b8" }}>
-              Page 1 / 2
+            <div style={{ fontSize: "0.70rem", fontWeight: 800, color: "#0f172a" }}>
+              Page 1 / 3
             </div>
           </div>
         </footer>
       </section>
 
       {/* ========================================================================= */}
-      {/* PAGE 2 : SPÉCIFICATIONS TECHNIQUES STRUCTURÉES & PHOTOS COORDONNÉES       */}
+      {/* PAGE 2 : L'HABITACLE, POSTE DE CONDUITE & CONFORT EMBARQUÉ (FORMAT 4:3)   */}
       {/* ========================================================================= */}
       <section
         className="ox-tech-sheet-page ox-tech-sheet-page-2"
@@ -360,10 +478,228 @@ export function VehicleTechSheetPrint({
           width: "210mm",
           height: "297mm",
           maxHeight: "297mm",
+          margin: "0 auto 2.5rem",
+          background: "#ffffff",
+          padding: "10mm 15mm 9mm",
+          boxShadow: "0 10px 35px rgba(0,0,0,0.08)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          boxSizing: "border-box",
+          overflow: "hidden",
+          fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+          pageBreakInside: "avoid",
+          breakInside: "avoid",
+          pageBreakAfter: "always",
+          breakAfter: "page",
+        }}
+      >
+        {/* Header Title with Official Brand Logo */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingBottom: "4mm",
+            borderBottom: "1.5px solid #e2e8f0",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/carzone-logo.png"
+              alt="Carzone SARL"
+              style={{ height: "42px", width: "42px", borderRadius: "50%", objectFit: "contain" }}
+            />
+            <div>
+              <div style={{ fontSize: "1.02rem", fontWeight: 900, color: "#0f172a" }}>
+                {sheet.title}
+              </div>
+              <div style={{ fontSize: "0.68rem", fontWeight: 700, color: brandMeta.primaryColor, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                HABITACLE, POSTE DE CONDUITE &amp; CONFORT EMBARQUÉ
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <BrandLogoSvg brand={sheet.brand} size={26} />
+            <span style={{ fontSize: "0.82rem", fontWeight: 800, color: brandMeta.primaryColor }}>{sheet.brand}</span>
+          </div>
+        </div>
+
+        {/* GRANDE PHOTOGRAPHIE MAJESTUEUSE DE L'INTÉRIEUR AU FORMAT 4:3 CLAIR ET SANS DÉFORMATION */}
+        <div style={{ margin: "2mm 0" }}>
+          <div
+            style={{
+              position: "relative",
+              width: "100%",
+              height: "116mm",
+              borderRadius: "12px",
+              overflow: "hidden",
+              border: "1.5px solid #cbd5e1",
+              boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+              background: "#f8fafc",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={sheet.interiorPhotoUrl || "/images/vehicles/prado-interior.jpg"}
+              alt="Habitacle & Cockpit officiel"
+              referrerPolicy="no-referrer"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "center center",
+              }}
+            />
+            {/* Badge élégant sur la photo */}
+            <div
+              style={{
+                position: "absolute",
+                bottom: "10px",
+                left: "12px",
+                background: "rgba(15, 23, 42, 0.78)",
+                backdropFilter: "blur(4px)",
+                color: "#ffffff",
+                padding: "5px 14px",
+                borderRadius: "20px",
+                fontSize: "0.70rem",
+                fontWeight: 700,
+                letterSpacing: "0.06em",
+                border: "1px solid rgba(255,255,255,0.25)",
+              }}
+            >
+              Cockpit &amp; Sellerie Cuir Haut de Gamme · Format d&apos;Origine Constructeur
+            </div>
+          </div>
+        </div>
+
+        {/* ÉQUIPEMENTS ET CONFORT : AÉRÉ, POLICES VISIBLES ET LISIBLES */}
+        <div style={{ margin: "2mm 0" }}>
+          <div
+            style={{
+              background: brandMeta.primaryColor,
+              color: "#ffffff",
+              padding: "4px 12px",
+              borderRadius: "6px",
+              fontSize: "0.78rem",
+              fontWeight: 800,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              display: "inline-block",
+              marginBottom: "8px",
+            }}
+          >
+            Équipements de Confort &amp; Technologies de Bord
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "14px 20px",
+              background: "#f8fafc",
+              padding: "14px 16px",
+              borderRadius: "10px",
+              border: "1px solid #e2e8f0",
+            }}
+          >
+            <ul
+              style={{
+                margin: 0,
+                paddingLeft: "18px",
+                fontSize: "0.84rem",
+                lineHeight: "1.55",
+                color: "#1e293b",
+                fontWeight: 500,
+              }}
+            >
+              {sheet.equipementConfort.slice(0, 5).map((item, idx) => (
+                <li key={idx} style={{ marginBottom: "6px" }}>
+                  {item}
+                </li>
+              ))}
+            </ul>
+
+            <ul
+              style={{
+                margin: 0,
+                paddingLeft: "18px",
+                fontSize: "0.84rem",
+                lineHeight: "1.55",
+                color: "#1e293b",
+                fontWeight: 500,
+              }}
+            >
+              {sheet.equipementConfort.slice(5, 10).map((item, idx) => (
+                <li key={idx} style={{ marginBottom: "6px" }}>
+                  {item}
+                </li>
+              ))}
+              {sheet.equipementConfort.length <= 5 && (
+                <>
+                  <li style={{ marginBottom: "6px" }}>Climatisation automatique trizone avec aérateurs arrière</li>
+                  <li style={{ marginBottom: "6px" }}>Système multimédia tactile haute résolution avec Apple CarPlay &amp; Android Auto</li>
+                  <li style={{ marginBottom: "6px" }}>Compartiment réfrigéré Cool Box pour voyages et boissons</li>
+                </>
+              )}
+            </ul>
+          </div>
+        </div>
+
+        {/* ENCADRÉ EXPÉRIENCE CONDUCTEUR ET PASSAGERS */}
+        <div
+          style={{
+            background: `${brandMeta.primaryColor}08`,
+            borderLeft: `4px solid ${brandMeta.primaryColor}`,
+            padding: "8px 14px",
+            borderRadius: "0 8px 8px 0",
+            fontSize: "0.74rem",
+            color: "#334155",
+            lineHeight: 1.45,
+          }}
+        >
+          <strong>Exigence Qualité Carzone SARL :</strong> Tous les équipements d&apos;habitacle, selleries et systèmes multimédias ont été méticuleusement testés par les techniciens de notre atelier concessionnaire à Cotonou pour garantir un confort irréprochable et durable.
+        </div>
+
+        {/* Footer info Page 2 */}
+        <div
+          style={{
+            marginTop: "auto",
+            paddingTop: "4mm",
+            borderTop: "1.5px solid #e2e8f0",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontSize: "0.68rem",
+            color: "#64748b",
+            fontWeight: 600,
+          }}
+        >
+          <div>
+            CARZONE SARL · Atelier &amp; Concessionnaire Automobile Multi-Marques · Bénin (+229 01 92 61 61 61)
+          </div>
+          <div style={{ fontWeight: 800, color: "#0f172a" }}>Page 2 / 3</div>
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* PAGE 3 : DESIGN EXTÉRIEUR, MOTORISATION DÉTAILLÉE & SÉCURITÉ (FORMAT 4:3) */}
+      {/* ========================================================================= */}
+      <section
+        className="ox-tech-sheet-page ox-tech-sheet-page-3"
+        style={{
+          width: "210mm",
+          height: "297mm",
+          maxHeight: "297mm",
           margin: "0 auto",
           background: "#ffffff",
-          padding: "9mm 15mm 7mm",
-          boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
+          padding: "10mm 15mm 9mm",
+          boxShadow: "0 10px 35px rgba(0,0,0,0.08)",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
@@ -381,317 +717,332 @@ export function VehicleTechSheetPrint({
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
-            gap: "14px",
-            marginBottom: "8px",
-            paddingBottom: "6px",
+            justifyContent: "space-between",
+            paddingBottom: "4mm",
             borderBottom: "1.5px solid #e2e8f0",
           }}
         >
-          <BrandLogoSvg brand={sheet.brand} size={28} />
-          <div style={{ textAlign: "center" }}>
-            <h1
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/carzone-logo.png"
+              alt="Carzone SARL"
+              style={{ height: "42px", width: "42px", borderRadius: "50%", objectFit: "contain" }}
+            />
+            <div>
+              <div style={{ fontSize: "1.02rem", fontWeight: 900, color: "#0f172a" }}>
+                {sheet.title}
+              </div>
+              <div style={{ fontSize: "0.68rem", fontWeight: 700, color: brandMeta.primaryColor, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                DESIGN EXTÉRIEUR, ARCHITECTURE TECHNIQUE &amp; SÉCURITÉ
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <BrandLogoSvg brand={sheet.brand} size={26} />
+            <span style={{ fontSize: "0.82rem", fontWeight: 800, color: brandMeta.primaryColor }}>{sheet.brand}</span>
+          </div>
+        </div>
+
+        {/* DOUBLE GALERIE VISUELLE AU FORMAT 4:3 : PROFIL & VUE ARRIÈRE SANS DÉFORMATION */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "14px",
+            margin: "2mm 0",
+          }}
+        >
+          {/* Photo Profil 4:3 */}
+          <div
+            style={{
+              position: "relative",
+              height: "64mm",
+              borderRadius: "10px",
+              overflow: "hidden",
+              border: "1.5px solid #cbd5e1",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+              background: "#f8fafc",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={sheet.exteriorPhotoUrl || sheet.mainPhotoUrl || "/images/vehicles/prado-exterior.jpg"}
+              alt="Vue Extérieure de Profil"
+              referrerPolicy="no-referrer"
               style={{
-                margin: 0,
-                fontSize: "1.12rem",
-                fontWeight: 900,
-                textTransform: "uppercase",
-                letterSpacing: "0.03em",
-                color: "#0f172a",
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "center center",
               }}
-            >
-              {sheet.title}
-            </h1>
+            />
             <div
               style={{
-                marginTop: "2px",
+                position: "absolute",
+                bottom: "6px",
+                left: "8px",
+                background: "rgba(15, 23, 42, 0.78)",
+                color: "#ffffff",
+                padding: "3px 10px",
+                borderRadius: "12px",
+                fontSize: "0.62rem",
+                fontWeight: 700,
+                letterSpacing: "0.04em",
+              }}
+            >
+              Ligne &amp; Profil Dynamique
+            </div>
+          </div>
+
+          {/* Photo Arrière 4:3 */}
+          <div
+            style={{
+              position: "relative",
+              height: "64mm",
+              borderRadius: "10px",
+              overflow: "hidden",
+              border: "1.5px solid #cbd5e1",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+              background: "#f8fafc",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={sheet.rearPhotoUrl || sheet.mainPhotoUrl || "/images/vehicles/prado-rear.jpg"}
+              alt="Vue Arrière Officielle"
+              referrerPolicy="no-referrer"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "center center",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                bottom: "6px",
+                left: "8px",
+                background: "rgba(15, 23, 42, 0.78)",
+                color: "#ffffff",
+                padding: "3px 10px",
+                borderRadius: "12px",
+                fontSize: "0.62rem",
+                fontWeight: 700,
+                letterSpacing: "0.04em",
+              }}
+            >
+              Poupe &amp; Signature Lumineuse LED
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION CARACTÉRISTIQUES DÉTAILLÉES : DIMENSIONS & MOTORISATION */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", margin: "2mm 0" }}>
+          {/* Dimensions */}
+          <div
+            style={{
+              background: "#f8fafc",
+              border: "1px solid #e2e8f0",
+              borderRadius: "10px",
+              padding: "10px 14px",
+            }}
+          >
+            <div
+              style={{
                 fontSize: "0.72rem",
                 fontWeight: 800,
                 color: brandMeta.primaryColor,
                 textTransform: "uppercase",
-                letterSpacing: "0.15em",
-              }}
-            >
-              {sheet.subtitle || "SPÉCIFICATIONS TECHNIQUES OFFICIELLES"}
-            </div>
-          </div>
-        </div>
-
-        {/* SECTION 1 & 2 : DIMENSIONS & MOTORISATION (GRILLE 2 COLONNES) */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "8px" }}>
-          {/* DIMENSIONS */}
-          <div>
-            <div
-              style={{
-                background: brandMeta.primaryColor,
-                color: "#ffffff",
-                padding: "2px 8px",
-                borderRadius: "4px",
-                fontSize: "0.7rem",
-                fontWeight: 800,
                 letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                display: "inline-block",
-                marginBottom: "4px",
+                borderBottom: "1.5px solid #e2e8f0",
+                paddingBottom: "4px",
+                marginBottom: "6px",
               }}
             >
-              DIMENSIONS
+              Dimensions &amp; Habitabilité
             </div>
-            <div
-              style={{
-                fontSize: "0.72rem",
-                lineHeight: "1.45",
-                color: "#1e293b",
-                borderTop: "1px solid #cbd5e1",
-                paddingTop: "4px",
-              }}
-            >
-              <div>L/l/h (mm) : <strong>{sheet.dimensions.lengthWidthHeight}</strong></div>
-              <div>Empattement (mm) : <strong>{sheet.dimensions.wheelbase}</strong></div>
-              <div>Nombre de portes : <strong>{sheet.dimensions.doors}</strong></div>
-              <div>Nombre de places : <strong>{sheet.dimensions.seats}</strong></div>
-              <div>Capacité réservoir / batterie : <strong>{sheet.dimensions.tankOrBattery}</strong></div>
+            <div style={{ fontSize: "0.78rem", lineHeight: "1.55", color: "#1e293b" }}>
+              <div>L x l x h : <strong>{sheet.dimensions.lengthWidthHeight} mm</strong></div>
+              <div>Empattement : <strong>{sheet.dimensions.wheelbase} mm</strong></div>
+              <div>Capacité : <strong>{sheet.dimensions.seats} Places · {sheet.dimensions.doors} Portes</strong></div>
+              <div>Réservoir / Batterie : <strong>{sheet.dimensions.tankOrBattery}</strong></div>
             </div>
           </div>
 
-          {/* MOTORISATION */}
-          <div>
-            <div
-              style={{
-                background: brandMeta.primaryColor,
-                color: "#ffffff",
-                padding: "2px 8px",
-                borderRadius: "4px",
-                fontSize: "0.7rem",
-                fontWeight: 800,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                display: "inline-block",
-                marginBottom: "4px",
-              }}
-            >
-              MOTORISATION
-            </div>
+          {/* Motorisation */}
+          <div
+            style={{
+              background: "#f8fafc",
+              border: "1px solid #e2e8f0",
+              borderRadius: "10px",
+              padding: "10px 14px",
+            }}
+          >
             <div
               style={{
                 fontSize: "0.72rem",
-                lineHeight: "1.45",
-                color: "#1e293b",
-                borderTop: "1px solid #cbd5e1",
-                paddingTop: "4px",
+                fontWeight: 800,
+                color: brandMeta.primaryColor,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                borderBottom: "1.5px solid #e2e8f0",
+                paddingBottom: "4px",
+                marginBottom: "6px",
               }}
             >
-              <div>Cylindrée / Moteur : <strong>{sheet.motorisation.displacementOrMotor}</strong></div>
-              <div>Configuration : <strong>{sheet.motorisation.cylinders}</strong></div>
+              Motorisation &amp; Transmission
+            </div>
+            <div style={{ fontSize: "0.78rem", lineHeight: "1.55", color: "#1e293b" }}>
+              <div>Technologie : <strong>{sheet.motorisation.displacementOrMotor}</strong></div>
               <div>Transmission : <strong>{sheet.motorisation.transmission}</strong></div>
-              <div>Type de carburant : <strong>{sheet.motorisation.fuelType}</strong></div>
               <div>Puissance maximale : <strong>{sheet.motorisation.maxPower}</strong></div>
               <div>Couple maximal : <strong>{sheet.motorisation.maxTorque}</strong></div>
-              {sheet.motorisation.rangeKm && (
-                <div>Autonomie homologuée : <strong>{sheet.motorisation.rangeKm}</strong></div>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION SÉCURITÉ ACTIVE & PASSIVE */}
+        <div
+          style={{
+            background: "#ffffff",
+            border: "1.5px solid #e2e8f0",
+            borderRadius: "10px",
+            padding: "10px 14px",
+            margin: "2mm 0",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "0.72rem",
+              fontWeight: 800,
+              color: "#b45309",
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              marginBottom: "6px",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
+            <span>🛡️</span> Sécurité Active, Passive &amp; Aides à la Conduite
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 16px" }}>
+            <ul style={{ margin: 0, paddingLeft: "16px", fontSize: "0.78rem", lineHeight: "1.5", color: "#1e293b" }}>
+              {sheet.securite.slice(0, 4).map((sec, idx) => (
+                <li key={idx} style={{ marginBottom: "4px" }}>{sec}</li>
+              ))}
+            </ul>
+            <ul style={{ margin: 0, paddingLeft: "16px", fontSize: "0.78rem", lineHeight: "1.5", color: "#1e293b" }}>
+              {sheet.securite.slice(4, 8).map((sec, idx) => (
+                <li key={idx} style={{ marginBottom: "4px" }}>{sec}</li>
+              ))}
+              {sheet.securite.length <= 4 && (
+                <>
+                  <li style={{ marginBottom: "4px" }}>Caméras panoramiques 360° avec vue sous châssis</li>
+                  <li style={{ marginBottom: "4px" }}>Pack complet 7 airbags avec protection genoux et rideaux</li>
+                </>
               )}
-            </div>
-          </div>
-        </div>
-
-        {/* SECTION 3 : ÉQUIPEMENT ET CONFORT (TEXTE GAUCHE + PHOTO HABITACLE DROITE) */}
-        <div style={{ marginBottom: "8px" }}>
-          <div
-            style={{
-              background: brandMeta.primaryColor,
-              color: "#ffffff",
-              padding: "2px 8px",
-              borderRadius: "4px",
-              fontSize: "0.7rem",
-              fontWeight: 800,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              display: "inline-block",
-              marginBottom: "3px",
-            }}
-          >
-            EQUIPEMENT ET CONFORT
-          </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1.45fr 1fr",
-              gap: "12px",
-              alignItems: "center",
-              borderTop: "1px solid #cbd5e1",
-              paddingTop: "4px",
-            }}
-          >
-            <ul style={{ margin: 0, paddingLeft: "15px", fontSize: "0.7rem", lineHeight: "1.38", color: "#1e293b" }}>
-              {sheet.equipementConfort.slice(0, 8).map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
             </ul>
-            <div
+          </div>
+        </div>
+
+        {/* BLOC CERTIFICATION & CONTACT CONCESSIONNAIRE CARZONE SARL */}
+        <div
+          style={{
+            background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+            color: "#ffffff",
+            borderRadius: "10px",
+            padding: "10px 16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginTop: "1mm",
+            boxShadow: "0 6px 18px rgba(15, 23, 42, 0.12)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/carzone-logo.png"
+              alt="Badge Officiel Carzone SARL"
               style={{
-                height: 90,
-                borderRadius: "8px",
-                overflow: "hidden",
-                border: "1px solid #cbd5e1",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
-                background: "radial-gradient(ellipse at center, #1e293b 0%, #0f172a 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "2px",
+                height: "46px",
+                width: "46px",
+                borderRadius: "50%",
+                objectFit: "contain",
+                border: "2px solid #f59e0b",
               }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={sheet.interiorPhotoUrl || "/images/vehicles/rich7-interior.jpg"}
-                alt="Intérieur & Habitacle officiel"
-                referrerPolicy="no-referrer"
-                style={{ width: "100%", height: "100%", maxHeight: "100%", maxWidth: "100%", objectFit: "contain", objectPosition: "center center" }}
-              />
+            />
+            <div>
+              <div style={{ fontSize: "0.86rem", fontWeight: 900, letterSpacing: "0.06em", color: "#fcd34d" }}>
+                CARZONE SARL · CONCESSIONNAIRE &amp; ATELIER HOMOLOGUÉ
+              </div>
+              <div style={{ fontSize: "0.68rem", color: "#cbd5e1", marginTop: "2px" }}>
+                Cotonou, République du Bénin · Téléphone direct : <strong>+229 01 92 61 61 61</strong>
+              </div>
+              <div style={{ fontSize: "0.64rem", color: "#94a3b8" }}>
+                Véhicule sélectionné, contrôlé et certifié conforme · Pièces d&apos;origine &amp; garantie atelier
+              </div>
+            </div>
+          </div>
+
+          <div style={{ textAlign: "right", borderLeft: "1px solid rgba(255,255,255,0.2)", paddingLeft: "14px" }}>
+            <div style={{ fontSize: "0.64rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              Garantie Concession
+            </div>
+            <div style={{ fontSize: "0.82rem", fontWeight: 900, color: "#22c55e" }}>
+              CONFORME
             </div>
           </div>
         </div>
 
-        {/* SECTION 4 : EXTÉRIEUR (TEXTE GAUCHE + PHOTO PROFIL MÊME COULEUR DROITE SANS ROGNAGE) */}
-        <div style={{ marginBottom: "8px" }}>
-          <div
-            style={{
-              background: brandMeta.primaryColor,
-              color: "#ffffff",
-              padding: "2px 8px",
-              borderRadius: "4px",
-              fontSize: "0.7rem",
-              fontWeight: 800,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              display: "inline-block",
-              marginBottom: "3px",
-            }}
-          >
-            EXTERIEUR
-          </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1.45fr 1fr",
-              gap: "12px",
-              alignItems: "center",
-              borderTop: "1px solid #cbd5e1",
-              paddingTop: "4px",
-            }}
-          >
-            <ul style={{ margin: 0, paddingLeft: "15px", fontSize: "0.7rem", lineHeight: "1.38", color: "#1e293b" }}>
-              {sheet.exterieur.slice(0, 8).map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
-            <div
-              style={{
-                height: 90,
-                borderRadius: "8px",
-                overflow: "hidden",
-                border: "1px solid #cbd5e1",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
-                background: "radial-gradient(ellipse at center, #1e293b 0%, #0f172a 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "2px",
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={sheet.exteriorPhotoUrl || sheet.mainPhotoUrl || undefined}
-                alt="Vue Extérieure officielle"
-                referrerPolicy="no-referrer"
-                style={{ width: "100%", height: "100%", maxHeight: "100%", maxWidth: "100%", objectFit: "contain", objectPosition: "center center" }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* SECTION 5 : SÉCURITÉ (TEXTE GAUCHE + PHOTO ARRIÈRE MÊME COULEUR DROITE SANS ROGNAGE) */}
-        <div style={{ marginBottom: "6px" }}>
-          <div
-            style={{
-              background: brandMeta.primaryColor,
-              color: "#ffffff",
-              padding: "2px 8px",
-              borderRadius: "4px",
-              fontSize: "0.7rem",
-              fontWeight: 800,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              display: "inline-block",
-              marginBottom: "3px",
-            }}
-          >
-            SECURITE
-          </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1.45fr 1fr",
-              gap: "12px",
-              alignItems: "center",
-              borderTop: "1px solid #cbd5e1",
-              paddingTop: "4px",
-            }}
-          >
-            <ul style={{ margin: 0, paddingLeft: "15px", fontSize: "0.7rem", lineHeight: "1.38", color: "#1e293b" }}>
-              {sheet.securite.slice(0, 8).map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
-            <div
-              style={{
-                height: 90,
-                borderRadius: "8px",
-                overflow: "hidden",
-                border: "1px solid #cbd5e1",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
-                background: "radial-gradient(ellipse at center, #1e293b 0%, #0f172a 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "2px",
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={sheet.rearPhotoUrl || sheet.mainPhotoUrl || undefined}
-                alt="Vue Arrière officielle"
-                referrerPolicy="no-referrer"
-                style={{ width: "100%", height: "100%", maxHeight: "100%", maxWidth: "100%", objectFit: "contain", objectPosition: "center center" }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Footer info */}
+        {/* Footer info Page 3 */}
         <div
           style={{
             marginTop: "auto",
-            paddingTop: "5px",
-            borderTop: "1px solid #e2e8f0",
+            paddingTop: "3mm",
+            borderTop: "1.5px solid #e2e8f0",
             display: "flex",
             justifyContent: "space-between",
-            fontSize: "0.66rem",
+            alignItems: "center",
+            fontSize: "0.68rem",
             color: "#64748b",
-            fontWeight: 500,
+            fontWeight: 600,
           }}
         >
           <div>
-            CARZONE SARL · Importateur &amp; Concessionnaire Automobile Agréé Bénin
-            {vehicleInfo?.vin ? ` · VIN: ${vehicleInfo.vin}` : ""}
-            {vehicleInfo?.color ? ` · Teinte: ${vehicleInfo.color}` : ""}
+            CARZONE SARL · Fiche certifiée conforme constructeur · {vehicleInfo?.vin ? `N° VIN: ${vehicleInfo.vin}` : ""}
           </div>
-          <div>Fiche Technique certifiée conforme constructeur · Page 2 / 2</div>
+          <div style={{ fontWeight: 800, color: "#0f172a" }}>Page 3 / 3</div>
         </div>
       </section>
 
-      {/* Global Print Styles (Strict A4 2-Page Control) */}
+      {/* Global Print & Responsive Styles (Strict A4 3-Page Control) */}
       <style>{`
+        @media screen and (max-width: 768px) {
+          .ox-tech-sheet-page {
+            width: 100% !important;
+            height: auto !important;
+            max-height: none !important;
+            padding: 1.2rem 1rem !important;
+            margin-bottom: 1.5rem !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06) !important;
+          }
+          .ox-tech-specs-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 8px !important;
+          }
+        }
+
+        @media screen and (max-width: 480px) {
+          .ox-tech-specs-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
         @media print {
           @page {
             size: A4 portrait;
@@ -730,6 +1081,10 @@ export function VehicleTechSheetPrint({
             break-after: page !important;
           }
           .ox-tech-sheet-page-2 {
+            page-break-after: always !important;
+            break-after: page !important;
+          }
+          .ox-tech-sheet-page-3 {
             page-break-after: avoid !important;
             break-after: avoid !important;
           }

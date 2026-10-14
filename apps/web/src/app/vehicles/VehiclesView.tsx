@@ -22,6 +22,7 @@ import {
   Calendar,
   MapPin,
   Box,
+  PlusCircle,
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
 import { BrandLogoSvg } from "@/lib/brand-logos";
@@ -132,6 +133,7 @@ export function VehiclesView({
   initialParams: { energy?: string; q?: string; vehicleType?: string; siteId?: string };
 }) {
   const [viewMode, setViewMode] = useState<"pipeline" | "table">("pipeline");
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<VehicleItem | null>(null);
   const [deletingVehicle, setDeletingVehicle] = useState<VehicleItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -235,7 +237,33 @@ export function VehiclesView({
             </p>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "0.8rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", flexWrap: "wrap" }}>
+            {canCreate && (
+              <button
+                type="button"
+                onClick={() => setIsCreateModalOpen(true)}
+                className="ox-btn"
+                style={{
+                  background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                  color: "#ffffff",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.45rem",
+                  fontWeight: 700,
+                  fontSize: "0.84rem",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "8px",
+                  border: "none",
+                  boxShadow: "0 4px 14px rgba(16, 185, 129, 0.35)",
+                  cursor: "pointer",
+                }}
+                title="Ouvrir le formulaire d'entrée de stock pour enregistrer un nouveau véhicule"
+              >
+                <PlusCircle size={17} />
+                <span>+ Entrée Stock (Nouveau Véhicule)</span>
+              </button>
+            )}
+
             <div
               style={{
                 display: "inline-flex",
@@ -325,89 +353,286 @@ export function VehiclesView({
         </div>
       </div>
 
-      {/* FORMULAIRE AJOUT DE VÉHICULE EN STOCK (AVEC LES 5 STATUTS) */}
-      {canCreate ? (
-        <form action={createVehicle} className="ox-glass" style={{ padding: "1.2rem", marginBottom: 16, borderRadius: "14px" }}>
-          <div style={{ fontSize: "0.85rem", opacity: 0.8, marginBottom: 8, fontWeight: 600 }}>
-            + Entrée Stock — Affectez l&apos;étape logistique, le showroom et les caractéristiques :
-          </div>
-          <BrandModelSelect brands={catalog} energyFieldId="vehicle-energy" />
-          <div className="ox-form-row" style={{ marginTop: 8 }}>
-            <input name="variant" placeholder="Finition / Pack" className="ox-input" title="Finition / variante" />
-            <input name="vin" placeholder="Numéro VIN (Châssis)" className="ox-input" title="Numéro VIN" />
-            <input name="year" type="number" placeholder="Année" defaultValue={2026} className="ox-input" />
-            <select
-              id="vehicle-energy"
-              name="energy"
-              className="ox-select"
-              defaultValue="HYBRIDE"
-              title="Énergie"
+      {/* MODAL POP-UP : NOUVELLE ENTRÉE EN STOCK (ÉPURÉ ET SANS ENCOMBREMENT) */}
+      {isCreateModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(15, 23, 42, 0.8)",
+            backdropFilter: "blur(8px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            padding: "1rem",
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsCreateModalOpen(false);
+          }}
+        >
+          <div
+            style={{
+              background: "#0f172a",
+              border: "1.5px solid rgba(225, 29, 72, 0.35)",
+              borderRadius: "18px",
+              padding: "1.75rem",
+              width: "100%",
+              maxWidth: 780,
+              maxHeight: "90vh",
+              overflowY: "auto",
+              boxShadow: "0 25px 60px rgba(0,0,0,0.6)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1.2rem",
+            }}
+          >
+            {/* Header Modal */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                borderBottom: "1px solid rgba(255,255,255,0.1)",
+                paddingBottom: "1rem",
+              }}
             >
-              <option value="ELECTRIQUE">Électrique (EV)</option>
-              <option value="HYBRIDE">Hybride (HEV)</option>
-              <option value="PHEV">Hybride Rechargeable (PHEV)</option>
-              <option value="ESSENCE">Essence</option>
-              <option value="DIESEL">Diesel</option>
-            </select>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                  <span
+                    style={{
+                      background: "rgba(16, 185, 129, 0.15)",
+                      color: "#10b981",
+                      borderRadius: "8px",
+                      padding: "0.35rem",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <PlusCircle size={22} />
+                  </span>
+                  <h3 style={{ fontSize: "1.25rem", fontWeight: 800, margin: 0, color: "#f8fafc" }}>
+                    Nouvelle Entrée en Stock — Véhicule Neuf
+                  </h3>
+                </div>
+                <p style={{ margin: "0.35rem 0 0", fontSize: "0.82rem", color: "var(--ice-text-muted)" }}>
+                  Affectez les caractéristiques officielles, l&apos;étape logistique initiale (parmi les 5) et le showroom de destination.
+                </p>
+              </div>
 
-            {/* SÉLECTEUR DU STATUT INITIAL PARMI LES 5 ÉTAPES */}
-            <select name="status" defaultValue="EN_MAGASIN" className="ox-select" title="Statut logistique initial" style={{ fontWeight: 600, color: "#38bdf8" }}>
-              <option value="COMMANDE">1. COMMANDE (Usine / BDC)</option>
-              <option value="EN_PRODUCTION">2. EN PRODUCTION (Chine)</option>
-              <option value="EN_TRANSIT">3. EN TRANSIT (Maritime)</option>
-              <option value="AU_PORT">4. AU PORT (Port de Cotonou)</option>
-              <option value="EN_MAGASIN">5. EN MAGASIN (Showroom)</option>
-            </select>
+              <button
+                type="button"
+                onClick={() => setIsCreateModalOpen(false)}
+                style={{
+                  background: "rgba(255,255,255,0.08)",
+                  border: "none",
+                  borderRadius: "8px",
+                  color: "#cbd5e1",
+                  width: 32,
+                  height: 32,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                }}
+                title="Fermer"
+              >
+                <X size={18} />
+              </button>
+            </div>
 
-            <select name="siteId" className="ox-select" defaultValue={sites[0]?.id || ""} title="Showroom d'affectation">
-              {sites.map((s) => (
-                <option key={s.id} value={s.id}>
-                  📍 {s.name}
-                </option>
-              ))}
-            </select>
-            <select name="supplierId" className="ox-select" defaultValue="" title="Fournisseur">
-              <option value="">Fournisseur (opt.)</option>
-              {suppliers.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+            {/* Formulaire dans la modale */}
+            <form
+              action={async (formData) => {
+                await createVehicle(formData);
+                setIsCreateModalOpen(false);
+              }}
+              style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}
+            >
+              {/* SECTION 1 : VÉHICULE & MODÈLE */}
+              <div
+                style={{
+                  background: "rgba(30, 41, 59, 0.4)",
+                  padding: "1rem",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                }}
+              >
+                <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.6rem" }}>
+                  1. Marque, Modèle &amp; Finition Constructeur
+                </div>
+                <BrandModelSelect brands={catalog} energyFieldId="modal-vehicle-energy" />
+                <div className="ox-form-row" style={{ marginTop: "0.75rem" }}>
+                  <input name="variant" placeholder="Finition / Pack (ex: 1.5T DCT Premium)" className="ox-input" title="Finition / variante" />
+                  <input name="year" type="number" placeholder="Année" defaultValue={2026} className="ox-input" />
+                  <select
+                    id="modal-vehicle-energy"
+                    name="energy"
+                    className="ox-select"
+                    defaultValue="HYBRIDE"
+                    title="Énergie"
+                  >
+                    <option value="ELECTRIQUE">Électrique (EV)</option>
+                    <option value="HYBRIDE">Hybride (HEV)</option>
+                    <option value="PHEV">Hybride Rechargeable (PHEV)</option>
+                    <option value="ESSENCE">Essence</option>
+                    <option value="DIESEL">Diesel</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* SECTION 2 : ÉTAPE LOGISTIQUE & SHOWROOM */}
+              <div
+                style={{
+                  background: "rgba(30, 41, 59, 0.4)",
+                  padding: "1rem",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                }}
+              >
+                <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#f59e0b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.6rem" }}>
+                  2. Affectation Logistique (5 Étapes) &amp; Emplacement
+                </div>
+                <div className="ox-form-row">
+                  <select
+                    name="status"
+                    defaultValue="EN_MAGASIN"
+                    className="ox-select"
+                    title="Statut logistique initial"
+                    style={{ fontWeight: 700, color: "#34d399", background: "rgba(15,23,42,0.8)" }}
+                  >
+                    <option value="COMMANDE">1. COMMANDE (Usine / BDC)</option>
+                    <option value="EN_PRODUCTION">2. EN PRODUCTION (Chine)</option>
+                    <option value="EN_TRANSIT">3. EN TRANSIT (Maritime)</option>
+                    <option value="AU_PORT">4. AU PORT (Port de Cotonou)</option>
+                    <option value="EN_MAGASIN">5. EN MAGASIN (Showroom Cotonou)</option>
+                  </select>
+
+                  <select name="siteId" className="ox-select" defaultValue={sites[0]?.id || ""} title="Showroom d'affectation">
+                    {sites.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        📍 {s.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select name="supplierId" className="ox-select" defaultValue="" title="Fournisseur">
+                    <option value="">Fournisseur (opt.)</option>
+                    {suppliers.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* SECTION 3 : EXPÉDITION & CHÂSSIS VIN */}
+              <div
+                style={{
+                  background: "rgba(30, 41, 59, 0.4)",
+                  padding: "1rem",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                }}
+              >
+                <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#8b5cf6", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.6rem" }}>
+                  3. Suivi Maritime &amp; Châssis (VIN)
+                </div>
+                <div className="ox-form-row">
+                  <input
+                    name="shippingOriginPort"
+                    placeholder="Port d'origine (ex: Shanghai, Ningbo, Anvers)"
+                    className="ox-input"
+                  />
+                  <input
+                    name="etaDate"
+                    type="date"
+                    title="Date estimée d'arrivée (ETA)"
+                    className="ox-input"
+                  />
+                  <input
+                    name="containerNumber"
+                    placeholder="N° Conteneur / BL maritime"
+                    className="ox-input"
+                  />
+                  <input
+                    name="vin"
+                    placeholder="Numéro VIN (17 caractères châssis)"
+                    className="ox-input"
+                    title="Numéro VIN"
+                  />
+                </div>
+              </div>
+
+              {/* SECTION 4 : PRIX DE VENTE & VALIDATION */}
+              <div
+                style={{
+                  background: "rgba(30, 41, 59, 0.4)",
+                  padding: "1rem",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                }}
+              >
+                <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#ec4899", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.6rem" }}>
+                  4. Tarification en Francs CFA
+                </div>
+                <div className="ox-form-row">
+                  <input
+                    name="priceXof"
+                    type="number"
+                    placeholder="Prix de vente XOF *"
+                    required
+                    className="ox-input"
+                    title="Prix de vente en francs CFA"
+                    style={{ fontWeight: 800, fontSize: "1.05rem", color: "#34d399", minWidth: 260 }}
+                  />
+                </div>
+              </div>
+
+              {/* Actions Footer */}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: "0.8rem",
+                  marginTop: "0.5rem",
+                  borderTop: "1px solid rgba(255,255,255,0.1)",
+                  paddingTop: "1rem",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setIsCreateModalOpen(false)}
+                  className="ox-btn ox-btn-ghost"
+                  style={{ color: "#cbd5e1" }}
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  className="ox-btn"
+                  style={{
+                    background: "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)",
+                    border: "none",
+                    padding: "0.6rem 1.4rem",
+                    fontWeight: 800,
+                    fontSize: "0.92rem",
+                  }}
+                >
+                  Valider et Ajouter au Stock
+                </button>
+              </div>
+            </form>
           </div>
-
-          <div className="ox-form-row" style={{ marginTop: 8 }}>
-            <input
-              name="shippingOriginPort"
-              placeholder="Port d'origine (ex: Shanghai, Ningbo, Anvers)"
-              className="ox-input"
-            />
-            <input
-              name="etaDate"
-              type="date"
-              title="Date estimée d'arrivée (ETA)"
-              className="ox-input"
-            />
-            <input
-              name="containerNumber"
-              placeholder="N° Conteneur / BL maritime"
-              className="ox-input"
-            />
-            <input
-              name="priceXof"
-              type="number"
-              placeholder="Prix de vente XOF *"
-              required
-              className="ox-input"
-              title="Prix de vente en francs CFA"
-              style={{ fontWeight: 700 }}
-            />
-            <button type="submit" className="ox-btn" style={{ background: "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)", border: "none" }}>
-              Ajouter au stock
-            </button>
-          </div>
-        </form>
-      ) : null}
+        </div>
+      )}
 
       {/* RECHERCHE ET FILTRES RAPIDES */}
       <form className="ox-form-row" style={{ marginBottom: 16 }}>
@@ -541,15 +766,32 @@ export function VehiclesView({
                           background: "rgba(30, 41, 59, 0.4)",
                         }}
                       >
-                        {/* PHOTO & MARQUE */}
+                        {/* PHOTO & MARQUE (STUDIO CADRÉ SANS AUCUN ROGNAGE) */}
                         <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
                           {v.mainPhotoUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={v.mainPhotoUrl}
-                              alt={v.model}
-                              style={{ width: 44, height: 32, objectFit: "cover", borderRadius: 4 }}
-                            />
+                            <div
+                              style={{
+                                width: 56,
+                                height: 38,
+                                borderRadius: 6,
+                                background: "radial-gradient(ellipse at center, #1e293b 0%, #0f172a 100%)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                overflow: "hidden",
+                                border: "1px solid rgba(255,255,255,0.1)",
+                                flexShrink: 0,
+                                padding: "2px",
+                              }}
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={v.mainPhotoUrl}
+                                alt={v.model}
+                                referrerPolicy="no-referrer"
+                                style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center" }}
+                              />
+                            </div>
                           ) : (
                             <Box size={24} color={stage.color} />
                           )}
@@ -684,22 +926,35 @@ export function VehiclesView({
             v.vin || "—",
             <div key={v.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
               {v.mainPhotoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={v.mainPhotoUrl}
-                  alt={v.model}
-                  referrerPolicy="no-referrer"
+                <div
                   style={{
-                    width: 48,
-                    height: 32,
-                    objectFit: "cover",
-                    borderRadius: 4,
-                    border: "1px solid rgba(0,0,0,0.08)",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                    background: "#f1f5f9",
+                    width: 58,
+                    height: 38,
+                    borderRadius: 6,
+                    background: "radial-gradient(ellipse at center, #1e293b 0%, #0f172a 100%)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    overflow: "hidden",
+                    border: "1px solid rgba(0,0,0,0.15)",
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
                     flexShrink: 0,
+                    padding: "2px",
                   }}
-                />
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={v.mainPhotoUrl}
+                    alt={v.model}
+                    referrerPolicy="no-referrer"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                      objectPosition: "center",
+                    }}
+                  />
+                </div>
               ) : null}
               <div>
                 <div style={{ fontWeight: 650, display: "flex", alignItems: "center", gap: 6 }}>

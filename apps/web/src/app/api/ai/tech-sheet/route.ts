@@ -42,12 +42,16 @@ export async function POST(req: Request) {
       rearPhotoUrl: vehicle.rearPhotoUrl || sheet.rearPhotoUrl,
     };
 
-    // Mettre à jour en BDD
+    // Mettre à jour en BDD avec les photos officielles synchronisées
     const updatedVehicle = await prisma.vehicle.update({
       where: { id: vehicleId },
       data: {
         technicalSheetJson: JSON.stringify(updatedSheet),
         hasTechSheet: true,
+        mainPhotoUrl: updatedSheet.mainPhotoUrl,
+        interiorPhotoUrl: updatedSheet.interiorPhotoUrl,
+        exteriorPhotoUrl: updatedSheet.exteriorPhotoUrl,
+        rearPhotoUrl: updatedSheet.rearPhotoUrl,
       },
     });
 

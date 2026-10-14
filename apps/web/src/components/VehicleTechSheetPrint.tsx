@@ -536,12 +536,16 @@ export function VehicleTechSheetPrint({
             </ul>
             <div
               style={{
-                height: 82,
-                borderRadius: "6px",
+                height: 90,
+                borderRadius: "8px",
                 overflow: "hidden",
-                border: "1px solid #e2e8f0",
+                border: "1px solid #cbd5e1",
                 boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
-                background: "#f1f5f9",
+                background: "radial-gradient(ellipse at center, #1e293b 0%, #0f172a 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "2px",
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -549,13 +553,13 @@ export function VehicleTechSheetPrint({
                 src={sheet.interiorPhotoUrl || "https://upload.wikimedia.org/wikipedia/commons/0/0f/2020_Toyota_Corolla_Cross_Hybrid_Premium_Safety_%28Cockpit%29.jpg"}
                 alt="Intérieur & Habitacle officiel"
                 referrerPolicy="no-referrer"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                style={{ width: "100%", height: "100%", maxHeight: "100%", maxWidth: "100%", objectFit: "contain", objectPosition: "center center" }}
               />
             </div>
           </div>
         </div>
 
-        {/* SECTION 4 : EXTÉRIEUR (TEXTE GAUCHE + PHOTO PROFIL MÊME COULEUR DROITE) */}
+        {/* SECTION 4 : EXTÉRIEUR (TEXTE GAUCHE + PHOTO PROFIL MÊME COULEUR DROITE SANS ROGNAGE) */}
         <div style={{ marginBottom: "8px" }}>
           <div
             style={{
@@ -590,12 +594,16 @@ export function VehicleTechSheetPrint({
             </ul>
             <div
               style={{
-                height: 82,
-                borderRadius: "6px",
+                height: 90,
+                borderRadius: "8px",
                 overflow: "hidden",
-                border: "1px solid #e2e8f0",
+                border: "1px solid #cbd5e1",
                 boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
-                background: "#f1f5f9",
+                background: "radial-gradient(ellipse at center, #1e293b 0%, #0f172a 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "2px",
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -603,13 +611,13 @@ export function VehicleTechSheetPrint({
                 src={sheet.exteriorPhotoUrl || sheet.mainPhotoUrl || undefined}
                 alt="Vue Extérieure officielle"
                 referrerPolicy="no-referrer"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                style={{ width: "100%", height: "100%", maxHeight: "100%", maxWidth: "100%", objectFit: "contain", objectPosition: "center center" }}
               />
             </div>
           </div>
         </div>
 
-        {/* SECTION 5 : SÉCURITÉ (TEXTE GAUCHE + PHOTO ARRIÈRE MÊME COULEUR DROITE) */}
+        {/* SECTION 5 : SÉCURITÉ (TEXTE GAUCHE + PHOTO ARRIÈRE MÊME COULEUR DROITE SANS ROGNAGE) */}
         <div style={{ marginBottom: "6px" }}>
           <div
             style={{
@@ -644,12 +652,16 @@ export function VehicleTechSheetPrint({
             </ul>
             <div
               style={{
-                height: 82,
-                borderRadius: "6px",
+                height: 90,
+                borderRadius: "8px",
                 overflow: "hidden",
-                border: "1px solid #e2e8f0",
+                border: "1px solid #cbd5e1",
                 boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
-                background: "#f1f5f9",
+                background: "radial-gradient(ellipse at center, #1e293b 0%, #0f172a 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "2px",
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -657,7 +669,7 @@ export function VehicleTechSheetPrint({
                 src={sheet.rearPhotoUrl || sheet.mainPhotoUrl || undefined}
                 alt="Vue Arrière officielle"
                 referrerPolicy="no-referrer"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                style={{ width: "100%", height: "100%", maxHeight: "100%", maxWidth: "100%", objectFit: "contain", objectPosition: "center center" }}
               />
             </div>
           </div>

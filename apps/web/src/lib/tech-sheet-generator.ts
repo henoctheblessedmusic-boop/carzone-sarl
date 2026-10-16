@@ -152,22 +152,14 @@ export function buildStandardTechnicalSheet(vehicle: {
     const cleanVariant =
       vehicle.variant && !isLicensePlate ? vehicle.variant : catalogEntry.variant;
 
-    const mainPhoto =
-      vehicle.mainPhotoUrl && !isObsoletePhoto(vehicle.mainPhotoUrl) && !vehicle.mainPhotoUrl.includes("Corolla_Cross")
-        ? vehicle.mainPhotoUrl
-        : catalogEntry.photos.mainPhotoUrl;
-    const interiorPhoto =
-      vehicle.interiorPhotoUrl && !isObsoletePhoto(vehicle.interiorPhotoUrl) && !vehicle.interiorPhotoUrl.includes("Corolla_Cross")
-        ? vehicle.interiorPhotoUrl
-        : catalogEntry.photos.interiorPhotoUrl;
-    const exteriorPhoto =
-      vehicle.exteriorPhotoUrl && !isObsoletePhoto(vehicle.exteriorPhotoUrl) && !vehicle.exteriorPhotoUrl.includes("Corolla_Cross")
-        ? vehicle.exteriorPhotoUrl
-        : catalogEntry.photos.exteriorPhotoUrl;
-    const rearPhoto =
-      vehicle.rearPhotoUrl && !isObsoletePhoto(vehicle.rearPhotoUrl) && !vehicle.rearPhotoUrl.includes("Corolla_Cross")
-        ? vehicle.rearPhotoUrl
-        : catalogEntry.photos.rearPhotoUrl;
+    // Pour un modèle catalogué, les photos vérifiées du catalogue sont TOUJOURS prioritaires :
+    // les anciennes URL stockées en base (photos de rue, plaques) ne doivent plus jamais réapparaître.
+    const pick = (catalogUrl: string | null | undefined, dbUrl?: string | null) =>
+      catalogUrl || (dbUrl && !isObsoletePhoto(dbUrl) ? dbUrl : null);
+    const mainPhoto = pick(catalogEntry.photos.mainPhotoUrl, vehicle.mainPhotoUrl);
+    const interiorPhoto = pick(catalogEntry.photos.interiorPhotoUrl, vehicle.interiorPhotoUrl);
+    const exteriorPhoto = pick(catalogEntry.photos.exteriorPhotoUrl, vehicle.exteriorPhotoUrl);
+    const rearPhoto = pick(catalogEntry.photos.rearPhotoUrl, vehicle.rearPhotoUrl);
 
     return {
       title: `${catalogEntry.brand} ${catalogEntry.model} ${cleanVariant ? cleanVariant.toUpperCase() : ""}`.trim(),
@@ -294,6 +286,29 @@ export function buildStandardTechnicalSheet(vehicle: {
     ],
     translatedAt: new Date().toISOString(),
   };
+}
+
+/**
+ * Source unique de la fiche à afficher / imprimer.
+ * - Modèle présent dans le catalogue officiel → fiche reconstruite à chaque affichage depuis le catalogue
+ *   (photos vérifiées, cockpit + sellerie, textes à jour). L'ancien JSON en base est ignoré.
+ * - Modèle hors catalogue → JSON enregistré (ex. généré par IA), sinon fiche standard.
+ */
+export function resolveVehicleTechSheet(
+  vehicle: Parameters<typeof buildStandardTechnicalSheet>[0] & { technicalSheetJson?: string | null },
+): TechnicalSheet {
+  if (findCatalogSpecs(vehicle.brand, vehicle.model, vehicle.variant)) {
+    return buildStandardTechnicalSheet(vehicle);
+  }
+  if (vehicle.technicalSheetJson) {
+    try {
+      const stored = JSON.parse(vehicle.technicalSheetJson) as TechnicalSheet;
+      if (stored.mainPhotoUrl && !isObsoletePhoto(stored.mainPhotoUrl)) return stored;
+    } catch {
+      // JSON corrompu → fiche standard
+    }
+  }
+  return buildStandardTechnicalSheet(vehicle);
 }
 
 /**

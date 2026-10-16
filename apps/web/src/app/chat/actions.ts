@@ -23,6 +23,7 @@ export async function sendChatMessage(data: {
 
   // Si c'est une diffusion générale du DG ou Admin
   const isPrivileged =
+    currentUser.role === "DEVELOPER" ||
     currentUser.role === "PDG" ||
     currentUser.role === "SG" ||
     currentUser.role === "DG" ||
@@ -184,8 +185,14 @@ export async function getColleagues(): Promise<ColleaguePresence[]> {
     })
     .catch(() => {});
 
+  const isDev = currentUser.role === "DEVELOPER";
+
+  // Rôle invisible : Le Développeur n'apparaît pas dans la liste des utilisateurs pour les autres
   const users = await prisma.user.findMany({
-    where: { active: true },
+    where: {
+      active: true,
+      ...(isDev ? {} : { role: { not: "DEVELOPER" } }),
+    },
     select: {
       id: true,
       fullName: true,

@@ -133,7 +133,7 @@ export async function sendProforma(formData: FormData) {
   const now = new Date();
 
   const finalSubject = customSubject || `Facture Proforma ${quote.number} — CARZONE SARL`;
-  const defaultBody = `Bonjour ${quote.customer.contactName},\n\nVeuillez trouver le récapitulatif de votre facture proforma ${quote.number} pour un montant total de ${formatXof(quote.totalXof)} (${quote.taxMode}).\n\nPrestations et articles inclus :\n${quote.lines.map((l) => `- ${l.quantity}x ${l.description} : ${formatXof(l.unitPriceXof * l.quantity)}`).join("\n")}\n\nCe devis proforma est valable jusqu'au ${formatDate(quote.validUntil)}.\n\nLes Conditions Générales de Vente sont adossées au document officiel en page 2.\n\nRestant à votre entière disposition pour validation,\nL'équipe commerciale OXCAR Motors\nShowrooms Akpakpa & Étoile Rouge · Cotonou, Bénin`;
+  const defaultBody = `Bonjour ${quote.customer.contactName},\n\nVeuillez trouver le récapitulatif de votre facture proforma ${quote.number} pour un montant total de ${formatXof(quote.totalXof)} (${quote.taxMode}).\n\nPrestations et articles inclus :\n${quote.lines.map((l) => `- ${l.quantity}x ${l.description} : ${formatXof(l.unitPriceXof * l.quantity)}`).join("\n")}\n\nCe devis proforma est valable jusqu'au ${formatDate(quote.validUntil)}.\n\nLes Conditions Générales de Vente sont adossées au document officiel en page 2.\n\nRestant à votre entière disposition pour validation,\nL'équipe commerciale Carzone SARL\nShowroom Zone Maro-Militaire, Gbèdomidji · Cotonou, Bénin`;
   const finalBody = customBody || defaultBody;
 
   // Create message in Mailbox

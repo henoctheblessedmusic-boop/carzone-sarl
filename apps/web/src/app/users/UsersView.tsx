@@ -60,6 +60,7 @@ export function UsersView({
   const [isPending, startTransition] = useTransition();
 
   const isPrivileged =
+    currentUserRole === "DEVELOPER" ||
     currentUserRole === "PDG" ||
     currentUserRole === "SG" ||
     currentUserRole === "DG" ||
@@ -166,6 +167,14 @@ export function UsersView({
       setList(next);
     }
   };
+
+  // Rôles autorisés à l'affichage : le DEVELOPER est totalement invisible pour tous les autres utilisateurs
+  const availableRoleEntries = useMemo(() => {
+    return Object.entries(ROLE_LABELS).filter(([k]) => {
+      if (k === "DEVELOPER" && currentUserRole !== "DEVELOPER") return false;
+      return true;
+    });
+  }, [currentUserRole]);
 
   // Filtered Users
   const filteredUsers = useMemo(() => {
@@ -633,7 +642,7 @@ export function UsersView({
             }}
           >
             <option value="ALL">Tous les rôles</option>
-            {Object.entries(ROLE_LABELS).map(([k, label]) => (
+            {availableRoleEntries.map(([k, label]) => (
               <option key={k} value={k}>
                 {label} ({k})
               </option>
@@ -1199,7 +1208,7 @@ export function UsersView({
                       cursor: "pointer",
                     }}
                   >
-                    {Object.entries(ROLE_LABELS).map(([k, label]) => (
+                    {availableRoleEntries.map(([k, label]) => (
                       <option key={k} value={k}>
                         {label} ({k})
                       </option>
@@ -1513,7 +1522,7 @@ export function UsersView({
                       cursor: "pointer",
                     }}
                   >
-                    {Object.entries(ROLE_LABELS).map(([k, label]) => (
+                    {availableRoleEntries.map(([k, label]) => (
                       <option key={k} value={k}>
                         {label} ({k})
                       </option>

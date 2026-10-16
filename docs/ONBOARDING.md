@@ -29,8 +29,8 @@ All passwords: `carzone2026`
 - `installateur@volthome.bj` — Installateur
 
 ## Sites
-- Akpakpa showroom
-- PK3 atelier
+- Showroom & Siège : Zone Maro-Militaire, Gbèdomidji, Cotonou
+- Atelier SAV : En attente de confirmation de localisation dédiée
 
 ## Fiscalité (e-MECeF)
 Guide compte développeur DGI sandbox (enregistrement, JWT, URLs test/prod) : [`docs/DGI-EMECEF-COMPTE-DEVELOPPEUR-SANDBOX.md`](./DGI-EMECEF-COMPTE-DEVELOPPEUR-SANDBOX.md)

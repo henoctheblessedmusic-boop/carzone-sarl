@@ -241,40 +241,32 @@ async function main() {
 
   console.log(`Catalogue: ${catalog.length} marques, ${catalog.reduce((n, b) => n + b.models.length, 0)} modèles`);
 
-  const akpakpa = await prisma.site.create({
+  const maroMilitaire = await prisma.site.create({
     data: {
-      name: "Showroom Saint-Michel (Immeuble CBDH)",
-      code: "AKPAKPA",
-      address: "Rte de Porto-Novo, 150m Sobebra",
+      name: "Siège & Showroom Carzone SARL",
+      code: "MARO_MILITAIRE",
+      address: "Zone Maro-Militaire, Quartier Gbèdomidji",
       city: "Cotonou",
     },
   });
-  const etoileRouge = await prisma.site.create({
+  const atelierSav = await prisma.site.create({
     data: {
-      name: "Showroom Étoile Rouge",
-      code: "ETOILE_ROUGE",
-      address: "Carrefour Étoile Rouge",
-      city: "Cotonou",
-    },
-  });
-  const pk3 = await prisma.site.create({
-    data: {
-      name: "Atelier SAV Carzone Cotonou",
-      code: "PK3",
-      address: "Zone Technique & SAV Carzone, Cotonou",
+      name: "Atelier SAV Carzone (Emplacement à confirmer)",
+      code: "ATELIER_SAV",
+      address: "En attente de confirmation de localisation",
       city: "Cotonou",
     },
   });
 
   const hash = await bcrypt.hash("carzone2026", 10);
   const users = [
-    { email: "jeanine@carzone.bj", fullName: "Jeanine Desroses", role: Role.DG, siteId: akpakpa.id },
-    { email: "igor@carzone.bj", fullName: "Igor DAGBONOUTON", role: Role.ADMIN, siteId: akpakpa.id },
-    { email: "basile@carzone.bj", fullName: "Basile TOKPOMONHOUN", role: Role.COMPTA, siteId: akpakpa.id },
-    { email: "jennifer@carzone.bj", fullName: "Jennifer ONHIAS", role: Role.COMMERCIAL, siteId: akpakpa.id },
-    { email: "stanislas@carzone.bj", fullName: "Stanislas FASSINOU", role: Role.STOCK, siteId: akpakpa.id },
-    { email: "joslain@carzone.bj", fullName: "Joslain AHOLOU", role: Role.ATELIER, siteId: pk3.id },
-    { email: "orelia@carzone.bj", fullName: "Orélia B. DIKPE", role: Role.BORNES_OPS, siteId: akpakpa.id },
+    { email: "jeanine@carzone.bj", fullName: "Jeanine Desroses", role: Role.DG, siteId: maroMilitaire.id },
+    { email: "igor@carzone.bj", fullName: "Igor DAGBONOUTON", role: Role.ADMIN, siteId: maroMilitaire.id },
+    { email: "basile@carzone.bj", fullName: "Basile TOKPOMONHOUN", role: Role.COMPTA, siteId: maroMilitaire.id },
+    { email: "jennifer@carzone.bj", fullName: "Jennifer ONHIAS", role: Role.COMMERCIAL, siteId: maroMilitaire.id },
+    { email: "stanislas@carzone.bj", fullName: "Stanislas FASSINOU", role: Role.STOCK, siteId: maroMilitaire.id },
+    { email: "joslain@carzone.bj", fullName: "Joslain AHOLOU", role: Role.ATELIER, siteId: atelierSav.id },
+    { email: "orelia@carzone.bj", fullName: "Orélia B. DIKPE", role: Role.BORNES_OPS, siteId: maroMilitaire.id },
   ];
 
   for (const u of users) {
@@ -320,7 +312,7 @@ async function main() {
       priceXof: 18900000,
       costXof: 15200000,
       status: "EN_STOCK",
-      siteId: akpakpa.id,
+      siteId: maroMilitaire.id,
       supplierId: supplierDubai.id,
     },
   });
@@ -337,7 +329,7 @@ async function main() {
       color: "Gris",
       priceXof: 22500000,
       status: "EN_STOCK",
-      siteId: akpakpa.id,
+      siteId: maroMilitaire.id,
       supplierId: supplierAnvers.id,
     },
   });
@@ -351,7 +343,7 @@ async function main() {
       vehicleType: "PICKUP",
       priceXof: 28500000,
       status: "EN_TRANSIT",
-      siteId: akpakpa.id,
+      siteId: maroMilitaire.id,
       supplierId: supplierDubai.id,
     },
   });
@@ -562,12 +554,12 @@ async function main() {
 
   const station = await prisma.chargingStation.create({
     data: {
-      code: "OXC-AKP-01",
-      name: "Borne Showroom Saint-Michel (Immeuble CBDH)",
-      address: "Showroom Saint-Michel (Immeuble CBDH)",
-      siteId: akpakpa.id,
+      code: "CARZONE-MARO-01",
+      name: "Borne Showroom Carzone (Maro-Militaire)",
+      address: "Zone Maro-Militaire, Quartier Gbèdomidji, Cotonou",
+      siteId: maroMilitaire.id,
       powerKw: 22,
-      terminalId: "TERM-AKP-01",
+      terminalId: "TERM-MARO-01",
     },
   });
 

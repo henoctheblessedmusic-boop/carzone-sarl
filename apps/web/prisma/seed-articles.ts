@@ -40,7 +40,7 @@ async function seedArticlesAndMails() {
         to: "contact@topcarzone.com",
         subject: "Demande de confirmation proforma BYD Song Plus",
         snippet: "Bonjour équipe CARZONE SARL, suite à notre échange au showroom, nous confirmons le devis...",
-        body: "Bonjour équipe CARZONE SARL,\n\nSuite à notre échange au showroom Saint-Michel (Immeuble CBDH), nous souhaitons valider la commande ferme pour le BYD Song Plus EV avec la borne 7.4 kW.\n\nMerci de nous transmettre les modalités de règlement.\n\nBien cordialement,\nAugustin JOHNSON",
+        body: "Bonjour équipe CARZONE SARL,\n\nSuite à notre échange au showroom de la Zone Maro-Militaire (Gbèdomidji), nous souhaitons valider la commande ferme pour le BYD Song Plus EV avec la borne 7.4 kW.\n\nMerci de nous transmettre les modalités de règlement.\n\nBien cordialement,\nAugustin JOHNSON",
         customerId: customer?.id,
         isRead: false,
         starred: true,

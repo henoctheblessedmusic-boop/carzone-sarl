@@ -3,6 +3,7 @@ import type { SessionUser } from "@/lib/auth";
 import { AppShellClient } from "@/components/AppShellClient";
 import { NAV_KEYS_BY_HREF, roleLabel, type PageKey } from "@/lib/i18n";
 import { getServerMessages } from "@/lib/i18n/server";
+import { RoleService } from "@/lib/role-service";
 
 export type { PageKey };
 
@@ -45,10 +46,19 @@ export async function AppShell({
 }) {
   const { messages } = await getServerMessages();
   const heading = (titleKey ? messages.pages[titleKey] : undefined) ?? title ?? "";
-  const isSuperAdmin = user.role === "DG" || user.role === "PDG" || user.role === "SG";
+  const isSuperAdmin =
+    user.role === "DEVELOPER" ||
+    user.role === "DG" ||
+    user.role === "PDG" ||
+    user.role === "SG";
 
   const items = navDefs
-    .filter((n) => !n.roles || isSuperAdmin || n.roles.includes(user.role))
+    .filter((n) => {
+      if (!n.roles) return true;
+      if (isSuperAdmin) return true;
+      if (RoleService.isRouteAllowedForUser(user, n.href)) return true;
+      return n.roles.includes(user.role);
+    })
     .map((n) => {
       const key = NAV_KEYS_BY_HREF[n.href];
       return {

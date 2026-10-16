@@ -518,7 +518,7 @@ export function QuoteCreator({
                   </h2>
                 </div>
                 <div style={{ fontSize: "0.85rem", color: "var(--ice-text-muted)", marginTop: 4 }}>
-                  CARZONE SARL · Showroom Immeuble CBDH Saint-Michel, Cotonou · Devis catalogue & véhicules
+                  CARZONE SARL · Showroom Zone Maro-Militaire, Gbèdomidji, Cotonou · Devis catalogue & véhicules
                 </div>
               </div>
               <button
@@ -1508,7 +1508,7 @@ export function QuoteCreator({
                 <textarea
                   className="ox-input"
                   style={{ width: "100%", height: 90, fontSize: "0.85rem" }}
-                  placeholder="Ex: Livraison sous 48h au Showroom (Akpakpa ou Étoile Rouge). Câble de recharge Type 2 et première révision offerts. Garantie batterie 8 ans / 150 000 km."
+                  placeholder="Ex: Livraison sous 48h au Showroom (Zone Maro-Militaire, Gbèdomidji). Câble de recharge Type 2 et première révision offerts. Garantie batterie 8 ans / 150 000 km."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   disabled={isPending}

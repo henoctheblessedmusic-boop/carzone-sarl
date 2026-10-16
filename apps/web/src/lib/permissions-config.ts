@@ -288,6 +288,8 @@ export const DEFAULT_ROLE_CAPABILITIES: Record<Role, string[]> = {
   INSTALLATEUR: [
     "estimates:view_own",
   ],
+
+  DEVELOPER: [...ALL_CAPABILITY_IDS],
 };
 
 /**
@@ -296,7 +298,7 @@ export const DEFAULT_ROLE_CAPABILITIES: Record<Role, string[]> = {
  * Sinon, les capacités par défaut de son rôle sont utilisées.
  */
 export function getEffectiveCapabilities(role: Role, customPermissions?: string[] | null): string[] {
-  if (role === "PDG" || role === "SG" || role === "DG") {
+  if (role === "DEVELOPER" || role === "PDG" || role === "SG" || role === "DG") {
     return [...ALL_CAPABILITY_IDS];
   }
   if (customPermissions && customPermissions.length > 0) {
@@ -313,7 +315,7 @@ export function userHasCapability(
   capabilityId: string,
   customPermissions?: string[] | null
 ): boolean {
-  if (role === "PDG" || role === "SG" || role === "DG") {
+  if (role === "DEVELOPER" || role === "PDG" || role === "SG" || role === "DG") {
     return true;
   }
   const effective = getEffectiveCapabilities(role, customPermissions);

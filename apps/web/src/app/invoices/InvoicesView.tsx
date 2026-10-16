@@ -127,6 +127,7 @@ export function InvoicesView({
   const [voidReason, setVoidReason] = useState("");
 
   const canVoid =
+    userRole === "DEVELOPER" ||
     userRole === "DG" ||
     userRole === "PDG" ||
     userRole === "SG" ||
@@ -135,6 +136,7 @@ export function InvoicesView({
     userRole === "COMPTA";
 
   const canExportFinancials =
+    userRole === "DEVELOPER" ||
     userRole === "DG" ||
     userRole === "PDG" ||
     userRole === "SG" ||

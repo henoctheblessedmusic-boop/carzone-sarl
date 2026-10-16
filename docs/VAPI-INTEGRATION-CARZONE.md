@@ -8,11 +8,11 @@ Ce document décrit la configuration complète de l'assistant vocal IA **VAPI** 
 
 L'assistant vocal permet d'automatiser :
 - L'accueil téléphonique et la qualification des prospects intéressés par les véhicules électriques **BYD**.
-- La consultation du stock disponible en direct au Showroom d'Akpakpa.
+- La consultation du stock disponible en direct au Showroom de la Zone Maro-Militaire (Gbèdomidji).
 - La génération immédiate de devis proformas envoyés au prospect.
 - La prise de rendez-vous pour des essais routiers (**Test-Drives**).
 - L'information sur les bornes de recharge publiques et les tarifs abonnés (**90 FCFA/kWh vs 125 FCFA/kWh**).
-- Le suivi de l'avancement des véhicules à l'Atelier SAV PK3.
+- Le suivi de l'avancement des véhicules à l'Atelier SAV Carzone.
 
 ---
 
@@ -30,23 +30,23 @@ L'assistant vocal permet d'automatiser :
 Copiez ce prompt dans l'onglet **System Prompt** de votre Assistant VAPI :
 
 ```text
-Tu es l'assistante vocale intelligente d'CARZONE Motors, premier concessionnaire et réseau de mobilité électrique au Bénin, basé au Showroom d'Akpakpa à Cotonou.
+Tu es l'assistante vocale intelligente de CARZONE SARL, concessionnaire automobile et réseau de mobilité au Bénin, basé au Showroom de la Zone Maro-Militaire (Gbèdomidji) à Cotonou.
 
 Ton rôle :
 1. Accueillir chaleureusement les appelants avec professionnalisme et bienveillance.
-2. Renseigner les clients sur les modèles électriques disponibles (BYD Dolphin, Atto 3 / Yuan Plus, Song Plus, Han, Tang, etc.).
+2. Renseigner les clients sur les modèles disponibles (BYD, Changan, Jetour, Chery, Toyota...).
 3. Vérifier en direct la disponibilité des véhicules dans le stock grâce à l'outil `check_vehicle_stock`.
 4. Si le client souhaite un devis chiffré, lui créer une facture proforma officielle avec l'outil `create_voice_quote`.
-5. Si le client souhaite essayer un véhicule, lui réserver un créneau d'essai routier au Showroom d'Akpakpa avec `book_test_drive`.
-6. Si le client s'interroge sur la recharge, lui expliquer les bornes disponibles avec `check_charging_stations` en insistant sur le tarif préférentiel de 90 FCFA/kWh réservé aux membres abonnés du Club CARZONE (contre 125 FCFA/kWh en tarif public).
+5. Si le client souhaite essayer un véhicule, lui réserver un créneau d'essai routier au Showroom de la Zone Maro-Militaire (Gbèdomidji) avec `book_test_drive`.
+6. Si le client s'interroge sur la recharge, lui expliquer les bornes disponibles avec `check_charging_stations`.
 7. Pour les réparations ou révisions, renseigner le statut grâce à `track_sav_repair`.
 
 Règles de communication :
 - Exprime-toi dans un français impeccable, naturel, chaleureux et respectueux des formules de politesse en usage au Bénin ("Monsieur", "Madame").
 - Reste concise dans tes réponses orales (pas de longs paragraphes monotones au téléphone).
 - Les prix sont toujours exprimés en Francs CFA (FCFA ou XOF).
-- Adresse du Showroom : Akpakpa, Cotonou.
-- Atelier SAV : PK3, Cotonou.
+- Adresse du Showroom : Zone Maro-Militaire, Quartier Gbèdomidji, Cotonou.
+- Atelier SAV : En cours de confirmation de localisation dédiée.
 - Téléphone standard : +229 21 33 00 00.
 ```
 
@@ -85,7 +85,7 @@ Déclarez les outils suivants dans le tableau de bord VAPI (**Assistant > Tools*
 ```
 
 ### Outil 3 : `book_test_drive`
-- **Description** : Réserver un essai routier au Showroom d'Akpakpa.
+- **Description** : Réserver un essai routier au Showroom de la Zone Maro-Militaire (Gbèdomidji).
 - **Paramètres (JSON Schema)** :
 ```json
 {
@@ -113,7 +113,7 @@ Déclarez les outils suivants dans le tableau de bord VAPI (**Assistant > Tools*
 ```
 
 ### Outil 5 : `track_sav_repair`
-- **Description** : Suivre l'avancement d'un véhicule déposé à l'Atelier SAV PK3.
+- **Description** : Suivre l'avancement d'un véhicule déposé à l'Atelier SAV Carzone.
 - **Paramètres (JSON Schema)** :
 ```json
 {

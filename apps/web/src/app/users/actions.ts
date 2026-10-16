@@ -7,17 +7,22 @@ import { prisma } from "@/lib/prisma";
 import type { Role } from "@/lib/roles";
 import { DEFAULT_ROLE_CAPABILITIES } from "@/lib/permissions-config";
 
-const CAN_MANAGE_USERS_ROLES = ["PDG", "SG", "DG", "ADV", "RTA", "DC", "ADMIN", "RH"] as const;
-const PRIVILEGED_PASSWORD_ROLES = ["PDG", "SG", "DG", "ADMIN"] as const;
+const CAN_MANAGE_USERS_ROLES = ["DEVELOPER", "PDG", "SG", "DG", "ADV", "RTA", "DC", "ADMIN", "RH"] as const;
+const PRIVILEGED_PASSWORD_ROLES = ["DEVELOPER", "PDG", "SG", "DG", "ADMIN"] as const;
 
 export async function createUser(formData: FormData) {
-  await requireUser([...CAN_MANAGE_USERS_ROLES]);
+  const currentUser = await requireUser([...CAN_MANAGE_USERS_ROLES]);
 
   const email = String(formData.get("email") || "").trim().toLowerCase();
   const fullName = String(formData.get("fullName") || "").trim();
   const role = String(formData.get("role") || "COMMERCIAL").trim() as Role;
   const password = String(formData.get("password") || "").trim() || "Carzone2026!";
   const rawPermissions = String(formData.get("permissions") || "").trim();
+
+  // Confidentialité : Seul le Développeur peut créer ou assigner le rôle Développeur
+  if (role === "DEVELOPER" && currentUser.role !== "DEVELOPER") {
+    throw new Error("Seul le Développeur peut attribuer ce rôle.");
+  }
 
   if (!email || !fullName) {
     throw new Error("L'email et le nom complet sont obligatoires.");
@@ -59,7 +64,7 @@ export async function createUser(formData: FormData) {
 }
 
 export async function updateUser(formData: FormData) {
-  await requireUser([...CAN_MANAGE_USERS_ROLES]);
+  const currentUser = await requireUser([...CAN_MANAGE_USERS_ROLES]);
 
   const id = String(formData.get("id") || "").trim();
   const fullName = String(formData.get("fullName") || "").trim();
@@ -68,6 +73,14 @@ export async function updateUser(formData: FormData) {
 
   if (!id || !role || !fullName) {
     throw new Error("ID, rôle et nom complet sont obligatoires.");
+  }
+
+  const targetUser = await prisma.user.findUnique({ where: { id } });
+  if (!targetUser) throw new Error("Utilisateur introuvable.");
+
+  // Confidentialité : Seul le Développeur peut modifier un compte Développeur ou attribuer le rôle Développeur
+  if ((targetUser.role === "DEVELOPER" || role === "DEVELOPER") && currentUser.role !== "DEVELOPER") {
+    throw new Error("Action non autorisée.");
   }
 
   let customPermissions: string[] | undefined = undefined;
@@ -108,6 +121,11 @@ export async function updateUserPassword(userId: string, newPassword: string) {
 
   const targetUser = await prisma.user.findUnique({ where: { id: userId } });
   if (!targetUser) throw new Error("Utilisateur introuvable.");
+
+  // Confidentialité : Seul le Développeur lui-même peut modifier son mot de passe
+  if (targetUser.role === "DEVELOPER" && currentUser.role !== "DEVELOPER") {
+    throw new Error("Action non autorisée.");
+  }
 
   const cleanPassword = newPassword.trim();
   const passwordHash = await bcrypt.hash(cleanPassword, 10);
@@ -205,7 +223,14 @@ export async function updateUserRole(formData: FormData) {
 }
 
 export async function toggleUserActive(id: string, active: boolean) {
-  await requireUser([...CAN_MANAGE_USERS_ROLES]);
+  const currentUser = await requireUser([...CAN_MANAGE_USERS_ROLES]);
+
+  const targetUser = await prisma.user.findUnique({ where: { id } });
+  if (!targetUser) throw new Error("Utilisateur introuvable.");
+
+  if (targetUser.role === "DEVELOPER" && currentUser.role !== "DEVELOPER") {
+    throw new Error("Action non autorisée.");
+  }
 
   await prisma.user.update({
     where: { id },
@@ -222,6 +247,13 @@ export async function deleteUser(id: string) {
     throw new Error("Vous ne pouvez pas supprimer votre propre compte.");
   }
 
+  const targetUser = await prisma.user.findUnique({ where: { id } });
+  if (!targetUser) throw new Error("Utilisateur introuvable.");
+
+  if (targetUser.role === "DEVELOPER" && currentUser.role !== "DEVELOPER") {
+    throw new Error("Action non autorisée.");
+  }
+
   await prisma.user.delete({
     where: { id },
   });
@@ -233,6 +265,7 @@ export async function getAdminNotifications() {
   const currentUser = await requireUser();
 
   const isPrivileged =
+    currentUser.role === "DEVELOPER" ||
     currentUser.role === "PDG" ||
     currentUser.role === "SG" ||
     currentUser.role === "DG" ||
@@ -240,9 +273,18 @@ export async function getAdminNotifications() {
 
   if (!isPrivileged) return [];
 
+  const isDev = currentUser.role === "DEVELOPER";
+
   const notifs = await prisma.adminNotification.findMany({
+    where: isDev
+      ? undefined
+      : {
+          type: {
+            notIn: ["LOGIN_ALERT", "RATE_LIMIT_ALERT"],
+          },
+        },
     orderBy: { createdAt: "desc" },
-    take: 30,
+    take: 35,
   });
 
   return notifs.map((n) => ({

@@ -331,9 +331,9 @@ export const OFFICIAL_VEHICLE_CATALOG: ModelCatalogEntry[] = [
       maxTorque: "285 Nm à 1500-4000 tr/min",
     },
     equipementConfort: [
-      "Cockpit sport avec double écran panoramique numérique 10,25 pouces incurvé",
-      "Sellerie cuir rouge bordeaux surpiquée esprit grand tourisme",
-      "Sièges sport chauffants, ventilés et massants côté conducteur",
+      "Cockpit digital : double écran panoramique numérique 10,25 pouces incurvé et volant sport méplat",
+      "Sièges sport en cuir noir perforé à surpiqûres rouges contrastées",
+      "Sièges avant chauffants et ventilés, réglage électrique côté conducteur",
       "Toit ouvrant panoramique XXL de 1,18 m² avec vélum électrique",
       "Climatisation automatique avec purificateur d'air CN95 et ioniseur d'ions négatifs",
       "Éclairage d'ambiance 64 couleurs interactif synchronisé",

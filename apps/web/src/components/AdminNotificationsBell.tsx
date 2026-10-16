@@ -1,7 +1,17 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Bell, Key, CheckCheck, Clock, X } from "lucide-react";
+import {
+  Bell,
+  Key,
+  CheckCheck,
+  Clock,
+  X,
+  LogIn,
+  AlertOctagon,
+  Globe,
+  Radio,
+} from "lucide-react";
 
 export type AdminNotif = {
   id: string;
@@ -9,42 +19,80 @@ export type AdminNotif = {
   title: string;
   message: string;
   userName?: string | null;
-  newValue?: string | null;
+  oldValue?: string | null; // Adresse IP
+  newValue?: string | null; // User agent / Détail
   isRead: boolean;
   createdAt: string;
 };
 
 export function AdminNotificationsBell({ userRole }: { userRole: string }) {
   const isPrivileged =
+    userRole === "DEVELOPER" ||
     userRole === "PDG" ||
     userRole === "SG" ||
     userRole === "DG" ||
     userRole === "ADMIN";
 
+  const isDev = userRole === "DEVELOPER";
+
   const [notifications, setNotifications] = useState<AdminNotif[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const prevCountRef = useRef(0);
 
   const fetchNotifs = async () => {
     try {
       const res = await fetch("/api/notifications");
       if (res.ok) {
         const data = await res.json();
-        setNotifications(data.notifications || []);
-        setUnreadCount(data.unreadCount || 0);
+        const list: AdminNotif[] = data.notifications || [];
+        const count: number = data.unreadCount || 0;
+
+        // Si le Développeur a de nouvelles alertes non lues, déclencher un bip sonore discret
+        if (isDev && count > prevCountRef.current && prevCountRef.current !== 0) {
+          playNotificationChime();
+        }
+        prevCountRef.current = count;
+
+        setNotifications(list);
+        setUnreadCount(count);
       }
     } catch {
       // Ignorer
     }
   };
 
+  const playNotificationChime = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime); // Re5
+      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1); // La5
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.35);
+    } catch {
+      // Ignorer audio non autorisé par le navigateur
+    }
+  };
+
   useEffect(() => {
     if (!isPrivileged) return;
     fetchNotifs();
-    const interval = setInterval(fetchNotifs, 10000); // Poll every 10s
+    // Le Développeur dispose d'un polling accéléré (5 secondes) pour une notification immédiate
+    const intervalTime = isDev ? 5000 : 10000;
+    const interval = setInterval(fetchNotifs, intervalTime);
     return () => clearInterval(interval);
-  }, [isPrivileged]);
+  }, [isPrivileged, isDev]);
+
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -277,17 +325,32 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
                       padding: 7,
                       borderRadius: 8,
                       background:
-                        n.type === "PASSWORD_CHANGED"
+                        n.type === "LOGIN_ALERT"
+                          ? "rgba(34, 197, 94, 0.15)"
+                          : n.type === "RATE_LIMIT_ALERT"
+                          ? "rgba(239, 68, 68, 0.18)"
+                          : n.type === "PASSWORD_CHANGED"
                           ? "rgba(212, 175, 55, 0.15)"
                           : "rgba(59, 130, 246, 0.15)",
                       color:
-                        n.type === "PASSWORD_CHANGED"
+                        n.type === "LOGIN_ALERT"
+                          ? "#4ade80"
+                          : n.type === "RATE_LIMIT_ALERT"
+                          ? "#f87171"
+                          : n.type === "PASSWORD_CHANGED"
                           ? "var(--gold, #d4af37)"
                           : "#60a5fa",
                       marginTop: 2,
+                      flexShrink: 0,
                     }}
                   >
-                    <Key size={14} />
+                    {n.type === "LOGIN_ALERT" ? (
+                      <LogIn size={15} />
+                    ) : n.type === "RATE_LIMIT_ALERT" ? (
+                      <AlertOctagon size={15} />
+                    ) : (
+                      <Key size={14} />
+                    )}
                   </div>
 
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -323,12 +386,64 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
                       style={{
                         margin: "4px 0",
                         fontSize: "0.78rem",
-                        opacity: 0.8,
+                        opacity: 0.85,
                         lineHeight: 1.35,
                       }}
                     >
                       {n.message}
                     </p>
+
+                    {/* IP & Métadonnées de connexion */}
+                    {n.oldValue && (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                          gap: 6,
+                          margin: "4px 0 6px 0",
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4,
+                            padding: "2px 7px",
+                            borderRadius: 6,
+                            background:
+                              n.type === "RATE_LIMIT_ALERT"
+                                ? "rgba(239, 68, 68, 0.15)"
+                                : "rgba(34, 197, 94, 0.12)",
+                            color:
+                              n.type === "RATE_LIMIT_ALERT" ? "#f87171" : "#4ade80",
+                            fontSize: "0.72rem",
+                            fontWeight: 700,
+                            fontFamily: "monospace",
+                          }}
+                        >
+                          <Globe size={11} />
+                          IP: {n.oldValue}
+                        </span>
+
+                        {n.newValue && (
+                          <span
+                            style={{
+                              fontSize: "0.7rem",
+                              opacity: 0.6,
+                              maxWidth: 200,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            }}
+                            title={n.newValue}
+                          >
+                            {n.newValue}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
                     <div
                       style={{
                         display: "flex",
@@ -344,9 +459,11 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
                         month: "2-digit",
                         hour: "2-digit",
                         minute: "2-digit",
+                        second: "2-digit",
                       })}
                     </div>
                   </div>
+
                 </div>
               ))
             )}

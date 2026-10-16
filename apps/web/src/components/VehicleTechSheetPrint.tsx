@@ -39,6 +39,21 @@ export function VehicleTechSheetPrint({
     : "Transmission Assistée";
   const seatsSummary = `${sheet.dimensions.seats || 5} Places · ${sheet.dimensions.doors || 5} Portes`;
 
+  // Anti-cache : force le navigateur à recharger les photos vérifiées (les anciennes photos de rue restaient en cache)
+  const PHOTO_VERSION = "2026-10-14b";
+  const v = (url: string) => (url.startsWith("/images/") ? `${url}?v=${PHOTO_VERSION}` : url);
+
+  // Textes habitacle toujours affichés sous le duo photo (page 2)
+  const confort = sheet.equipementConfort || [];
+  const cockpitText =
+    confort.find((i) => /cockpit|écran|ecran|numérique|digital|instrumentation/i.test(i)) ||
+    "Cockpit digital avec combiné d'instrumentation numérique et écran tactile multimédia haute résolution";
+  const seatsText =
+    confort.find((i) => /cuir|sellerie/i.test(i)) ||
+    confort.find((i) => /siège|sieges|sièges/i.test(i)) ||
+    "Sièges sport en cuir avec maintien latéral renforcé et surpiqûres contrastées";
+  const seatsExtra = confort.find((i) => i !== seatsText && /siège|sièges|chauffant|ventil|massant/i.test(i));
+
   return (
     <div className="ox-tech-sheet-wrapper" style={{ color: "#111827", background: "#f1f5f9" }}>
       {/* ========================================================================= */}
@@ -229,7 +244,7 @@ export function VehicleTechSheetPrint({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={sheet.mainPhotoUrl || "/images/vehicles/prado-main.jpg"}
+            src={v(sheet.mainPhotoUrl || "/images/vehicles/prado-main.jpg")}
             alt={sheet.title}
             referrerPolicy="no-referrer"
             style={{
@@ -540,7 +555,7 @@ export function VehicleTechSheetPrint({
           <div
             style={{
               position: "relative",
-              height: "72mm",
+              height: "64mm",
               borderRadius: "10px",
               overflow: "hidden",
               border: "1.5px solid #cbd5e1",
@@ -550,7 +565,7 @@ export function VehicleTechSheetPrint({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={sheet.interiorPhotoUrl || "/images/vehicles/x55-interior.jpg"}
+              src={v(sheet.interiorPhotoUrl || "/images/vehicles/x55-interior.jpg")}
               alt="Cockpit & Poste de Pilotage Officiel"
               referrerPolicy="no-referrer"
               style={{
@@ -583,7 +598,7 @@ export function VehicleTechSheetPrint({
           <div
             style={{
               position: "relative",
-              height: "72mm",
+              height: "64mm",
               borderRadius: "10px",
               overflow: "hidden",
               border: "1.5px solid #cbd5e1",
@@ -593,12 +608,12 @@ export function VehicleTechSheetPrint({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={
+              src={v(
                 sheet.interiorSeatsPhotoUrl ||
                 (sheet.interiorPhotoUrl?.includes("-interior")
                   ? sheet.interiorPhotoUrl.replace("-interior.jpg", "-seats.jpg")
                   : "/images/vehicles/x55-seats.jpg")
-              }
+              )}
               alt="Sellerie Cuir & Confort Passagers"
               referrerPolicy="no-referrer"
               style={{
@@ -623,7 +638,26 @@ export function VehicleTechSheetPrint({
                 letterSpacing: "0.04em",
               }}
             >
-              Sellerie Cuir &amp; Espace Passagers de Luxe
+              Sièges Cuir Sport &amp; Sellerie
+            </div>
+          </div>
+        </div>
+
+        {/* DESCRIPTION EXPLICITE SOUS LE DUO : COCKPIT DIGITAL + SIÈGES CUIR SPORT */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", margin: "0 0 2mm" }}>
+          <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderTop: `3px solid ${brandMeta.primaryColor}`, borderRadius: "8px", padding: "8px 12px" }}>
+            <div style={{ fontSize: "0.74rem", fontWeight: 900, color: brandMeta.primaryColor, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "4px" }}>
+              Cockpit Digital
+            </div>
+            <div style={{ fontSize: "0.8rem", color: "#1e293b", lineHeight: 1.45, fontWeight: 500 }}>{cockpitText}</div>
+          </div>
+          <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderTop: `3px solid ${brandMeta.primaryColor}`, borderRadius: "8px", padding: "8px 12px" }}>
+            <div style={{ fontSize: "0.74rem", fontWeight: 900, color: brandMeta.primaryColor, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "4px" }}>
+              Sièges en Cuir Sport
+            </div>
+            <div style={{ fontSize: "0.8rem", color: "#1e293b", lineHeight: 1.45, fontWeight: 500 }}>
+              {seatsText}
+              {seatsExtra ? <> · {seatsExtra}</> : null}
             </div>
           </div>
         </div>
@@ -818,7 +852,7 @@ export function VehicleTechSheetPrint({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={sheet.exteriorPhotoUrl || sheet.mainPhotoUrl || "/images/vehicles/prado-exterior.jpg"}
+              src={v(sheet.exteriorPhotoUrl || sheet.mainPhotoUrl || "/images/vehicles/prado-exterior.jpg")}
               alt="Vue Extérieure de Profil"
               referrerPolicy="no-referrer"
               style={{
@@ -860,7 +894,7 @@ export function VehicleTechSheetPrint({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={sheet.rearPhotoUrl || sheet.mainPhotoUrl || "/images/vehicles/prado-rear.jpg"}
+              src={v(sheet.rearPhotoUrl || sheet.mainPhotoUrl || "/images/vehicles/prado-rear.jpg")}
               alt="Vue Arrière Officielle"
               referrerPolicy="no-referrer"
               style={{
@@ -884,7 +918,7 @@ export function VehicleTechSheetPrint({
                 letterSpacing: "0.04em",
               }}
             >
-              Poupe &amp; Signature Lumineuse LED
+              Design &amp; Signature Lumineuse LED
             </div>
           </div>
         </div>

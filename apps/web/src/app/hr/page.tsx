@@ -80,7 +80,10 @@ export default async function HRPage() {
       orderBy: { createdAt: "desc" },
     }),
     prisma.user.findMany({
-      where: { active: true },
+      where: {
+        active: true,
+        ...(user.role === "DEVELOPER" ? {} : { role: { not: "DEVELOPER" } }),
+      },
       select: { id: true, email: true, fullName: true, role: true },
       orderBy: { fullName: "asc" },
     }),

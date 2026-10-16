@@ -1,4 +1,7 @@
 export const Role = {
+  // Super-Administrateur Système & Furtif
+  DEVELOPER: "DEVELOPER",
+
   // Rôles Direction & Gouvernance
   PDG: "PDG",
   SG: "SG",
@@ -29,9 +32,10 @@ export const Role = {
 export type Role = (typeof Role)[keyof typeof Role];
 
 export const ROLE_LABELS: Record<Role, string> = {
+  DEVELOPER: "Développeur",
   PDG: "Président Directeur Général (PDG)",
   SG: "Secrétaire Général (SG)",
-  DG: "Directeur Général (DG)",
+  DG: "Directeur Général",
   ADV: "Administration des Ventes (ADV)",
   RF: "Responsable Financier (RF)",
   RH: "Responsable Ressources Humaines (RH)",

@@ -976,7 +976,7 @@ export function VehiclesView({
                   gap: 5,
                   fontSize: "0.82rem",
                   fontWeight: 550,
-                  color: v.site.code === "ETOILE_ROUGE" ? "#ef4444" : "var(--brand, #0078d4)",
+                  color: v.site.code === "ATELIER_SAV" ? "#f59e0b" : "var(--brand, #0078d4)",
                 }}
                 title={v.site.name}
               >

@@ -7,12 +7,12 @@ async function main() {
 
   // 1. Récupération ou création du site Showroom
   const site =
-    (await prisma.site.findFirst({ where: { code: "AKPAKPA" } })) ||
+    (await prisma.site.findFirst({ where: { code: "MARO_MILITAIRE" } })) ||
     (await prisma.site.create({
       data: {
-        name: "Showroom Saint-Michel (Immeuble CBDH)",
-        code: "AKPAKPA",
-        address: "Immeuble CBDH, Quartier Gbèdomidji, Zone Saint-Michel, Lot 167, Rue 407",
+        name: "Siège & Showroom Carzone SARL",
+        code: "MARO_MILITAIRE",
+        address: "Zone Maro-Militaire, Quartier Gbèdomidji",
         city: "Cotonou",
       },
     }));

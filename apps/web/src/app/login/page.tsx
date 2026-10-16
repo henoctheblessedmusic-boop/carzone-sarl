@@ -1,11 +1,19 @@
 import { PrefsControls } from "@/components/PrefsControls";
 import { CarzoneLogo } from "@/components/CarzoneLogo";
 import { getServerMessages } from "@/lib/i18n/server";
+import { LoginFeedback } from "./LoginFeedback";
 
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{
+    error?: string;
+    sec?: string;
+    stage?: string;
+    label?: string;
+    remaining?: string;
+    email?: string;
+  }>;
 }) {
   const params = await searchParams;
   const { messages } = await getServerMessages();
@@ -33,11 +41,16 @@ export default async function LoginPage({
           <div style={{ fontSize: "0.85rem", opacity: 0.7 }}>{messages.brand.tagline}</div>
           <p style={{ margin: 0, opacity: 0.75, fontSize: "0.92rem" }}>{messages.brand.subtitle}</p>
         </div>
-        {params.error ? (
-          <div className="ox-badge ox-badge--bad" style={{ padding: "0.6rem 0.8rem", borderRadius: 8 }}>
-            {messages.login.error}
-          </div>
-        ) : null}
+
+        <LoginFeedback
+          error={params.error}
+          sec={params.sec}
+          stage={params.stage}
+          label={params.label}
+          remaining={params.remaining}
+          defaultErrorMessage={messages.login.error}
+        />
+
         <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           {messages.login.email}
           <input
@@ -45,11 +58,13 @@ export default async function LoginPage({
             type="email"
             required
             autoComplete="username"
+            defaultValue={params.email || ""}
             placeholder="contact@topcarzone.com"
             className="ox-input"
             title={messages.login.emailTitle}
           />
         </label>
+
         <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           {messages.login.password}
           <input

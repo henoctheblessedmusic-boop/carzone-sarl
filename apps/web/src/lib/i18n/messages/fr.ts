@@ -95,6 +95,7 @@ export const fr: Messages = {
     menuAria: "Choisir la langue",
   },
   roles: {
+    DEVELOPER: "Développeur Système",
     PDG: "Président Directeur Général (PDG)",
     SG: "Secrétaire Général (SG)",
     DG: "Directeur Général",

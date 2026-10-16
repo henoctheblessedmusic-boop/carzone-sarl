@@ -8,6 +8,13 @@ export type OnboardingStep = {
 };
 
 export const ONBOARDING_STEPS: Record<Role, OnboardingStep[]> = {
+  DEVELOPER: [
+    { id: "dash", label: "Superviser tout le système & logs", href: "/dashboard", hint: "Vue globale illimitée" },
+    { id: "security", label: "Surveillance connexions & IPs", href: "/dashboard", hint: "Alertes immédiates en temps réel" },
+    { id: "team", label: "Contrôle des utilisateurs & permissions", href: "/users", hint: "Gestion avancée de la flotte" },
+    { id: "workshop", label: "Superviser les flux SAV / Atelier", href: "/workshop", hint: "Accès total" },
+    { id: "invoices", label: "Superviser facturation & finance", href: "/invoices", hint: "Accès total" },
+  ],
   PDG: [
     { id: "dash", label: "Superviser les indicateurs globaux", href: "/dashboard", hint: "KPIs d'activité" },
     { id: "workshop", label: "Superviser les flux SAV / Atelier", href: "/workshop", hint: "Véhicules en cours & livrés" },

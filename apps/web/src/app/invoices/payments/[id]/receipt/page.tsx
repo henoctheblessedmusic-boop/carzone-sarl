@@ -109,10 +109,10 @@ export default async function PaymentReceiptPage({
                 marginBottom: 6,
               }}
             />
-            <div style={{ fontWeight: 700, fontSize: "1rem" }}>CARZONE MOTORS BÉNIN</div>
+            <div style={{ fontWeight: 700, fontSize: "1rem" }}>CARZONE SARL</div>
             <div style={{ fontSize: "0.82rem", opacity: 0.75, lineHeight: 1.35 }}>
-              Showroom Akpakpa · Cotonou<br />
-              IFU : 0201910815523 · Tél : +229 21 33 00 00
+              Zone Maro-Militaire, Gbèdomidji · Cotonou<br />
+              IFU : 0202314589201 · Tél : +229 21 33 00 00
             </div>
           </div>
 

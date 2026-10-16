@@ -60,18 +60,113 @@ export async function getSession(): Promise<SessionUser | null> {
 export async function requireSession(roles?: Role[]) {
   const session = await getSession();
   if (!session) throw new Error("UNAUTHORIZED");
-  const isSuperAdmin = session.role === "DG" || session.role === "PDG" || session.role === "SG";
+  const isSuperAdmin =
+    session.role === "DEVELOPER" ||
+    session.role === "DG" ||
+    session.role === "PDG" ||
+    session.role === "SG";
   if (roles && !roles.includes(session.role) && !isSuperAdmin) {
     throw new Error("FORBIDDEN");
   }
   return session;
 }
 
-export async function login(email: string, password: string) {
-  const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
-  if (!user || !user.active) return null;
-  const ok = await bcrypt.compare(password, user.passwordHash);
-  if (!ok) return null;
+import {
+  checkRateLimit,
+  recordFailedAttempt,
+  recordSuccessfulLogin,
+  normalizeEmail,
+} from "./rate-limiter";
+
+export type AuthResult =
+  | { success: true; user: SessionUser }
+  | {
+      success: false;
+      error: "LOCKED";
+      remainingSeconds: number;
+      lockoutStage: number;
+      label?: string;
+    }
+  | {
+      success: false;
+      error: "INVALID_CREDENTIALS";
+      remainingAttempts: number;
+    }
+  | {
+      success: false;
+      error: "INACTIVE";
+    };
+
+export async function authenticate(
+  rawEmail: string,
+  password: string,
+  meta?: { ip?: string; userAgent?: string }
+): Promise<AuthResult> {
+  const email = normalizeEmail(rawEmail);
+  const ip = meta?.ip || "127.0.0.1";
+  const userAgent = meta?.userAgent || "";
+
+  // 1. Vérification préalable du Rate Limiting
+  const limitStatus = await checkRateLimit(email, ip);
+  if (limitStatus.isLocked) {
+    return {
+      success: false,
+      error: "LOCKED",
+      remainingSeconds: limitStatus.remainingSeconds,
+      lockoutStage: limitStatus.lockoutStage,
+      label: limitStatus.label,
+    };
+  }
+
+  // 2. Recherche de l'utilisateur
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    const failed = await recordFailedAttempt(email, ip, userAgent);
+    if (failed.isLockedNow) {
+      return {
+        success: false,
+        error: "LOCKED",
+        remainingSeconds: failed.remainingSeconds || 60,
+        lockoutStage: failed.stage,
+        label: failed.durationLabel,
+      };
+    }
+    return {
+      success: false,
+      error: "INVALID_CREDENTIALS",
+      remainingAttempts: failed.remainingAttempts,
+    };
+  }
+
+  if (!user.active) {
+    return { success: false, error: "INACTIVE" };
+  }
+
+  // 3. Vérification du mot de passe
+  const isMatch = await bcrypt.compare(password, user.passwordHash);
+
+  if (!isMatch) {
+    const failed = await recordFailedAttempt(email, ip, userAgent);
+    if (failed.isLockedNow) {
+      return {
+        success: false,
+        error: "LOCKED",
+        remainingSeconds: failed.remainingSeconds || 60,
+        lockoutStage: failed.stage,
+        label: failed.durationLabel,
+      };
+    }
+    return {
+      success: false,
+      error: "INVALID_CREDENTIALS",
+      remainingAttempts: failed.remainingAttempts,
+    };
+  }
+
+  // 4. Succès : création session + notification immédiate Directeur Général
   const session: SessionUser = {
     id: user.id,
     email: user.email,
@@ -79,6 +174,32 @@ export async function login(email: string, password: string) {
     role: user.role as Role,
     customPermissions: user.customPermissions || [],
   };
+
   await createSession(session);
-  return session;
+
+  // Mettre à jour lastSeenAt
+  await prisma.user
+    .update({
+      where: { id: user.id },
+      data: { lastSeenAt: new Date() },
+    })
+    .catch(() => {});
+
+  // Enregistrer succès et notifier le DG
+  await recordSuccessfulLogin(email, ip, userAgent, {
+    id: user.id,
+    fullName: user.fullName,
+    role: user.role,
+  });
+
+  return { success: true, user: session };
 }
+
+export async function login(email: string, password: string, meta?: { ip?: string; userAgent?: string }) {
+  const result = await authenticate(email, password, meta);
+  if (result.success) {
+    return result.user;
+  }
+  return null;
+}
+

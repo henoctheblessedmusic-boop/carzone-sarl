@@ -13,7 +13,7 @@ import {
 
 import { formatLegalAmountNotice } from "@/lib/number-to-words-fr";
 import { VehicleTechSheetPrint } from "@/components/VehicleTechSheetPrint";
-import { buildStandardTechnicalSheet, type TechnicalSheet } from "@/lib/tech-sheet-generator";
+import { resolveVehicleTechSheet } from "@/lib/tech-sheet-generator";
 
 export default async function QuotePrintPage({
   params,
@@ -37,22 +37,10 @@ export default async function QuotePrintPage({
     .filter((l) => l.vehicle)
     .map((l) => l.vehicle!);
   const uniqueVehicles = Array.from(new Map(vehicleItems.map((v) => [v.id, v])).values());
-  const vehiclesWithSheets = uniqueVehicles.map((vehicle) => {
-    let sheet: TechnicalSheet;
-    if (vehicle.technicalSheetJson) {
-      try {
-        sheet = JSON.parse(vehicle.technicalSheetJson);
-        if (!sheet.mainPhotoUrl || !sheet.interiorSeatsPhotoUrl || sheet.mainPhotoUrl.includes("photo-1617814076367-b759c7d7e738")) {
-          sheet = buildStandardTechnicalSheet(vehicle);
-        }
-      } catch {
-        sheet = buildStandardTechnicalSheet(vehicle);
-      }
-    } else {
-      sheet = buildStandardTechnicalSheet(vehicle);
-    }
-    return { vehicle, sheet };
-  });
+  const vehiclesWithSheets = uniqueVehicles.map((vehicle) => ({
+    vehicle,
+    sheet: resolveVehicleTechSheet(vehicle),
+  }));
 
   const to = quote.emailTo || quote.customer.email;
   const mailto = to
@@ -145,7 +133,7 @@ export default async function QuotePrintPage({
                 marginBottom: 6,
               }}
             />
-            <div style={{ opacity: 0.7, fontSize: "0.9rem" }}>SARL · Immeuble CBDH Saint-Michel · Cotonou</div>
+            <div style={{ opacity: 0.7, fontSize: "0.9rem" }}>SARL · Zone Maro-Militaire, Gbèdomidji · Cotonou</div>
           </div>
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: "1.25rem", fontWeight: 700 }}>FACTURE PROFORMA</div>
@@ -336,7 +324,7 @@ export default async function QuotePrintPage({
           </div>
           <div style={{ textAlign: "right", fontSize: "0.82rem", opacity: 0.75 }}>
             <strong>CARZONE SARL</strong> (SARL Showroom & Mobilité)<br />
-            Immeuble CBDH Saint-Michel · Quartier Gbèdomidji, Cotonou
+            Zone Maro-Militaire, Quartier Gbèdomidji · Cotonou
           </div>
         </header>
 

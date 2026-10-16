@@ -6,8 +6,7 @@ import { Edit2, X, Search } from "lucide-react";
 import { createLead, updateLead, advanceLead } from "./actions";
 
 export const LEAD_SOURCES = [
-  { value: "showroom_akpakpa", label: "Showroom Akpakpa" },
-  { value: "showroom_etoile_rouge", label: "Showroom Étoile Rouge" },
+  { value: "showroom_maro_militaire", label: "Showroom Maro-Militaire (Gbèdomidji)" },
   { value: "showroom", label: "Showroom" },
   { value: "site_web", label: "Site web" },
   { value: "whatsapp", label: "WhatsApp" },

@@ -209,6 +209,7 @@ export function ChatView({
   }, [activeTab, selectedPeer, markAsRead]);
 
   const isPrivileged =
+    currentUser.role === "DEVELOPER" ||
     currentUser.role === "PDG" ||
     currentUser.role === "SG" ||
     currentUser.role === "DG" ||

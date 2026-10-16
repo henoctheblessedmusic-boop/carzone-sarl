@@ -22,7 +22,8 @@ export async function createVehicle(formData: FormData) {
   const siteIdInput = String(formData.get("siteId") || "").trim() || null;
   const site = siteIdInput
     ? await prisma.site.findUnique({ where: { id: siteIdInput } })
-    : await prisma.site.findFirst({ where: { code: "AKPAKPA" } });
+    : (await prisma.site.findFirst({ where: { code: "MARO_MILITAIRE" } })) ||
+      (await prisma.site.findFirst());
 
   const rawBrand = String(formData.get("brand") || "").trim();
   const brand = normalizeBrandName(rawBrand);

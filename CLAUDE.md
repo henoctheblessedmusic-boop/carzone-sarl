@@ -3,7 +3,8 @@
 ## Enterprise Identity
 - **Société** : CARZONE SARL
 - **Activité** : Concessionnaire Automobile Multimarques, Showroom Véhicules Neufs (Changan, Deepal, Jetour, BYD, Chery, Toyota...), Atelier SAV & Entretien rapide, Solutions de recharge VE
-- **Showroom** : Immeuble de la Commission Béninoise des Droits de l'Homme (CBDH), Quartier Gbèdomidji / Zone Saint-Michel, Lot 167, Rue 407, Cotonou, Bénin
+- **Showroom** : Zone Maro-Militaire, Quartier Gbèdomidji, Cotonou, Bénin
+- **Atelier SAV** : En attente de confirmation de localisation dédiée
 - **Google Maps** : https://maps.app.goo.gl/ie79JAW6ri2km8Qx8?g_st=ac
 - **Téléphones** : +229 01 92 61 61 61 / +229 01 63 70 00 00 / +229 01 92 62 62 62
 - **Email** : contact@topcarzone.com / direction@topcarzone.com

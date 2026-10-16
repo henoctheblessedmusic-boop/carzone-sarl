@@ -108,7 +108,7 @@ export default async function InvoicePrintPage({
             <div style={{ fontWeight: 700, fontSize: "1.05rem" }}>CARZONE SARL</div>
             <div style={{ fontSize: "0.85rem", opacity: 0.8, lineHeight: 1.4 }}>
               SARL Showroom & Mobilité SARL<br />
-              Immeuble CBDH Saint-Michel · Quartier Gbèdomidji, Cotonou<br />
+              Zone Maro-Militaire, Quartier Gbèdomidji · Cotonou<br />
               Tél : +229 21 33 00 00 / 97 00 00 00<br />
               Email : contact@topcarzone.com · Web : www.topcarzone.com<br />
               IFU : 0202314589201 · RCCM : RB/COT/23 B 34567
@@ -442,7 +442,7 @@ export default async function InvoicePrintPage({
               <strong>Mobile Money &amp; Caisse :</strong><br />
               • MTN MoMo Marchand : *880*41*CARZONE# (+229 97 00 00 00)<br />
               • Moov Money Marchand : *855*1*CARZONE# (+229 95 00 00 00)<br />
-              • Caisse Showroom Akpakpa (Chèque ou Espèces)
+              • Caisse Showroom Maro-Militaire (Chèque ou Espèces)
             </div>
           </div>
         </div>
@@ -506,7 +506,7 @@ export default async function InvoicePrintPage({
           </div>
           <div style={{ textAlign: "right", fontSize: "0.82rem", opacity: 0.75 }}>
             <strong>CARZONE SARL</strong> (SARL Showroom & Mobilité)<br />
-            Immeuble CBDH Saint-Michel · Quartier Gbèdomidji, Cotonou
+            Zone Maro-Militaire, Quartier Gbèdomidji · Cotonou
           </div>
         </header>
 

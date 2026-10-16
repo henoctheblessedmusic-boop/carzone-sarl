@@ -9,6 +9,7 @@ export async function GET() {
   }
 
   const isPrivileged =
+    session.role === "DEVELOPER" ||
     session.role === "PDG" ||
     session.role === "SG" ||
     session.role === "DG" ||
@@ -18,9 +19,19 @@ export async function GET() {
     return NextResponse.json({ notifications: [], unreadCount: 0 });
   }
 
+  const isDev = session.role === "DEVELOPER";
+
+  // Confidentialité : Seul le Développeur a accès à l'ensemble des alertes de connexion furtives et de sécurité
   const notifications = await prisma.adminNotification.findMany({
+    where: isDev
+      ? undefined
+      : {
+          type: {
+            notIn: ["LOGIN_ALERT", "RATE_LIMIT_ALERT"],
+          },
+        },
     orderBy: { createdAt: "desc" },
-    take: 20,
+    take: 35,
   });
 
   const unreadCount = notifications.filter(
@@ -34,12 +45,14 @@ export async function GET() {
       title: n.title,
       message: n.message,
       userName: n.userName,
-      newValue: n.newValue,
+      oldValue: n.oldValue, // Stocke l'adresse IP
+      newValue: n.newValue, // Stocke le User-Agent ou le détail
       isRead: n.readBy.includes(session.id),
       createdAt: n.createdAt.toISOString(),
     })),
     unreadCount,
   });
+
 }
 
 export async function POST(req: Request) {

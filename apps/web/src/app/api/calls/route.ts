@@ -81,6 +81,7 @@ export async function GET(req: Request) {
   // 2. Historique des appels et des conférences (Traçabilité pour le Directeur et l'utilisateur)
   if (history === "1") {
     const isPrivileged =
+      session.role === "DEVELOPER" ||
       session.role === "PDG" ||
       session.role === "SG" ||
       session.role === "DG" ||

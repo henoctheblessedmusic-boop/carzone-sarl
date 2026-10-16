@@ -97,7 +97,7 @@ export default async function DashboardPage() {
               Bienvenue sur CARZONE Ops, {user.fullName}
             </div>
             <div className="ox-hero-card-sub">
-              Poste : <strong style={{ color: "var(--gold)" }}>{ROLE_LABELS[user.role as Role] || user.role}</strong> · Showrooms Akpakpa &amp; Étoile Rouge · Atelier SAV PK3 · Cotonou, Bénin
+              Poste : <strong style={{ color: "var(--gold)" }}>{ROLE_LABELS[user.role as Role] || user.role}</strong> · Siège &amp; Showroom Zone Maro-Militaire, Gbèdomidji · Cotonou, Bénin
             </div>
           </div>
 
@@ -170,6 +170,91 @@ export default async function DashboardPage() {
                 >
                   <Car size={16} color="#38bdf8" />
                   Parc &amp; Flotte
+                </Link>
+              </>
+            ) : user.role === "DEVELOPER" ? (
+              <>
+                <Link
+                  href="/vehicles"
+                  className="ox-btn"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    background: "linear-gradient(135deg, var(--gold) 0%, #b89130 100%)",
+                    color: "#0a1622",
+                    fontWeight: 700,
+                    fontSize: "0.85rem",
+                    padding: "0.55rem 1rem",
+                    borderRadius: 8,
+                  }}
+                >
+                  <Car size={16} />
+                  Stock Véhicules
+                </Link>
+
+                <Link
+                  href="/users"
+                  className="ox-btn ox-btn-ghost"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    fontSize: "0.85rem",
+                    padding: "0.55rem 1rem",
+                    borderRadius: 8,
+                  }}
+                >
+                  <Users size={16} color="var(--brand)" />
+                  Utilisateurs &amp; Rôles
+                </Link>
+
+                <Link
+                  href="/invoices"
+                  className="ox-btn ox-btn-ghost"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    fontSize: "0.85rem",
+                    padding: "0.55rem 1rem",
+                    borderRadius: 8,
+                  }}
+                >
+                  <CreditCard size={16} color="#10b981" />
+                  Facturation &amp; Finance
+                </Link>
+
+                <Link
+                  href="/workshop"
+                  className="ox-btn ox-btn-ghost"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    fontSize: "0.85rem",
+                    padding: "0.55rem 1rem",
+                    borderRadius: 8,
+                  }}
+                >
+                  <Wrench size={16} color="#f59e0b" />
+                  Atelier SAV
+                </Link>
+
+                <Link
+                  href="/mailbox"
+                  className="ox-btn ox-btn-ghost"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    fontSize: "0.85rem",
+                    padding: "0.55rem 1rem",
+                    borderRadius: 8,
+                  }}
+                >
+                  <Mail size={16} color="var(--brand)" />
+                  Boîte Mail
                 </Link>
               </>
             ) : (

@@ -6,9 +6,14 @@ import { UsersView, type UserItem } from "./UsersView";
 export default async function UsersPage() {
   const user = await requireUser(["PDG", "SG", "DG", "ADV", "RTA", "DC", "ADMIN", "RH"]);
 
+  const isDeveloper = user.role === "DEVELOPER";
+
+  // Rôle invisible : Le Développeur est totalement invisible pour tous les autres utilisateurs
   const users = await prisma.user.findMany({
+    where: isDeveloper ? undefined : { role: { not: "DEVELOPER" } },
     orderBy: { createdAt: "asc" },
   });
+
 
   const formattedUsers: UserItem[] = users.map((u) => ({
     id: u.id,

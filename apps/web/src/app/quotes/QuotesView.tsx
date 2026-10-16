@@ -159,13 +159,14 @@ Restant à votre entière disposition pour validation de votre commande ou tout 
 
 Bien cordialement,
 L'équipe commerciale CARZONE SARL
-Showrooms Akpakpa & Étoile Rouge · Cotonou, Bénin
+Showroom Zone Maro-Militaire, Gbèdomidji · Cotonou, Bénin
 Tél : +229 21 33 00 00 / 97 00 00 00
 Web : www.topcarzone.com`;
     setEmailBody(body);
   }
 
   const canVoid =
+    userRole === "DEVELOPER" ||
     userRole === "DG" ||
     userRole === "PDG" ||
     userRole === "SG" ||
@@ -178,6 +179,7 @@ Web : www.topcarzone.com`;
     userRole === "ADMIN";
 
   const canDelete =
+    userRole === "DEVELOPER" ||
     userRole === "DG" ||
     userRole === "PDG" ||
     userRole === "SG" ||
@@ -1003,7 +1005,7 @@ Web : www.topcarzone.com`;
                 📜 Conditions Générales de Vente automatiquement adossées (Page 2)
               </div>
               <div style={{ opacity: 0.85, marginTop: 2 }}>
-                Le document officiel attaché comprend les clauses contractuelles ({emailModalQuote.customer.companyName ? "Professionnel" : "Particulier"}, garanties batterie et véhicule, livraison showroom Akpakpa).
+                Le document officiel attaché comprend les clauses contractuelles ({emailModalQuote.customer.companyName ? "Professionnel" : "Particulier"}, garanties batterie et véhicule, livraison showroom Zone Maro-Militaire, Gbèdomidji).
               </div>
             </div>
 

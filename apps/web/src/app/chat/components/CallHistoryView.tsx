@@ -89,6 +89,7 @@ export function CallHistoryView({
   const [searchQuery, setSearchQuery] = useState("");
 
   const isPrivileged =
+    currentUser.role === "DEVELOPER" ||
     currentUser.role === "PDG" ||
     currentUser.role === "SG" ||
     currentUser.role === "DG" ||

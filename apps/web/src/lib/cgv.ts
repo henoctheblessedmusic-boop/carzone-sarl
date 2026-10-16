@@ -1,7 +1,7 @@
 /**
  * Conditions Générales de Vente & Prestations CARZONE SARL Bénin
  * - Vente de Véhicules (Neufs, Électriques, Hybrides)
- * - Prestations Atelier SAV & Réparations (Atelier PK3)
+ * - Prestations Atelier SAV & Réparations
  */
 
 export type CgvType = "VEHICULE" | "ATELIER";
@@ -44,7 +44,7 @@ Les présentes conditions sont régies par le droit béninois. Tout litige relat
 export const DEFAULT_CGV_ATELIER = `CONDITIONS GÉNÉRALES DE RÉPARATION & PRESTATIONS SAV — CARZONE ATELIER SAV COTONOU
 
 ARTICLE 1 — ORDRE DE RÉPARATION ET DIAGNOSTIC CONTRADICTOIRE
-1. Toute entrée de véhicule dans l'atelier SAV CARZONE (Immeuble CBDH Saint-Michel, Cotonou) fait l'objet d'un Ordre de Réparation (OR) contradictoire signé par le client, mentionnant le kilométrage au compteur, l'état extérieur et les symptômes signalés.
+1. Toute entrée de véhicule dans l'atelier SAV CARZONE (Zone Maro-Militaire, Gbèdomidji, Cotonou) fait l'objet d'un Ordre de Réparation (OR) contradictoire signé par le client, mentionnant le kilométrage au compteur, l'état extérieur et les symptômes signalés.
 2. Les opérations de diagnostic préalable font l'objet d'une tarification forfaitaire communiquée avant démontage, déductible des travaux en cas d'acceptation du devis de réparation.
 
 ARTICLE 2 — DEVIS PRÉALABLE ET TRAVAUX SUPPLÉMENTAIRES

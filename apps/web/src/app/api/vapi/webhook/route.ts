@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
             count: vehicles.length,
             message:
               vehicles.length > 0
-                ? `Nous avons actuellement ${vehicles.length} véhicule(s) disponible(s) immédiatement au showroom d'Akpakpa.`
+                ? `Nous avons actuellement ${vehicles.length} véhicule(s) disponible(s) immédiatement au showroom de la Zone Maro-Militaire (Gbèdomidji).`
                 : "Aucun véhicule correspondant n'est disponible en stock immédiat, mais des arrivages maritimes sont en cours.",
             vehicles: vehicles.map((v) => ({
               description: `${v.brand} ${v.model} ${v.variant || ""} (${v.color || "Standard"})`,
@@ -168,7 +168,7 @@ export async function POST(req: NextRequest) {
           result = {
             success: true,
             bookingId: opp.id,
-            message: `Votre essai routier pour le modèle ${vehicleModel} a été pré-réservé pour ${preferredDate} au showroom CARZONE SARL de Saint-Michel (Immeuble CBDH). Notre équipe commerciale vous attend avec les clés !`,
+            message: `Votre essai routier pour le modèle ${vehicleModel} a été pré-réservé pour ${preferredDate} au showroom CARZONE SARL de la Zone Maro-Militaire (Gbèdomidji). Notre équipe commerciale vous attend avec les clés !`,
           };
           break;
         }
@@ -196,7 +196,7 @@ export async function POST(req: NextRequest) {
           break;
         }
 
-        // 5. Suivi d'un véhicule à l'Atelier SAV PK3
+        // 5. Suivi d'un véhicule à l'Atelier SAV
         case "track_sav_repair": {
           const query = String(params.phone || params.vin || "");
           const workOrder = await prisma.workOrder.findFirst({
@@ -214,7 +214,7 @@ export async function POST(req: NextRequest) {
           if (!workOrder) {
             result = {
               found: false,
-              message: "Aucun ordre de réparation en cours n'a été trouvé avec ces références. Veuillez vérifier le numéro ou contacter directement l'Atelier SAV PK3 au +229 21 33 00 00.",
+              message: "Aucun ordre de réparation en cours n'a été trouvé avec ces références. Veuillez vérifier le numéro ou contacter directement l'Atelier SAV Carzone au +229 21 33 00 00.",
             };
           } else {
             result = {

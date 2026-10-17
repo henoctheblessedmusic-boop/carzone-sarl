@@ -38,7 +38,6 @@ export type UserItem = {
   fullName: string;
   role: string;
   active: boolean;
-  visiblePassword?: string | null;
   lastPasswordChange?: string | null;
   customPermissions: string[];
   createdAt: string;
@@ -333,7 +332,6 @@ export function UsersView({
             u.id === pwdModalUser.id
               ? {
                   ...u,
-                  visiblePassword: cleanPwd,
                   lastPasswordChange: new Date().toISOString(),
                 }
               : u
@@ -844,57 +842,34 @@ export function UsersView({
                       </div>
                     </td>
 
-                    {/* Password Visibility & Edit (DG / Admin) */}
+                    {/* Password Modification (DG / Admin) */}
                     {isPrivileged && (
                       <td style={{ padding: "14px 18px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <code
+                          <span
                             style={{
-                              fontSize: "0.85rem",
+                              fontSize: "0.76rem",
                               padding: "4px 8px",
                               borderRadius: 6,
-                              background: "rgba(0, 0, 0, 0.3)",
-                              border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.12))",
-                              color: revealedPasswords[u.id] ? "var(--gold, #d4af37)" : "var(--ice-text-muted)",
-                              letterSpacing: revealedPasswords[u.id] ? "normal" : "0.2em",
-                              minWidth: 88,
-                              display: "inline-block",
+                              background: "rgba(16, 185, 129, 0.1)",
+                              border: "1px solid rgba(52, 211, 153, 0.3)",
+                              color: "#34d399",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 5,
+                              fontWeight: 650,
+                              fontFamily: "monospace",
                             }}
+                            title="Mot de passe chiffré de façon irréversible avec l'algorithme Bcrypt (Sécurité maximale)"
                           >
-                            {revealedPasswords[u.id]
-                              ? (u.visiblePassword || "Carzone2026!")
-                              : "••••••••"}
-                          </code>
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setRevealedPasswords((prev) => ({
-                                ...prev,
-                                [u.id]: !prev[u.id],
-                              }))
-                            }
-                            title={
-                              revealedPasswords[u.id]
-                                ? "Masquer le mot de passe"
-                                : "Afficher le mot de passe en clair (Visible par DG/Admin)"
-                            }
-                            style={{
-                              padding: "5px",
-                              background: "none",
-                              border: "none",
-                              color: "var(--ice-text)",
-                              opacity: 0.75,
-                              cursor: "pointer",
-                            }}
-                          >
-                            {revealedPasswords[u.id] ? <EyeOff size={15} /> : <Eye size={15} />}
-                          </button>
+                            <Shield size={13} />
+                            •••••••• (Bcrypt)
+                          </span>
 
                           <button
                             type="button"
                             onClick={() => handleOpenPwdModal(u)}
-                            title="Modifier le mot de passe de cet utilisateur"
+                            title="Définir ou réinitialiser le mot de passe de cet utilisateur"
                             style={{
                               padding: "4px 8px",
                               borderRadius: 6,

@@ -8,6 +8,20 @@ import { formatXof, nextDocNumber } from "@/lib/format";
  */
 export async function POST(req: NextRequest) {
   try {
+    // 0. Sécurisation Webhook : Vérification du secret partagé si configuré
+    const expectedSecret = process.env.VAPI_SECRET || process.env.VAPI_WEBHOOK_SECRET;
+    if (expectedSecret) {
+      const headerSecret = req.headers.get("x-vapi-secret") || req.headers.get("x-webhook-secret");
+      const authHeader = req.headers.get("authorization");
+      const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+      if (headerSecret !== expectedSecret && bearerToken !== expectedSecret) {
+        return NextResponse.json(
+          { error: "Accès refusé : signature ou secret webhook VAPI invalide" },
+          { status: 401 }
+        );
+      }
+    }
+
     const body = await req.json();
     const message = body.message || body;
 

@@ -168,12 +168,30 @@ export async function GET(req: Request) {
     });
   }
 
-  // 3. Get specific call details
+  // 3. Get specific call details (Sécurisation IDOR)
   if (callId) {
     const call = await prisma.callSession.findUnique({
       where: { id: callId },
     });
-    return NextResponse.json({ call: call || null });
+    if (!call) return NextResponse.json({ call: null });
+
+    const isPrivileged =
+      session.role === "DEVELOPER" ||
+      session.role === "PDG" ||
+      session.role === "SG" ||
+      session.role === "DG" ||
+      session.role === "ADMIN";
+
+    const isParticipant =
+      call.callerId === session.id ||
+      call.receiverId === session.id ||
+      call.receiverId.startsWith("CONF_");
+
+    if (!isParticipant && !isPrivileged) {
+      return NextResponse.json({ error: "Accès refusé à cet appel" }, { status: 403 });
+    }
+
+    return NextResponse.json({ call });
   }
 
   return NextResponse.json({ ok: true });
@@ -236,8 +254,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, call: newCall });
   }
 
-  // 2. Décrocher l'appel (Accept)
+  // 2. Décrocher l'appel (Accept) - Vérification stricte
   if (action === "accept" && callId) {
+    const existing = await prisma.callSession.findUnique({ where: { id: callId } });
+    if (!existing) {
+      return NextResponse.json({ error: "Appel introuvable" }, { status: 404 });
+    }
+    if (existing.receiverId !== session.id && !existing.receiverId.startsWith("CONF_")) {
+      return NextResponse.json({ error: "Non autorisé à décrocher cet appel" }, { status: 403 });
+    }
+
     const updated = await prisma.callSession.update({
       where: { id: callId },
       data: {
@@ -248,9 +274,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, call: updated });
   }
 
-  // 3. Refuser l'appel (Reject)
+  // 3. Refuser l'appel (Reject) - Vérification stricte
   if (action === "reject" && callId) {
     const existing = await prisma.callSession.findUnique({ where: { id: callId } });
+    if (!existing) {
+      return NextResponse.json({ error: "Appel introuvable" }, { status: 404 });
+    }
+    if (existing.receiverId !== session.id && existing.callerId !== session.id) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+    }
+
     const candidates = (Array.isArray(existing?.iceCandidates) ? existing.iceCandidates : []) as Prisma.InputJsonValue[];
     candidates.push({
       type: "CALL_SUMMARY",
@@ -270,16 +303,36 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, call: updated });
   }
 
-  // 4. Raccrocher / Terminer l'appel (End avec enregistrement de la durée exacte)
+  // 4. Raccrocher / Terminer l'appel (End avec vérification d'autorisation)
   if (action === "end" && callId) {
     const existing = await prisma.callSession.findUnique({ where: { id: callId } });
+    if (!existing) {
+      return NextResponse.json({ error: "Appel introuvable" }, { status: 404 });
+    }
+
+    const isPrivileged =
+      session.role === "DEVELOPER" ||
+      session.role === "PDG" ||
+      session.role === "SG" ||
+      session.role === "DG" ||
+      session.role === "ADMIN";
+
+    const isParticipant =
+      existing.callerId === session.id ||
+      existing.receiverId === session.id ||
+      existing.receiverId.startsWith("CONF_");
+
+    if (!isParticipant && !isPrivileged) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+    }
+
     let duration = Number(durationSeconds) || 0;
-    const wasAnswered = existing?.status === "ACCEPTED";
-    if (!duration && existing && wasAnswered) {
+    const wasAnswered = existing.status === "ACCEPTED";
+    if (!duration && wasAnswered) {
       duration = Math.max(1, Math.round((Date.now() - new Date(existing.updatedAt).getTime()) / 1000));
     }
 
-    const candidates = (Array.isArray(existing?.iceCandidates) ? existing.iceCandidates : []) as Prisma.InputJsonValue[];
+    const candidates = (Array.isArray(existing.iceCandidates) ? existing.iceCandidates : []) as Prisma.InputJsonValue[];
     candidates.push({
       type: "CALL_SUMMARY",
       durationSeconds: duration,
@@ -299,10 +352,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, call: updated });
   }
 
-  // 5. Envoyer candidat ICE
+  // 5. Envoyer candidat ICE (Vérification de participation)
   if (action === "candidate" && callId && candidate) {
     const call = await prisma.callSession.findUnique({ where: { id: callId } });
     if (call) {
+      if (call.callerId !== session.id && call.receiverId !== session.id && !call.receiverId.startsWith("CONF_")) {
+        return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+      }
       const candidates = (Array.isArray(call.iceCandidates) ? call.iceCandidates : []) as Prisma.InputJsonValue[];
       candidates.push({ candidate, senderId: session.id } as unknown as Prisma.InputJsonValue);
       await prisma.callSession.update({

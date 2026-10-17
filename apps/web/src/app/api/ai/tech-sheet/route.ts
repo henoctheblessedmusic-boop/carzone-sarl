@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateTechSheetWithAI } from "@/lib/openai-tech-sheet";
-import { requireUser } from "@/lib/require-user";
+import { getSession } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
-    await requireUser();
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+    }
     const body = await req.json();
     const { vehicleId, customApiKey, action, sheetData } = body;
 

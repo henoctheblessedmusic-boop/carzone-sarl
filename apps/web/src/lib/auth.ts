@@ -14,8 +14,13 @@ export type SessionUser = {
   customPermissions?: string[];
 };
 
+export type SessionPayload = SessionUser & {
+  iat?: number;
+  exp?: number;
+};
+
 function secret() {
-  return process.env.AUTH_SECRET || "dev-secret";
+  return process.env.AUTH_SECRET || "carzone-giani-prod-auth-secret-key-2026-cuid";
 }
 
 function sign(payload: string) {
@@ -23,7 +28,13 @@ function sign(payload: string) {
 }
 
 export async function createSession(user: SessionUser) {
-  const body = Buffer.from(JSON.stringify(user)).toString("base64url");
+  const now = Math.floor(Date.now() / 1000);
+  const payload: SessionPayload = {
+    ...user,
+    iat: now,
+    exp: now + 60 * 60 * 24 * 14, // 14 jours de validité maximale
+  };
+  const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
   const token = `${body}.${sign(body)}`;
   const jar = await cookies();
   jar.set(COOKIE, token, {
@@ -51,7 +62,22 @@ export async function getSession(): Promise<SessionUser | null> {
     const a = Buffer.from(sig);
     const b = Buffer.from(expected);
     if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
-    return JSON.parse(Buffer.from(body, "base64url").toString("utf8")) as SessionUser;
+    const raw = JSON.parse(Buffer.from(body, "base64url").toString("utf8")) as SessionPayload;
+    if (!raw || !raw.id || !raw.role) return null;
+
+    // Vérifier l'expiration interne
+    const now = Math.floor(Date.now() / 1000);
+    if (raw.exp && raw.exp < now) {
+      return null;
+    }
+
+    return {
+      id: raw.id,
+      email: raw.email,
+      fullName: raw.fullName,
+      role: raw.role,
+      customPermissions: raw.customPermissions || [],
+    };
   } catch {
     return null;
   }

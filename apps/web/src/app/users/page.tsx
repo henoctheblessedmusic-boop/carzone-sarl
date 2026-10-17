@@ -21,7 +21,6 @@ export default async function UsersPage() {
     fullName: u.fullName,
     role: u.role,
     active: u.active,
-    visiblePassword: u.visiblePassword || null,
     lastPasswordChange: u.lastPasswordChange ? u.lastPasswordChange.toISOString() : null,
     customPermissions: u.customPermissions || [],
     createdAt: u.createdAt.toISOString(),

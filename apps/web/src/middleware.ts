@@ -40,11 +40,12 @@ async function verifyHmac(body: string, sig: string, secret: string): Promise<bo
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // 1. Ignorer les fichiers statiques internes Next.js
+  // 1. Ignorer les fichiers statiques internes Next.js et assets web
+  const STATIC_FILE_REGEX = /\.(ico|png|jpg|jpeg|svg|css|js|woff|woff2|webp|json|txt|xml|map)$/i;
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/static") ||
-    pathname.includes(".")
+    STATIC_FILE_REGEX.test(pathname)
   ) {
     return NextResponse.next();
   }
@@ -53,7 +54,7 @@ export async function middleware(req: NextRequest) {
   const isPublic = PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
 
   const cookie = req.cookies.get("carzone_session")?.value;
-  const secret = process.env.AUTH_SECRET || "dev-secret";
+  const secret = process.env.AUTH_SECRET || "carzone-giani-prod-auth-secret-key-2026-cuid";
 
   let isAuthenticated = false;
   let userRole = "";
@@ -68,8 +69,11 @@ export async function middleware(req: NextRequest) {
           const padded = pad.padEnd(pad.length + (4 - (pad.length % 4)) % 4, "=");
           const payload = JSON.parse(atob(padded));
           if (payload && payload.id && payload.role) {
-            isAuthenticated = true;
-            userRole = payload.role;
+            const nowSeconds = Math.floor(Date.now() / 1000);
+            if (!payload.exp || payload.exp > nowSeconds) {
+              isAuthenticated = true;
+              userRole = payload.role;
+            }
           }
         } catch {
           // Token malformé

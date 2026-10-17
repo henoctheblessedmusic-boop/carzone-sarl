@@ -53,7 +53,6 @@ export async function createUser(formData: FormData) {
       fullName,
       role,
       passwordHash,
-      visiblePassword: password,
       lastPasswordChange: new Date(),
       active: true,
       customPermissions,
@@ -134,7 +133,6 @@ export async function updateUserPassword(userId: string, newPassword: string) {
     where: { id: userId },
     data: {
       passwordHash,
-      visiblePassword: cleanPassword,
       lastPasswordChange: new Date(),
     },
   });
@@ -147,8 +145,8 @@ export async function updateUserPassword(userId: string, newPassword: string) {
       message: `Le mot de passe de ${targetUser.fullName} (${targetUser.email} - ${targetUser.role}) a été mis à jour par ${currentUser.fullName} (${currentUser.role}).`,
       userId: targetUser.id,
       userName: targetUser.fullName,
-      oldValue: targetUser.visiblePassword || "Non renseigné",
-      newValue: cleanPassword,
+      oldValue: "Hash chiffré précédent",
+      newValue: "Nouveau hash sécurisé bcrypt",
     },
   });
 

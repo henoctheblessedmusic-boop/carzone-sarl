@@ -269,7 +269,12 @@ export async function POST(req: Request) {
 
   // 4. CLÔTURER LA CONFÉRENCE (DIRECTEUR / ADMIN / ORGANISATEUR)
   if (action === "close") {
-    pMap.clear();
+    const isPrivileged =
+      session.role === "DEVELOPER" ||
+      session.role === "PDG" ||
+      session.role === "SG" ||
+      session.role === "DG" ||
+      session.role === "ADMIN";
 
     const activeSession = await prisma.callSession.findFirst({
       where: {
@@ -278,6 +283,17 @@ export async function POST(req: Request) {
       },
       orderBy: { createdAt: "desc" },
     });
+
+    const isOrganizer = activeSession?.callerId === session.id;
+
+    if (!isPrivileged && !isOrganizer) {
+      return NextResponse.json(
+        { error: "Seul l'organisateur ou un membre de la Direction peut clôturer cette conférence" },
+        { status: 403 }
+      );
+    }
+
+    pMap.clear();
 
     if (activeSession) {
       const durationSeconds = Math.max(1, Math.round((Date.now() - new Date(activeSession.createdAt).getTime()) / 1000));

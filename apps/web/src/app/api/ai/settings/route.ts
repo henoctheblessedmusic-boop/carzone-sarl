@@ -1,24 +1,31 @@
 import { NextResponse } from "next/server";
 import { getOpenAIApiKey, setOpenAIApiKey } from "@/lib/openai-tech-sheet";
-import { requireUser } from "@/lib/require-user";
+import { getSession } from "@/lib/auth";
+
+const ALLOWED_CONFIG_ROLES = ["PDG", "DG", "ADMIN", "ADV", "RTA", "DEVELOPER", "SG"];
 
 export async function GET() {
-  try {
-    await requireUser();
-    const key = await getOpenAIApiKey();
-    if (!key) {
-      return NextResponse.json({ configured: false });
-    }
-    const masked = `${key.slice(0, 6)}...${key.slice(-4)}`;
-    return NextResponse.json({ configured: true, maskedKey: masked });
-  } catch (err: unknown) {
-    return NextResponse.json({ error: (err as Error)?.message || "Erreur" }, { status: 401 });
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
+  const key = await getOpenAIApiKey();
+  if (!key) {
+    return NextResponse.json({ configured: false });
+  }
+  const masked = `${key.slice(0, 6)}...${key.slice(-4)}`;
+  return NextResponse.json({ configured: true, maskedKey: masked });
 }
 
 export async function POST(req: Request) {
   try {
-    await requireUser(["PDG", "DG", "ADMIN", "ADV", "RTA"]);
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+    }
+    if (!ALLOWED_CONFIG_ROLES.includes(session.role)) {
+      return NextResponse.json({ error: "Accès refusé pour votre rôle" }, { status: 403 });
+    }
     const body = await req.json();
     const apiKey = (body.apiKey || "").trim();
 

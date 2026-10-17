@@ -28,7 +28,6 @@ model User {
   fullName      String
   role          String
   active        Boolean        @default(true)
-  visiblePassword String?
   lastPasswordChange DateTime?
   customPermissions String[]   @default([])
   lastSeenAt        DateTime?

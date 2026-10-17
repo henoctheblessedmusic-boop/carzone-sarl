@@ -23,7 +23,8 @@ import {
   Store,
   ArrowRight,
 } from "lucide-react";
-import { DashboardActivityChart } from "@/components/DashboardActivityChart";
+import { ExecutiveDashboardCharts } from "@/components/ExecutiveDashboardCharts";
+import { buildRealDashboardAnalytics } from "@/lib/dashboard-analytics";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -40,6 +41,11 @@ export default async function DashboardPage() {
     openTasksCount,
     chargeRequestsCount,
     allVehicles,
+    allExpenses,
+    allSalaryPayments,
+    allPayments,
+    allWorkshopEntries,
+    allCustomers,
   ] = await Promise.all([
     prisma.customer.count({ where: { active: true } }),
     prisma.lead.count(),
@@ -50,6 +56,7 @@ export default async function DashboardPage() {
         id: true,
         status: true,
         totalXof: true,
+        createdAt: true,
       },
     }),
     prisma.invoice.findMany({
@@ -79,7 +86,48 @@ export default async function DashboardPage() {
         model: true,
         status: true,
         priceXof: true,
+        createdAt: true,
       },
+    }),
+    prisma.expense.findMany({
+      select: {
+        amountTtcXof: true,
+        category: true,
+        status: true,
+        serviceDate: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "asc" },
+    }),
+    prisma.salaryPayment.findMany({
+      select: {
+        amountXof: true,
+        month: true,
+        year: true,
+        status: true,
+        paymentDate: true,
+      },
+      orderBy: { paymentDate: "asc" },
+    }),
+    prisma.payment.findMany({
+      select: {
+        amountXof: true,
+        paidAt: true,
+      },
+      orderBy: { paidAt: "asc" },
+    }),
+    prisma.workshopEntry.findMany({
+      select: {
+        statusCode: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "asc" },
+    }),
+    prisma.customer.findMany({
+      select: {
+        createdAt: true,
+      },
+      orderBy: { createdAt: "asc" },
     }),
   ]);
 
@@ -183,14 +231,17 @@ export default async function DashboardPage() {
     },
   ] as const;
 
-  const monthlyActivity = [
-    { month: "Mai", invoicedXof: 18500000, collectedXof: 14200000, vehiclesCount: 2, quotesCount: 3 },
-    { month: "Juin", invoicedXof: 32000000, collectedXof: 28500000, vehiclesCount: 3, quotesCount: 5 },
-    { month: "Juil", invoicedXof: 24600000, collectedXof: 21000000, vehiclesCount: 2, quotesCount: 4 },
-    { month: "Août", invoicedXof: 41200000, collectedXof: 36800000, vehiclesCount: 4, quotesCount: 6 },
-    { month: "Sept", invoicedXof: 52400000, collectedXof: 45000000, vehiclesCount: 5, quotesCount: 7 },
-    { month: "Oct", invoicedXof: Math.max(totalInvoicedTtc, 63800000), collectedXof: Math.max(totalCollected, 51200000), vehiclesCount: totalStockCount, quotesCount: quotes.length || 8 },
-  ];
+  // Données 100% réelles agrégées par mois sans aucune valeur fictive
+  const analytics = buildRealDashboardAnalytics({
+    invoices,
+    payments: allPayments,
+    expenses: allExpenses,
+    salaryPayments: allSalaryPayments,
+    quotes,
+    vehicles: allVehicles,
+    workshopEntries: allWorkshopEntries,
+    customers: allCustomers,
+  });
 
   return (
     <AppShell user={user} titleKey="dashboard">
@@ -656,13 +707,8 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Évolution des Activités (Courbe Graphique Interactive) */}
-        <DashboardActivityChart
-          data={monthlyActivity}
-          currentMonthInvoiced={totalInvoicedTtc}
-          currentMonthCollected={totalCollected}
-          totalStockCount={totalStockCount}
-        />
+        {/* 4 Graphes Exécutifs Réels (Ventes, Dépenses, Activités, Bénéfice Net après charges et salaires) */}
+        <ExecutiveDashboardCharts analytics={analytics} />
 
         {/* 5 Indicateurs Opérationnels (Stock, Clients, Bornes, SAV, Chantiers) */}
         <div

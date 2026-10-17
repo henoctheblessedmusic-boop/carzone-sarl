@@ -3,11 +3,12 @@
 import { useState, useEffect, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Menu, X, MessageSquare } from "lucide-react";
+import { Menu, X, MessageSquare, HelpCircle } from "lucide-react";
 import { CarzoneLogo } from "@/components/CarzoneLogo";
 import { StickyNav } from "@/components/StickyNav";
 import { PrefsControls } from "@/components/PrefsControls";
 import { OnboardingHost } from "@/components/OnboardingHost";
+import { HelpCenterModal } from "@/components/HelpCenterModal";
 import { AdminNotificationsBell } from "@/components/AdminNotificationsBell";
 import { ChangePasswordModal } from "@/components/ChangePasswordModal";
 import { DevicePermissionsSetup } from "@/components/DevicePermissionsSetup";
@@ -42,6 +43,7 @@ export function AppShellClient({
   children: ReactNode;
 }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const pathname = usePathname();
 
   // Close drawer on route change
@@ -117,16 +119,41 @@ export function AppShellClient({
           onNavigate={() => setIsDrawerOpen(false)}
         />
 
-        <form action="/api/auth/logout" method="post" style={{ marginTop: "auto" }}>
+        <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 8 }}>
           <button
-            type="submit"
+            type="button"
+            onClick={() => {
+              setIsDrawerOpen(false);
+              setIsHelpOpen(true);
+            }}
             className="ox-btn ox-btn-ghost"
-            style={{ width: "100%" }}
-            title={logoutTitle}
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              fontSize: "0.82rem",
+              color: "var(--ice-text)",
+              border: "1px solid var(--ice-border)",
+            }}
+            title="Ouvrir le Centre d'Aide & Documentation"
           >
-            {logoutLabel}
+            <HelpCircle size={16} style={{ color: "#f43f5e" }} />
+            <span>Centre d&apos;Aide &amp; Guides</span>
           </button>
-        </form>
+
+          <form action="/api/auth/logout" method="post">
+            <button
+              type="submit"
+              className="ox-btn ox-btn-ghost"
+              style={{ width: "100%" }}
+              title={logoutTitle}
+            >
+              {logoutLabel}
+            </button>
+          </form>
+        </div>
       </aside>
 
       {/* Main Content */}
@@ -207,6 +234,31 @@ export function AppShellClient({
               <ChangePasswordModal />
             </div>
 
+            {/* Bouton Centre d'Aide & Documentation */}
+            <button
+              type="button"
+              onClick={() => setIsHelpOpen(true)}
+              className="ox-header-desktop-only"
+              title="Centre d'Aide & Documentation CARZONE Ops"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "6px 12px",
+                borderRadius: 8,
+                border: "1px solid rgba(225, 29, 72, 0.4)",
+                background: "linear-gradient(135deg, rgba(225, 29, 72, 0.15) 0%, rgba(15, 23, 42, 0.6) 100%)",
+                color: "#fda4af",
+                fontSize: "0.82rem",
+                fontWeight: 700,
+                cursor: "pointer",
+                transition: "all 0.15s ease",
+              }}
+            >
+              <HelpCircle size={15} style={{ color: "#f43f5e" }} />
+              <span>Aide</span>
+            </button>
+
             <PrefsControls />
             <div className="ox-user-meta">
               <strong style={{ fontSize: "0.9rem" }}>{user.fullName}</strong>
@@ -223,7 +275,21 @@ export function AppShellClient({
         <div className="ox-content">{children}</div>
       </main>
 
-      {pathname !== "/chat" && <OnboardingHost role={user.role} userName={user.fullName} />}
+      {pathname !== "/chat" && (
+        <OnboardingHost
+          role={user.role}
+          userName={user.fullName}
+          userId={user.id}
+        />
+      )}
+
+      <HelpCenterModal
+        isOpen={isHelpOpen}
+        onClose={() => setIsHelpOpen(false)}
+        userRole={user.role}
+        userName={user.fullName}
+      />
+
       <GlobalCallManager currentUserId={user.id} />
     </div>
   );

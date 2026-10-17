@@ -1173,9 +1173,9 @@ export function VehicleTechSheetPrint({
             box-shadow: none !important;
             margin: 0mm !important;
             width: 210mm !important;
-            height: 296mm !important;
-            max-height: 296mm !important;
-            min-height: 296mm !important;
+            height: 295mm !important;
+            max-height: 295mm !important;
+            min-height: 295mm !important;
             box-sizing: border-box !important;
             overflow: hidden !important;
             page-break-inside: avoid !important;

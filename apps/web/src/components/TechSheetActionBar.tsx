@@ -323,7 +323,7 @@ export function TechSheetActionBar({
             }}
             title="Imprimer ou enregistrer en PDF la fiche technique"
           >
-            <span>🖨️ Imprimer / PDF</span>
+            <span>🖨️ Imprimer / PDF (3 Pages A4)</span>
           </button>
         </div>
       </div>

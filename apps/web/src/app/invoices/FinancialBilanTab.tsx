@@ -10,6 +10,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Wrench,
+  CheckCircle2,
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
 import type { InvoiceItem, PaymentRow } from "./InvoicesView";
@@ -444,16 +445,34 @@ export function FinancialBilanTab({
             style={{
               display: "flex",
               justifyContent: "space-between",
-              padding: "0.8rem 1rem",
+              alignItems: "center",
+              padding: "0.85rem 1.1rem",
               background: "rgba(0, 120, 212, 0.08)",
               borderRadius: 8,
+              borderLeft: "3px solid var(--brand)",
               fontWeight: 600,
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ color: "var(--brand)", fontWeight: 800 }}>[ + ]</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 26,
+                  height: 26,
+                  borderRadius: "50%",
+                  background: "rgba(0, 120, 212, 0.15)",
+                  color: "var(--brand)",
+                  flexShrink: 0,
+                }}
+              >
+                <ArrowUpRight size={15} />
+              </span>
               <div>
-                <span>Chiffre d&apos;Affaires Global Facturé (Ventes, Atelier, Énergie)</span>
+                <span style={{ fontSize: "0.92rem", fontWeight: 700 }}>
+                  Chiffre d&apos;Affaires Global Facturé (Ventes, Atelier, Énergie)
+                </span>
                 {workshopRevenue > 0 && (
                   <div style={{ fontSize: "0.75rem", opacity: 0.7, fontWeight: 400, marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
                     <Wrench size={12} /> dont Prestations Atelier SAV : {formatXof(workshopRevenue)}
@@ -461,7 +480,7 @@ export function FinancialBilanTab({
                 )}
               </div>
             </div>
-            <span style={{ color: "var(--brand)", fontSize: "1rem" }}>
+            <span style={{ color: "var(--brand)", fontSize: "1.05rem", fontWeight: 700 }}>
               {formatXof(totalInvoicedRevenue)}
             </span>
           </div>
@@ -471,16 +490,34 @@ export function FinancialBilanTab({
             style={{
               display: "flex",
               justifyContent: "space-between",
-              padding: "0.8rem 1rem",
+              alignItems: "center",
+              padding: "0.75rem 1.1rem",
               background: "rgba(255, 255, 255, 0.02)",
               borderRadius: 8,
+              paddingLeft: "2.2rem",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", paddingLeft: "1.5rem" }}>
-              <span style={{ color: "var(--bad)", fontWeight: 700 }}>[ − ]</span>
-              <span>Coûts d&apos;achat des matériels vendus &amp; pièces atelier</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 22,
+                  height: 22,
+                  borderRadius: "50%",
+                  background: "rgba(239, 68, 68, 0.1)",
+                  color: "var(--bad)",
+                  flexShrink: 0,
+                }}
+              >
+                <ArrowDownRight size={13} />
+              </span>
+              <span style={{ fontSize: "0.88rem", opacity: 0.9 }}>
+                Coûts d&apos;achat des matériels vendus &amp; pièces atelier
+              </span>
             </div>
-            <span style={{ color: "var(--bad)" }}>− {formatXof(totalDirectCosts)}</span>
+            <span style={{ color: "var(--bad)", fontWeight: 600 }}>− {formatXof(totalDirectCosts)}</span>
           </div>
 
           {/* Gross Margin Subtotal */}
@@ -488,18 +525,49 @@ export function FinancialBilanTab({
             style={{
               display: "flex",
               justifyContent: "space-between",
-              padding: "0.8rem 1rem",
+              alignItems: "center",
+              padding: "0.85rem 1.1rem",
               background: "rgba(56, 189, 248, 0.08)",
               borderRadius: 8,
               fontWeight: 700,
               borderLeft: "3px solid #38bdf8",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ color: "#38bdf8" }}>[ = ]</span>
-              <span>MARGE BRUTE OPÉRATIONNELLE ({grossMarginPct.toFixed(1)}%)</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 26,
+                  height: 26,
+                  borderRadius: "50%",
+                  background: "rgba(56, 189, 248, 0.18)",
+                  color: "#38bdf8",
+                  flexShrink: 0,
+                }}
+              >
+                <TrendingUp size={14} />
+              </span>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "0.92rem", letterSpacing: "0.2px" }}>
+                  MARGE BRUTE OPÉRATIONNELLE
+                </span>
+                <span
+                  style={{
+                    fontSize: "0.72rem",
+                    padding: "2px 7px",
+                    borderRadius: 4,
+                    background: "rgba(56, 189, 248, 0.18)",
+                    color: "#38bdf8",
+                    fontWeight: 700,
+                  }}
+                >
+                  {grossMarginPct.toFixed(1)}% du CA
+                </span>
+              </div>
             </div>
-            <span style={{ color: "#38bdf8", fontSize: "1.05rem" }}>
+            <span style={{ color: "#38bdf8", fontSize: "1.05rem", fontWeight: 700 }}>
               {formatXof(grossProfit)}
             </span>
           </div>
@@ -509,16 +577,34 @@ export function FinancialBilanTab({
             style={{
               display: "flex",
               justifyContent: "space-between",
-              padding: "0.8rem 1rem",
+              alignItems: "center",
+              padding: "0.75rem 1.1rem",
               background: "rgba(255, 255, 255, 0.02)",
               borderRadius: 8,
+              paddingLeft: "2.2rem",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", paddingLeft: "1.5rem" }}>
-              <span style={{ color: "var(--bad)", fontWeight: 700 }}>[ − ]</span>
-              <span>Masse salariale &amp; Rémunérations du personnel (RH)</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 22,
+                  height: 22,
+                  borderRadius: "50%",
+                  background: "rgba(239, 68, 68, 0.1)",
+                  color: "var(--bad)",
+                  flexShrink: 0,
+                }}
+              >
+                <ArrowDownRight size={13} />
+              </span>
+              <span style={{ fontSize: "0.88rem", opacity: 0.9 }}>
+                Masse salariale &amp; Rémunérations du personnel (RH)
+              </span>
             </div>
-            <span style={{ color: "var(--bad)" }}>− {formatXof(totalPayroll)}</span>
+            <span style={{ color: "var(--bad)", fontWeight: 600 }}>− {formatXof(totalPayroll)}</span>
           </div>
 
           {/* Operating expenses row */}
@@ -526,15 +612,31 @@ export function FinancialBilanTab({
             style={{
               display: "flex",
               justifyContent: "space-between",
-              padding: "0.8rem 1rem",
+              alignItems: "center",
+              padding: "0.75rem 1.1rem",
               background: "rgba(255, 255, 255, 0.02)",
               borderRadius: 8,
+              paddingLeft: "2.2rem",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", paddingLeft: "1.5rem" }}>
-              <span style={{ color: "var(--bad)", fontWeight: 700 }}>[ − ]</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 22,
+                  height: 22,
+                  borderRadius: "50%",
+                  background: "rgba(239, 68, 68, 0.1)",
+                  color: "var(--bad)",
+                  flexShrink: 0,
+                }}
+              >
+                <ArrowDownRight size={13} />
+              </span>
               <div>
-                <span>
+                <span style={{ fontSize: "0.88rem", opacity: 0.9 }}>
                   Charges externes &amp; prestataires (Climatisation, SBEE, SONEB, Télécoms, Loyer...)
                 </span>
                 {Object.keys(expensesByCategory).length > 0 && (
@@ -544,7 +646,7 @@ export function FinancialBilanTab({
                 )}
               </div>
             </div>
-            <span style={{ color: "var(--bad)" }}>− {formatXof(totalOperatingExpenses)}</span>
+            <span style={{ color: "var(--bad)", fontWeight: 600 }}>− {formatXof(totalOperatingExpenses)}</span>
           </div>
 
           {/* NET RESULT FINAL */}
@@ -552,26 +654,56 @@ export function FinancialBilanTab({
             style={{
               display: "flex",
               justifyContent: "space-between",
-              padding: "1rem",
+              alignItems: "center",
+              padding: "1rem 1.2rem",
               background: netProfit >= 0 ? "rgba(16, 185, 129, 0.12)" : "rgba(212, 90, 90, 0.12)",
               borderRadius: 10,
               fontWeight: 800,
-              border: `1px solid ${netProfit >= 0 ? "rgba(16, 185, 129, 0.4)" : "rgba(212, 90, 90, 0.4)"}`,
+              border: `1.5px solid ${netProfit >= 0 ? "rgba(16, 185, 129, 0.4)" : "rgba(212, 90, 90, 0.4)"}`,
               marginTop: "0.5rem",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ color: netProfit >= 0 ? "#10b981" : "var(--bad)", fontSize: "1.2rem" }}>
-                [ = ]
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 28,
+                  height: 28,
+                  borderRadius: "50%",
+                  background: netProfit >= 0 ? "rgba(16, 185, 129, 0.2)" : "rgba(239, 68, 68, 0.2)",
+                  color: netProfit >= 0 ? "#10b981" : "var(--bad)",
+                  flexShrink: 0,
+                }}
+              >
+                <CheckCircle2 size={16} />
               </span>
-              <span style={{ fontSize: "1.05rem" }}>
-                RÉSULTAT NET D&apos;EXPLOITATION / BÉNÉFICE NET APRÈS CHARGES &amp; SALAIRES
-              </span>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                  <span style={{ fontSize: "1rem", letterSpacing: "0.3px" }}>
+                    RÉSULTAT NET D&apos;EXPLOITATION
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "0.7rem",
+                      padding: "2px 7px",
+                      borderRadius: 4,
+                      background: netProfit >= 0 ? "rgba(16, 185, 129, 0.2)" : "rgba(239, 68, 68, 0.2)",
+                      color: netProfit >= 0 ? "#10b981" : "var(--bad)",
+                      fontWeight: 700,
+                    }}
+                  >
+                    BÉNÉFICE NET APRÈS CHARGES &amp; SALAIRES
+                  </span>
+                </div>
+              </div>
             </div>
             <span
               style={{
                 color: netProfit >= 0 ? "#10b981" : "var(--bad)",
                 fontSize: "1.3rem",
+                fontWeight: 800,
               }}
             >
               {formatXof(netProfit)}

@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   try {
     await requireUser();
     const body = await req.json();
-    const { vehicleId, customApiKey } = body;
+    const { vehicleId, customApiKey, action, sheetData } = body;
 
     if (!vehicleId) {
       return NextResponse.json({ error: "vehicleId requis" }, { status: 400 });
@@ -21,7 +21,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Véhicule introuvable" }, { status: 404 });
     }
 
-    // Générer avec OpenAI
+    // Action 1: Confirmation explicite en Base de Données
+    if (action === "confirm") {
+      const sheetToSave = sheetData || (vehicle.technicalSheetJson ? JSON.parse(vehicle.technicalSheetJson) : null);
+      const updatedVehicle = await prisma.vehicle.update({
+        where: { id: vehicleId },
+        data: {
+          techSheetConfirmed: true,
+          techSheetConfirmedAt: new Date(),
+          hasTechSheet: true,
+          ...(sheetToSave ? { technicalSheetJson: JSON.stringify(sheetToSave) } : {}),
+        },
+      });
+      return NextResponse.json({
+        success: true,
+        confirmed: true,
+        vehicle: updatedVehicle,
+      });
+    }
+
+    // Action 2: Génération unitaire avec OpenAI / DeepSeek
     const sheet = await generateTechSheetWithAI(
       {
         brand: vehicle.brand,
@@ -42,12 +61,13 @@ export async function POST(req: Request) {
       rearPhotoUrl: vehicle.rearPhotoUrl || sheet.rearPhotoUrl,
     };
 
-    // Mettre à jour en BDD avec les photos officielles synchronisées
+    // Mettre à jour en BDD en mode non confirmé (en attente de confirmation utilisateur)
     const updatedVehicle = await prisma.vehicle.update({
       where: { id: vehicleId },
       data: {
         technicalSheetJson: JSON.stringify(updatedSheet),
         hasTechSheet: true,
+        techSheetConfirmed: false,
         mainPhotoUrl: updatedSheet.mainPhotoUrl,
         interiorPhotoUrl: updatedSheet.interiorPhotoUrl,
         exteriorPhotoUrl: updatedSheet.exteriorPhotoUrl,

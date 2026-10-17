@@ -82,7 +82,68 @@ export async function createVehicle(formData: FormData) {
   revalidatePath("/catalog");
 }
 
-import { generateAndSaveVehicleTechSheet, generateAllVehiclesTechSheets } from "@/lib/tech-sheet-generator";
+import {
+  generateAndSaveVehicleTechSheet,
+  generateAllVehiclesTechSheets,
+  confirmVehicleTechSheet,
+  unconfirmVehicleTechSheet,
+  type TechnicalSheet,
+} from "@/lib/tech-sheet-generator";
+import { generateTechSheetWithAI } from "@/lib/openai-tech-sheet";
+
+export async function confirmVehicleTechSheetAction(vehicleId: string, sheetOverride?: TechnicalSheet) {
+  await requireUser([...VEHICLE_MANAGERS]);
+  const res = await confirmVehicleTechSheet(vehicleId, sheetOverride);
+  revalidatePath("/vehicles");
+  revalidatePath(`/vehicles/${vehicleId}/fiche-technique`);
+  revalidatePath("/quotes");
+  return res;
+}
+
+export async function unconfirmVehicleTechSheetAction(vehicleId: string) {
+  await requireUser([...VEHICLE_MANAGERS]);
+  const res = await unconfirmVehicleTechSheet(vehicleId);
+  revalidatePath("/vehicles");
+  revalidatePath(`/vehicles/${vehicleId}/fiche-technique`);
+  return res;
+}
+
+/**
+ * Génération IA unitaire (OpenAI / DeepSeek) pour UN véhicule spécifique uniquement.
+ * Appel strictement contrôlé à la demande de l'utilisateur pour préserver les crédits OpenAI.
+ */
+export async function generateSingleVehicleTechSheetAIAction(vehicleId: string, customApiKey?: string) {
+  await requireUser([...VEHICLE_MANAGERS]);
+  const vehicle = await prisma.vehicle.findUnique({ where: { id: vehicleId } });
+  if (!vehicle) throw new Error("Véhicule introuvable");
+
+  const generatedSheet = await generateTechSheetWithAI(
+    {
+      id: vehicle.id,
+      brand: vehicle.brand,
+      model: vehicle.model,
+      variant: vehicle.variant,
+      year: vehicle.year,
+      energy: vehicle.energy,
+    },
+    customApiKey,
+  );
+
+  // Mettre à jour le JSON en BDD sans marquer confirmé (l'utilisateur doit cliquer sur "Confirmer")
+  await prisma.vehicle.update({
+    where: { id: vehicle.id },
+    data: {
+      technicalSheetJson: JSON.stringify(generatedSheet),
+      hasTechSheet: true,
+      techSheetConfirmed: false,
+    },
+  });
+
+  revalidatePath(`/vehicles/${vehicleId}/fiche-technique`);
+  revalidatePath("/vehicles");
+
+  return { success: true, sheet: generatedSheet };
+}
 
 export async function batchGenerateAllVehiclesTechSheetsAction() {
   await requireUser([...VEHICLE_MANAGERS]);

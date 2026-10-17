@@ -54,6 +54,8 @@ export type VehicleItem = {
   site?: { id: string; name: string; code?: string } | null;
   mainPhotoUrl?: string | null;
   hasTechSheet?: boolean;
+  techSheetConfirmed?: boolean;
+  techSheetConfirmedAt?: string | null;
   shippingOriginPort?: string | null;
   etaDate?: string | null;
   containerNumber?: string | null;
@@ -871,11 +873,21 @@ export function VehiclesView({
                             </button>
                             <Link
                               href={`/vehicles/${v.id}/fiche-technique`}
-                              target="_blank"
-                              title="Fiche technique"
-                              style={{ color: "#38bdf8", padding: "2px" }}
+                              title={
+                                v.techSheetConfirmed
+                                  ? "Fiche technique confirmée en BDD (enregistrée définitivement)"
+                                  : "Fiche technique à confirmer"
+                              }
+                              style={{
+                                color: v.techSheetConfirmed ? "#10b981" : "#f59e0b",
+                                padding: "2px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "3px",
+                              }}
                             >
                               <FileText size={13} />
+                              {v.techSheetConfirmed && <span style={{ fontSize: "10px", fontWeight: 800 }}>✓</span>}
                             </Link>
                           </div>
 
@@ -1003,25 +1015,33 @@ export function VehiclesView({
             </Badge>,
             <div key={`act-${v.id}`} style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
               <Link
+                key={`sheet-${v.id}`}
                 href={`/vehicles/${v.id}/fiche-technique`}
-                target="_blank"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: 4,
+                  gap: 5,
                   padding: "4px 8px",
                   borderRadius: 6,
-                  border: "1px solid rgba(0, 120, 212, 0.4)",
-                  background: "rgba(0, 120, 212, 0.12)",
-                  color: "var(--brand, #0078d4)",
+                  border: v.techSheetConfirmed
+                    ? "1px solid rgba(16, 185, 129, 0.4)"
+                    : "1px solid rgba(245, 158, 11, 0.4)",
+                  background: v.techSheetConfirmed
+                    ? "rgba(16, 185, 129, 0.12)"
+                    : "rgba(245, 158, 11, 0.12)",
+                  color: v.techSheetConfirmed ? "#10b981" : "#f59e0b",
                   fontSize: "0.75rem",
-                  fontWeight: 600,
+                  fontWeight: 700,
                   textDecoration: "none",
                 }}
-                title="Consulter et imprimer la fiche technique officielle (FR)"
+                title={
+                  v.techSheetConfirmed
+                    ? "Fiche technique confirmée et scellée en BDD (aucun appel OpenAI)"
+                    : "Fiche technique non confirmée (cliquez pour voir et confirmer)"
+                }
               >
                 <FileText size={12} />
-                <span>Fiche Tech.</span>
+                <span>{v.techSheetConfirmed ? "Fiche BDD ✓" : "Fiche à valider"}</span>
               </Link>
               <button
                 key={`edit-${v.id}`}

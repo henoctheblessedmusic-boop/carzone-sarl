@@ -181,6 +181,8 @@ model Vehicle {
   exteriorPhotoUrl   String?
   rearPhotoUrl       String?
   hasTechSheet       Boolean        @default(false)
+  techSheetConfirmed Boolean        @default(false)
+  techSheetConfirmedAt DateTime?
   shippingOriginPort String?
   etaDate            DateTime?
   containerNumber    String?

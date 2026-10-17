@@ -290,25 +290,88 @@ export function buildStandardTechnicalSheet(vehicle: {
 
 /**
  * Source unique de la fiche à afficher / imprimer.
- * - Modèle présent dans le catalogue officiel → fiche reconstruite à chaque affichage depuis le catalogue
- *   (photos vérifiées, cockpit + sellerie, textes à jour). L'ancien JSON en base est ignoré.
- * - Modèle hors catalogue → JSON enregistré (ex. généré par IA), sinon fiche standard.
+ * 1. Priorité absolue : Fiche enregistrée en Base de Données (technicalSheetJson)
+ *    Dès qu'une fiche est enregistrée ou confirmée, elle reste définitivement en BDD.
+ *    Aucune régénération ni appel OpenAI n'est effectué à l'affichage.
+ * 2. Fallback catalogue officiel constructeur si pas encore de fiche en BDD.
+ * 3. Fallback standard de secours.
  */
 export function resolveVehicleTechSheet(
-  vehicle: Parameters<typeof buildStandardTechnicalSheet>[0] & { technicalSheetJson?: string | null },
+  vehicle: Parameters<typeof buildStandardTechnicalSheet>[0] & {
+    technicalSheetJson?: string | null;
+    techSheetConfirmed?: boolean | null;
+  },
 ): TechnicalSheet {
-  if (findCatalogSpecs(vehicle.brand, vehicle.model, vehicle.variant)) {
-    return buildStandardTechnicalSheet(vehicle);
-  }
+  // 1. Si la fiche existe en base de données, on l'utilise DIRECTEMENT sans aucun recalcul
   if (vehicle.technicalSheetJson) {
     try {
       const stored = JSON.parse(vehicle.technicalSheetJson) as TechnicalSheet;
-      if (stored.mainPhotoUrl && !isObsoletePhoto(stored.mainPhotoUrl)) return stored;
+      if (stored && stored.title && (stored.motorisation || stored.dimensions)) {
+        return stored;
+      }
     } catch {
-      // JSON corrompu → fiche standard
+      // JSON corrompu → fallback
     }
   }
+
+  // 2. Modèle présent dans le catalogue officiel constructeur
+  if (findCatalogSpecs(vehicle.brand, vehicle.model, vehicle.variant)) {
+    return buildStandardTechnicalSheet(vehicle);
+  }
+
+  // 3. Modèle hors catalogue
   return buildStandardTechnicalSheet(vehicle);
+}
+
+/**
+ * Confirme définitivement la Fiche Technique d'un véhicule en Base de Données.
+ * Une fois confirmée, elle ne change plus jamais sauf déverrouillage volontaire.
+ */
+export async function confirmVehicleTechSheet(vehicleId: string, sheetOverride?: TechnicalSheet) {
+  const vehicle = await prisma.vehicle.findUnique({ where: { id: vehicleId } });
+  if (!vehicle) throw new Error("Véhicule introuvable");
+
+  let sheetToSave: TechnicalSheet;
+  if (sheetOverride) {
+    sheetToSave = sheetOverride;
+  } else if (vehicle.technicalSheetJson) {
+    try {
+      sheetToSave = JSON.parse(vehicle.technicalSheetJson);
+    } catch {
+      sheetToSave = resolveVehicleTechSheet(vehicle);
+    }
+  } else {
+    sheetToSave = resolveVehicleTechSheet(vehicle);
+  }
+
+  const updated = await prisma.vehicle.update({
+    where: { id: vehicleId },
+    data: {
+      technicalSheetJson: JSON.stringify(sheetToSave),
+      mainPhotoUrl: sheetToSave.mainPhotoUrl || vehicle.mainPhotoUrl,
+      interiorPhotoUrl: sheetToSave.interiorPhotoUrl || vehicle.interiorPhotoUrl,
+      exteriorPhotoUrl: sheetToSave.exteriorPhotoUrl || vehicle.exteriorPhotoUrl,
+      rearPhotoUrl: sheetToSave.rearPhotoUrl || vehicle.rearPhotoUrl,
+      hasTechSheet: true,
+      techSheetConfirmed: true,
+      techSheetConfirmedAt: new Date(),
+    },
+  });
+
+  return { vehicle: updated, techSheet: sheetToSave };
+}
+
+/**
+ * Déverrouille la fiche technique si l'utilisateur souhaite ré-éditer ou régénérer avec l'IA
+ */
+export async function unconfirmVehicleTechSheet(vehicleId: string) {
+  const updated = await prisma.vehicle.update({
+    where: { id: vehicleId },
+    data: {
+      techSheetConfirmed: false,
+    },
+  });
+  return { vehicle: updated };
 }
 
 /**

@@ -634,7 +634,6 @@ Web : www.topcarzone.com`;
                             return (
                               <Link
                                 href={`/vehicles/${vLine.vehicleId}/fiche-technique`}
-                                target="_blank"
                                 className="ox-btn ox-btn-ghost ox-btn-sm"
                                 style={{
                                   display: "inline-flex",

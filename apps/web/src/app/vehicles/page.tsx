@@ -103,6 +103,8 @@ export default async function VehiclesPage({
     site: v.site ? { id: v.site.id, name: v.site.name, code: v.site.code } : null,
     mainPhotoUrl: v.mainPhotoUrl,
     hasTechSheet: v.hasTechSheet,
+    techSheetConfirmed: v.techSheetConfirmed,
+    techSheetConfirmedAt: v.techSheetConfirmedAt ? v.techSheetConfirmedAt.toISOString() : null,
     shippingOriginPort: v.shippingOriginPort,
     etaDate: v.etaDate ? v.etaDate.toISOString() : null,
     containerNumber: v.containerNumber,

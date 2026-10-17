@@ -22,7 +22,7 @@ export default async function VehicleTechSheetPage({
   const sheet = resolveVehicleTechSheet(vehicle);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f1f5f9" }}>
+    <div className="ox-tech-sheet-page-root" style={{ minHeight: "100vh", background: "#f1f5f9" }}>
       <TechSheetActionBar
         vehicleId={vehicle.id}
         brand={vehicle.brand}
@@ -33,7 +33,7 @@ export default async function VehicleTechSheetPage({
         confirmedAt={vehicle.techSheetConfirmedAt}
       />
 
-      <div style={{ padding: "2rem 1rem" }}>
+      <div className="ox-tech-sheet-print-container" style={{ padding: "2rem 1rem" }}>
         <VehicleTechSheetPrint
           sheet={sheet}
           vehicleInfo={{

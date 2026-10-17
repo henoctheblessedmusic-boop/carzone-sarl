@@ -63,9 +63,9 @@ export function VehicleTechSheetPrint({
         className="ox-tech-sheet-page ox-tech-sheet-page-1"
         style={{
           width: "210mm",
-          height: "297mm",
-          maxHeight: "297mm",
-          margin: "0 auto 2.5rem",
+          height: "296mm",
+          maxHeight: "296mm",
+          margin: "0 auto 2rem",
           background: "#ffffff",
           position: "relative",
           overflow: "hidden",
@@ -74,7 +74,7 @@ export function VehicleTechSheetPrint({
           flexDirection: "column",
           justifyContent: "space-between",
           boxSizing: "border-box",
-          padding: "10mm 15mm 9mm",
+          padding: "8mm 14mm 7mm",
           fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
           pageBreakInside: "avoid",
           breakInside: "avoid",
@@ -228,7 +228,8 @@ export function VehicleTechSheetPrint({
         <div
           style={{
             width: "100%",
-            height: "138mm",
+            height: "130mm",
+            maxHeight: "130mm",
             position: "relative",
             borderRadius: "14px",
             border: "1.5px solid #e2e8f0",
@@ -491,11 +492,11 @@ export function VehicleTechSheetPrint({
         className="ox-tech-sheet-page ox-tech-sheet-page-2"
         style={{
           width: "210mm",
-          height: "297mm",
-          maxHeight: "297mm",
-          margin: "0 auto 2.5rem",
+          height: "296mm",
+          maxHeight: "296mm",
+          margin: "0 auto 2rem",
           background: "#ffffff",
-          padding: "10mm 15mm 9mm",
+          padding: "8mm 14mm 7mm",
           boxShadow: "0 10px 35px rgba(0,0,0,0.08)",
           display: "flex",
           flexDirection: "column",
@@ -515,7 +516,7 @@ export function VehicleTechSheetPrint({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            paddingBottom: "4mm",
+            paddingBottom: "3mm",
             borderBottom: "1.5px solid #e2e8f0",
           }}
         >
@@ -524,7 +525,7 @@ export function VehicleTechSheetPrint({
             <img
               src="/brand/carzone-logo.png"
               alt="Carzone SARL"
-              style={{ height: "42px", width: "42px", borderRadius: "50%", objectFit: "contain" }}
+              style={{ height: "40px", width: "40px", borderRadius: "50%", objectFit: "contain" }}
             />
             <div>
               <div style={{ fontSize: "1.02rem", fontWeight: 900, color: "#0f172a" }}>
@@ -547,7 +548,7 @@ export function VehicleTechSheetPrint({
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: "14px",
+            gap: "12px",
             margin: "2mm 0",
           }}
         >
@@ -555,7 +556,8 @@ export function VehicleTechSheetPrint({
           <div
             style={{
               position: "relative",
-              height: "64mm",
+              height: "56mm",
+              maxHeight: "56mm",
               borderRadius: "10px",
               overflow: "hidden",
               border: "1.5px solid #cbd5e1",
@@ -598,7 +600,8 @@ export function VehicleTechSheetPrint({
           <div
             style={{
               position: "relative",
-              height: "64mm",
+              height: "56mm",
+              maxHeight: "56mm",
               borderRadius: "10px",
               overflow: "hidden",
               border: "1.5px solid #cbd5e1",
@@ -644,18 +647,18 @@ export function VehicleTechSheetPrint({
         </div>
 
         {/* DESCRIPTION EXPLICITE SOUS LE DUO : COCKPIT DIGITAL + SIÈGES CUIR SPORT */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", margin: "0 0 2mm" }}>
-          <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderTop: `3px solid ${brandMeta.primaryColor}`, borderRadius: "8px", padding: "8px 12px" }}>
-            <div style={{ fontSize: "0.74rem", fontWeight: 900, color: brandMeta.primaryColor, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "4px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", margin: "0 0 2mm" }}>
+          <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderTop: `3px solid ${brandMeta.primaryColor}`, borderRadius: "8px", padding: "6px 10px" }}>
+            <div style={{ fontSize: "0.72rem", fontWeight: 900, color: brandMeta.primaryColor, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "3px" }}>
               Cockpit Digital
             </div>
-            <div style={{ fontSize: "0.8rem", color: "#1e293b", lineHeight: 1.45, fontWeight: 500 }}>{cockpitText}</div>
+            <div style={{ fontSize: "0.78rem", color: "#1e293b", lineHeight: 1.4, fontWeight: 500 }}>{cockpitText}</div>
           </div>
-          <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderTop: `3px solid ${brandMeta.primaryColor}`, borderRadius: "8px", padding: "8px 12px" }}>
-            <div style={{ fontSize: "0.74rem", fontWeight: 900, color: brandMeta.primaryColor, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "4px" }}>
+          <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderTop: `3px solid ${brandMeta.primaryColor}`, borderRadius: "8px", padding: "6px 10px" }}>
+            <div style={{ fontSize: "0.72rem", fontWeight: 900, color: brandMeta.primaryColor, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "3px" }}>
               Sièges en Cuir Sport
             </div>
-            <div style={{ fontSize: "0.8rem", color: "#1e293b", lineHeight: 1.45, fontWeight: 500 }}>
+            <div style={{ fontSize: "0.78rem", color: "#1e293b", lineHeight: 1.4, fontWeight: 500 }}>
               {seatsText}
               {seatsExtra ? <> · {seatsExtra}</> : null}
             </div>
@@ -663,19 +666,19 @@ export function VehicleTechSheetPrint({
         </div>
 
         {/* ÉQUIPEMENTS ET CONFORT : AÉRÉ, POLICES VISIBLES ET LISIBLES */}
-        <div style={{ margin: "2mm 0" }}>
+        <div style={{ margin: "1mm 0" }}>
           <div
             style={{
               background: brandMeta.primaryColor,
               color: "#ffffff",
-              padding: "4px 12px",
+              padding: "3px 10px",
               borderRadius: "6px",
-              fontSize: "0.78rem",
+              fontSize: "0.74rem",
               fontWeight: 800,
               letterSpacing: "0.08em",
               textTransform: "uppercase",
               display: "inline-block",
-              marginBottom: "8px",
+              marginBottom: "6px",
             }}
           >
             Équipements de Confort &amp; Technologies de Bord
@@ -685,25 +688,25 @@ export function VehicleTechSheetPrint({
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              gap: "14px 20px",
+              gap: "10px 18px",
               background: "#f8fafc",
-              padding: "14px 16px",
-              borderRadius: "10px",
+              padding: "10px 14px",
+              borderRadius: "8px",
               border: "1px solid #e2e8f0",
             }}
           >
             <ul
               style={{
                 margin: 0,
-                paddingLeft: "18px",
-                fontSize: "0.84rem",
-                lineHeight: "1.55",
+                paddingLeft: "16px",
+                fontSize: "0.78rem",
+                lineHeight: "1.4",
                 color: "#1e293b",
                 fontWeight: 500,
               }}
             >
               {sheet.equipementConfort.slice(0, 5).map((item, idx) => (
-                <li key={idx} style={{ marginBottom: "6px" }}>
+                <li key={idx} style={{ marginBottom: "3px" }}>
                   {item}
                 </li>
               ))}
@@ -712,23 +715,23 @@ export function VehicleTechSheetPrint({
             <ul
               style={{
                 margin: 0,
-                paddingLeft: "18px",
-                fontSize: "0.84rem",
-                lineHeight: "1.55",
+                paddingLeft: "16px",
+                fontSize: "0.78rem",
+                lineHeight: "1.4",
                 color: "#1e293b",
                 fontWeight: 500,
               }}
             >
               {sheet.equipementConfort.slice(5, 10).map((item, idx) => (
-                <li key={idx} style={{ marginBottom: "6px" }}>
+                <li key={idx} style={{ marginBottom: "3px" }}>
                   {item}
                 </li>
               ))}
               {sheet.equipementConfort.length <= 5 && (
                 <>
-                  <li style={{ marginBottom: "6px" }}>Climatisation automatique trizone avec aérateurs arrière</li>
-                  <li style={{ marginBottom: "6px" }}>Système multimédia tactile haute résolution avec Apple CarPlay &amp; Android Auto</li>
-                  <li style={{ marginBottom: "6px" }}>Compartiment réfrigéré Cool Box pour voyages et boissons</li>
+                  <li style={{ marginBottom: "3px" }}>Climatisation automatique trizone avec aérateurs arrière</li>
+                  <li style={{ marginBottom: "3px" }}>Système multimédia tactile haute résolution avec Apple CarPlay &amp; Android Auto</li>
+                  <li style={{ marginBottom: "3px" }}>Compartiment réfrigéré Cool Box pour voyages et boissons</li>
                 </>
               )}
             </ul>
@@ -740,11 +743,11 @@ export function VehicleTechSheetPrint({
           style={{
             background: `${brandMeta.primaryColor}08`,
             borderLeft: `4px solid ${brandMeta.primaryColor}`,
-            padding: "8px 14px",
+            padding: "6px 12px",
             borderRadius: "0 8px 8px 0",
-            fontSize: "0.74rem",
+            fontSize: "0.72rem",
             color: "#334155",
-            lineHeight: 1.45,
+            lineHeight: 1.4,
           }}
         >
           <strong>Exigence Qualité Carzone SARL :</strong> Tous les équipements d&apos;habitacle, selleries et systèmes multimédias ont été méticuleusement testés par les techniciens de notre atelier concessionnaire à Cotonou pour garantir un confort irréprochable et durable.
@@ -754,7 +757,7 @@ export function VehicleTechSheetPrint({
         <div
           style={{
             marginTop: "auto",
-            paddingTop: "4mm",
+            paddingTop: "3mm",
             borderTop: "1.5px solid #e2e8f0",
             display: "flex",
             justifyContent: "space-between",
@@ -778,11 +781,11 @@ export function VehicleTechSheetPrint({
         className="ox-tech-sheet-page ox-tech-sheet-page-3"
         style={{
           width: "210mm",
-          height: "297mm",
-          maxHeight: "297mm",
+          height: "296mm",
+          maxHeight: "296mm",
           margin: "0 auto",
           background: "#ffffff",
-          padding: "10mm 15mm 9mm",
+          padding: "8mm 14mm 7mm",
           boxShadow: "0 10px 35px rgba(0,0,0,0.08)",
           display: "flex",
           flexDirection: "column",
@@ -802,7 +805,7 @@ export function VehicleTechSheetPrint({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            paddingBottom: "4mm",
+            paddingBottom: "3mm",
             borderBottom: "1.5px solid #e2e8f0",
           }}
         >
@@ -811,7 +814,7 @@ export function VehicleTechSheetPrint({
             <img
               src="/brand/carzone-logo.png"
               alt="Carzone SARL"
-              style={{ height: "42px", width: "42px", borderRadius: "50%", objectFit: "contain" }}
+              style={{ height: "40px", width: "40px", borderRadius: "50%", objectFit: "contain" }}
             />
             <div>
               <div style={{ fontSize: "1.02rem", fontWeight: 900, color: "#0f172a" }}>
@@ -834,7 +837,7 @@ export function VehicleTechSheetPrint({
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: "14px",
+            gap: "12px",
             margin: "2mm 0",
           }}
         >
@@ -842,7 +845,8 @@ export function VehicleTechSheetPrint({
           <div
             style={{
               position: "relative",
-              height: "64mm",
+              height: "56mm",
+              maxHeight: "56mm",
               borderRadius: "10px",
               overflow: "hidden",
               border: "1.5px solid #cbd5e1",
@@ -884,7 +888,8 @@ export function VehicleTechSheetPrint({
           <div
             style={{
               position: "relative",
-              height: "64mm",
+              height: "56mm",
+              maxHeight: "56mm",
               borderRadius: "10px",
               overflow: "hidden",
               border: "1.5px solid #cbd5e1",
@@ -924,31 +929,31 @@ export function VehicleTechSheetPrint({
         </div>
 
         {/* SECTION CARACTÉRISTIQUES DÉTAILLÉES : DIMENSIONS & MOTORISATION */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", margin: "2mm 0" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", margin: "1mm 0" }}>
           {/* Dimensions */}
           <div
             style={{
               background: "#f8fafc",
               border: "1px solid #e2e8f0",
-              borderRadius: "10px",
-              padding: "10px 14px",
+              borderRadius: "8px",
+              padding: "8px 12px",
             }}
           >
             <div
               style={{
-                fontSize: "0.72rem",
+                fontSize: "0.70rem",
                 fontWeight: 800,
                 color: brandMeta.primaryColor,
                 textTransform: "uppercase",
                 letterSpacing: "0.08em",
                 borderBottom: "1.5px solid #e2e8f0",
-                paddingBottom: "4px",
-                marginBottom: "6px",
+                paddingBottom: "3px",
+                marginBottom: "4px",
               }}
             >
               Dimensions &amp; Habitabilité
             </div>
-            <div style={{ fontSize: "0.78rem", lineHeight: "1.55", color: "#1e293b" }}>
+            <div style={{ fontSize: "0.76rem", lineHeight: "1.45", color: "#1e293b" }}>
               <div>L x l x h : <strong>{sheet.dimensions.lengthWidthHeight} mm</strong></div>
               <div>Empattement : <strong>{sheet.dimensions.wheelbase} mm</strong></div>
               <div>Capacité : <strong>{sheet.dimensions.seats} Places · {sheet.dimensions.doors} Portes</strong></div>
@@ -961,25 +966,25 @@ export function VehicleTechSheetPrint({
             style={{
               background: "#f8fafc",
               border: "1px solid #e2e8f0",
-              borderRadius: "10px",
-              padding: "10px 14px",
+              borderRadius: "8px",
+              padding: "8px 12px",
             }}
           >
             <div
               style={{
-                fontSize: "0.72rem",
+                fontSize: "0.70rem",
                 fontWeight: 800,
                 color: brandMeta.primaryColor,
                 textTransform: "uppercase",
                 letterSpacing: "0.08em",
                 borderBottom: "1.5px solid #e2e8f0",
-                paddingBottom: "4px",
-                marginBottom: "6px",
+                paddingBottom: "3px",
+                marginBottom: "4px",
               }}
             >
               Motorisation &amp; Transmission
             </div>
-            <div style={{ fontSize: "0.78rem", lineHeight: "1.55", color: "#1e293b" }}>
+            <div style={{ fontSize: "0.76rem", lineHeight: "1.45", color: "#1e293b" }}>
               <div>Technologie : <strong>{sheet.motorisation.displacementOrMotor}</strong></div>
               <div>Transmission : <strong>{sheet.motorisation.transmission}</strong></div>
               <div>Puissance maximale : <strong>{sheet.motorisation.maxPower}</strong></div>
@@ -993,19 +998,19 @@ export function VehicleTechSheetPrint({
           style={{
             background: "#ffffff",
             border: "1.5px solid #e2e8f0",
-            borderRadius: "10px",
-            padding: "10px 14px",
-            margin: "2mm 0",
+            borderRadius: "8px",
+            padding: "8px 12px",
+            margin: "1mm 0",
           }}
         >
           <div
             style={{
-              fontSize: "0.72rem",
+              fontSize: "0.70rem",
               fontWeight: 800,
               color: "#b45309",
               textTransform: "uppercase",
               letterSpacing: "0.08em",
-              marginBottom: "6px",
+              marginBottom: "4px",
               display: "flex",
               alignItems: "center",
               gap: "6px",
@@ -1013,20 +1018,20 @@ export function VehicleTechSheetPrint({
           >
             <span>🛡️</span> Sécurité Active, Passive &amp; Aides à la Conduite
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 16px" }}>
-            <ul style={{ margin: 0, paddingLeft: "16px", fontSize: "0.78rem", lineHeight: "1.5", color: "#1e293b" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 14px" }}>
+            <ul style={{ margin: 0, paddingLeft: "16px", fontSize: "0.75rem", lineHeight: "1.38", color: "#1e293b" }}>
               {sheet.securite.slice(0, 4).map((sec, idx) => (
-                <li key={idx} style={{ marginBottom: "4px" }}>{sec}</li>
+                <li key={idx} style={{ marginBottom: "2px" }}>{sec}</li>
               ))}
             </ul>
-            <ul style={{ margin: 0, paddingLeft: "16px", fontSize: "0.78rem", lineHeight: "1.5", color: "#1e293b" }}>
+            <ul style={{ margin: 0, paddingLeft: "16px", fontSize: "0.75rem", lineHeight: "1.38", color: "#1e293b" }}>
               {sheet.securite.slice(4, 8).map((sec, idx) => (
-                <li key={idx} style={{ marginBottom: "4px" }}>{sec}</li>
+                <li key={idx} style={{ marginBottom: "2px" }}>{sec}</li>
               ))}
               {sheet.securite.length <= 4 && (
                 <>
-                  <li style={{ marginBottom: "4px" }}>Caméras panoramiques 360° avec vue sous châssis</li>
-                  <li style={{ marginBottom: "4px" }}>Pack complet 7 airbags avec protection genoux et rideaux</li>
+                  <li style={{ marginBottom: "2px" }}>Caméras panoramiques 360° avec vue sous châssis</li>
+                  <li style={{ marginBottom: "2px" }}>Pack complet 7 airbags avec protection genoux et rideaux</li>
                 </>
               )}
             </ul>
@@ -1039,11 +1044,11 @@ export function VehicleTechSheetPrint({
             background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
             color: "#ffffff",
             borderRadius: "10px",
-            padding: "10px 16px",
+            padding: "8px 14px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            marginTop: "1mm",
+            marginTop: "1.5mm",
             boxShadow: "0 6px 18px rgba(15, 23, 42, 0.12)",
           }}
         >
@@ -1053,31 +1058,31 @@ export function VehicleTechSheetPrint({
               src="/brand/carzone-logo.png"
               alt="Badge Officiel Carzone SARL"
               style={{
-                height: "46px",
-                width: "46px",
+                height: "42px",
+                width: "42px",
                 borderRadius: "50%",
                 objectFit: "contain",
                 border: "2px solid #f59e0b",
               }}
             />
             <div>
-              <div style={{ fontSize: "0.86rem", fontWeight: 900, letterSpacing: "0.06em", color: "#fcd34d" }}>
+              <div style={{ fontSize: "0.82rem", fontWeight: 900, letterSpacing: "0.06em", color: "#fcd34d" }}>
                 CARZONE SARL · CONCESSIONNAIRE &amp; ATELIER HOMOLOGUÉ
               </div>
-              <div style={{ fontSize: "0.68rem", color: "#cbd5e1", marginTop: "2px" }}>
+              <div style={{ fontSize: "0.66rem", color: "#cbd5e1", marginTop: "1px" }}>
                 Cotonou, République du Bénin · Téléphone direct : <strong>+229 01 92 61 61 61</strong>
               </div>
-              <div style={{ fontSize: "0.64rem", color: "#94a3b8" }}>
+              <div style={{ fontSize: "0.62rem", color: "#94a3b8" }}>
                 Véhicule sélectionné, contrôlé et certifié conforme · Pièces d&apos;origine &amp; garantie atelier
               </div>
             </div>
           </div>
 
           <div style={{ textAlign: "right", borderLeft: "1px solid rgba(255,255,255,0.2)", paddingLeft: "14px" }}>
-            <div style={{ fontSize: "0.64rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+            <div style={{ fontSize: "0.62rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.06em" }}>
               Garantie Concession
             </div>
-            <div style={{ fontSize: "0.82rem", fontWeight: 900, color: "#22c55e" }}>
+            <div style={{ fontSize: "0.80rem", fontWeight: 900, color: "#22c55e" }}>
               CONFORME
             </div>
           </div>
@@ -1130,45 +1135,68 @@ export function VehicleTechSheetPrint({
         @media print {
           @page {
             size: A4 portrait;
-            margin: 0 !important;
+            margin: 0mm !important;
+          }
+          *, *::before, *::after {
+            box-sizing: border-box !important;
           }
           html, body {
             background: #ffffff !important;
-            margin: 0 !important;
-            padding: 0 !important;
+            margin: 0mm !important;
+            padding: 0mm !important;
             width: 210mm !important;
             height: auto !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
-          .no-print {
+          .no-print,
+          header.no-print,
+          .ox-header,
+          .ox-aside,
+          .ox-mobile-header-bar {
             display: none !important;
+            height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
           }
+          .ox-tech-sheet-page-root,
+          .ox-tech-sheet-print-container,
           .ox-tech-sheet-wrapper {
             background: #ffffff !important;
-            padding: 0 !important;
-            margin: 0 !important;
+            padding: 0mm !important;
+            margin: 0mm !important;
+            width: 210mm !important;
+            min-height: 0 !important;
           }
           .ox-tech-sheet-page {
             box-shadow: none !important;
-            margin: 0 !important;
+            margin: 0mm !important;
             width: 210mm !important;
-            height: 297mm !important;
-            max-height: 297mm !important;
+            height: 296mm !important;
+            max-height: 296mm !important;
+            min-height: 296mm !important;
             box-sizing: border-box !important;
             overflow: hidden !important;
             page-break-inside: avoid !important;
             break-inside: avoid !important;
+            padding: 8mm 14mm 7mm !important;
           }
           .ox-tech-sheet-page-1 {
-            page-break-after: always !important;
+            page-break-before: avoid !important;
+            break-before: avoid !important;
+            page-break-after: page !important;
             break-after: page !important;
           }
           .ox-tech-sheet-page-2 {
-            page-break-after: always !important;
+            page-break-before: page !important;
+            break-before: page !important;
+            page-break-after: page !important;
             break-after: page !important;
           }
           .ox-tech-sheet-page-3 {
+            page-break-before: page !important;
+            break-before: page !important;
             page-break-after: avoid !important;
             break-after: avoid !important;
           }

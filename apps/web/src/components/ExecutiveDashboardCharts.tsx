@@ -16,7 +16,6 @@ import {
   Eye,
   Layers,
   ChevronRight,
-  ShieldCheck,
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
 import type {
@@ -77,39 +76,18 @@ export function ExecutiveDashboardCharts({
             gap: "1rem",
           }}
         >
-          {/* Titre & certification 100% réel */}
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-              <h2
-                style={{
-                  margin: 0,
-                  fontSize: "1.25rem",
-                  fontWeight: 800,
-                  color: "#ffffff",
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                Tableau de Bord Financier &amp; Performance
-              </h2>
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 4,
-                  background: "rgba(16, 185, 129, 0.15)",
-                  color: "#34d399",
-                  border: "1px solid rgba(52, 211, 153, 0.35)",
-                  padding: "3px 8px",
-                  borderRadius: 20,
-                  fontSize: "0.72rem",
-                  fontWeight: 700,
-                }}
-                title="Toutes les valeurs affichées proviennent exclusivement des écritures réelles en base de données (factures, paiements, dépenses, salaires)."
-              >
-                <ShieldCheck size={13} />
-                Données 100% Réelles BDD
-              </span>
-            </div>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: "1.25rem",
+                fontWeight: 800,
+                color: "#ffffff",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              Tableau de Bord Financier &amp; Performance
+            </h2>
             <p
               style={{
                 margin: "4px 0 0",

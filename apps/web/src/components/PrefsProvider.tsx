@@ -65,11 +65,12 @@ export function PrefsProvider({
   /** When true, write locale cookie on mount if missing (first-visit Accept-Language). */
   persistLocaleCookie?: boolean;
 }) {
-  const [themePref, setThemePrefState] = useState<ThemePref>(
-    isThemePref(initialTheme) ? initialTheme : DEFAULT_THEME,
-  );
+  const [themePref, setThemePrefState] = useState<ThemePref>(() => {
+    if (initialTheme === "dark" || initialTheme === "light") return initialTheme;
+    return DEFAULT_THEME;
+  });
   const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">(() =>
-    themePref === "auto" ? "dark" : themePref,
+    themePref === "light" ? "light" : "dark",
   );
   const [locale, setLocaleState] = useState<Locale>(
     isLocale(initialLocale) ? initialLocale : DEFAULT_LOCALE,

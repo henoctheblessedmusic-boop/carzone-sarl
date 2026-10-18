@@ -9,7 +9,7 @@ export type Locale = "fr" | "en";
 export const THEME_PREFS: ThemePref[] = ["dark", "light", "auto"];
 export const LOCALES: Locale[] = ["fr", "en"];
 export const DEFAULT_LOCALE: Locale = "fr";
-export const DEFAULT_THEME: ThemePref = "auto";
+export const DEFAULT_THEME: ThemePref = "dark";
 
 export const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 
@@ -44,5 +44,5 @@ export function cookieWriteOptions(maxAge = COOKIE_MAX_AGE) {
   return `Path=/; Max-Age=${maxAge}; SameSite=Lax`;
 }
 
-/** Inline script: apply data-theme before paint (avoids FOUC). */
-export const THEME_BOOT_SCRIPT = `(function(){try{var m=document.cookie.match(/(?:^|; )${THEME_COOKIE}=([^;]*)/);var pref=m?decodeURIComponent(m[1]):"${DEFAULT_THEME}";if(pref!=="dark"&&pref!=="light"&&pref!=="auto")pref="${DEFAULT_THEME}";var resolved=pref==="auto"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):pref;document.documentElement.setAttribute("data-theme",resolved);document.documentElement.setAttribute("data-theme-pref",pref);}catch(e){}})();`;
+/** Inline script: apply data-theme before paint (avoids FOUC). Dark theme applied first; manual user choice respected. */
+export const THEME_BOOT_SCRIPT = `(function(){try{var m=document.cookie.match(/(?:^|; )${THEME_COOKIE}=([^;]*)/);var pref=m?decodeURIComponent(m[1]):"${DEFAULT_THEME}";if(pref==="auto"||(pref!=="dark"&&pref!=="light"))pref="${DEFAULT_THEME}";document.documentElement.setAttribute("data-theme",pref);document.documentElement.setAttribute("data-theme-pref",pref);}catch(e){}})();`;

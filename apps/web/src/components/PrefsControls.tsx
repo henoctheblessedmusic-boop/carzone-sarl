@@ -94,7 +94,7 @@ export function PrefsControls({ compact }: { compact?: boolean }) {
     };
   }, [openMenu]);
 
-  const themes: ThemePref[] = ["light", "dark", "auto"];
+  const themes: ThemePref[] = ["dark", "light"];
 
   const themeDropdown =
     mounted && openMenu === "theme" && themeCoords

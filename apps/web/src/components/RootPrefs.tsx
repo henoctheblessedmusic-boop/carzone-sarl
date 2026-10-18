@@ -19,7 +19,8 @@ export async function resolvePrefs(): Promise<{
 }> {
   const jar = await cookies();
   const themeRaw = jar.get(THEME_COOKIE)?.value;
-  const theme: ThemePref = isThemePref(themeRaw) ? themeRaw : DEFAULT_THEME;
+  const theme: ThemePref =
+    themeRaw === "dark" || themeRaw === "light" ? themeRaw : DEFAULT_THEME;
 
   const localeRaw = jar.get(LOCALE_COOKIE)?.value;
   if (isLocale(localeRaw)) {

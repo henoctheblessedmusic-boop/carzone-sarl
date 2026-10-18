@@ -11,7 +11,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const { locale, theme, localeFromCookie } = await resolvePrefs();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html
+      lang={locale}
+      data-theme={theme}
+      data-theme-pref={theme}
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>

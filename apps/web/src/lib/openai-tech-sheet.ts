@@ -69,6 +69,14 @@ export async function getDeepSeekApiKey(): Promise<string | null> {
   return null;
 }
 
+export function getAiGatewayApiKey(): string | null {
+  const key = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_API_KEY;
+  if (key && key.trim().startsWith("vck_")) {
+    return key.trim();
+  }
+  return null;
+}
+
 export async function setOpenAIApiKey(apiKey: string): Promise<void> {
   const cleanKey = apiKey.trim();
   await prisma.systemSetting.upsert({
@@ -266,7 +274,40 @@ Année modèle : ${vehicle.year || 2026}
     }
   }
 
-  // 3. Fallback catalogue usine officiel si aucune IA n'a répondu
+  // 3. Appel Vercel AI Gateway (multi-fournisseurs unifié)
+  const aiGatewayKey = getAiGatewayApiKey();
+  if (!parsed && aiGatewayKey) {
+    try {
+      const gwRes = await fetch("https://ai-gateway.vercel.sh/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${aiGatewayKey}`,
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-4o-mini",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.2,
+        }),
+      });
+      if (gwRes.ok) {
+        const json = await gwRes.json();
+        const raw = json.choices?.[0]?.message?.content;
+        if (raw) {
+          parsed = JSON.parse(raw);
+          usedEngine = "VERCEL_AI_GATEWAY";
+        }
+      }
+    } catch (err) {
+      console.warn("Erreur Vercel AI Gateway:", err);
+    }
+  }
+
+  // 4. Fallback catalogue usine officiel si aucune IA n'a répondu
   if (!parsed) {
     if (catalogEntry) {
       parsed = {

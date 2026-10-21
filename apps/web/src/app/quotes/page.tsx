@@ -48,7 +48,9 @@ export default async function QuotesPage() {
       },
     }),
     prisma.vehicle.findMany({
-      where: { status: "EN_STOCK" },
+      where: {
+        status: { notIn: ["VENDU", "ARCHIVE"] },
+      },
       orderBy: [{ brand: "asc" }, { model: "asc" }],
       select: {
         id: true,
@@ -58,6 +60,7 @@ export default async function QuotesPage() {
         variant: true,
         color: true,
         priceXof: true,
+        status: true,
       },
     }),
     prisma.opportunity.findMany({
@@ -69,6 +72,23 @@ export default async function QuotesPage() {
       },
     }),
   ]);
+
+  // Trier les véhicules pour que le Stock Showroom apparaisse en premier, puis Au Port, En Transit, etc.
+  const statusOrder: Record<string, number> = {
+    EN_MAGASIN: 1,
+    EN_STOCK: 1,
+    AU_PORT: 2,
+    EN_TRANSIT: 3,
+    EN_PRODUCTION: 4,
+    COMMANDE: 5,
+  };
+
+  const sortedVehicles = [...vehicles].sort((a, b) => {
+    const pA = statusOrder[a.status || ""] || 99;
+    const pB = statusOrder[b.status || ""] || 99;
+    if (pA !== pB) return pA - pB;
+    return a.brand.localeCompare(b.brand) || a.model.localeCompare(b.model);
+  });
 
   const quotes: QuoteItem[] = rawQuotes.map((q) => ({
     id: q.id,
@@ -122,7 +142,7 @@ export default async function QuotesPage() {
         quotes={quotes}
         customers={customers}
         articles={articles}
-        vehicles={vehicles}
+        vehicles={sortedVehicles}
         opportunities={opps}
         userRole={user.role}
       />

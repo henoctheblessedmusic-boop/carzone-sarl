@@ -3,10 +3,13 @@ import { RoleService } from "@/lib/role-service";
 import type { Role } from "@/lib/roles";
 
 const PUBLIC_PATHS = [
+  "/",
   "/login",
   "/api/auth/login",
+  "/api/public",
   "/api/vapi/webhook",
   "/brand",
+  "/images",
   "/favicon.ico",
   "/robots.txt",
 ];

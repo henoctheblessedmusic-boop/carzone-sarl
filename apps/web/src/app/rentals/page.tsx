@@ -34,7 +34,7 @@ export default async function RentalsPage() {
       orderBy: { createdAt: "desc" },
     }),
     prisma.customer.findMany({ orderBy: { contactName: "asc" } }),
-    prisma.vehicle.findMany({ where: { status: "EN_STOCK" } }),
+    prisma.vehicle.findMany({ where: { status: { in: ["EN_STOCK", "EN_MAGASIN"] } } }),
   ]);
 
   return (

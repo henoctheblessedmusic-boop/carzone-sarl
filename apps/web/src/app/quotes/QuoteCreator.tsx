@@ -54,6 +54,7 @@ export type VehicleOption = {
   variant?: string | null;
   color: string | null;
   priceXof: number;
+  status?: string | null;
 };
 
 export type OpportunityOption = {
@@ -771,12 +772,29 @@ export function QuoteCreator({
                   }}
                   disabled={isPending}
                 >
-                  <option value="">🚗 + Véhicule en stock...</option>
-                  {vehicles.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.brand} {v.model} ({v.color || "Standard"}) — {formatXof(v.priceXof)}
-                    </option>
-                  ))}
+                  <option value="">🚗 + Véhicule en stock / arrivage...</option>
+                  {vehicles.map((v) => {
+                    const statusBadge =
+                      v.status === "EN_MAGASIN" || v.status === "EN_STOCK"
+                        ? "🟢 Showroom"
+                        : v.status === "AU_PORT"
+                        ? "⚓ Au Port"
+                        : v.status === "EN_TRANSIT"
+                        ? "🚢 En Transit"
+                        : v.status === "EN_PRODUCTION"
+                        ? "🏭 Production"
+                        : v.status === "COMMANDE"
+                        ? "📋 Commande"
+                        : "";
+                    const badgeText = statusBadge ? ` [${statusBadge}]` : "";
+                    const variantText = v.variant ? ` · ${v.variant}` : "";
+                    const colorText = v.color ? ` (${v.color})` : "";
+                    return (
+                      <option key={v.id} value={v.id}>
+                        {v.brand} {v.model}{variantText}{colorText}{badgeText} — {formatXof(v.priceXof)}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 

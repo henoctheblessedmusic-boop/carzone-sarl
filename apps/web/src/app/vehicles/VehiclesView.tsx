@@ -107,7 +107,7 @@ export const STOCK_STAGES = [
   },
   {
     key: "EN_MAGASIN",
-    label: "En Magasin",
+    label: "En Stock au Showroom",
     short: "Showroom Cotonou",
     color: "#10b981",
     bg: "rgba(16, 185, 129, 0.12)",
@@ -231,11 +231,11 @@ export function VehiclesView({
                 <Layers size={18} />
               </span>
               <h2 style={{ fontSize: "1.35rem", fontWeight: 700, margin: 0, color: "#f8fafc" }}>
-                Stock Général CARZONE — Pipeline Logistique & Magasin
+                Stock Général CARZONE — Pipeline Logistique &amp; Showroom
               </h2>
             </div>
             <p style={{ margin: "0.4rem 0 0", fontSize: "0.85rem", color: "var(--ice-text-muted)" }}>
-              Suivi officiel en 5 étapes : Commandes · Stocks en Production · En Transit · Au Port · En Magasin (Showroom)
+              Suivi officiel en 5 étapes : Commandes · Stocks en Production · En Transit · Au Port · Stock Showroom (Disponible)
             </p>
           </div>
 
@@ -513,7 +513,7 @@ export function VehiclesView({
                     <option value="EN_PRODUCTION">2. EN PRODUCTION (Chine)</option>
                     <option value="EN_TRANSIT">3. EN TRANSIT (Maritime)</option>
                     <option value="AU_PORT">4. AU PORT (Port de Cotonou)</option>
-                    <option value="EN_MAGASIN">5. EN MAGASIN (Showroom Cotonou)</option>
+                    <option value="EN_MAGASIN">5. STOCK SHOWROOM (Disponible Cotonou)</option>
                   </select>
 
                   <select name="siteId" className="ox-select" defaultValue={sites[0]?.id || ""} title="Showroom d'affectation">
@@ -1181,7 +1181,7 @@ export function VehiclesView({
                     <option value="EN_PRODUCTION">2. EN PRODUCTION (Chine)</option>
                     <option value="EN_TRANSIT">3. EN TRANSIT (Maritime)</option>
                     <option value="AU_PORT">4. AU PORT (Port de Cotonou)</option>
-                    <option value="EN_MAGASIN">5. EN MAGASIN (Showroom)</option>
+                    <option value="EN_MAGASIN">5. STOCK SHOWROOM (Disponible Cotonou)</option>
                     <option value="RESERVE">RÉSERVÉ (Client)</option>
                     <option value="VENDU">VENDU (Facturé)</option>
                   </select>

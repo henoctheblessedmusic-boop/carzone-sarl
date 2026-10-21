@@ -49,8 +49,8 @@ export default async function DashboardPage() {
   ] = await Promise.all([
     prisma.customer.count({ where: { active: true } }),
     prisma.lead.count(),
-    prisma.vehicle.count({ where: { status: "EN_STOCK" } }),
-    prisma.vehicle.count({ where: { status: { in: ["EN_COMMANDE", "EN_TRANSIT"] } } }),
+    prisma.vehicle.count({ where: { status: { in: ["EN_STOCK", "EN_MAGASIN"] } } }),
+    prisma.vehicle.count({ where: { status: { in: ["COMMANDE", "EN_COMMANDE", "EN_PRODUCTION", "EN_TRANSIT", "AU_PORT"] } } }),
     prisma.quote.findMany({
       select: {
         id: true,
@@ -223,7 +223,7 @@ export default async function DashboardPage() {
     },
     {
       key: "EN_MAGASIN",
-      label: "En Magasin",
+      label: "En Stock au Showroom",
       color: "#10b981",
       bg: "rgba(16, 185, 129, 0.12)",
       border: "rgba(16, 185, 129, 0.35)",
@@ -614,7 +614,7 @@ export default async function DashboardPage() {
               </span>
               <div>
                 <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 750, color: "var(--ice-text-strong)" }}>
-                  Stock Général CARZONE — Pipeline Logistique &amp; Magasin
+                  Stock Général CARZONE — Pipeline Logistique &amp; Showroom
                 </h3>
                 <div style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", marginTop: 2 }}>
                   Inventaire total : <strong style={{ color: "#fff" }}>{totalStockCount} véhicules</strong> · Valeur marchande : <strong style={{ color: "var(--gold)" }}>{formatXof(totalStockValue)}</strong>

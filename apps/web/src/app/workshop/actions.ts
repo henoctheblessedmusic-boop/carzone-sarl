@@ -285,6 +285,109 @@ export async function deleteWorkshopEntry(id: string) {
   revalidatePath("/workshop");
 }
 
+export async function saveWorkshopTabletInspection(payload: {
+  id: string;
+  reportedFault?: string;
+  maintenanceTier?: number;
+  faultMotorTransmission?: string;
+  faultSuspension?: string;
+  faultElectricity?: string;
+  faultOthers?: string;
+  worksDone?: string;
+  partsToOrder?: string;
+  observations?: string;
+  startTime?: string;
+  endTime?: string;
+  technicianName?: string;
+  workshopManagerName?: string;
+  checklistItems?: Array<{
+    taskLabel: string;
+    category?: string;
+    mileageTier: number;
+    status: string;
+    observation?: string;
+  }>;
+  signatures?: Array<{
+    signerRole: string;
+    signerName: string;
+    signatureData: string;
+  }>;
+}) {
+  await requireUser([...WORKSHOP_ALLOWED_ROLES]);
+
+  const { id, checklistItems, signatures, ...fields } = payload;
+
+  // 1. Mettre à jour les données d'intervention de la fiche
+  await prisma.workshopEntry.update({
+    where: { id },
+    data: {
+      reportedFault: fields.reportedFault || null,
+      maintenanceTier: fields.maintenanceTier || null,
+      faultMotorTransmission: fields.faultMotorTransmission || null,
+      faultSuspension: fields.faultSuspension || null,
+      faultElectricity: fields.faultElectricity || null,
+      faultOthers: fields.faultOthers || null,
+      worksDone: fields.worksDone || null,
+      partsToOrder: fields.partsToOrder || null,
+      observations: fields.observations || null,
+      startTime: fields.startTime || null,
+      endTime: fields.endTime || null,
+      technicianName: fields.technicianName || null,
+      workshopManagerName: fields.workshopManagerName || null,
+    },
+  });
+
+  // 2. Mettre à jour les items de la checklist par palier
+  if (checklistItems && checklistItems.length > 0) {
+    await prisma.workshopChecklistItem.deleteMany({
+      where: { workshopEntryId: id },
+    });
+
+    await prisma.workshopChecklistItem.createMany({
+      data: checklistItems.map((item, index) => ({
+        workshopEntryId: id,
+        mileageTier: item.mileageTier,
+        taskLabel: item.taskLabel,
+        category: item.category || null,
+        status: item.status || "NON_EFFECTUE",
+        observation: item.observation || null,
+        checkedAt: item.status === "EFFECTUE" ? new Date() : null,
+        sortOrder: index,
+      })),
+    });
+  }
+
+  // 3. Mettre à jour les signatures numériques
+  if (signatures && signatures.length > 0) {
+    for (const sig of signatures) {
+      if (!sig.signatureData) continue;
+      await prisma.workshopSignature.upsert({
+        where: {
+          workshopEntryId_signerRole: {
+            workshopEntryId: id,
+            signerRole: sig.signerRole,
+          },
+        },
+        create: {
+          workshopEntryId: id,
+          signerRole: sig.signerRole,
+          signerName: sig.signerName,
+          signatureData: sig.signatureData,
+        },
+        update: {
+          signerName: sig.signerName,
+          signatureData: sig.signatureData,
+          signedAt: new Date(),
+        },
+      });
+    }
+  }
+
+  revalidatePath("/workshop");
+  revalidatePath(`/workshop/${id}/fiche-intervention`);
+  revalidatePath(`/workshop/${id}/fiche-entretien`);
+  return { success: true };
+}
 
 export async function seedRealWorkshopData() {
   return { success: false, message: "Le chargement de données de test est désactivé sur Carzone." };

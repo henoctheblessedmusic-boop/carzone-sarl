@@ -17,13 +17,19 @@ import {
   RefreshCw,
   Phone,
   Wrench,
+  Tablet,
+  Printer,
+  CheckSquare,
+  Sparkles,
 } from "lucide-react";
 import {
   importWorkshopExcel,
   createWorkshopEntry,
   updateWorkshopEntry,
   deleteWorkshopEntry,
+  saveWorkshopTabletInspection,
 } from "./actions";
+import { WorkshopTabletModal } from "@/components/workshop/WorkshopTabletModal";
 
 export type WorkshopItem = {
   id: string;
@@ -51,6 +57,32 @@ export type WorkshopItem = {
   exitTime: string | null;
   deliverer: string | null;
   paymentMode: string | null;
+  reportedFault?: string | null;
+  maintenanceTier?: number | null;
+  oilType?: string | null;
+  pv?: string | null;
+  faultMotorTransmission?: string | null;
+  faultSuspension?: string | null;
+  faultElectricity?: string | null;
+  faultOthers?: string | null;
+  partsToOrder?: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
+  technicianName?: string | null;
+  workshopManagerName?: string | null;
+  checklistItems?: Array<{
+    id?: string;
+    mileageTier: number;
+    taskLabel: string;
+    category?: string | null;
+    status: string;
+    observation?: string | null;
+  }>;
+  signatures?: Array<{
+    signerRole: string;
+    signerName: string;
+    signatureData: string;
+  }>;
   createdAt: string;
 };
 
@@ -198,6 +230,7 @@ export function WorkshopView({
   const [showImportModal, setShowImportModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingItem, setEditingItem] = useState<WorkshopItem | null>(null);
+  const [tabletEntry, setTabletEntry] = useState<WorkshopItem | null>(null);
 
   // Next order number (Clé primaire séquentielle auto-générée : 1, 2, 3...)
   const nextOrderNumber = useMemo(() => {
@@ -313,6 +346,11 @@ export function WorkshopView({
       return true;
     });
   }, [entries, search, statusFilter, clientTypeFilter]);
+
+  // Véhicules actuellement en atelier (hors livrés ou annulés)
+  const activeEntries = useMemo(() => {
+    return entries.filter((e) => e.statusCode !== "L" && e.statusCode !== "ANN");
+  }, [entries]);
 
   // Handle Excel Upload
   const handleImportSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -627,6 +665,267 @@ export function WorkshopView({
         ))}
       </div>
 
+      {/* SECTION NOUVEAU MODULE GARAGE & ORDRES DE RÉPARATION (ACCÈS DIRECT FICHES ET TABLETTE) */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.85))",
+          border: "1px solid rgba(245, 158, 11, 0.35)",
+          borderRadius: 16,
+          padding: "20px 24px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+          boxShadow: "0 8px 30px rgba(0, 0, 0, 0.25)",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12 }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+              <span
+                style={{
+                  background: "rgba(245, 158, 11, 0.2)",
+                  color: "#fbbf24",
+                  padding: "3px 10px",
+                  borderRadius: 6,
+                  fontWeight: 800,
+                  fontSize: "0.72rem",
+                  letterSpacing: "0.5px",
+                  textTransform: "uppercase",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 5,
+                  border: "1px solid rgba(245, 158, 11, 0.4)",
+                }}
+              >
+                <Sparkles size={12} />
+                Nouvelles Fiches Techniques &amp; Mode Tablette
+              </span>
+              <span style={{ fontSize: "0.8rem", opacity: 0.65 }}>
+                · Modélisation conforme aux 2 fiches physiques de l&apos;Atelier
+              </span>
+            </div>
+            <h2 style={{ fontSize: "1.2rem", fontWeight: 750, margin: 0, color: "var(--ice-text)" }}>
+              Accès Direct aux Fiches d&apos;Intervention &amp; Checklist des Véhicules en Atelier
+            </h2>
+            <p style={{ margin: "4px 0 0", fontSize: "0.85rem", opacity: 0.75, maxWidth: 900 }}>
+              Vous n&apos;avez plus besoin de chercher dans les colonnes du tableau : voici vos véhicules actuellement en cours de travaux. Cliquez directement sur les boutons ci-dessous pour ouvrir la saisie tactile mécanicien ou imprimer vos fiches normalisées A4.
+            </p>
+          </div>
+
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "6px 12px",
+                borderRadius: 8,
+                background: "rgba(56, 189, 248, 0.12)",
+                color: "#38bdf8",
+                fontSize: "0.78rem",
+                fontWeight: 650,
+                border: "1px solid rgba(56, 189, 248, 0.25)",
+              }}
+            >
+              <Printer size={13} /> 📋 Fiche 1 = OR (4 Pôles)
+            </span>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "6px 12px",
+                borderRadius: 8,
+                background: "rgba(168, 85, 247, 0.12)",
+                color: "#c084fc",
+                fontSize: "0.78rem",
+                fontWeight: 650,
+                border: "1px solid rgba(168, 85, 247, 0.25)",
+              }}
+            >
+              <CheckSquare size={13} /> ⚙️ Fiche 2 = 22 Tâches (5k à 100k)
+            </span>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "6px 12px",
+                borderRadius: 8,
+                background: "rgba(245, 158, 11, 0.12)",
+                color: "#fbbf24",
+                fontSize: "0.78rem",
+                fontWeight: 650,
+                border: "1px solid rgba(245, 158, 11, 0.25)",
+              }}
+            >
+              <Tablet size={13} /> 📱 Tablette = Saisie &amp; Signatures
+            </span>
+          </div>
+        </div>
+
+        {/* Grille des cartes véhicules actifs */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 14 }}>
+          {activeEntries.length === 0 ? (
+            <div style={{ padding: "16px", borderRadius: 10, background: "rgba(255, 255, 255, 0.03)", opacity: 0.6, fontSize: "0.85rem" }}>
+              Aucun véhicule en cours dans l&apos;atelier actuellement.
+            </div>
+          ) : (
+            activeEntries.map((entry) => (
+              <div
+                key={`hero-card-${entry.id}`}
+                style={{
+                  background: "rgba(15, 23, 42, 0.85)",
+                  border: "1px solid rgba(255, 255, 255, 0.12)",
+                  borderRadius: 12,
+                  padding: "16px 18px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12,
+                  boxShadow: "0 4px 16px rgba(0, 0, 0, 0.2)",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span
+                        style={{
+                          background: "rgba(225, 29, 72, 0.2)",
+                          color: "#fb7185",
+                          padding: "3px 8px",
+                          borderRadius: 6,
+                          fontWeight: 800,
+                          fontSize: "0.85rem",
+                          fontFamily: "monospace",
+                          letterSpacing: "0.5px",
+                          border: "1px solid rgba(225, 29, 72, 0.35)",
+                        }}
+                      >
+                        {entry.immatriculation}
+                      </span>
+                      <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>
+                        {entry.brand || "Véhicule"} {entry.model || ""}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: 4 }}>
+                      Client : <strong style={{ color: "var(--ice-text)" }}>{entry.clientName}</strong> {entry.phone ? `(${entry.phone})` : ""} · Compteur : {entry.mileage ? `${entry.mileage.toLocaleString()} KM` : "—"}
+                    </div>
+                  </div>
+
+                  <span
+                    style={{
+                      padding: "3px 8px",
+                      borderRadius: 6,
+                      background: "rgba(245, 158, 11, 0.15)",
+                      color: "#fbbf24",
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                      border: "1px solid rgba(245, 158, 11, 0.3)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    OR #{entry.orNumber || "—"} · En Cours
+                  </span>
+                </div>
+
+                {entry.worksDone && (
+                  <div
+                    style={{
+                      fontSize: "0.78rem",
+                      background: "rgba(255, 255, 255, 0.04)",
+                      padding: "6px 10px",
+                      borderRadius: 6,
+                      borderLeft: "3px solid #f59e0b",
+                      opacity: 0.88,
+                    }}
+                  >
+                    <strong>Diagnostic / Travaux :</strong> {entry.worksDone}
+                  </div>
+                )}
+
+                {/* 3 BOUTONS D'ACTION DIRECTS */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginTop: 2 }}>
+                  <button
+                    type="button"
+                    onClick={() => setTabletEntry(entry)}
+                    style={{
+                      background: "linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.35))",
+                      border: "1px solid rgba(245, 158, 11, 0.5)",
+                      color: "#fbbf24",
+                      padding: "9px 6px",
+                      borderRadius: 8,
+                      fontWeight: 700,
+                      fontSize: "0.78rem",
+                      cursor: "pointer",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: 4,
+                      textAlign: "center",
+                      transition: "transform 0.1s ease",
+                    }}
+                    title="Ouvrir la checklist tactile et signer au doigt"
+                  >
+                    <Tablet size={16} />
+                    <span>📱 Mode Tablette</span>
+                  </button>
+
+                  <a
+                    href={`/workshop/${entry.id}/fiche-intervention`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(14, 165, 233, 0.3))",
+                      border: "1px solid rgba(56, 189, 248, 0.5)",
+                      color: "#7dd3fc",
+                      padding: "9px 6px",
+                      borderRadius: 8,
+                      fontWeight: 700,
+                      fontSize: "0.78rem",
+                      textDecoration: "none",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: 4,
+                      textAlign: "center",
+                    }}
+                    title="Imprimer Fiche 1 (Ordre de Réparation 4 Pôles)"
+                  >
+                    <Printer size={16} />
+                    <span>📋 Fiche 1 (A4)</span>
+                  </a>
+
+                  <a
+                    href={`/workshop/${entry.id}/fiche-entretien`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(147, 51, 234, 0.3))",
+                      border: "1px solid rgba(168, 85, 247, 0.5)",
+                      color: "#d8b4fe",
+                      padding: "9px 6px",
+                      borderRadius: 8,
+                      fontWeight: 700,
+                      fontSize: "0.78rem",
+                      textDecoration: "none",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: 4,
+                      textAlign: "center",
+                    }}
+                    title="Imprimer Fiche 2 (Entretien Systématique 22 points)"
+                  >
+                    <CheckSquare size={16} />
+                    <span>⚙️ Fiche 2 (A4)</span>
+                  </a>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
       {/* Barres de filtres & Recherche */}
       <div
         style={{
@@ -731,6 +1030,7 @@ export function WorkshopView({
               <th style={thStyle}>N° d&apos;Ordre</th>
               <th style={thStyle}>Immatriculation</th>
               <th style={thStyle}>Marque / Modèle</th>
+              <th style={{ ...thStyle, background: "rgba(245, 158, 11, 0.08)", minWidth: 210 }}>⚡ Fiches &amp; Tablette</th>
               <th style={thStyle}>Châssis (VIN)</th>
               <th style={thStyle}>Kilométrage</th>
               <th style={thStyle}>Client</th>
@@ -749,7 +1049,7 @@ export function WorkshopView({
           <tbody>
             {filteredEntries.length === 0 ? (
               <tr>
-                <td colSpan={17} style={{ textAlign: "center", padding: "40px 20px", opacity: 0.6 }}>
+                <td colSpan={18} style={{ textAlign: "center", padding: "40px 20px", opacity: 0.6 }}>
                   Aucun passage de véhicule ne correspond aux critères.
                 </td>
               </tr>
@@ -810,6 +1110,73 @@ export function WorkshopView({
                     <td style={tdStyle}>
                       <div style={{ fontWeight: 600 }}>{row.brand || "—"}</div>
                       <div style={{ fontSize: "0.75rem", opacity: 0.7 }}>{row.model || ""}</div>
+                    </td>
+                    <td style={{ ...tdStyle, whiteSpace: "nowrap" }}>
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                        <button
+                          type="button"
+                          onClick={() => setTabletEntry(row)}
+                          title="Ouvrir sur Tablette (Checklist & Signatures)"
+                          style={{
+                            border: 0,
+                            background: "rgba(245, 158, 11, 0.2)",
+                            cursor: "pointer",
+                            color: "#fbbf24",
+                            padding: "4px 8px",
+                            borderRadius: 6,
+                            fontWeight: 700,
+                            fontSize: "0.72rem",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4,
+                          }}
+                        >
+                          <Tablet size={12} />
+                          Tablette
+                        </button>
+                        <a
+                          href={`/workshop/${row.id}/fiche-intervention`}
+                          target="_blank"
+                          rel="noreferrer"
+                          title="Imprimer Fiche d'Intervention (A4)"
+                          style={{
+                            textDecoration: "none",
+                            background: "rgba(56, 189, 248, 0.2)",
+                            color: "#7dd3fc",
+                            padding: "4px 8px",
+                            borderRadius: 6,
+                            fontWeight: 700,
+                            fontSize: "0.72rem",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4,
+                          }}
+                        >
+                          <Printer size={12} />
+                          Fiche 1
+                        </a>
+                        <a
+                          href={`/workshop/${row.id}/fiche-entretien`}
+                          target="_blank"
+                          rel="noreferrer"
+                          title="Imprimer Fiche d'Entretien Systématique (A4)"
+                          style={{
+                            textDecoration: "none",
+                            background: "rgba(168, 85, 247, 0.2)",
+                            color: "#d8b4fe",
+                            padding: "4px 8px",
+                            borderRadius: 6,
+                            fontWeight: 700,
+                            fontSize: "0.72rem",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4,
+                          }}
+                        >
+                          <CheckSquare size={12} />
+                          Fiche 2
+                        </a>
+                      </div>
                     </td>
                     <td style={tdStyle}>
                       <span style={{ fontFamily: "monospace", fontSize: "0.75rem", opacity: 0.8 }}>
@@ -923,6 +1290,71 @@ export function WorkshopView({
                       )}
                     </td>
                     <td style={{ ...tdStyle, textAlign: "right", whiteSpace: "nowrap" }}>
+                      <button
+                        onClick={() => setTabletEntry(row)}
+                        title="Ouvrir sur Tablette (Checklist & Signatures)"
+                        style={{
+                          border: 0,
+                          background: "rgba(245, 158, 11, 0.15)",
+                          cursor: "pointer",
+                          color: "#f59e0b",
+                          padding: "4px 8px",
+                          borderRadius: 6,
+                          fontWeight: 700,
+                          fontSize: "0.75rem",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                          marginRight: 6,
+                        }}
+                      >
+                        <Tablet size={13} />
+                        Tablette
+                      </button>
+                      <a
+                        href={`/workshop/${row.id}/fiche-intervention`}
+                        target="_blank"
+                        rel="noreferrer"
+                        title="Imprimer Fiche d'Intervention (A4)"
+                        style={{
+                          textDecoration: "none",
+                          background: "rgba(56, 189, 248, 0.15)",
+                          color: "#38bdf8",
+                          padding: "4px 8px",
+                          borderRadius: 6,
+                          fontWeight: 700,
+                          fontSize: "0.75rem",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                          marginRight: 6,
+                        }}
+                      >
+                        <Printer size={13} />
+                        Fiche 1
+                      </a>
+                      <a
+                        href={`/workshop/${row.id}/fiche-entretien`}
+                        target="_blank"
+                        rel="noreferrer"
+                        title="Imprimer Fiche d'Entretien Systématique (A4)"
+                        style={{
+                          textDecoration: "none",
+                          background: "rgba(168, 85, 247, 0.15)",
+                          color: "#c084fc",
+                          padding: "4px 8px",
+                          borderRadius: 6,
+                          fontWeight: 700,
+                          fontSize: "0.75rem",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                          marginRight: 6,
+                        }}
+                      >
+                        <Printer size={13} />
+                        Fiche 2
+                      </a>
                       <button
                         onClick={() => setEditingItem(row)}
                         title="Modifier cette entrée"
@@ -1685,6 +2117,20 @@ export function WorkshopView({
             </form>
           </div>
         </div>
+      )}
+
+      {tabletEntry && (
+        <WorkshopTabletModal
+          isOpen={!!tabletEntry}
+          onClose={() => setTabletEntry(null)}
+          entry={tabletEntry}
+          onSave={async (payload) => {
+            await saveWorkshopTabletInspection(payload);
+            setEntries((prev) =>
+              prev.map((e) => (e.id === payload.id ? { ...e, ...payload } : e))
+            );
+          }}
+        />
       )}
     </div>
   );

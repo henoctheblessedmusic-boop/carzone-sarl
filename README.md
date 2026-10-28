@@ -2,6 +2,8 @@
 
 Application SaaS DMS / ERP sur-mesure développée pour **CARZONE SARL**, concessionnaire automobile et showroom véhicules neufs à Cotonou (Bénin).
 
+> 📘 **Document de Passation Complète :** Pour tout repreneur technique, auditeur ou administrateur système, veuillez consulter le document exhaustif [`PASSATION_COMPLETE.md`](./PASSATION_COMPLETE.md) contenant l'historique complet, les 10 erreurs capitales à éviter, l'architecture BDD/Vercel et le runbook opérationnel.
+
 ---
 
 ## 🚗 À propos de CARZONE SARL

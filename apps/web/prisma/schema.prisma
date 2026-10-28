@@ -597,6 +597,22 @@ model WorkshopEntry {
   exitTime               String?
   deliverer              String?
   paymentMode            String?
+
+  // Champs Fiche 1 (Intervention) & Fiche 2 (Entretien Systématique)
+  reportedFault          String?    // PANNE SIGNALÉE
+  maintenanceTier        Int?       // Palier km : 5000, 10000, 30000, 50000, 100000
+  oilType                String?    // Type de vidange (ex: 5W30, 10W40, Synthèse...)
+  pv                     String?    // Procès Verbal / Réf PV
+  faultMotorTransmission String?    // Section MOTEUR TRANSMISSION
+  faultSuspension        String?    // Section SUSPENSION
+  faultElectricity       String?    // Section ÉLECTRICITÉ & SCANNER
+  faultOthers            String?    // Section AUTRES
+  partsToOrder           String?    // PIÈCES À COMMANDER
+  startTime              String?    // Heure de début d'intervention
+  endTime                String?    // Heure de fin d'intervention
+  technicianName         String?    // Nom du technicien assigné
+  workshopManagerName    String?    // Responsable Atelier
+
   customerId             String?
   customer               Customer?  @relation(fields: [customerId], references: [id])
   vehicleId              String?
@@ -604,8 +620,44 @@ model WorkshopEntry {
   workOrderId            String?    @unique
   workOrder              WorkOrder? @relation(fields: [workOrderId], references: [id])
   partUsages             WorkOrderPartUsage[]
+
+  // Lignes de checklist et signatures numériques tablettes
+  checklistItems         WorkshopChecklistItem[]
+  signatures             WorkshopSignature[]
+
   createdAt              DateTime   @default(now())
   updatedAt              DateTime   @updatedAt
+}
+
+/// Ligne d'exécution de la Fiche d'Entretien Systématique (Checklist)
+model WorkshopChecklistItem {
+  id              String        @id @default(cuid())
+  workshopEntryId String
+  workshopEntry   WorkshopEntry @relation(fields: [workshopEntryId], references: [id], onDelete: Cascade)
+  mileageTier     Int           // 5000, 10000, 30000, 50000, 100000
+  taskLabel       String        // ex: "Vidange huile moteur", "Pose du scanner"
+  category        String?       // "MOTEUR", "FILTRATION", "FREINAGE", etc.
+  status          String        @default("NON_EFFECTUE") // "EFFECTUE", "NON_EFFECTUE", "NON_APPLICABLE"
+  observation     String?       // Notes spécifiques pour cette tâche
+  checkedAt       DateTime?
+  sortOrder       Int           @default(0)
+  createdAt       DateTime      @default(now())
+
+  @@index([workshopEntryId, mileageTier])
+}
+
+/// Signature numérique tactile (Client, Technicien, Responsable Atelier)
+model WorkshopSignature {
+  id              String        @id @default(cuid())
+  workshopEntryId String
+  workshopEntry   WorkshopEntry @relation(fields: [workshopEntryId], references: [id], onDelete: Cascade)
+  signerRole      String        // "CLIENT", "TECHNICIEN", "RESPONSABLE_ATELIER"
+  signerName      String        // Nom de la personne qui a signé
+  signatureData   String        @db.Text // Base64 Canvas PNG/SVG
+  signedAt        DateTime      @default(now())
+  ipAddress       String?
+
+  @@unique([workshopEntryId, signerRole])
 }
 
 model AdminNotification {

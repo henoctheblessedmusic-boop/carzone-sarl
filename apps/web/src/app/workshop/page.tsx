@@ -20,6 +20,10 @@ export default async function WorkshopPage() {
   ]);
 
   const entries = await prisma.workshopEntry.findMany({
+    include: {
+      checklistItems: true,
+      signatures: true,
+    },
     orderBy: { createdAt: "desc" },
   });
 
@@ -125,6 +129,32 @@ export default async function WorkshopPage() {
     exitTime: e.exitTime,
     deliverer: e.deliverer,
     paymentMode: e.paymentMode,
+    reportedFault: e.reportedFault,
+    maintenanceTier: e.maintenanceTier,
+    oilType: e.oilType,
+    pv: e.pv,
+    faultMotorTransmission: e.faultMotorTransmission,
+    faultSuspension: e.faultSuspension,
+    faultElectricity: e.faultElectricity,
+    faultOthers: e.faultOthers,
+    partsToOrder: e.partsToOrder,
+    startTime: e.startTime,
+    endTime: e.endTime,
+    technicianName: e.technicianName,
+    workshopManagerName: e.workshopManagerName,
+    checklistItems: e.checklistItems.map((ci) => ({
+      id: ci.id,
+      mileageTier: ci.mileageTier,
+      taskLabel: ci.taskLabel,
+      category: ci.category,
+      status: ci.status,
+      observation: ci.observation,
+    })),
+    signatures: e.signatures.map((s) => ({
+      signerRole: s.signerRole,
+      signerName: s.signerName,
+      signatureData: s.signatureData,
+    })),
     createdAt: e.createdAt.toISOString(),
   }));
 

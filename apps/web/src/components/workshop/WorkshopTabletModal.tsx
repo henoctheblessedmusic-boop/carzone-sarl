@@ -13,6 +13,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { WORKSHOP_CHECKLIST_TEMPLATE } from "@/lib/workshop-checklist-data";
+import type { WorkshopSignaturePayload, WorkshopTabletPayload } from "@/lib/workshop-types";
 
 export type WorkshopTabletProps = {
   isOpen: boolean;
@@ -55,7 +56,7 @@ export type WorkshopTabletProps = {
       signatureData: string;
     }>;
   };
-  onSave: (payload: any) => Promise<void>;
+  onSave: (payload: WorkshopTabletPayload) => Promise<{ success: boolean; error?: string }>;
 };
 
 // Composant Canvas pour signature tactile autonome
@@ -71,29 +72,83 @@ function SignaturePad({
   onSaveSignature: (role: string, dataUrl: string) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const lastDataUrlRef = useRef<string>(initialData || "");
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(!!initialData);
 
+  const redrawFromDataUrl = (dataUrl: string) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
+    if (!dataUrl) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
+    const img = new window.Image();
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+    img.src = dataUrl;
+  };
+
+  // Redimensionne le buffer selon la taille affichée x devicePixelRatio,
+  // sinon le tracé est flou/décalé sur tablette (buffer fixe != taille CSS réelle).
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
 
-    ctx.strokeStyle = "#0f172a";
-    ctx.lineWidth = 2.5;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
+    const resizeBuffer = () => {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width === 0) return;
+      const dpr = window.devicePixelRatio || 1;
+      const nextWidth = Math.round(rect.width * dpr);
+      const nextHeight = Math.round(140 * dpr);
+      if (canvas.width === nextWidth && canvas.height === nextHeight) return;
 
-    if (initialData) {
-      const img = new window.Image();
-      img.onload = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      };
-      img.src = initialData;
-    }
+      canvas.width = nextWidth;
+      canvas.height = nextHeight;
+
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.strokeStyle = "#0f172a";
+        ctx.lineWidth = 2.5 * (canvas.width / rect.width);
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+      }
+
+      // Le redimensionnement du buffer efface le tracé : on le redessine.
+      redrawFromDataUrl(lastDataUrlRef.current);
+    };
+
+    resizeBuffer();
+
+    const observer = new ResizeObserver(() => resizeBuffer());
+    observer.observe(canvas);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const next = initialData || "";
+    setHasDrawn(!!initialData);
+    if (next === lastDataUrlRef.current) return; // redraw déjà fait par le resize
+    lastDataUrlRef.current = next;
+    redrawFromDataUrl(next);
   }, [initialData]);
+
+  const getScaledPoint = (
+    canvas: HTMLCanvasElement,
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
+  ) => {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+    return {
+      x: (clientX - rect.left) * (canvas.width / rect.width),
+      y: (clientY - rect.top) * (canvas.height / rect.height),
+    };
+  };
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -103,9 +158,7 @@ function SignaturePad({
 
     setIsDrawing(true);
     setHasDrawn(true);
-    const rect = canvas.getBoundingClientRect();
-    const x = "touches" in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = "touches" in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+    const { x, y } = getScaledPoint(canvas, e);
 
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -118,9 +171,7 @@ function SignaturePad({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = "touches" in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = "touches" in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+    const { x, y } = getScaledPoint(canvas, e);
 
     ctx.lineTo(x, y);
     ctx.stroke();
@@ -131,16 +182,22 @@ function SignaturePad({
     setIsDrawing(false);
     const canvas = canvasRef.current;
     if (canvas) {
-      onSaveSignature(signerRole, canvas.toDataURL("image/png"));
+      const dataUrl = canvas.toDataURL("image/png");
+      lastDataUrlRef.current = dataUrl;
+      onSaveSignature(signerRole, dataUrl);
     }
   };
 
   const clearSignature = () => {
+    if (hasDrawn && !window.confirm("Effacer cette signature déjà apposée ?")) {
+      return;
+    }
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    lastDataUrlRef.current = "";
     setHasDrawn(false);
     onSaveSignature(signerRole, "");
   };
@@ -189,8 +246,6 @@ function SignaturePad({
       >
         <canvas
           ref={canvasRef}
-          width={320}
-          height={140}
           style={{ width: "100%", height: 140, display: "block", cursor: "crosshair" }}
           onMouseDown={startDrawing}
           onMouseMove={draw}
@@ -320,9 +375,9 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
               signatureData: signatures["RESPONSABLE_ATELIER"],
             }
           : null,
-      ].filter(Boolean);
+      ].filter((signature): signature is WorkshopSignaturePayload => signature !== null);
 
-      await onSave({
+      const result = await onSave({
         id: entry.id,
         maintenanceTier: selectedTier,
         reportedFault,
@@ -341,10 +396,15 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
         signatures: signaturePayload,
       });
 
+      if (!result.success) {
+        alert(result.error || "Erreur lors de la sauvegarde. Veuillez vérifier vos données.");
+        return;
+      }
+
       onClose();
     } catch (err) {
       console.error("Erreur sauvegarde tablette atelier :", err);
-      alert("Erreur lors de la sauvegarde. Veuillez vérifier vos données.");
+      alert(err instanceof Error ? err.message : "Erreur lors de la sauvegarde. Veuillez vérifier vos données.");
     } finally {
       setIsSubmitting(false);
     }

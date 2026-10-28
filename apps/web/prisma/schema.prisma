@@ -643,6 +643,9 @@ model WorkshopChecklistItem {
   sortOrder       Int           @default(0)
   createdAt       DateTime      @default(now())
 
+  // Une seule ligne par tâche et par fiche : empêche les doublons en cas de
+  // sauvegardes concurrentes (deux tablettes sur la même fiche).
+  @@unique([workshopEntryId, taskLabel])
   @@index([workshopEntryId, mileageTier])
 }
 

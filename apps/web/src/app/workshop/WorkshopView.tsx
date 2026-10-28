@@ -2125,10 +2125,13 @@ export function WorkshopView({
           onClose={() => setTabletEntry(null)}
           entry={tabletEntry}
           onSave={async (payload) => {
-            await saveWorkshopTabletInspection(payload);
-            setEntries((prev) =>
-              prev.map((e) => (e.id === payload.id ? { ...e, ...payload } : e))
-            );
+            const result = await saveWorkshopTabletInspection(payload);
+            if (result.success) {
+              setEntries((prev) =>
+                prev.map((e) => (e.id === payload.id ? { ...e, ...payload } : e))
+              );
+            }
+            return result;
           }}
         />
       )}

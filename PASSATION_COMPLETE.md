@@ -189,16 +189,16 @@ apps/web/
 6. **Studio Motion Design Exécutif :**
    - Module interactif de présentation en 16:9 paysage et format mobile (`PRESENTATION_MOTION_DESIGN.html` et `/presentation`) permettant d'enregistrer des démonstrations vidéos percutantes pour la Direction et les investisseurs.
 
-### 4.2. Ce qui est en Cours d'Achèvement (Chantier Atelier SAV sur Tablettes)
+### 4.2. Chantier Atelier SAV sur Tablettes — Terminé, Commité & Déployé (Octobre 2026)
 
-Des modifications récentes ont été apportées dans l'arborescence locale concernant l'Atelier SAV :
-- **Fiche d'Intervention (Fiche 1) :** Ajout des champs de panne signalée, diagnostic par compartiment (Moteur/Transmission, Suspension, Électricité & Scanner, Autres), pièces à commander, temps d'intervention, nom du technicien et du responsable d'atelier.
-- **Fiche d'Entretien Systématique (Fiche 2) :** Matrice de 17 points de contrôle cumulatifs selon le kilométrage du véhicule (5 000 km, 10 000 km, 30 000 km, 50 000 km, 100 000 km).
-- **Interface Tablette Tactile (`WorkshopTabletModal.tsx`) :** Saisie directe au garage avec émargement par **signatures manuscrites numériques sur Canvas** (Client, Technicien, Responsable Atelier).
-- **Impressions A4 Dédiées :** Composants `FicheInterventionPrint.tsx` et `FicheEntretienSystematiquePrint.tsx`.
+Le chantier est finalisé et livré en production (commit `97589c6`, build Vercel OK, base Neon synchronisée) :
+- **Fiche d'Intervention (Fiche 1) :** panne signalée, diagnostic par compartiment (Moteur/Transmission, Suspension, Électricité & Scanner, Autres), pièces à commander, temps d'intervention, nom du technicien et du responsable d'atelier.
+- **Fiche d'Entretien Systématique (Fiche 2) :** matrice de 17 points de contrôle cumulatifs selon le kilométrage du véhicule (5 000 km, 10 000 km, 30 000 km, 50 000 km, 100 000 km).
+- **Interface Tablette Tactile (`WorkshopTabletModal.tsx`) :** saisie directe au garage avec émargement par **signatures manuscrites numériques sur Canvas** (Client, Technicien, Responsable Atelier).
+- **Impressions A4 Dédiées :** composants `FicheInterventionPrint.tsx` et `FicheEntretienSystematiquePrint.tsx`, routes `/workshop/[id]/fiche-intervention` et `/workshop/[id]/fiche-entretien`.
 
-> [!IMPORTANT]
-> **Action Immédiate pour le Repreneur :** Les nouveaux modèles Prisma `WorkshopChecklistItem` et `WorkshopSignature` sont définis dans `apps/web/prisma/schema.prisma`. Exécutez `npm run db:push` dans `apps/web` pour synchroniser la base PostgreSQL Neon avant de committer ces ajouts.
+> [!NOTE]
+> **Statut au 23 Octobre 2026 :** les modèles Prisma `WorkshopChecklistItem` et `WorkshopSignature` sont synchronisés sur Neon (`npm run db:push` : base déjà en phase), la compilation `npm run build` passe (48 routes) et le commit `97589c6` est poussé sur `main` → déploiement Vercel automatique. Il reste uniquement la validation physique sur tablette tactile (voir Action 2, section 10).
 
 ---
 
@@ -479,9 +479,10 @@ graph TD
     E --> F[Action 6: Bascule DNS topcarzone.com]
 ```
 
-### Action 1 (Immédiate) : Synchroniser la BDD Neon pour l'Atelier SAV
-- Exécuter `npm run db:push` dans `apps/web` pour créer les tables `WorkshopChecklistItem` et `WorkshopSignature`.
-- Vérifier que la compilation Next.js passe sans erreur (`npm run build`).
+### Action 1 (Immédiate) — ✅ FAIT : Synchroniser la BDD Neon pour l'Atelier SAV
+- `npm run db:push` : base Neon déjà en phase avec le schéma (tables `WorkshopChecklistItem` et `WorkshopSignature` présentes).
+- `npm run build` : compilation Next.js validée (48 routes, dont les 2 pages d'impression atelier).
+- Commit `97589c6` poussé sur `main` → déploiement Vercel automatique déclenché.
 
 ### Action 2 (Immédiate) : Valider les Signatures Numériques sur Tablette
 - Ouvrir le module `/workshop` sur une tablette tactile (iPad ou Samsung Galaxy Tab) au garage.

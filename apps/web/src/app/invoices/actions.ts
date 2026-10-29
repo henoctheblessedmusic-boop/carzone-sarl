@@ -5,6 +5,8 @@ import { certifyInvoiceWithMecef } from "@/lib/dgi-emecef";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
+import { getServerMessages } from "@/lib/i18n/server";
+import { invoicesCopy } from "@/lib/i18n/messages/invoices";
 
 export async function addPayment(formData: FormData) {
   const user = await requireUser([
@@ -20,6 +22,8 @@ export async function addPayment(formData: FormData) {
     "COMPTA",
     "ADMIN",
   ]);
+  const { locale } = await getServerMessages();
+  const copy = invoicesCopy[locale];
   const invoiceId = String(formData.get("invoiceId") || "");
   const amountXof = Number(formData.get("amountXof") || 0);
   const method = String(formData.get("method") || "VIREMENT");
@@ -28,8 +32,8 @@ export async function addPayment(formData: FormData) {
   const rawDate = String(formData.get("paidAt") || "");
   const paidAt = rawDate ? new Date(rawDate) : new Date();
 
-  if (!invoiceId) throw new Error("Facture requise");
-  if (amountXof <= 0) throw new Error("Montant invalide");
+  if (!invoiceId) throw new Error(copy.server.invoiceRequired);
+  if (amountXof <= 0) throw new Error(copy.server.invalidAmount);
 
   const invoice = await prisma.invoice.findUniqueOrThrow({
     where: { id: invoiceId },

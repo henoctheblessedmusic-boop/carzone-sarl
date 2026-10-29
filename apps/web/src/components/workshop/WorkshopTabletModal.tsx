@@ -13,6 +13,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { WORKSHOP_CHECKLIST_TEMPLATE } from "@/lib/workshop-checklist-data";
+import { usePrefs } from "@/components/PrefsProvider";
+import { workshopCopy, type WorkshopCopy } from "@/lib/i18n/messages/workshop";
 import type { WorkshopSignaturePayload, WorkshopTabletPayload } from "@/lib/workshop-types";
 
 export type WorkshopTabletProps = {
@@ -64,11 +66,13 @@ function SignaturePad({
   title,
   signerRole,
   initialData,
+  copy,
   onSaveSignature,
 }: {
   title: string;
   signerRole: "CLIENT" | "TECHNICIEN" | "RESPONSABLE_ATELIER";
   initialData?: string;
+  copy: WorkshopCopy["tablet"];
   onSaveSignature: (role: string, dataUrl: string) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -189,7 +193,7 @@ function SignaturePad({
   };
 
   const clearSignature = () => {
-    if (hasDrawn && !window.confirm("Effacer cette signature déjà apposée ?")) {
+    if (hasDrawn && !window.confirm(copy.clearConfirm)) {
       return;
     }
     const canvas = canvasRef.current;
@@ -230,7 +234,7 @@ function SignaturePad({
               cursor: "pointer",
             }}
           >
-            Effacer
+            {copy.clearSignature}
           </button>
         )}
       </div>
@@ -257,13 +261,15 @@ function SignaturePad({
         />
       </div>
       <span style={{ fontSize: "0.72rem", color: "#94a3b8", textAlign: "center" }}>
-        Signez au doigt ou au stylet ci-dessus
+        {copy.signHint}
       </span>
     </div>
   );
 }
 
 export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: WorkshopTabletProps) {
+  const { locale } = usePrefs();
+  const copy = workshopCopy[locale].tablet;
   const [activeTab, setActiveTab] = useState<"CHECKLIST" | "INTERVENTION" | "SIGNATURES">("CHECKLIST");
   const [selectedTier, setSelectedTier] = useState<number>(entry.maintenanceTier || 5000);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -397,14 +403,14 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
       });
 
       if (!result.success) {
-        alert(result.error || "Erreur lors de la sauvegarde. Veuillez vérifier vos données.");
+        alert(result.error || copy.saveError);
         return;
       }
 
       onClose();
     } catch (err) {
       console.error("Erreur sauvegarde tablette atelier :", err);
-      alert(err instanceof Error ? err.message : "Erreur lors de la sauvegarde. Veuillez vérifier vos données.");
+      alert(err instanceof Error ? err.message : copy.saveError);
     } finally {
       setIsSubmitting(false);
     }
@@ -476,7 +482,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <h2 style={{ fontSize: "1.15rem", fontWeight: 800, margin: 0, color: "#ffffff" }}>
-                  Fiche Technique Atelier · OR #{entry.orNumber || "-"}
+                  {copy.title(entry.orNumber || "-")}
                 </h2>
                 <span
                   style={{
@@ -494,7 +500,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 </span>
               </div>
               <p style={{ margin: "2px 0 0", fontSize: "0.82rem", opacity: 0.75 }}>
-                {entry.brand} {entry.model} · Client : <strong style={{ color: "#ffffff" }}>{entry.clientName}</strong> · Compteur : <strong style={{ color: "#ffffff" }}>{entry.mileage ? `${entry.mileage.toLocaleString()} KM` : "-"}</strong>
+                {entry.brand} {entry.model} · {copy.client} <strong style={{ color: "#ffffff" }}>{entry.clientName}</strong> · {copy.mileage} <strong style={{ color: "#ffffff" }}>{entry.mileage ? `${entry.mileage.toLocaleString()} KM` : "-"}</strong>
               </p>
             </div>
           </div>
@@ -517,9 +523,9 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 border: "1px solid rgba(56, 189, 248, 0.3)",
                 textDecoration: "none",
               }}
-              title="Aperçu & Impression Fiche 1 A4"
+              title={copy.fiche1Title}
             >
-              <Printer size={14} /> Fiche 1
+              <Printer size={14} /> {copy.fiche1}
             </a>
             <a
               href={`/workshop/${entry.id}/fiche-entretien`}
@@ -538,9 +544,9 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 border: "1px solid rgba(168, 85, 247, 0.3)",
                 textDecoration: "none",
               }}
-              title="Aperçu & Impression Fiche 2 A4"
+              title={copy.fiche2Title}
             >
-              <Printer size={14} /> Fiche 2
+              <Printer size={14} /> {copy.fiche2}
             </a>
             <button
               type="button"
@@ -593,7 +599,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
             }}
           >
             <CheckCircle2 size={16} />
-            Checklist Paliers ({selectedTier.toLocaleString()} KM)
+            {copy.tabChecklist(selectedTier.toLocaleString())}
           </button>
           <button
             type="button"
@@ -615,7 +621,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
             }}
           >
             <Wrench size={16} />
-            Fiche Intervention (4 Pôles)
+            {copy.tabIntervention}
           </button>
           <button
             type="button"
@@ -637,7 +643,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
             }}
           >
             <PenTool size={16} />
-            Signatures Tactiles
+            {copy.tabSignatures}
           </button>
         </div>
 
@@ -657,7 +663,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
                   <span style={{ fontSize: "0.8rem", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                    Sélectionnez le Palier d&apos;Entretien Réalisé :
+                    {copy.tierTitle}
                   </span>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button
@@ -674,7 +680,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                         cursor: "pointer",
                       }}
                     >
-                      Tout cocher &quot;Effectué&quot;
+                      {copy.checkAll}
                     </button>
                     <button
                       type="button"
@@ -690,7 +696,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                         cursor: "pointer",
                       }}
                     >
-                      Réinitialiser
+                      {copy.reset}
                     </button>
                   </div>
                 </div>
@@ -719,7 +725,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                       >
                         <span style={{ fontSize: "0.95rem" }}>{tier.toLocaleString()} KM</span>
                         <span style={{ fontSize: "0.72rem", opacity: 0.8, textTransform: "uppercase" }}>
-                          {tier === 5000 ? "Vidange standard" : tier === 10000 ? "Filtres + Vidange" : "Grand entretien"}
+                          {tier === 5000 ? copy.tierStandard : tier === 10000 ? copy.tierFilters : copy.tierMajor}
                         </span>
                       </button>
                     );
@@ -749,8 +755,8 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                     textTransform: "uppercase",
                   }}
                 >
-                  <span>Matrice d&apos;intervention ({WORKSHOP_CHECKLIST_TEMPLATE.length} points de contrôle)</span>
-                  <span style={{ color: "#fbbf24" }}>Palier actif : {selectedTier.toLocaleString()} KM</span>
+                  <span>{copy.matrixTitle(WORKSHOP_CHECKLIST_TEMPLATE.length)}</span>
+                  <span style={{ color: "#fbbf24" }}>{copy.activeTier(selectedTier.toLocaleString())}</span>
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column" }}>
@@ -798,7 +804,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                           </div>
                           <input
                             type="text"
-                            placeholder="Observation ou mesure (ex: 2.3 bars, plaquettes 80% usées...)"
+                            placeholder={copy.observationPlaceholder}
                             value={state.observation}
                             onChange={(e) => handleTaskObsChange(task.taskLabel, e.target.value)}
                             style={{
@@ -835,7 +841,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                               color: state.status === "EFFECTUE" ? "#ffffff" : "#94a3b8",
                             }}
                           >
-                            <CheckCircle2 size={14} /> Effectué
+                            <CheckCircle2 size={14} /> {copy.done}
                           </button>
 
                           <button
@@ -855,7 +861,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                               color: state.status === "NON_EFFECTUE" ? "#ffffff" : "#94a3b8",
                             }}
                           >
-                            <XCircle size={14} /> Non fait
+                            <XCircle size={14} /> {copy.notDone}
                           </button>
 
                           <button
@@ -871,7 +877,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                               color: state.status === "NON_APPLICABLE" ? "#ffffff" : "#64748b",
                             }}
                           >
-                            N/A
+                            {copy.notApplicable}
                           </button>
                         </div>
                       </div>
@@ -895,13 +901,13 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 }}
               >
                 <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", marginBottom: 6 }}>
-                  Panne Signalée à la réception :
+                  {copy.faultLabel}
                 </label>
                 <textarea
                   rows={2}
                   value={reportedFault}
                   onChange={(e) => setReportedFault(e.target.value)}
-                  placeholder="Décrivez les bruits suspects, symptômes ou pannes signalées par le client..."
+                  placeholder={copy.faultPlaceholder}
                   style={{
                     width: "100%",
                     backgroundColor: "rgba(0, 0, 0, 0.4)",
@@ -920,56 +926,56 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div style={poleBoxStyle}>
                   <label style={poleLabelStyle}>
-                    <span>1. Moteur &amp; Transmission</span>
-                    <span style={{ color: "#fbbf24", fontSize: "0.72rem" }}>Pôle Moteur</span>
+                    <span>{copy.pole1Title}</span>
+                    <span style={{ color: "#fbbf24", fontSize: "0.72rem" }}>{copy.pole1Tag}</span>
                   </label>
                   <textarea
                     rows={2}
                     value={faultMotorTransmission}
                     onChange={(e) => setFaultMotorTransmission(e.target.value)}
-                    placeholder="Vidange moteur, filtres, courroie, boîte de vitesse, pont..."
+                    placeholder={copy.pole1Placeholder}
                     style={poleTextareaStyle}
                   />
                 </div>
 
                 <div style={poleBoxStyle}>
                   <label style={poleLabelStyle}>
-                    <span>2. Suspension &amp; Train Roulant</span>
-                    <span style={{ color: "#fbbf24", fontSize: "0.72rem" }}>Pôle Châssis</span>
+                    <span>{copy.pole2Title}</span>
+                    <span style={{ color: "#fbbf24", fontSize: "0.72rem" }}>{copy.pole2Tag}</span>
                   </label>
                   <textarea
                     rows={2}
                     value={faultSuspension}
                     onChange={(e) => setFaultSuspension(e.target.value)}
-                    placeholder="Amortisseurs, rotules, triangles, silentblocs, pneus, freinage..."
+                    placeholder={copy.pole2Placeholder}
                     style={poleTextareaStyle}
                   />
                 </div>
 
                 <div style={poleBoxStyle}>
                   <label style={poleLabelStyle}>
-                    <span>3. Électricité &amp; Scanner</span>
-                    <span style={{ color: "#fbbf24", fontSize: "0.72rem" }}>Diagnostic OBD</span>
+                    <span>{copy.pole3Title}</span>
+                    <span style={{ color: "#fbbf24", fontSize: "0.72rem" }}>{copy.pole3Tag}</span>
                   </label>
                   <textarea
                     rows={2}
                     value={faultElectricity}
                     onChange={(e) => setFaultElectricity(e.target.value)}
-                    placeholder="Pose scanner diagnostic, batterie, alternateur, capteurs, feux..."
+                    placeholder={copy.pole3Placeholder}
                     style={poleTextareaStyle}
                   />
                 </div>
 
                 <div style={poleBoxStyle}>
                   <label style={poleLabelStyle}>
-                    <span>4. Autres (Clim, Tôlerie, etc.)</span>
-                    <span style={{ color: "#fbbf24", fontSize: "0.72rem" }}>Accessoires</span>
+                    <span>{copy.pole4Title}</span>
+                    <span style={{ color: "#fbbf24", fontSize: "0.72rem" }}>{copy.pole4Tag}</span>
                   </label>
                   <textarea
                     rows={2}
                     value={faultOthers}
                     onChange={(e) => setFaultOthers(e.target.value)}
-                    placeholder="Recharge climatisation, carrosserie, serrures, lavage..."
+                    placeholder={copy.pole4Placeholder}
                     style={poleTextareaStyle}
                   />
                 </div>
@@ -979,26 +985,26 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div style={poleBoxStyle}>
                   <label style={{ ...poleLabelStyle, color: "#34d399" }}>
-                    Travaux Effectués (Bilan d&apos;intervention) :
+                    {copy.worksLabel}
                   </label>
                   <textarea
                     rows={3}
                     value={worksDone}
                     onChange={(e) => setWorksDone(e.target.value)}
-                    placeholder="Détail des réparations effectuées par le technicien..."
+                    placeholder={copy.worksPlaceholder}
                     style={poleTextareaStyle}
                   />
                 </div>
 
                 <div style={poleBoxStyle}>
                   <label style={{ ...poleLabelStyle, color: "#fbbf24" }}>
-                    Pièces consommées / À commander au Magasin :
+                    {copy.partsLabel}
                   </label>
                   <textarea
                     rows={3}
                     value={partsToOrder}
                     onChange={(e) => setPartsToOrder(e.target.value)}
-                    placeholder="Références des pièces demandées au magasinier..."
+                    placeholder={copy.partsPlaceholder}
                     style={poleTextareaStyle}
                   />
                 </div>
@@ -1018,7 +1024,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
               >
                 <div>
                   <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "#94a3b8", marginBottom: 4 }}>
-                    Heure de début :
+                    {copy.startLabel}
                   </label>
                   <input
                     type="time"
@@ -1030,7 +1036,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "#94a3b8", marginBottom: 4 }}>
-                    Heure de fin :
+                    {copy.endLabel}
                   </label>
                   <input
                     type="time"
@@ -1042,26 +1048,26 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "#94a3b8", marginBottom: 4 }}>
-                    Technicien assigné :
+                    {copy.technicianLabel}
                   </label>
                   <input
                     type="text"
                     value={technicianName}
                     onChange={(e) => setTechnicianName(e.target.value)}
-                    placeholder="Nom du mécanicien"
+                    placeholder={copy.technicianPlaceholder}
                     style={inputStyle}
                   />
                 </div>
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "#94a3b8", marginBottom: 4 }}>
-                    Responsable atelier :
+                    {copy.managerLabel}
                   </label>
                   <input
                     type="text"
                     value={workshopManagerName}
                     onChange={(e) => setWorkshopManagerName(e.target.value)}
-                    placeholder="Nom du chef d'atelier"
+                    placeholder={copy.managerPlaceholder}
                     style={inputStyle}
                   />
                 </div>
@@ -1087,26 +1093,29 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
               >
                 <AlertCircle size={20} style={{ flexShrink: 0 }} />
                 <p style={{ margin: 0 }}>
-                  Ces signatures sont conformes aux cadres officiels de validation Carzone. Elles seront automatiquement incrustées sur les fiches A4 imprimées et dans l&apos;archivage PDF du véhicule.
+                  {copy.signatureNote}
                 </p>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
                 <SignaturePad
-                  title="1. Accord Client"
+                  title={copy.padClient}
                   signerRole="CLIENT"
+                  copy={copy}
                   initialData={signatures["CLIENT"]}
                   onSaveSignature={handleSignatureSave}
                 />
                 <SignaturePad
-                  title="2. Technicien Exécutant"
+                  title={copy.padTechnician}
                   signerRole="TECHNICIEN"
+                  copy={copy}
                   initialData={signatures["TECHNICIEN"]}
                   onSaveSignature={handleSignatureSave}
                 />
                 <SignaturePad
-                  title="3. Responsable Atelier"
+                  title={copy.padManager}
                   signerRole="RESPONSABLE_ATELIER"
+                  copy={copy}
                   initialData={signatures["RESPONSABLE_ATELIER"]}
                   onSaveSignature={handleSignatureSave}
                 />
@@ -1142,7 +1151,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
               cursor: "pointer",
             }}
           >
-            Fermer sans enregistrer
+            {copy.closeNoSave}
           </button>
 
           <button
@@ -1166,7 +1175,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
             }}
           >
             <Save size={16} />
-            {isSubmitting ? "Enregistrement en cours..." : "Valider & Enregistrer Fiche"}
+            {isSubmitting ? copy.saveRunning : copy.save}
           </button>
         </div>
       </div>

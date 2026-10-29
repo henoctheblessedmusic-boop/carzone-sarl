@@ -539,7 +539,7 @@ const fr: ClientsCopy = {
     noActivity: "Nouveau",
     toggleTitle: "Cliquer pour changer le statut",
     viewTitle: "Fiche 360°",
-    documentsTitle: "Dossier documents et immatriculation (CIP, IFU...)",
+    documentsTitle: "Pièces du dossier et immatriculation (CIP, IFU...)",
     editTitle: "Modifier la fiche",
     deleteTitle: "Supprimer ou désactiver",
   },
@@ -909,7 +909,7 @@ const en: ClientsCopy = {
     uploadFirst: "Upload at least one document for this customer first (CIP, IFU...).",
     transferSuccess: "Customer file and KYC documents sent to Registration (ANaTT).",
     deleteWithHistory:
-      "This customer has quotes or invoices. We'll deactivate them to keep the accounting history. Confirm?",
+      "This customer has quotes or invoices. We'll deactivate the account to keep the accounting history. Confirm?",
     deletePermanent: (name) => `Permanently delete customer "${name}"?`,
   },
   csv: {

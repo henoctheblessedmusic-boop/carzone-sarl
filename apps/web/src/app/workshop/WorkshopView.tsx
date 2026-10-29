@@ -30,6 +30,13 @@ import {
   saveWorkshopTabletInspection,
 } from "./actions";
 import { WorkshopTabletModal } from "@/components/workshop/WorkshopTabletModal";
+import { usePrefs } from "@/components/PrefsProvider";
+import {
+  WORKSHOP_PAYMENT_MODES,
+  paymentModeLabel,
+  workshopCopy,
+  workshopStatusLabel,
+} from "@/lib/i18n/messages/workshop";
 
 export type WorkshopItem = {
   id: string;
@@ -86,76 +93,58 @@ export type WorkshopItem = {
   createdAt: string;
 };
 
+// Codes de statut et couleurs d'affichage. Les libellés viennent de workshopCopy
+// (lib/i18n/messages/workshop.ts) pour rester traduits FR/EN/ZH.
 const STATUS_CONFIG: Record<
   string,
-  { label: string; full: string; bg: string; text: string; border: string }
+  { bg: string; text: string; border: string }
 > = {
   L: {
-    label: "L",
-    full: "Livré",
     bg: "rgba(34, 197, 94, 0.15)",
     text: "#4ade80",
     border: "rgba(34, 197, 94, 0.3)",
   },
   C: {
-    label: "C",
-    full: "En Cours",
     bg: "rgba(59, 130, 246, 0.15)",
     text: "#60a5fa",
     border: "rgba(59, 130, 246, 0.3)",
   },
   AT: {
-    label: "AT",
-    full: "Attente Pièce",
     bg: "rgba(234, 179, 8, 0.15)",
     text: "#facc15",
     border: "rgba(234, 179, 8, 0.3)",
   },
   AC: {
-    label: "AC",
-    full: "Attente Accord Client",
     bg: "rgba(249, 115, 22, 0.15)",
     text: "#fb923c",
     border: "rgba(249, 115, 22, 0.3)",
   },
   F: {
-    label: "F",
-    full: "Fini (Prêt)",
     bg: "rgba(20, 184, 166, 0.15)",
     text: "#2dd4bf",
     border: "rgba(20, 184, 166, 0.3)",
   },
   D: {
-    label: "D",
-    full: "Diagnostic",
     bg: "rgba(168, 85, 247, 0.15)",
     text: "#c084fc",
     border: "rgba(168, 85, 247, 0.3)",
   },
   ATD: {
-    label: "ATD",
-    full: "Attente Décaissement",
     bg: "rgba(244, 63, 94, 0.15)",
     text: "#fb7185",
     border: "rgba(244, 63, 94, 0.3)",
   },
   AF: {
-    label: "AF",
-    full: "À Faire",
     bg: "rgba(148, 163, 184, 0.15)",
     text: "#cbd5e1",
     border: "rgba(148, 163, 184, 0.3)",
   },
   HSAV: {
-    label: "HSAV",
-    full: "Hors SAV",
     bg: "rgba(100, 116, 139, 0.15)",
     text: "#94a3b8",
     border: "rgba(100, 116, 139, 0.3)",
   },
   ANN: {
-    label: "ANN",
-    full: "Annulé (Fichier / Travaux annulés)",
     bg: "rgba(239, 68, 68, 0.15)",
     text: "#f87171",
     border: "rgba(239, 68, 68, 0.3)",
@@ -221,6 +210,9 @@ export function WorkshopView({
   receptionists?: string[];
 }) {
   const [entries, setEntries] = useState<WorkshopItem[]>(initialEntries);
+  const { locale } = usePrefs();
+  const copy = workshopCopy[locale];
+  const t = copy.list;
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [clientTypeFilter, setClientTypeFilter] = useState("ALL");
@@ -357,7 +349,7 @@ export function WorkshopView({
     e.preventDefault();
     if (!importFile) return;
 
-    setImportStatus("Importation et structuration de la base de données en cours...");
+    setImportStatus(t.importModal.running);
     setImportError(null);
 
     const formData = new FormData();
@@ -366,7 +358,7 @@ export function WorkshopView({
     startTransition(async () => {
       try {
         const res = await importWorkshopExcel(formData);
-        setImportStatus(`Succès ! ${res.count} lignes importées depuis la feuille "${res.sheetName}".`);
+        setImportStatus(t.importModal.success(res.count, res.sheetName));
         setTimeout(() => {
           setShowImportModal(false);
           setImportStatus(null);
@@ -374,20 +366,20 @@ export function WorkshopView({
           window.location.reload();
         }, 1200);
       } catch (err: unknown) {
-        setImportError(err instanceof Error ? err.message : "Erreur lors de l'import");
+        setImportError(err instanceof Error ? err.message : t.errors.importFailed);
         setImportStatus(null);
       }
     });
   };
 
   const handleDelete = (id: string, immat: string) => {
-    if (!confirm(`Supprimer le passage du véhicule ${immat} ?`)) return;
+    if (!confirm(t.deleteConfirm(immat))) return;
     startTransition(async () => {
       try {
         await deleteWorkshopEntry(id);
         setEntries((prev) => prev.filter((e) => e.id !== id));
       } catch (err: unknown) {
-        alert(err instanceof Error ? err.message : "Erreur suppression");
+        alert(err instanceof Error ? err.message : t.errors.deleteFailed);
       }
     });
   };
@@ -422,7 +414,7 @@ export function WorkshopView({
               <FileSpreadsheet size={24} />
             </span>
             <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 700, color: "var(--ice-text)" }}>
-              Historique de passage des véhicules au SAV
+              {t.title}
             </h1>
             <span
               style={{
@@ -438,8 +430,7 @@ export function WorkshopView({
             </span>
           </div>
           <p style={{ margin: "6px 0 0 0", opacity: 0.75, fontSize: "0.875rem", maxWidth: 680 }}>
-            Gestion centralisée de l&apos;atelier garage : téléversez directement vos anciens classeurs Excel
-            programmés pour constituer et synchroniser la base de données de l&apos;entreprise.
+            {t.subtitle}
           </p>
         </div>
 
@@ -464,7 +455,7 @@ export function WorkshopView({
             }}
           >
             <UploadCloud size={17} />
-            Téléverser Fichier Excel SAV
+            {t.importExcel}
           </button>
 
           {/* Exporter Excel */}
@@ -486,13 +477,13 @@ export function WorkshopView({
             }}
           >
             <Download size={16} />
-            Exporter Excel (.xlsx)
+            {t.exportExcel}
           </a>
 
           {/* Modèle Excel Vierge */}
           <a
             href="/api/workshop/template"
-            title="Télécharger le modèle Excel officiel préformaté"
+            title={t.templateTitle}
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -509,7 +500,7 @@ export function WorkshopView({
             }}
           >
             <FileSpreadsheet size={15} />
-            Gabarit
+            {t.template}
           </a>
 
           {/* Lien direct Magasin Pièces & Réf. Croisées */}
@@ -530,7 +521,7 @@ export function WorkshopView({
             }}
           >
             <Wrench size={16} />
-            Pièces & Réf. Croisées
+            {t.partsLink}
           </a>
 
           {/* Nouvelle Entrée */}
@@ -555,7 +546,7 @@ export function WorkshopView({
             }}
           >
             <Plus size={17} />
-            Nouvelle Entrée
+            {t.newEntry}
           </button>
 
           
@@ -572,55 +563,55 @@ export function WorkshopView({
       >
         <div style={kpiCardStyle}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: "0.78rem", opacity: 0.7, textTransform: "uppercase" }}>Total Passages</span>
+            <span style={{ fontSize: "0.78rem", opacity: 0.7, textTransform: "uppercase" }}>{t.kpiTotal}</span>
             <Car size={16} style={{ color: "#d4af37" }} />
           </div>
           <span style={{ fontSize: "1.75rem", fontWeight: 800, marginTop: 4 }}>{stats.total}</span>
-          <span style={{ fontSize: "0.75rem", opacity: 0.6 }}>En base de données</span>
+          <span style={{ fontSize: "0.75rem", opacity: 0.6 }}>{t.kpiTotalHint}</span>
         </div>
 
         <div style={kpiCardStyle}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: "0.78rem", opacity: 0.7, textTransform: "uppercase" }}>En cours [C]</span>
+            <span style={{ fontSize: "0.78rem", opacity: 0.7, textTransform: "uppercase" }}>{t.kpiOngoing}</span>
             <Clock size={16} style={{ color: "#60a5fa" }} />
           </div>
           <span style={{ fontSize: "1.75rem", fontWeight: 800, marginTop: 4, color: "#60a5fa" }}>
             {stats.enCours}
           </span>
-          <span style={{ fontSize: "0.75rem", opacity: 0.6 }}>Véhicules en atelier</span>
+          <span style={{ fontSize: "0.75rem", opacity: 0.6 }}>{t.kpiOngoingHint}</span>
         </div>
 
         <div style={kpiCardStyle}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: "0.78rem", opacity: 0.7, textTransform: "uppercase" }}>Attente Pièce [AT]</span>
+            <span style={{ fontSize: "0.78rem", opacity: 0.7, textTransform: "uppercase" }}>{t.kpiPart}</span>
             <AlertCircle size={16} style={{ color: "#facc15" }} />
           </div>
           <span style={{ fontSize: "1.75rem", fontWeight: 800, marginTop: 4, color: "#facc15" }}>
             {stats.attentePiece}
           </span>
-          <span style={{ fontSize: "0.75rem", opacity: 0.6 }}>En commande pièces</span>
+          <span style={{ fontSize: "0.75rem", opacity: 0.6 }}>{t.kpiPartHint}</span>
         </div>
 
         <div style={kpiCardStyle}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: "0.78rem", opacity: 0.7, textTransform: "uppercase" }}>Attente Accord [AC]</span>
+            <span style={{ fontSize: "0.78rem", opacity: 0.7, textTransform: "uppercase" }}>{t.kpiApproval}</span>
             <AlertCircle size={16} style={{ color: "#fb923c" }} />
           </div>
           <span style={{ fontSize: "1.75rem", fontWeight: 800, marginTop: 4, color: "#fb923c" }}>
             {stats.attenteAccord}
           </span>
-          <span style={{ fontSize: "0.75rem", opacity: 0.6 }}>Devis en attente client</span>
+          <span style={{ fontSize: "0.75rem", opacity: 0.6 }}>{t.kpiApprovalHint}</span>
         </div>
 
         <div style={kpiCardStyle}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: "0.78rem", opacity: 0.7, textTransform: "uppercase" }}>Livrés [L]</span>
+            <span style={{ fontSize: "0.78rem", opacity: 0.7, textTransform: "uppercase" }}>{t.kpiDelivered}</span>
             <CheckCircle2 size={16} style={{ color: "#4ade80" }} />
           </div>
           <span style={{ fontSize: "1.75rem", fontWeight: 800, marginTop: 4, color: "#4ade80" }}>
             {stats.livrés}
           </span>
-          <span style={{ fontSize: "0.75rem", opacity: 0.6 }}>Sorties validées</span>
+          <span style={{ fontSize: "0.75rem", opacity: 0.6 }}>{t.kpiDeliveredHint}</span>
         </div>
       </div>
 
@@ -639,7 +630,7 @@ export function WorkshopView({
         }}
       >
         <span style={{ fontWeight: 700, color: "var(--gold, #d4af37)", marginRight: 6 }}>
-          LÉGENDES STATUTS :
+          {t.legendTitle}
         </span>
         {Object.entries(STATUS_CONFIG).map(([code, conf]) => (
           <button
@@ -659,8 +650,8 @@ export function WorkshopView({
               cursor: "pointer",
             }}
           >
-            <span>{conf.label}</span>
-            <span style={{ opacity: 0.85 }}>= {conf.full}</span>
+            <span>{code}</span>
+            <span style={{ opacity: 0.85 }}>= {workshopStatusLabel(copy, code)}</span>
           </button>
         ))}
       </div>
@@ -698,17 +689,17 @@ export function WorkshopView({
                 }}
               >
                 <Sparkles size={12} />
-                Nouvelles Fiches Techniques &amp; Mode Tablette
+                {t.heroBadge}
               </span>
               <span style={{ fontSize: "0.8rem", opacity: 0.65 }}>
-                · Modélisation conforme aux 2 fiches physiques de l&apos;Atelier
+                · {t.heroBadgeHint}
               </span>
             </div>
             <h2 style={{ fontSize: "1.2rem", fontWeight: 750, margin: 0, color: "var(--ice-text)" }}>
-              Accès Direct aux Fiches d&apos;Intervention &amp; Checklist des Véhicules en Atelier
+              {t.heroTitle}
             </h2>
             <p style={{ margin: "4px 0 0", fontSize: "0.85rem", opacity: 0.75, maxWidth: 900 }}>
-              Vous n&apos;avez plus besoin de chercher dans les colonnes du tableau : voici vos véhicules actuellement en cours de travaux. Cliquez directement sur les boutons ci-dessous pour ouvrir la saisie tactile mécanicien ou imprimer vos fiches normalisées A4.
+              {t.heroSubtitle}
             </p>
           </div>
 
@@ -727,7 +718,7 @@ export function WorkshopView({
                 border: "1px solid rgba(56, 189, 248, 0.25)",
               }}
             >
-              <Printer size={13} /> 📋 Fiche 1 = OR (4 Pôles)
+              <Printer size={13} /> {t.heroChip1}
             </span>
             <span
               style={{
@@ -743,7 +734,7 @@ export function WorkshopView({
                 border: "1px solid rgba(168, 85, 247, 0.25)",
               }}
             >
-              <CheckSquare size={13} /> ⚙️ Fiche 2 = 22 Tâches (5k à 100k)
+              <CheckSquare size={13} /> {t.heroChip2}
             </span>
             <span
               style={{
@@ -759,7 +750,7 @@ export function WorkshopView({
                 border: "1px solid rgba(245, 158, 11, 0.25)",
               }}
             >
-              <Tablet size={13} /> 📱 Tablette = Saisie &amp; Signatures
+              <Tablet size={13} /> {t.heroChip3}
             </span>
           </div>
         </div>
@@ -768,7 +759,7 @@ export function WorkshopView({
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 14 }}>
           {activeEntries.length === 0 ? (
             <div style={{ padding: "16px", borderRadius: 10, background: "rgba(255, 255, 255, 0.03)", opacity: 0.6, fontSize: "0.85rem" }}>
-              Aucun véhicule en cours dans l&apos;atelier actuellement.
+              {t.heroEmpty}
             </div>
           ) : (
             activeEntries.map((entry) => (
@@ -804,11 +795,11 @@ export function WorkshopView({
                         {entry.immatriculation}
                       </span>
                       <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>
-                        {entry.brand || "Véhicule"} {entry.model || ""}
+                        {entry.brand || t.heroVehicleFallback} {entry.model || ""}
                       </span>
                     </div>
                     <div style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: 4 }}>
-                      Client : <strong style={{ color: "var(--ice-text)" }}>{entry.clientName}</strong> {entry.phone ? `(${entry.phone})` : ""} · Compteur : {entry.mileage ? `${entry.mileage.toLocaleString()} KM` : "-"}
+                      {t.heroClient} <strong style={{ color: "var(--ice-text)" }}>{entry.clientName}</strong> {entry.phone ? `(${entry.phone})` : ""} · {t.heroMileage} {entry.mileage ? `${entry.mileage.toLocaleString()} KM` : "-"}
                     </div>
                   </div>
 
@@ -824,7 +815,7 @@ export function WorkshopView({
                       whiteSpace: "nowrap",
                     }}
                   >
-                    OR #{entry.orNumber || "-"} · En Cours
+                    OR #{entry.orNumber || "-"} · {t.heroOngoing}
                   </span>
                 </div>
 
@@ -839,7 +830,7 @@ export function WorkshopView({
                       opacity: 0.88,
                     }}
                   >
-                    <strong>Diagnostic / Travaux :</strong> {entry.worksDone}
+                    <strong>{t.heroWorks}</strong> {entry.worksDone}
                   </div>
                 )}
 
@@ -864,10 +855,10 @@ export function WorkshopView({
                       textAlign: "center",
                       transition: "transform 0.1s ease",
                     }}
-                    title="Ouvrir la checklist tactile et signer au doigt"
+                    title={t.heroTabletTitle}
                   >
                     <Tablet size={16} />
-                    <span>📱 Mode Tablette</span>
+                    <span>{t.heroTablet}</span>
                   </button>
 
                   <a
@@ -889,10 +880,10 @@ export function WorkshopView({
                       gap: 4,
                       textAlign: "center",
                     }}
-                    title="Imprimer Fiche 1 (Ordre de Réparation 4 Pôles)"
+                    title={t.heroFiche1Title}
                   >
                     <Printer size={16} />
-                    <span>📋 Fiche 1 (A4)</span>
+                    <span>{t.heroFiche1}</span>
                   </a>
 
                   <a
@@ -914,10 +905,10 @@ export function WorkshopView({
                       gap: 4,
                       textAlign: "center",
                     }}
-                    title="Imprimer Fiche 2 (Entretien Systématique 22 points)"
+                    title={t.heroFiche2Title}
                   >
                     <CheckSquare size={16} />
-                    <span>⚙️ Fiche 2 (A4)</span>
+                    <span>{t.heroFiche2}</span>
                   </a>
                 </div>
               </div>
@@ -952,7 +943,7 @@ export function WorkshopView({
             <Search size={16} style={{ opacity: 0.5 }} />
             <input
               type="text"
-              placeholder="Rechercher par immat, client, châssis, N° d'ordre, marque..."
+              placeholder={t.searchPlaceholder}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
@@ -983,9 +974,9 @@ export function WorkshopView({
             onChange={(e) => setClientTypeFilter(e.target.value)}
             style={{ ...selectStyle, width: "auto" }}
           >
-            <option value="ALL" style={optionStyle}>Tous types clients</option>
-            <option value="Client" style={optionStyle}>Clients</option>
-            <option value="Interne" style={optionStyle}>Interne</option>
+            <option value="ALL" style={optionStyle}>{t.filterAllClientTypes}</option>
+            <option value="Client" style={optionStyle}>{t.filterClient}</option>
+            <option value="Interne" style={optionStyle}>{t.filterInternal}</option>
           </select>
 
           {/* Filtre Statut */}
@@ -994,10 +985,10 @@ export function WorkshopView({
             onChange={(e) => setStatusFilter(e.target.value)}
             style={{ ...selectStyle, width: "auto" }}
           >
-            <option value="ALL" style={optionStyle}>Tous les statuts</option>
-            {Object.entries(STATUS_CONFIG).map(([k, v]) => (
+            <option value="ALL" style={optionStyle}>{t.filterAllStatuses}</option>
+            {Object.entries(STATUS_CONFIG).map(([k]) => (
               <option key={k} value={k} style={optionStyle}>
-                {v.label} · {v.full}
+                {k} · {workshopStatusLabel(copy, k)}
               </option>
             ))}
           </select>
@@ -1026,38 +1017,36 @@ export function WorkshopView({
                 whiteSpace: "nowrap",
               }}
             >
-              <th style={thStyle}>Date & Heure</th>
-              <th style={thStyle}>N° d&apos;Ordre</th>
-              <th style={thStyle}>Immatriculation</th>
-              <th style={thStyle}>Marque / Modèle</th>
-              <th style={{ ...thStyle, background: "rgba(245, 158, 11, 0.08)", minWidth: 210 }}>⚡ Fiches &amp; Tablette</th>
-              <th style={thStyle}>Châssis (VIN)</th>
-              <th style={thStyle}>Kilométrage</th>
-              <th style={thStyle}>Client</th>
-              <th style={thStyle}>Type</th>
-              <th style={thStyle}>Téléphone</th>
-              <th style={thStyle}>Réceptionnaire</th>
-              <th style={thStyle}>Statut</th>
-              <th style={thStyle}>Travaux Effectués</th>
-              <th style={thStyle}>Fin Travaux</th>
-              <th style={thStyle}>Sortie (Date & H)</th>
-              <th style={thStyle}>Livreur</th>
-              <th style={thStyle}>Règlement</th>
-              <th style={{ ...thStyle, textAlign: "right" }}>Actions</th>
+              <th style={thStyle}>{t.colDate}</th>
+              <th style={thStyle}>{t.colOr}</th>
+              <th style={thStyle}>{t.colImmat}</th>
+              <th style={thStyle}>{t.colVehicle}</th>
+              <th style={{ ...thStyle, background: "rgba(245, 158, 11, 0.08)", minWidth: 210 }}>{t.colSheets}</th>
+              <th style={thStyle}>{t.colChassis}</th>
+              <th style={thStyle}>{t.colMileage}</th>
+              <th style={thStyle}>{t.colClient}</th>
+              <th style={thStyle}>{t.colType}</th>
+              <th style={thStyle}>{t.colPhone}</th>
+              <th style={thStyle}>{t.colReceptionist}</th>
+              <th style={thStyle}>{t.colStatus}</th>
+              <th style={thStyle}>{t.colWorks}</th>
+              <th style={thStyle}>{t.colEndWorks}</th>
+              <th style={thStyle}>{t.colExit}</th>
+              <th style={thStyle}>{t.colDeliverer}</th>
+              <th style={thStyle}>{t.colPayment}</th>
+              <th style={{ ...thStyle, textAlign: "right" }}>{t.colActions}</th>
             </tr>
           </thead>
           <tbody>
             {filteredEntries.length === 0 ? (
               <tr>
                 <td colSpan={18} style={{ textAlign: "center", padding: "40px 20px", opacity: 0.6 }}>
-                  Aucun passage de véhicule ne correspond aux critères.
+                  {t.emptyRow}
                 </td>
               </tr>
             ) : (
               filteredEntries.map((row) => {
                 const conf = STATUS_CONFIG[row.statusCode] || {
-                  label: row.statusCode,
-                  full: row.statusCode,
                   bg: "rgba(255, 255, 255, 0.1)",
                   text: "inherit",
                   border: "transparent",
@@ -1116,7 +1105,7 @@ export function WorkshopView({
                         <button
                           type="button"
                           onClick={() => setTabletEntry(row)}
-                          title="Ouvrir sur Tablette (Checklist & Signatures)"
+                          title={t.rowTabletTitle}
                           style={{
                             border: 0,
                             background: "rgba(245, 158, 11, 0.2)",
@@ -1132,13 +1121,13 @@ export function WorkshopView({
                           }}
                         >
                           <Tablet size={12} />
-                          Tablette
+                          {t.rowTablet}
                         </button>
                         <a
                           href={`/workshop/${row.id}/fiche-intervention`}
                           target="_blank"
                           rel="noreferrer"
-                          title="Imprimer Fiche d'Intervention (A4)"
+                          title={t.rowFiche1Title}
                           style={{
                             textDecoration: "none",
                             background: "rgba(56, 189, 248, 0.2)",
@@ -1153,13 +1142,13 @@ export function WorkshopView({
                           }}
                         >
                           <Printer size={12} />
-                          Fiche 1
+                          {t.rowFiche1}
                         </a>
                         <a
                           href={`/workshop/${row.id}/fiche-entretien`}
                           target="_blank"
                           rel="noreferrer"
-                          title="Imprimer Fiche d'Entretien Systématique (A4)"
+                          title={t.rowFiche2Title}
                           style={{
                             textDecoration: "none",
                             background: "rgba(168, 85, 247, 0.2)",
@@ -1174,7 +1163,7 @@ export function WorkshopView({
                           }}
                         >
                           <CheckSquare size={12} />
-                          Fiche 2
+                          {t.rowFiche2}
                         </a>
                       </div>
                     </td>
@@ -1203,7 +1192,7 @@ export function WorkshopView({
                           color: row.clientType === "Interne" ? "#818cf8" : "inherit",
                         }}
                       >
-                        {row.clientType || "Client"}
+                        {row.clientType || copy.clientType.client}
                       </span>
                     </td>
                     <td style={tdStyle}>
@@ -1238,9 +1227,9 @@ export function WorkshopView({
                           fontWeight: 700,
                           fontSize: "0.76rem",
                         }}
-                        title={conf.full}
+                        title={workshopStatusLabel(copy, row.statusCode)}
                       >
-                        {conf.label} ({conf.full})
+                        {row.statusCode} ({workshopStatusLabel(copy, row.statusCode)})
                       </span>
                     </td>
                     <td style={{ ...tdStyle, maxWidth: 220 }}>
@@ -1283,7 +1272,7 @@ export function WorkshopView({
                             fontWeight: 650,
                           }}
                         >
-                          {row.paymentMode}
+                          {paymentModeLabel(copy, row.paymentMode)}
                         </span>
                       ) : (
                         <span style={{ opacity: 0.4 }}>-</span>
@@ -1292,7 +1281,7 @@ export function WorkshopView({
                     <td style={{ ...tdStyle, textAlign: "right", whiteSpace: "nowrap" }}>
                       <button
                         onClick={() => setTabletEntry(row)}
-                        title="Ouvrir sur Tablette (Checklist & Signatures)"
+                        title={t.rowTabletTitle}
                         style={{
                           border: 0,
                           background: "rgba(245, 158, 11, 0.15)",
@@ -1309,13 +1298,13 @@ export function WorkshopView({
                         }}
                       >
                         <Tablet size={13} />
-                        Tablette
+                        {t.rowTablet}
                       </button>
                       <a
                         href={`/workshop/${row.id}/fiche-intervention`}
                         target="_blank"
                         rel="noreferrer"
-                        title="Imprimer Fiche d'Intervention (A4)"
+                        title={t.rowFiche1Title}
                         style={{
                           textDecoration: "none",
                           background: "rgba(56, 189, 248, 0.15)",
@@ -1331,13 +1320,13 @@ export function WorkshopView({
                         }}
                       >
                         <Printer size={13} />
-                        Fiche 1
+                        {t.rowFiche1}
                       </a>
                       <a
                         href={`/workshop/${row.id}/fiche-entretien`}
                         target="_blank"
                         rel="noreferrer"
-                        title="Imprimer Fiche d'Entretien Systématique (A4)"
+                        title={t.rowFiche2Title}
                         style={{
                           textDecoration: "none",
                           background: "rgba(168, 85, 247, 0.15)",
@@ -1353,11 +1342,11 @@ export function WorkshopView({
                         }}
                       >
                         <Printer size={13} />
-                        Fiche 2
+                        {t.rowFiche2}
                       </a>
                       <button
                         onClick={() => setEditingItem(row)}
-                        title="Modifier cette entrée"
+                        title={t.rowEditTitle}
                         style={{
                           border: 0,
                           background: "transparent",
@@ -1371,7 +1360,7 @@ export function WorkshopView({
                       </button>
                       <button
                         onClick={() => handleDelete(row.id, row.immatriculation)}
-                        title="Supprimer"
+                        title={t.rowDeleteTitle}
                         style={{
                           border: 0,
                           background: "transparent",
@@ -1409,7 +1398,7 @@ export function WorkshopView({
                   <UploadCloud size={20} />
                 </span>
                 <h3 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700 }}>
-                  Importer Fichier Excel d&apos;Atelier SAV
+                  {t.importModal.title}
                 </h3>
               </div>
               <button
@@ -1421,10 +1410,7 @@ export function WorkshopView({
             </div>
 
             <p style={{ fontSize: "0.85rem", opacity: 0.8, lineHeight: 1.5, margin: "0 0 16px 0" }}>
-              Sélectionnez votre classeur Excel (.xlsx, .xls ou .csv) contenant l&apos;historique de passage des
-              véhicules. L&apos;application analyse automatiquement toutes les colonnes officielles (N° OR,
-              Immatriculation, Châssis, Client, Statut L/C/AT/AC..., Travaux, Date de sortie, Mode de règlement)
-              pour construire et alimenter la base de données.
+              {t.importModal.description}
             </p>
 
             <form onSubmit={handleImportSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -1448,10 +1434,10 @@ export function WorkshopView({
                 <label htmlFor="excelFileInput" style={{ cursor: "pointer", display: "block" }}>
                   <FileSpreadsheet size={36} style={{ color: "#4ade80", marginBottom: 10 }} />
                   <div style={{ fontWeight: 650, fontSize: "0.95rem" }}>
-                    {importFile ? importFile.name : "Cliquez pour choisir votre fichier Excel SAV"}
+                    {importFile ? importFile.name : t.importModal.choose}
                   </div>
                   <div style={{ fontSize: "0.78rem", opacity: 0.6, marginTop: 4 }}>
-                    Formats acceptés : .xlsx, .xls, .csv (Taille max 15 Mo)
+                    {t.importModal.formats}
                   </div>
                 </label>
               </div>
@@ -1490,7 +1476,7 @@ export function WorkshopView({
                   onClick={() => setShowImportModal(false)}
                   style={btnSecondary}
                 >
-                  Annuler
+                  {t.importModal.cancel}
                 </button>
                 <button
                   type="submit"
@@ -1500,7 +1486,7 @@ export function WorkshopView({
                     opacity: !importFile || isPending ? 0.6 : 1,
                   }}
                 >
-                  {isPending ? "Traitement en cours..." : "Lancer l'importation & créer la base"}
+                  {isPending ? t.importModal.submitting : t.importModal.submit}
                 </button>
               </div>
             </form>
@@ -1515,10 +1501,10 @@ export function WorkshopView({
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700 }}>
-                  Enregistrer un passage de véhicule au SAV
+                  {t.createModal.title}
                 </h3>
                 <span style={{ fontSize: "0.78rem", color: "var(--gold)", fontWeight: 600 }}>
-                  N° d&apos;Ordre #{nextOrderNumber} • Clé primaire auto-assignée
+                  {t.createModal.subtitle(nextOrderNumber)}
                 </span>
               </div>
               <button
@@ -1537,7 +1523,7 @@ export function WorkshopView({
                     setShowCreateModal(false);
                     window.location.reload();
                   } catch (err: unknown) {
-                    alert(err instanceof Error ? err.message : "Erreur création");
+                    alert(err instanceof Error ? err.message : t.errors.createFailed);
                   }
                 });
               }}
@@ -1563,11 +1549,11 @@ export function WorkshopView({
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                   <label style={{ ...labelStyle, marginBottom: 0, fontWeight: 700, color: "var(--gold)" }}>
-                    👤 Sélection du Client (Base de données ou Nouveau)
+                    {t.createModal.clientLabel}
                   </label>
                   {createCustomerSelection && createCustomerSelection !== "__NEW__" && (
                     <span style={{ fontSize: "0.72rem", color: "#4ade80", fontWeight: 600 }}>
-                      ✓ Données client auto-remplies
+                      ✓ {t.createModal.autofillBadge}
                     </span>
                   )}
                 </div>
@@ -1577,14 +1563,14 @@ export function WorkshopView({
                   style={{ ...selectStyle, fontWeight: 550 }}
                 >
                   <option value="" style={{ ...optionStyle, color: "#94a3b8" }}>
-                    -- Choisir un client existant ({customers.length} en base) ou saisir nouveau --
+                    -- {t.createModal.clientPlaceholder(customers.length)} --
                   </option>
                   <option value="__NEW__" style={{ ...optionStyle, color: "#60a5fa", fontWeight: 700 }}>
-                    ➕ Nouveau client (Saisir manuellement)
+                    {t.createModal.newClientOption}
                   </option>
                   {customers.map((c) => (
                     <option key={c.id} value={c.id} style={optionStyle}>
-                      {c.name} {c.phone ? `· Tél: ${c.phone}` : ""} {c.brand ? `[${c.brand} ${c.model || ""}]` : ""}
+                      {c.name} {c.phone ? `· ${t.createModal.telInline} ${c.phone}` : ""} {c.brand ? `[${c.brand} ${c.model || ""}]` : ""}
                     </option>
                   ))}
                 </select>
@@ -1599,7 +1585,7 @@ export function WorkshopView({
                       borderRadius: 6,
                     }}
                   >
-                    ⚡ Téléphone ({createPhone || "-"}) et véhicule ({createBrand || "-"} {createModel || ""}) renseignés automatiquement.
+                    ⚡ {t.createModal.autofillHint(createPhone || "-", createBrand || "-", createModel || "")}
                   </div>
                 )}
               </div>
@@ -1607,23 +1593,23 @@ export function WorkshopView({
               {/* Immatriculation et Nom du Client */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={labelStyle}>Immatriculation *</label>
+                  <label style={labelStyle}>{t.createModal.immatLabel}</label>
                   <input
                     name="immatriculation"
                     value={createImmat}
                     onChange={(e) => setCreateImmat(e.target.value.toUpperCase())}
-                    placeholder="ex: CJ 0290 RB"
+                    placeholder={t.createModal.immatPlaceholder}
                     required
                     style={inputStyle}
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Nom du Client *</label>
+                  <label style={labelStyle}>{t.createModal.clientNameLabel}</label>
                   <input
                     name="clientName"
                     value={createClientName}
                     onChange={(e) => setCreateClientName(e.target.value)}
-                    placeholder="ex: Palais Présidentiel"
+                    placeholder={t.createModal.clientNamePlaceholder}
                     required
                     style={inputStyle}
                   />
@@ -1633,33 +1619,33 @@ export function WorkshopView({
               {/* Marque, Modèle, Kilométrage */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={labelStyle}>Marque</label>
+                  <label style={labelStyle}>{t.createModal.brandLabel}</label>
                   <input
                     name="brand"
                     value={createBrand}
                     onChange={(e) => setCreateBrand(e.target.value)}
-                    placeholder="ex: MITSUBISHI"
+                    placeholder={t.createModal.brandPlaceholder}
                     style={inputStyle}
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Modèle</label>
+                  <label style={labelStyle}>{t.createModal.modelLabel}</label>
                   <input
                     name="model"
                     value={createModel}
                     onChange={(e) => setCreateModel(e.target.value)}
-                    placeholder="ex: OUTLANDER"
+                    placeholder={t.createModal.modelPlaceholder}
                     style={inputStyle}
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Kilométrage (Km)</label>
+                  <label style={labelStyle}>{t.createModal.mileageLabel}</label>
                   <input
                     name="mileage"
                     type="number"
                     value={createMileage}
                     onChange={(e) => setCreateMileage(e.target.value)}
-                    placeholder="ex: 37445"
+                    placeholder={t.createModal.mileagePlaceholder}
                     style={inputStyle}
                   />
                 </div>
@@ -1669,7 +1655,7 @@ export function WorkshopView({
               <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={labelStyle}>
-                    N° d&apos;Ordre <span style={{ fontSize: "0.7rem", color: "var(--gold)" }}>(Clé primaire)</span>
+                    {t.createModal.orLabel} <span style={{ fontSize: "0.7rem", color: "var(--gold)" }}>{t.createModal.orTag}</span>
                   </label>
                   <div
                     style={{
@@ -1682,7 +1668,7 @@ export function WorkshopView({
                       cursor: "not-allowed",
                       userSelect: "none",
                     }}
-                    title="Numéro d'ordre / clé primaire incrémenté automatiquement (Non modifiable)"
+                    title={t.createModal.orTitle}
                   >
                     <span style={{ fontWeight: 800, color: "var(--gold)", fontSize: "0.95rem" }}>
                       #{nextOrderNumber}
@@ -1697,12 +1683,12 @@ export function WorkshopView({
                         fontWeight: 600,
                       }}
                     >
-                      🔒 Auto
+                      🔒 {t.createModal.orAuto}
                     </span>
                   </div>
                 </div>
                 <div>
-                  <label style={labelStyle}>Date d&apos;entrée *</label>
+                  <label style={labelStyle}>{t.createModal.entryDateLabel}</label>
                   <input
                     type="date"
                     name="entryDate"
@@ -1722,7 +1708,7 @@ export function WorkshopView({
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Heure d&apos;entrée *</label>
+                  <label style={labelStyle}>{t.createModal.entryTimeLabel}</label>
                   <input
                     type="time"
                     name="entryTime"
@@ -1746,17 +1732,17 @@ export function WorkshopView({
               {/* Téléphone Client, Réceptionnaire (Sélectionné, pas taper), Statut */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={labelStyle}>Téléphone Client</label>
+                  <label style={labelStyle}>{t.createModal.phoneLabel}</label>
                   <input
                     name="phone"
                     value={createPhone}
                     onChange={(e) => setCreatePhone(e.target.value)}
-                    placeholder="ex: 0167434244"
+                    placeholder={t.createModal.phonePlaceholder}
                     style={inputStyle}
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Réceptionnaire *</label>
+                  <label style={labelStyle}>{t.createModal.receptionistLabel}</label>
                   <select
                     name="receptionist"
                     value={createReceptionist}
@@ -1764,7 +1750,7 @@ export function WorkshopView({
                     required
                     style={selectStyle}
                   >
-                    <option value="" style={optionStyle}>-- Sélectionner le réceptionnaire --</option>
+                    <option value="" style={optionStyle}>-- {t.createModal.receptionistPlaceholder} --</option>
                     {receptionists.map((r) => (
                       <option key={r} value={r} style={optionStyle}>
                         {r}
@@ -1773,16 +1759,16 @@ export function WorkshopView({
                   </select>
                 </div>
                 <div>
-                  <label style={labelStyle}>Statut (Code Légende) *</label>
+                  <label style={labelStyle}>{t.createModal.statusLabel}</label>
                   <select
                     name="statusCode"
                     value={createStatusCode}
                     onChange={(e) => setCreateStatusCode(e.target.value)}
                     style={selectStyle}
                   >
-                    {Object.entries(STATUS_CONFIG).map(([k, v]) => (
+                    {Object.entries(STATUS_CONFIG).map(([k]) => (
                       <option key={k} value={k} style={optionStyle}>
-                        {v.label} · {v.full}
+                        {k} · {workshopStatusLabel(copy, k)}
                       </option>
                     ))}
                   </select>
@@ -1790,13 +1776,13 @@ export function WorkshopView({
               </div>
 
               <div>
-                <label style={labelStyle}>Travaux Effectués / Diagnostic</label>
+                <label style={labelStyle}>{t.createModal.worksLabel}</label>
                 <textarea
                   name="worksDone"
                   rows={2}
                   value={createWorksDone}
                   onChange={(e) => setCreateWorksDone(e.target.value)}
-                  placeholder="ex: Exécution de deux proformas, révision des 20 000 km..."
+                  placeholder={t.createModal.worksPlaceholder}
                   style={{ ...inputStyle, resize: "vertical" }}
                 />
               </div>
@@ -1804,7 +1790,7 @@ export function WorkshopView({
               {/* Date de sortie (Calendrier), Heure de sortie (Heure), Mode de Règlement */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={labelStyle}>Date de sortie</label>
+                  <label style={labelStyle}>{t.createModal.exitDateLabel}</label>
                   <input
                     type="date"
                     name="exitDate"
@@ -1823,7 +1809,7 @@ export function WorkshopView({
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Heure de sortie</label>
+                  <label style={labelStyle}>{t.createModal.exitTimeLabel}</label>
                   <input
                     type="time"
                     name="exitTime"
@@ -1842,28 +1828,28 @@ export function WorkshopView({
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Mode de Règlement</label>
+                  <label style={labelStyle}>{t.createModal.paymentLabel}</label>
                   <select
                     name="paymentMode"
                     value={createPaymentMode}
                     onChange={(e) => setCreatePaymentMode(e.target.value)}
                     style={selectStyle}
                   >
-                    <option value="BC" style={optionStyle}>BC (Bon de commande)</option>
-                    <option value="Mobile Money" style={optionStyle}>Mobile Money</option>
-                    <option value="En espèces" style={optionStyle}>En espèces</option>
-                    <option value="Proforma" style={optionStyle}>Proforma</option>
-                    <option value="Interne" style={optionStyle}>Interne</option>
+                    {WORKSHOP_PAYMENT_MODES.map((mode) => (
+                      <option key={mode.value} value={mode.value} style={optionStyle}>
+                        {copy.paymentMode[mode.key]}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 12 }}>
                 <button type="button" onClick={() => setShowCreateModal(false)} style={btnSecondary}>
-                  Annuler
+                  {t.createModal.cancel}
                 </button>
                 <button type="submit" disabled={isPending} style={btnPrimary}>
-                  {isPending ? "Enregistrement..." : "Valider l'entrée"}
+                  {isPending ? t.createModal.submitting : t.createModal.submit}
                 </button>
               </div>
             </form>
@@ -1878,10 +1864,10 @@ export function WorkshopView({
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700 }}>
-                  Modifier le passage : {editingItem.immatriculation}
+                  {t.editModal.title(editingItem.immatriculation)}
                 </h3>
                 <span style={{ fontSize: "0.78rem", color: "var(--gold)", fontWeight: 600 }}>
-                  N° d&apos;Ordre #{editingItem.orNumber || "-"} (Clé primaire)
+                  {t.editModal.subtitle(editingItem.orNumber || "-")}
                 </span>
               </div>
               <button
@@ -1900,7 +1886,7 @@ export function WorkshopView({
                     setEditingItem(null);
                     window.location.reload();
                   } catch (err: unknown) {
-                    alert(err instanceof Error ? err.message : "Erreur mise à jour");
+                    alert(err instanceof Error ? err.message : t.errors.updateFailed);
                   }
                 });
               }}
@@ -1911,7 +1897,7 @@ export function WorkshopView({
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={labelStyle}>Immatriculation *</label>
+                  <label style={labelStyle}>{t.editModal.immatLabel}</label>
                   <input
                     name="immatriculation"
                     defaultValue={editingItem.immatriculation}
@@ -1920,7 +1906,7 @@ export function WorkshopView({
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Client *</label>
+                  <label style={labelStyle}>{t.editModal.clientLabel}</label>
                   <input
                     name="clientName"
                     defaultValue={editingItem.clientName}
@@ -1932,15 +1918,15 @@ export function WorkshopView({
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={labelStyle}>Marque</label>
+                  <label style={labelStyle}>{t.editModal.brandLabel}</label>
                   <input name="brand" defaultValue={editingItem.brand || ""} style={inputStyle} />
                 </div>
                 <div>
-                  <label style={labelStyle}>Modèle</label>
+                  <label style={labelStyle}>{t.editModal.modelLabel}</label>
                   <input name="model" defaultValue={editingItem.model || ""} style={inputStyle} />
                 </div>
                 <div>
-                  <label style={labelStyle}>Kilométrage</label>
+                  <label style={labelStyle}>{t.editModal.mileageLabel}</label>
                   <input
                     name="mileage"
                     type="number"
@@ -1953,7 +1939,7 @@ export function WorkshopView({
               <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={labelStyle}>
-                    N° d&apos;Ordre <span style={{ fontSize: "0.7rem", color: "var(--gold)" }}>(Clé primaire)</span>
+                    {t.editModal.orLabel} <span style={{ fontSize: "0.7rem", color: "var(--gold)" }}>{t.createModal.orTag}</span>
                   </label>
                   <div
                     style={{
@@ -1969,11 +1955,11 @@ export function WorkshopView({
                     <span style={{ fontWeight: 800, color: "var(--gold)" }}>
                       #{editingItem.orNumber || "-"}
                     </span>
-                    <span style={{ fontSize: "0.68rem", opacity: 0.6 }}>Non modifiable</span>
+                    <span style={{ fontSize: "0.68rem", opacity: 0.6 }}>{t.editModal.orLocked}</span>
                   </div>
                 </div>
                 <div>
-                  <label style={labelStyle}>Date d&apos;entrée</label>
+                  <label style={labelStyle}>{t.editModal.entryDateLabel}</label>
                   <input
                     type="date"
                     name="entryDate"
@@ -1987,7 +1973,7 @@ export function WorkshopView({
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Heure d&apos;entrée</label>
+                  <label style={labelStyle}>{t.editModal.entryTimeLabel}</label>
                   <input
                     type="time"
                     name="entryTime"
@@ -2004,17 +1990,17 @@ export function WorkshopView({
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={labelStyle}>Téléphone</label>
+                  <label style={labelStyle}>{t.editModal.phoneLabel}</label>
                   <input name="phone" defaultValue={editingItem.phone || ""} style={inputStyle} />
                 </div>
                 <div>
-                  <label style={labelStyle}>Réceptionnaire</label>
+                  <label style={labelStyle}>{t.editModal.receptionistLabel}</label>
                   <select
                     name="receptionist"
                     defaultValue={editingItem.receptionist || ""}
                     style={selectStyle}
                   >
-                    <option value="" style={optionStyle}>-- Sélectionner le réceptionnaire --</option>
+                    <option value="" style={optionStyle}>-- {t.editModal.receptionistPlaceholder} --</option>
                     {receptionists.map((r) => (
                       <option key={r} value={r} style={optionStyle}>
                         {r}
@@ -2023,11 +2009,11 @@ export function WorkshopView({
                   </select>
                 </div>
                 <div>
-                  <label style={labelStyle}>Statut (Niv Exéc) *</label>
+                  <label style={labelStyle}>{t.editModal.statusLabel}</label>
                   <select name="statusCode" defaultValue={editingItem.statusCode} style={selectStyle}>
-                    {Object.entries(STATUS_CONFIG).map(([k, v]) => (
+                    {Object.entries(STATUS_CONFIG).map(([k]) => (
                       <option key={k} value={k} style={optionStyle}>
-                        {v.label} · {v.full}
+                        {k} · {workshopStatusLabel(copy, k)}
                       </option>
                     ))}
                   </select>
@@ -2035,7 +2021,7 @@ export function WorkshopView({
               </div>
 
               <div>
-                <label style={labelStyle}>Travaux effectués</label>
+                <label style={labelStyle}>{t.editModal.worksLabel}</label>
                 <textarea
                   name="worksDone"
                   rows={2}
@@ -2046,20 +2032,20 @@ export function WorkshopView({
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={labelStyle}>Date et H fin des travaux</label>
+                  <label style={labelStyle}>{t.editModal.endWorksLabel}</label>
                   <input
                     name="endWorksAt"
                     defaultValue={editingItem.endWorksAt || ""}
-                    placeholder="ex: 16/07/2026 17:00:00"
+                    placeholder={t.editModal.endWorksPlaceholder}
                     style={inputStyle}
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Durée d&apos;exécution</label>
+                  <label style={labelStyle}>{t.editModal.durationLabel}</label>
                   <input
                     name="executionDuration"
                     defaultValue={editingItem.executionDuration || ""}
-                    placeholder="ex: 6 jours"
+                    placeholder={t.editModal.durationPlaceholder}
                     style={inputStyle}
                   />
                 </div>
@@ -2067,7 +2053,7 @@ export function WorkshopView({
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={labelStyle}>Date de sortie Véh</label>
+                  <label style={labelStyle}>{t.editModal.exitDateLabel}</label>
                   <input
                     type="date"
                     name="exitDate"
@@ -2081,7 +2067,7 @@ export function WorkshopView({
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Heure de sortie</label>
+                  <label style={labelStyle}>{t.editModal.exitTimeLabel}</label>
                   <input
                     type="time"
                     name="exitTime"
@@ -2095,23 +2081,23 @@ export function WorkshopView({
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Mode de Règlement</label>
+                  <label style={labelStyle}>{t.editModal.paymentLabel}</label>
                   <select name="paymentMode" defaultValue={editingItem.paymentMode || "BC"} style={selectStyle}>
-                    <option value="BC" style={optionStyle}>BC (Bon de commande)</option>
-                    <option value="Mobile Money" style={optionStyle}>Mobile Money</option>
-                    <option value="En espèces" style={optionStyle}>En espèces</option>
-                    <option value="Proforma" style={optionStyle}>Proforma</option>
-                    <option value="Interne" style={optionStyle}>Interne</option>
+                    {WORKSHOP_PAYMENT_MODES.map((mode) => (
+                      <option key={mode.value} value={mode.value} style={optionStyle}>
+                        {copy.paymentMode[mode.key]}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 12 }}>
                 <button type="button" onClick={() => setEditingItem(null)} style={btnSecondary}>
-                  Annuler
+                  {t.editModal.cancel}
                 </button>
                 <button type="submit" disabled={isPending} style={btnPrimary}>
-                  {isPending ? "Mise à jour..." : "Enregistrer les modifications"}
+                  {isPending ? t.editModal.submitting : t.editModal.submit}
                 </button>
               </div>
             </form>

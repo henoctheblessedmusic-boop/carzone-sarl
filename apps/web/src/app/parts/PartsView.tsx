@@ -27,6 +27,16 @@ import {
   Info,
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
+import { usePrefs } from "@/components/PrefsProvider";
+import {
+  PART_CATEGORY_KEYS,
+  PART_MOVEMENT_TYPE_KEYS,
+  PART_UNIT_KEYS,
+  movementTypeLabel,
+  partCategoryLabel,
+  partUnitLabel,
+  workshopCopy,
+} from "@/lib/i18n/messages/workshop";
 import {
   createPart,
   updatePart,
@@ -104,6 +114,9 @@ export function PartsView({
   workshopEntries: WorkshopSelectOption[];
   canManage: boolean;
 }) {
+  const { locale } = usePrefs();
+  const copy = workshopCopy[locale].parts;
+  const dateLocale = workshopCopy[locale].dateLocale;
   const [activeTab, setActiveTab] = useState<"inventory" | "cross-ref" | "movements">("inventory");
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
@@ -210,11 +223,11 @@ export function PartsView({
               <Wrench size={20} />
             </span>
             <h1 style={{ fontSize: "1.6rem", fontWeight: 700, margin: 0, letterSpacing: "-0.02em" }}>
-              Gestion des Pièces & Références Croisées
+              {copy.title}
             </h1>
           </div>
           <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--ice-text-muted)" }}>
-            Atelier SAV & Magasin Central CARZONE · Croisement multi-modèles (Changan, Jetour, Chery, BAIC, Forthing, BYD, Toyota)
+            {copy.subtitle}
           </p>
         </div>
 
@@ -235,7 +248,7 @@ export function PartsView({
               }}
             >
               <Plus size={16} />
-              Nouvelle Pièce Détachée
+              {copy.newPart}
             </button>
           )}
         </div>
@@ -254,14 +267,14 @@ export function PartsView({
           style={{ padding: "1.2rem", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)" }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 600 }}>
-            <span>RÉFÉRENCES PIÈCES</span>
+            <span>{copy.kpiRefs}</span>
             <Package size={16} color="#38bdf8" />
           </div>
           <div style={{ fontSize: "1.8rem", fontWeight: 700, marginTop: "0.4rem", color: "#f8fafc" }}>
             {stats.totalRef}
           </div>
           <div style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", marginTop: "0.3rem" }}>
-            {stats.totalStockQty} unités physiques en stock
+            {copy.kpiRefsHint(stats.totalStockQty)}
           </div>
         </div>
 
@@ -270,14 +283,14 @@ export function PartsView({
           style={{ padding: "1.2rem", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)" }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 600 }}>
-            <span>RÉFÉRENCES CROISÉES</span>
+            <span>{copy.kpiCrossRefs}</span>
             <ArrowRightLeft size={16} color="#a855f7" />
           </div>
           <div style={{ fontSize: "1.8rem", fontWeight: 700, marginTop: "0.4rem", color: "#c084fc" }}>
             {stats.totalCrossRefs}
           </div>
           <div style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", marginTop: "0.3rem" }}>
-            Équivalences multi-marques actives
+            {copy.kpiCrossRefsHint}
           </div>
         </div>
 
@@ -286,14 +299,14 @@ export function PartsView({
           style={{ padding: "1.2rem", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)" }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 600 }}>
-            <span>VALEUR STOCK MAGASIN</span>
+            <span>{copy.kpiValue}</span>
             <Boxes size={16} color="#34d399" />
           </div>
           <div style={{ fontSize: "1.8rem", fontWeight: 700, marginTop: "0.4rem", color: "#34d399" }}>
             {formatXof(stats.totalValueXof)}
           </div>
           <div style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", marginTop: "0.3rem" }}>
-            Coût d&apos;achat immobilisé en magasin
+            {copy.kpiValueHint}
           </div>
         </div>
 
@@ -307,14 +320,14 @@ export function PartsView({
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 600 }}>
-            <span>ALERTES RÉAPPROVISIONNEMENT</span>
+            <span>{copy.kpiAlerts}</span>
             <AlertTriangle size={16} color={stats.outOfStockCount > 0 ? "#f43f5e" : "#fbbf24"} />
           </div>
           <div style={{ fontSize: "1.8rem", fontWeight: 700, marginTop: "0.4rem", color: stats.outOfStockCount > 0 ? "#f43f5e" : "#fbbf24" }}>
-            {stats.outOfStockCount} <span style={{ fontSize: "1rem", fontWeight: 500, color: "var(--ice-text-muted)" }}>ruptures</span> · {stats.lowStockCount} <span style={{ fontSize: "1rem", fontWeight: 500, color: "var(--ice-text-muted)" }}>faibles</span>
+            {stats.outOfStockCount} <span style={{ fontSize: "1rem", fontWeight: 500, color: "var(--ice-text-muted)" }}>{copy.kpiAlertsOut}</span> · {stats.lowStockCount} <span style={{ fontSize: "1rem", fontWeight: 500, color: "var(--ice-text-muted)" }}>{copy.kpiAlertsLow}</span>
           </div>
           <div style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", marginTop: "0.3rem" }}>
-            Commandes réapprovisionnement à lancer
+            {copy.kpiAlertsHint}
           </div>
         </div>
       </div>
@@ -335,12 +348,12 @@ export function PartsView({
       >
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#38bdf8", fontWeight: 700, fontSize: "0.85rem" }}>
           <Info size={16} />
-          <span>Guide opérationnel :</span>
+          <span>{copy.guideTitle}</span>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "1.2rem", fontSize: "0.82rem", color: "#cbd5e1" }}>
-          <div><strong>1. Trouver :</strong> Tapez le modèle (ex: <em>Jetour Dashing</em>) ou le type de pièce (ex: <em>Patin frein</em>).</div>
-          <div><strong>2. Vérifier :</strong> Les badges bleus indiquent sur quelles autres voitures la pièce se monte.</div>
-          <div><strong>3. Actionner :</strong> Cliquez sur <em>Entrée/Sortie</em> pour mettre à jour le stock en temps réel.</div>
+          <div><strong>{copy.guideFindTitle}</strong> {copy.guideFind}</div>
+          <div><strong>{copy.guideCheckTitle}</strong> {copy.guideCheck}</div>
+          <div><strong>{copy.guideActTitle}</strong> {copy.guideAct}</div>
         </div>
       </div>
 
@@ -372,7 +385,7 @@ export function PartsView({
           }}
         >
           <Boxes size={16} />
-          Magasin & Stock Pièces ({parts.length})
+          {copy.tabInventory(parts.length)}
         </button>
 
         <button
@@ -393,7 +406,7 @@ export function PartsView({
           }}
         >
           <ArrowRightLeft size={16} />
-          Fiches d&apos;Interchangeabilité Multi-Modèles
+          {copy.tabCrossRefs}
         </button>
 
         <button
@@ -414,7 +427,7 @@ export function PartsView({
           }}
         >
           <History size={16} />
-          Historique Entrées & Sorties
+          {copy.tabMovements}
         </button>
       </div>
 
@@ -448,13 +461,13 @@ export function PartsView({
                   marginBottom: "0.8rem",
                 }}
               >
-                <Sparkles size={14} /> Moteur d&apos;interchangeabilité pièces multi-marques CARZONE
+                <Sparkles size={14} /> {copy.crossBadge}
               </span>
               <h2 style={{ fontSize: "1.4rem", margin: "0 0 0.5rem", color: "#f8fafc" }}>
-                Recherche de Référence Croisée & Compatibilité Véhicule
+                {copy.crossTitle}
               </h2>
               <p style={{ fontSize: "0.88rem", color: "var(--ice-text-muted)", margin: "0 0 1.2rem" }}>
-                Tapez une référence OEM constructeur, une référence équipementier (Bosch, Brembo, Valeo...) ou le nom d&apos;un véhicule (ex: <em>Jetour Dashing</em>, <em>Changan CS35</em>, <em>Patin</em>, <em>Filtre 1.5T</em>).
+                {copy.crossIntro}
               </p>
 
               <div style={{ position: "relative" }}>
@@ -472,7 +485,7 @@ export function PartsView({
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Ex: 3501110-M01, T15-3501080, Changan CS35, Jetour Dashing, Patin frein..."
+                  placeholder={copy.crossPlaceholder}
                   className="ox-input"
                   style={{
                     width: "100%",
@@ -517,7 +530,7 @@ export function PartsView({
                   color: "var(--ice-text-muted)",
                 }}
               >
-                <span>Recherches rapides :</span>
+                <span>{copy.quickSearches}</span>
                 {[
                   "Patin",
                   "CS35",
@@ -553,10 +566,10 @@ export function PartsView({
           <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <h3 style={{ fontSize: "1.1rem", margin: 0, fontWeight: 600 }}>
-                {filteredParts.length} résultat(s) correspondant(s)
+                {copy.resultCount(filteredParts.length)}
               </h3>
               <span style={{ fontSize: "0.82rem", color: "var(--ice-text-muted)" }}>
-                Les correspondances croisées et multi-modèles sont recalculées instantanément
+                {copy.resultsHint}
               </span>
             </div>
 
@@ -571,9 +584,9 @@ export function PartsView({
                 }}
               >
                 <AlertTriangle size={36} color="#fbbf24" style={{ margin: "0 auto 1rem" }} />
-                <h4 style={{ color: "#f8fafc", margin: "0 0 0.5rem" }}>Aucune pièce trouvée pour cette recherche</h4>
+                <h4 style={{ color: "#f8fafc", margin: "0 0 0.5rem" }}>{copy.emptyTitle}</h4>
                 <p style={{ fontSize: "0.9rem", margin: 0 }}>
-                  Essayez avec une autre référence, un nom de modèle (ex: Changan, Jetour, Chery, BAIC) ou ajoutez la pièce au catalogue.
+                  {copy.emptyBody}
                 </p>
                 {canManage && (
                   <button
@@ -582,7 +595,7 @@ export function PartsView({
                     className="ox-btn"
                     style={{ marginTop: "1rem" }}
                   >
-                    Ajouter cette référence au stock
+                    {copy.emptyAction}
                   </button>
                 )}
               </div>
@@ -654,7 +667,7 @@ export function PartsView({
                               color: "var(--ice-text-muted)",
                             }}
                           >
-                            {part.category}
+                            {partCategoryLabel(copy, part.category)}
                           </span>
                           {part.manufacturer && (
                             <span
@@ -667,7 +680,7 @@ export function PartsView({
                                 fontWeight: 550,
                               }}
                             >
-                              Fabriquant: {part.manufacturer}
+                              {copy.manufacturerBadge} {part.manufacturer}
                             </span>
                           )}
                         </div>
@@ -684,12 +697,12 @@ export function PartsView({
                       {/* ÉTAT DU STOCK & PRIX */}
                       <div style={{ display: "flex", alignItems: "center", gap: "1.2rem", textAlign: "right" }}>
                         <div>
-                          <div style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)" }}>Prix Vente Atelier</div>
+                          <div style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)" }}>{copy.salePrice}</div>
                           <div style={{ fontSize: "1.15rem", fontWeight: 700, color: "#f8fafc" }}>
                             {formatXof(part.sellingPriceXof)}
                           </div>
                           <div style={{ fontSize: "0.74rem", color: "var(--ice-text-muted)" }}>
-                            Achat: {formatXof(part.purchasePriceXof)}
+                            {copy.purchasePrice(formatXof(part.purchasePriceXof))}
                           </div>
                         </div>
 
@@ -718,7 +731,7 @@ export function PartsView({
                               color: isOutOfStock ? "#f43f5e" : isLowStock ? "#fbbf24" : "#4ade80",
                             }}
                           >
-                            {part.stockQuantity} {part.unit}
+                            {part.stockQuantity} {partUnitLabel(copy, part.unit)}
                           </div>
                           <div
                             style={{
@@ -727,7 +740,7 @@ export function PartsView({
                               color: isOutOfStock ? "#f43f5e" : isLowStock ? "#fbbf24" : "#4ade80",
                             }}
                           >
-                            {isOutOfStock ? "RUPTURE" : isLowStock ? "STOCK FAIBLE" : "EN MAGASIN"}
+                            {isOutOfStock ? copy.stockOut : isLowStock ? copy.stockLow : copy.stockIn}
                           </div>
                         </div>
                       </div>
@@ -748,8 +761,8 @@ export function PartsView({
                       }}
                     >
                       <MapPin size={14} color="#f43f5e" />
-                      <span>Emplacement :</span>
-                      <strong style={{ color: "#f8fafc" }}>{part.location || "Non assigné (Magasin)"}</strong>
+                      <span>{copy.locationLabel}</span>
+                      <strong style={{ color: "#f8fafc" }}>{part.location || copy.locationNone}</strong>
                     </div>
 
                     <div
@@ -780,16 +793,16 @@ export function PartsView({
                         >
                           <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#c084fc", display: "flex", alignItems: "center", gap: "0.3rem" }}>
                             <ArrowRightLeft size={14} />
-                            RÉFÉRENCES CROISÉES (Équivalences OEM & Équipementiers)
+                            {copy.crossBlockTitle}
                           </span>
                           <span style={{ fontSize: "0.75rem", color: "var(--ice-text-muted)" }}>
-                            {part.crossReferences.length} réf.
+                            {copy.crossCount(part.crossReferences.length)}
                           </span>
                         </div>
 
                         {part.crossReferences.length === 0 ? (
                           <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", fontStyle: "italic" }}>
-                            Aucune référence croisée enregistrée pour l&apos;instant.
+                            {copy.crossEmpty}
                           </div>
                         ) : (
                           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
@@ -820,7 +833,7 @@ export function PartsView({
                                   <button
                                     type="button"
                                     onClick={() => deleteCrossReference(cr.id)}
-                                    title="Supprimer cette référence croisée"
+                                    title={copy.crossDeleteTitle}
                                     style={{
                                       background: "none",
                                       border: "none",
@@ -858,16 +871,16 @@ export function PartsView({
                         >
                           <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#38bdf8", display: "flex", alignItems: "center", gap: "0.3rem" }}>
                             <Car size={14} />
-                            VÉHICULES COMPATIBLES (Interchangeabilité directe)
+                            {copy.compatBlockTitle}
                           </span>
                           <span style={{ fontSize: "0.75rem", color: "var(--ice-text-muted)" }}>
-                            {part.compatibilities.length} modèle(s)
+                            {copy.compatCount(part.compatibilities.length)}
                           </span>
                         </div>
 
                         {part.compatibilities.length === 0 ? (
                           <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", fontStyle: "italic" }}>
-                            Aucun véhicule associé pour l&apos;instant.
+                            {copy.compatEmpty}
                           </div>
                         ) : (
                           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.45rem" }}>
@@ -901,7 +914,7 @@ export function PartsView({
                                   <button
                                     type="button"
                                     onClick={() => deleteCompatibility(c.id)}
-                                    title="Supprimer cette compatibilité"
+                                    title={copy.compatDeleteTitle}
                                     style={{
                                       background: "none",
                                       border: "none",
@@ -946,7 +959,7 @@ export function PartsView({
                           gap: "0.3rem",
                         }}
                       >
-                        <Plus size={14} /> Ajouter Réf. Croisée / Véhicule
+                        <Plus size={14} /> {copy.actionAddCrossRef}
                       </button>
 
                       <button
@@ -964,7 +977,7 @@ export function PartsView({
                           gap: "0.3rem",
                         }}
                       >
-                        <Boxes size={14} /> Entrée / Sortie Stock
+                        <Boxes size={14} /> {copy.actionMovement}
                       </button>
 
                       {part.stockQuantity > 0 && workshopEntries.length > 0 && (
@@ -983,7 +996,7 @@ export function PartsView({
                             gap: "0.3rem",
                           }}
                         >
-                          <Wrench size={14} /> Prélever pour Réparation Atelier
+                          <Wrench size={14} /> {copy.actionPickForWorkshop}
                         </button>
                       )}
                     </div>
@@ -1018,7 +1031,7 @@ export function PartsView({
                 <Search size={18} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
                 <input
                   type="text"
-                  placeholder="Tapez un modèle (ex: Jetour Dashing), un nom (ex: Patin) ou une référence..."
+                  placeholder={copy.filterSearchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="ox-input"
@@ -1050,10 +1063,10 @@ export function PartsView({
                 className="ox-select"
                 style={{ fontSize: "0.85rem", minWidth: 160 }}
               >
-                <option value="ALL">Toutes les catégories</option>
+                <option value="ALL">{copy.filterAllCategories}</option>
                 {categories.filter((c) => c !== "ALL").map((c) => (
                   <option key={c} value={c}>
-                    {c}
+                    {partCategoryLabel(copy, c)}
                   </option>
                 ))}
               </select>
@@ -1064,16 +1077,16 @@ export function PartsView({
                 className="ox-select"
                 style={{ fontSize: "0.85rem", minWidth: 160 }}
               >
-                <option value="ALL">Tous les statuts de stock</option>
-                <option value="IN_STOCK">En Stock uniquement</option>
-                <option value="LOW">Stock Faible / Alerte</option>
-                <option value="OUT">Rupture de Stock</option>
+                <option value="ALL">{copy.filterAllStock}</option>
+                <option value="IN_STOCK">{copy.filterInStock}</option>
+                <option value="LOW">{copy.filterLowStock}</option>
+                <option value="OUT">{copy.filterOutStock}</option>
               </select>
             </div>
 
             {/* BOUTONS DE FILTRAGE RAPIDE PAR VOITURE DE COTONOU */}
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.4rem", marginTop: "0.6rem", width: "100%", fontSize: "0.8rem" }}>
-              <span style={{ color: "var(--ice-text-muted)", fontSize: "0.78rem", marginRight: "0.3rem" }}>Filtres rapides :</span>
+              <span style={{ color: "var(--ice-text-muted)", fontSize: "0.78rem", marginRight: "0.3rem" }}>{copy.filterQuick}</span>
               {[
                 { label: "Patin frein", query: "Patin" },
                 { label: "Jetour Dashing", query: "Jetour Dashing" },
@@ -1116,7 +1129,7 @@ export function PartsView({
                     fontWeight: 600,
                   }}
                 >
-                  Effacer le filtre ✕
+                  {copy.filterClear} ✕
                 </button>
               )}
             </div>
@@ -1127,16 +1140,16 @@ export function PartsView({
             <table className="ox-table">
               <thead>
                 <tr>
-                  <th>Code CARZONE</th>
-                  <th>Réf. OEM</th>
-                  <th>Désignation</th>
-                  <th>Catégorie</th>
-                  <th>Emplacement</th>
-                  <th>Réf. Croisées</th>
-                  <th>Véhicules Compatibles</th>
-                  <th>Stock Magasin</th>
-                  <th>Prix Vente</th>
-                  <th>Actions</th>
+                  <th>{copy.colPartCode}</th>
+                  <th>{copy.colOem}</th>
+                  <th>{copy.colName}</th>
+                  <th>{copy.colCategory}</th>
+                  <th>{copy.colLocation}</th>
+                  <th>{copy.colCrossRefs}</th>
+                  <th>{copy.colCompatible}</th>
+                  <th>{copy.colStock}</th>
+                  <th>{copy.colSalePrice}</th>
+                  <th>{copy.colActions}</th>
                 </tr>
               </thead>
               <tbody>
@@ -1162,11 +1175,11 @@ export function PartsView({
                       </td>
                       <td>
                         <span style={{ fontSize: "0.78rem", padding: "0.2rem 0.5rem", borderRadius: "6px", background: "rgba(255,255,255,0.06)" }}>
-                          {p.category}
+                          {partCategoryLabel(copy, p.category)}
                         </span>
                       </td>
                       <td style={{ color: "#cbd5e1", fontSize: "0.85rem" }}>
-                        {p.location || "Non défini"}
+                        {p.location || copy.locationUndefined}
                       </td>
                       <td>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.3rem" }}>
@@ -1228,7 +1241,7 @@ export function PartsView({
                             color: isOutOfStock ? "#f43f5e" : isLow ? "#fbbf24" : "#4ade80",
                           }}
                         >
-                          {p.stockQuantity} {p.unit}
+                          {p.stockQuantity} {partUnitLabel(copy, p.unit)}
                         </span>
                       </td>
                       <td style={{ fontWeight: 600, color: "#f8fafc" }}>
@@ -1239,7 +1252,7 @@ export function PartsView({
                           <button
                             type="button"
                             onClick={() => setMovementPart(p)}
-                            title="Entrée ou sortie de stock"
+                            title={copy.rowStockTitle}
                             style={{
                               padding: "0.35rem 0.65rem",
                               borderRadius: "6px",
@@ -1254,12 +1267,12 @@ export function PartsView({
                               gap: "0.3rem",
                             }}
                           >
-                            <Boxes size={13} /> ± Stock
+                            <Boxes size={13} /> {copy.rowStockButton}
                           </button>
                           <button
                             type="button"
                             onClick={() => setSelectedPartForDetails(p)}
-                            title="Voir et associer des voitures compatibles ou références croisées"
+                            title={copy.rowVehiclesTitle}
                             style={{
                               padding: "0.35rem 0.65rem",
                               borderRadius: "6px",
@@ -1274,13 +1287,13 @@ export function PartsView({
                               gap: "0.3rem",
                             }}
                           >
-                            <ArrowRightLeft size={13} /> Voitures ({p.compatibilities.length})
+                            <ArrowRightLeft size={13} /> {copy.rowVehicles(p.compatibilities.length)}
                           </button>
                           {canManage && (
                             <button
                               type="button"
                               onClick={() => setEditingPart(p)}
-                              title="Modifier la fiche pièce"
+                              title={copy.rowEditTitle}
                               style={{
                                 padding: "0.35rem 0.55rem",
                                 borderRadius: "6px",
@@ -1317,10 +1330,10 @@ export function PartsView({
             style={{ padding: "1.2rem", borderRadius: "14px" }}
           >
             <h3 style={{ fontSize: "1.1rem", margin: "0 0 0.5rem", fontWeight: 700 }}>
-              Journal d&apos;Audit des Mouvements de Stock
+              {copy.auditTitle}
             </h3>
             <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--ice-text-muted)" }}>
-              Historique complet des entrées achats, sorties vers l&apos;atelier pour les réparations, et ajustements physiques.
+              {copy.auditSubtitle}
             </p>
           </div>
 
@@ -1328,14 +1341,14 @@ export function PartsView({
             <table className="ox-table">
               <thead>
                 <tr>
-                  <th>Date & Heure</th>
-                  <th>Pièce / Réf.</th>
-                  <th>Type de Mouvement</th>
-                  <th>Quantité</th>
-                  <th>Montant Total</th>
-                  <th>Document / Véhicule</th>
-                  <th>Motif / Commentaire</th>
-                  <th>Opérateur</th>
+                  <th>{copy.colDate}</th>
+                  <th>{copy.colPart}</th>
+                  <th>{copy.colMovementType}</th>
+                  <th>{copy.colQuantity}</th>
+                  <th>{copy.colTotal}</th>
+                  <th>{copy.colDocument}</th>
+                  <th>{copy.colReason}</th>
+                  <th>{copy.colOperator}</th>
                 </tr>
               </thead>
               <tbody>
@@ -1355,7 +1368,7 @@ export function PartsView({
                     return (
                       <tr key={m.id}>
                         <td style={{ color: "var(--ice-text-muted)", fontSize: "0.82rem" }}>
-                          {new Date(m.createdAt).toLocaleDateString("fr-FR", {
+                          {new Date(m.createdAt).toLocaleDateString(dateLocale, {
                             day: "2-digit",
                             month: "2-digit",
                             year: "numeric",
@@ -1382,11 +1395,7 @@ export function PartsView({
                               color: isOut ? "#fb7185" : "#4ade80",
                             }}
                           >
-                            {m.type === "SORTIE_ATELIER"
-                              ? "SORTIE ATELIER"
-                              : m.type === "ENTREE_ACHAT"
-                              ? "ENTRÉE ACHAT"
-                              : m.type}
+                            {movementTypeLabel(copy, m.type)}
                           </span>
                         </td>
                         <td style={{ fontWeight: 700, color: isOut ? "#fb7185" : "#4ade80" }}>
@@ -1402,7 +1411,7 @@ export function PartsView({
                           {m.reason || "-"}
                         </td>
                         <td style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)" }}>
-                          {m.performedBy || "Système"}
+                          {m.performedBy || copy.operatorSystem}
                         </td>
                       </tr>
                     );
@@ -1447,7 +1456,7 @@ export function PartsView({
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.2rem" }}>
               <h3 style={{ fontSize: "1.3rem", fontWeight: 700, margin: 0 }}>
-                Enregistrer une Nouvelle Pièce Détachée
+                {copy.createTitle}
               </h3>
               <button
                 type="button"
@@ -1468,23 +1477,23 @@ export function PartsView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <div>
                   <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                    Code CARZONE (interne) *
+                    {copy.createCodeLabel}
                   </label>
                   <input
                     name="partNumber"
                     required
-                    placeholder="Ex: CZ-BRK-35011"
+                    placeholder={copy.createCodePlaceholder}
                     className="ox-input"
                     style={{ width: "100%" }}
                   />
                 </div>
                 <div>
                   <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                    Référence OEM Constructeur (opt.)
+                    {copy.createOemLabel}
                   </label>
                   <input
                     name="oemNumber"
-                    placeholder="Ex: 3501110-M01"
+                    placeholder={copy.createOemPlaceholder}
                     className="ox-input"
                     style={{ width: "100%" }}
                   />
@@ -1493,12 +1502,12 @@ export function PartsView({
 
               <div>
                 <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                  Désignation de la pièce *
+                  {copy.createNameLabel}
                 </label>
                 <input
                   name="name"
                   required
-                  placeholder="Ex: Jeu de plaquettes de frein avant (Patin)"
+                  placeholder={copy.createNamePlaceholder}
                   className="ox-input"
                   style={{ width: "100%" }}
                 />
@@ -1507,41 +1516,37 @@ export function PartsView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
                 <div>
                   <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                    Catégorie
+                    {copy.createCategoryLabel}
                   </label>
                   <select name="category" className="ox-select" style={{ width: "100%" }}>
-                    <option value="FREINAGE">FREINAGE</option>
-                    <option value="FILTRATION">FILTRATION</option>
-                    <option value="SUSPENSION">SUSPENSION</option>
-                    <option value="MOTEUR">MOTEUR</option>
-                    <option value="ELECTRICITE">ÉLECTRICITÉ</option>
-                    <option value="ECLAIRAGE">ÉCLAIRAGE</option>
-                    <option value="CARROSSERIE">CARROSSERIE</option>
-                    <option value="FLUIDES">FLUIDES & HUILES</option>
-                    <option value="AUTRE">AUTRE</option>
+                    {PART_CATEGORY_KEYS.map((key) => (
+                      <option key={key} value={key}>
+                        {copy.category[key]}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>
                   <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                    Fabricant / Marque
+                    {copy.createManufacturerLabel}
                   </label>
                   <input
                     name="manufacturer"
-                    placeholder="Ex: OEM Changan / Bosch"
+                    placeholder={copy.createManufacturerPlaceholder}
                     className="ox-input"
                     style={{ width: "100%" }}
                   />
                 </div>
                 <div>
                   <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                    Unité
+                    {copy.createUnitLabel}
                   </label>
                   <select name="unit" className="ox-select" style={{ width: "100%" }}>
-                    <option value="JEU">JEU</option>
-                    <option value="PIECE">PIÈCE</option>
-                    <option value="PAIRE">PAIRE</option>
-                    <option value="LITRE">LITRE</option>
-                    <option value="KIT">KIT</option>
+                    {PART_UNIT_KEYS.map((key) => (
+                      <option key={key} value={key}>
+                        {copy.unit[key]}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -1549,7 +1554,7 @@ export function PartsView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
                 <div>
                   <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                    Quantité stock initial
+                    {copy.createStockLabel}
                   </label>
                   <input
                     name="stockQuantity"
@@ -1562,7 +1567,7 @@ export function PartsView({
                 </div>
                 <div>
                   <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                    Seuil alerte réappro
+                    {copy.createAlertLabel}
                   </label>
                   <input
                     name="minStockAlert"
@@ -1575,11 +1580,11 @@ export function PartsView({
                 </div>
                 <div>
                   <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                    Emplacement Magasin
+                    {copy.createLocationLabel}
                   </label>
                   <input
                     name="location"
-                    placeholder="Ex: Rayon B - Casier 04"
+                    placeholder={copy.createLocationPlaceholder}
                     className="ox-input"
                     style={{ width: "100%" }}
                   />
@@ -1589,7 +1594,7 @@ export function PartsView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <div>
                   <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                    Prix d&apos;achat (FCFA)
+                    {copy.createPurchaseLabel}
                   </label>
                   <input
                     name="purchasePriceXof"
@@ -1602,7 +1607,7 @@ export function PartsView({
                 </div>
                 <div>
                   <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                    Prix de vente Atelier (FCFA)
+                    {copy.createSaleLabel}
                   </label>
                   <input
                     name="sellingPriceXof"
@@ -1625,17 +1630,17 @@ export function PartsView({
                 }}
               >
                 <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "#c084fc", marginBottom: "0.5rem" }}>
-                  Première Référence Croisée / Équivalence (opt.)
+                  {copy.createCrossRefTitle}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
                   <input
                     name="initialCrossBrand"
-                    placeholder="Marque équivalente (ex: JETOUR, BOSCH)"
+                    placeholder={copy.createCrossRefBrandPlaceholder}
                     className="ox-input"
                   />
                   <input
                     name="initialCrossRef"
-                    placeholder="Code équivalent (ex: T15-3501080)"
+                    placeholder={copy.createCrossRefCodePlaceholder}
                     className="ox-input"
                   />
                 </div>
@@ -1651,17 +1656,17 @@ export function PartsView({
                 }}
               >
                 <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "#38bdf8", marginBottom: "0.5rem" }}>
-                  Premier Véhicule Compatible certifié (opt.)
+                  {copy.createCompatTitle}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
                   <input
                     name="compatBrand"
-                    placeholder="Marque voiture (ex: CHANGAN)"
+                    placeholder={copy.createCompatBrandPlaceholder}
                     className="ox-input"
                   />
                   <input
                     name="compatModel"
-                    placeholder="Modèle voiture (ex: CS35 PLUS)"
+                    placeholder={copy.createCompatModelPlaceholder}
                     className="ox-input"
                   />
                 </div>
@@ -1674,14 +1679,14 @@ export function PartsView({
                   className="ox-btn"
                   style={{ background: "rgba(255,255,255,0.08)" }}
                 >
-                  Annuler
+                  {copy.cancel}
                 </button>
                 <button
                   type="submit"
                   className="ox-btn"
                   style={{ background: "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)", border: "none" }}
                 >
-                  Créer et enregistrer
+                  {copy.createSubmit}
                 </button>
               </div>
             </form>
@@ -1722,10 +1727,14 @@ export function PartsView({
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
               <div>
                 <h3 style={{ fontSize: "1.25rem", fontWeight: 700, margin: 0 }}>
-                  Gestion des Croisements · {selectedPartForDetails.partNumber}
+                  {copy.detailsTitle(selectedPartForDetails.partNumber)}
                 </h3>
                 <div style={{ fontSize: "0.85rem", color: "var(--ice-text-muted)" }}>
-                  {selectedPartForDetails.name} (Stock: {selectedPartForDetails.stockQuantity} {selectedPartForDetails.unit})
+                  {copy.detailsSubtitle(
+                    selectedPartForDetails.name,
+                    selectedPartForDetails.stockQuantity,
+                    partUnitLabel(copy, selectedPartForDetails.unit)
+                  )}
                 </div>
               </div>
               <button
@@ -1748,7 +1757,7 @@ export function PartsView({
                 }}
               >
                 <h4 style={{ margin: "0 0 0.8rem", color: "#c084fc", fontSize: "0.95rem", fontWeight: 700 }}>
-                  + Ajouter une Nouvelle Référence Croisée (Équivalence)
+                  {copy.detailsAddCrossRefTitle}
                 </h4>
 
                 <form
@@ -1763,13 +1772,13 @@ export function PartsView({
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
                     <div>
                       <label style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 3 }}>
-                        Marque / Équipementier
+                        {copy.detailsBrandLabel}
                       </label>
                       <input
                         name="brand"
                         value={newCrossRefBrand}
                         onChange={(e) => setNewCrossRefBrand(e.target.value)}
-                        placeholder="Ex: JETOUR, BOSCH, CHERY, BREMBO"
+                        placeholder={copy.detailsBrandPlaceholder}
                         className="ox-input"
                         required
                         style={{ width: "100%" }}
@@ -1777,13 +1786,13 @@ export function PartsView({
                     </div>
                     <div>
                       <label style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 3 }}>
-                        Référence équivalente *
+                        {copy.detailsCodeLabel}
                       </label>
                       <input
                         name="crossReference"
                         value={newCrossRefCode}
                         onChange={(e) => setNewCrossRefCode(e.target.value)}
-                        placeholder="Ex: T15-3501080 ou 0 986 494 567"
+                        placeholder={copy.detailsCodePlaceholder}
                         className="ox-input"
                         required
                         style={{ width: "100%" }}
@@ -1796,7 +1805,7 @@ export function PartsView({
                       name="notes"
                       value={newCrossRefNotes}
                       onChange={(e) => setNewCrossRefNotes(e.target.value)}
-                      placeholder="Remarque technique (ex: Même étrier, dimensions identiques)"
+                      placeholder={copy.detailsNotesPlaceholder}
                       className="ox-input"
                       style={{ width: "100%" }}
                     />
@@ -1808,7 +1817,7 @@ export function PartsView({
                       className="ox-btn"
                       style={{ background: "#9333ea", border: "none", fontSize: "0.85rem" }}
                     >
-                      Enregistrer la Référence Croisée
+                      {copy.detailsAddCrossRefSubmit}
                     </button>
                   </div>
                 </form>
@@ -1824,7 +1833,7 @@ export function PartsView({
                 }}
               >
                 <h4 style={{ margin: "0 0 0.8rem", color: "#38bdf8", fontSize: "0.95rem", fontWeight: 700 }}>
-                  + Associer un Modèle de Véhicule Compatible
+                  {copy.detailsAddCompatTitle}
                 </h4>
 
                 <form
@@ -1839,13 +1848,13 @@ export function PartsView({
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
                     <div>
                       <label style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 3 }}>
-                        Marque Véhicule
+                        {copy.detailsVehicleBrandLabel}
                       </label>
                       <input
                         name="vehicleBrand"
                         value={newCompatBrand}
                         onChange={(e) => setNewCompatBrand(e.target.value)}
-                        placeholder="Ex: JETOUR, CHANGAN, BAIC"
+                        placeholder={copy.detailsVehicleBrandPlaceholder}
                         className="ox-input"
                         required
                         style={{ width: "100%" }}
@@ -1853,13 +1862,13 @@ export function PartsView({
                     </div>
                     <div>
                       <label style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 3 }}>
-                        Modèle Véhicule *
+                        {copy.detailsVehicleModelLabel}
                       </label>
                       <input
                         name="vehicleModel"
                         value={newCompatModel}
                         onChange={(e) => setNewCompatModel(e.target.value)}
-                        placeholder="Ex: DASHING, CS55 PLUS, T5 EVO"
+                        placeholder={copy.detailsVehicleModelPlaceholder}
                         className="ox-input"
                         required
                         style={{ width: "100%" }}
@@ -1870,19 +1879,19 @@ export function PartsView({
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.75rem" }}>
                     <input
                       name="years"
-                      placeholder="Années (ex: 2022-2026)"
+                      placeholder={copy.detailsYearsPlaceholder}
                       className="ox-input"
                     />
                     <input
                       name="engine"
                       value={newCompatEngine}
                       onChange={(e) => setNewCompatEngine(e.target.value)}
-                      placeholder="Moteur (ex: 1.5T Turbo)"
+                      placeholder={copy.detailsEnginePlaceholder}
                       className="ox-input"
                     />
                     <input
                       name="position"
-                      placeholder="Position (ex: Avant, Arrière)"
+                      placeholder={copy.detailsPositionPlaceholder}
                       className="ox-input"
                     />
                   </div>
@@ -1893,7 +1902,7 @@ export function PartsView({
                       className="ox-btn"
                       style={{ background: "#0284c7", border: "none", fontSize: "0.85rem" }}
                     >
-                      Associer ce Véhicule
+                      {copy.detailsAddCompatSubmit}
                     </button>
                   </div>
                 </form>
@@ -1905,7 +1914,7 @@ export function PartsView({
                   onClick={() => setSelectedPartForDetails(null)}
                   className="ox-btn"
                 >
-                  Fermer
+                  {copy.close}
                 </button>
               </div>
             </div>
@@ -1943,7 +1952,7 @@ export function PartsView({
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
               <h3 style={{ fontSize: "1.2rem", fontWeight: 700, margin: 0 }}>
-                Mouvement de Stock · {movementPart.partNumber}
+                {copy.movementTitle(movementPart.partNumber)}
               </h3>
               <button
                 type="button"
@@ -1955,7 +1964,7 @@ export function PartsView({
             </div>
 
             <div style={{ fontSize: "0.85rem", color: "var(--ice-text-muted)", marginBottom: "1rem" }}>
-              Stock actuel : <strong style={{ color: "#4ade80" }}>{movementPart.stockQuantity} {movementPart.unit}</strong>
+              {copy.movementCurrentStock} <strong style={{ color: "#4ade80" }}>{movementPart.stockQuantity} {partUnitLabel(copy, movementPart.unit)}</strong>
             </div>
 
             <form
@@ -1968,19 +1977,20 @@ export function PartsView({
             >
               <div>
                 <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                  Type d&apos;opération
+                  {copy.movementTypeLabel}
                 </label>
                 <select name="type" className="ox-select" style={{ width: "100%" }}>
-                  <option value="ENTREE_ACHAT">Entrée en stock (Réception commande fournisseur)</option>
-                  <option value="SORTIE_ATELIER">Sortie vers atelier (Consommation réparation)</option>
-                  <option value="RETOUR_STOCK">Retour de pièce non utilisée</option>
-                  <option value="AJUSTEMENT_INVENTAIRE">Ajustement inventaire physique</option>
+                  {PART_MOVEMENT_TYPE_KEYS.map((key) => (
+                    <option key={key} value={key}>
+                      {copy.movementType[key]}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div>
                 <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                  Quantité
+                  {copy.movementQuantityLabel}
                 </label>
                 <input
                   name="quantity"
@@ -1995,11 +2005,11 @@ export function PartsView({
 
               <div>
                 <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                  N° de Document / Référence (opt.)
+                  {copy.movementDocumentLabel}
                 </label>
                 <input
                   name="referenceDoc"
-                  placeholder="Ex: BC-2026-089, OR-042..."
+                  placeholder={copy.movementDocumentPlaceholder}
                   className="ox-input"
                   style={{ width: "100%" }}
                 />
@@ -2007,11 +2017,11 @@ export function PartsView({
 
               <div>
                 <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                  Motif / Raison
+                  {copy.movementReasonLabel}
                 </label>
                 <input
                   name="reason"
-                  placeholder="Ex: Arrivage conteneur Shanghai, entretien rapide..."
+                  placeholder={copy.movementReasonPlaceholder}
                   className="ox-input"
                   style={{ width: "100%" }}
                 />
@@ -2024,14 +2034,14 @@ export function PartsView({
                   className="ox-btn"
                   style={{ background: "rgba(255,255,255,0.08)" }}
                 >
-                  Annuler
+                  {copy.cancel}
                 </button>
                 <button
                   type="submit"
                   className="ox-btn"
                   style={{ background: "#16a34a", border: "none" }}
                 >
-                  Valider le Mouvement
+                  {copy.movementSubmit}
                 </button>
               </div>
             </form>
@@ -2069,7 +2079,7 @@ export function PartsView({
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
               <h3 style={{ fontSize: "1.2rem", fontWeight: 700, margin: 0 }}>
-                Imputer la Pièce sur un Ordre de Réparation (OR)
+                {copy.assignTitle}
               </h3>
               <button
                 type="button"
@@ -2089,9 +2099,9 @@ export function PartsView({
                 fontSize: "0.85rem",
               }}
             >
-              <div><strong>Pièce :</strong> {assignPart.name} ({assignPart.partNumber})</div>
-              <div><strong>Disponible en stock :</strong> {assignPart.stockQuantity} {assignPart.unit}</div>
-              <div><strong>Prix de facturation :</strong> {formatXof(assignPart.sellingPriceXof)}</div>
+              <div><strong>{copy.assignPartLabel}</strong> {assignPart.name} ({assignPart.partNumber})</div>
+              <div><strong>{copy.assignAvailableLabel}</strong> {assignPart.stockQuantity} {partUnitLabel(copy, assignPart.unit)}</div>
+              <div><strong>{copy.assignPriceLabel}</strong> {formatXof(assignPart.sellingPriceXof)}</div>
             </div>
 
             <form
@@ -2104,10 +2114,10 @@ export function PartsView({
             >
               <div>
                 <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                  Sélectionner le Véhicule / OR de l&apos;Atelier SAV *
+                  {copy.assignEntryLabel}
                 </label>
                 <select name="workshopEntryId" required className="ox-select" style={{ width: "100%" }}>
-                  <option value="">-- Choisir un dossier en cours à l&apos;atelier --</option>
+                  <option value="">-- {copy.assignEntryPlaceholder} --</option>
                   {workshopEntries.map((w) => (
                     <option key={w.id} value={w.id}>
                       {w.immatriculation} {w.brand ? `(${w.brand} ${w.model || ""})` : ""} · {w.clientName} {w.orNumber ? `[OR: ${w.orNumber}]` : ""}
@@ -2118,7 +2128,7 @@ export function PartsView({
 
               <div>
                 <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                  Quantité à prélever
+                  {copy.assignQuantityLabel}
                 </label>
                 <input
                   name="quantity"
@@ -2134,11 +2144,11 @@ export function PartsView({
 
               <div>
                 <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                  Observation technicien (opt.)
+                  {copy.assignNotesLabel}
                 </label>
                 <input
                   name="notes"
-                  placeholder="Ex: Remplacement plaquettes avant sous garantie / révision 20 000 km"
+                  placeholder={copy.assignNotesPlaceholder}
                   className="ox-input"
                   style={{ width: "100%" }}
                 />
@@ -2151,14 +2161,14 @@ export function PartsView({
                   className="ox-btn"
                   style={{ background: "rgba(255,255,255,0.08)" }}
                 >
-                  Annuler
+                  {copy.cancel}
                 </button>
                 <button
                   type="submit"
                   className="ox-btn"
                   style={{ background: "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)", border: "none" }}
                 >
-                  Confirmer le prélèvement & sortir du stock
+                  {copy.assignSubmit}
                 </button>
               </div>
             </form>

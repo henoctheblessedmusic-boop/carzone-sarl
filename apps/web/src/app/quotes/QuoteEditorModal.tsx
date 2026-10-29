@@ -108,7 +108,7 @@ export function QuoteEditorModal({
         unitPriceXof: 0,
       },
     ]);
-    triggerActionFeedback(copy.creator.feedback.emptyLineAdded, newId);
+    triggerActionFeedback(copy.editor.feedback.emptyLineAdded, newId);
   };
 
   const removeLine = (id: string) => {

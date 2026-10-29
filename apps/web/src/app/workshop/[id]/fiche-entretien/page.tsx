@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/require-user";
 import { FicheEntretienSystematiquePrint } from "@/components/workshop/FicheEntretienSystematiquePrint";
+import { getServerMessages } from "@/lib/i18n/server";
+import { workshopCopy } from "@/lib/i18n/messages/workshop";
 
 export default async function FicheEntretienPage({
   params,
@@ -9,6 +11,8 @@ export default async function FicheEntretienPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const { locale } = await getServerMessages();
+  const copy = workshopCopy[locale];
 
   // Sécurité d'accès selon les rôles
   await requireUser([
@@ -47,15 +51,16 @@ export default async function FicheEntretienPage({
   const printData = {
     id: entry.id,
     orNumber: entry.orNumber || "OR-SYS",
-    entryDate: entry.entryDate || new Date(entry.createdAt).toLocaleDateString("fr-FR"),
+    entryDate:
+      entry.entryDate || new Date(entry.createdAt).toLocaleDateString(copy.dateLocale),
     brand: entry.brand || "-",
     model: entry.model || "-",
-    immatriculation: entry.immatriculation || "EN COURS",
+    immatriculation: entry.immatriculation || copy.print.fallbacks.immatInProgress,
     chassis: entry.chassis || "-",
     mileage: entry.mileage || 0,
     oilType: entry.oilType || undefined,
     pv: entry.pv || undefined,
-    clientName: entry.clientName || "Client Carzone",
+    clientName: entry.clientName || copy.print.fallbacks.clientName,
     phone: entry.phone || "",
     startTime: entry.startTime || undefined,
     endTime: entry.endTime || undefined,

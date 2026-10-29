@@ -2,20 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
-import { formatDate, formatXof } from "@/lib/format";
+import { formatXof } from "@/lib/format";
+import { getServerMessages } from "@/lib/i18n/server";
+import {
+  invoicesCopy,
+  paymentMethodLabel,
+  formatInvoiceDate,
+} from "@/lib/i18n/messages/invoices";
 import { PrintButton } from "@/components/PrintButton";
-
-const METHOD_LABELS: Record<string, string> = {
-  MTN_MOMO: "MTN Mobile Money Bénin",
-  MOOV_MONEY: "Moov Money Bénin",
-  MOBILE_MONEY: "Mobile Money Bénin",
-  VIREMENT_ECOBANK: "Virement Ecobank Bénin",
-  VIREMENT_BOA: "Virement Bank of Africa Bénin",
-  VIREMENT: "Virement Bancaire",
-  CHEQUE: "Chèque Bancaire",
-  ESPECES: "Espèces (Caisse Showroom)",
-  CARTE: "Carte Bancaire",
-};
 
 export default async function PaymentReceiptPage({
   params,
@@ -23,6 +17,8 @@ export default async function PaymentReceiptPage({
   params: Promise<{ id: string }>;
 }) {
   await requireUser(["DG", "COMMERCIAL", "COMPTA"]);
+  const { locale } = await getServerMessages();
+  const copy = invoicesCopy[locale];
   const { id } = await params;
 
   const payment = await prisma.payment.findUnique({
@@ -64,11 +60,11 @@ export default async function PaymentReceiptPage({
         }}
       >
         <Link href="/invoices" className="ox-btn ox-btn-ghost" style={{ color: "#fff" }}>
-          ← Retour Factures & Règlements
+          {copy.receipt.back}
         </Link>
         <PrintButton />
         <span style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.7)" }}>
-          Quittance officielle d&apos;encaissement · {regNumber}
+          {copy.receipt.actionHint(regNumber)}
         </span>
       </div>
 
@@ -111,20 +107,20 @@ export default async function PaymentReceiptPage({
             />
             <div style={{ fontWeight: 700, fontSize: "1rem" }}>CARZONE SARL</div>
             <div style={{ fontSize: "0.82rem", opacity: 0.75, lineHeight: 1.35 }}>
-              Zone Maro-Militaire, Gbèdomidji · Cotonou<br />
-              IFU : 0202314589201 · Tél : +229 21 33 00 00
+              {copy.receipt.companyAddress}<br />
+              {copy.receipt.companyFiscal}
             </div>
           </div>
 
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: "1.3rem", fontWeight: 800, color: "#10b981" }}>
-              QUITTANCE DE PAIEMENT
+              {copy.receipt.docTitle}
             </div>
             <div style={{ fontSize: "1.05rem", fontWeight: 700, marginTop: 4 }}>
               {regNumber}
             </div>
             <div style={{ fontSize: "0.85rem", opacity: 0.7, marginTop: 2 }}>
-              Date : {formatDate(payment.paidAt)}
+              {copy.receipt.date(formatInvoiceDate(copy, payment.paidAt))}
             </div>
           </div>
         </header>
@@ -132,12 +128,12 @@ export default async function PaymentReceiptPage({
         {/* Corps de la quittance */}
         <div style={{ fontSize: "0.95rem", lineHeight: 1.8, marginBottom: "2rem" }}>
           <div>
-            Reçu de : <strong>{invoice.customer.contactName}</strong>
+            {copy.receipt.receivedFrom} <strong>{invoice.customer.contactName}</strong>
             {invoice.customer.companyName && <span> ({invoice.customer.companyName})</span>}
           </div>
           {invoice.customer.phone && (
             <div style={{ fontSize: "0.85rem", opacity: 0.75 }}>
-              Téléphone : {invoice.customer.phone}
+              {copy.receipt.phone} {invoice.customer.phone}
             </div>
           )}
 
@@ -152,7 +148,7 @@ export default async function PaymentReceiptPage({
             }}
           >
             <div style={{ fontSize: "0.85rem", textTransform: "uppercase", color: "#166534", fontWeight: 700, marginBottom: 4 }}>
-              Montant Encaissé
+              {copy.receipt.amountCollected}
             </div>
             <div style={{ fontSize: "2rem", fontWeight: 800, color: "#15803d" }}>
               {formatXof(payment.amountXof)}
@@ -161,20 +157,20 @@ export default async function PaymentReceiptPage({
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", fontSize: "0.88rem", background: "#f8fafc", padding: "1rem", borderRadius: 6, border: "1px solid #e2e8f0" }}>
             <div>
-              <strong>Mode de règlement :</strong><br />
-              {METHOD_LABELS[payment.method] || payment.method}
+              <strong>{copy.receipt.method}</strong><br />
+              {paymentMethodLabel(copy, payment.method)}
             </div>
             <div>
-              <strong>Réf. Transaction / Pièce :</strong><br />
-              {payment.reference || "Aucune référence spécifiée"}
+              <strong>{copy.receipt.reference}</strong><br />
+              {payment.reference || copy.receipt.noReference}
             </div>
             <div>
-              <strong>Facture concernée :</strong><br />
+              <strong>{copy.receipt.invoice}</strong><br />
               {invoice.number}
             </div>
             <div>
-              <strong>Motif / Notes :</strong><br />
-              {payment.notes || "Règlement acompte / solde"}
+              <strong>{copy.receipt.notes}</strong><br />
+              {payment.notes || copy.receipt.defaultNote}
             </div>
           </div>
         </div>
@@ -189,14 +185,14 @@ export default async function PaymentReceiptPage({
           }}
         >
           <strong style={{ display: "block", marginBottom: 8, color: "#0f172a" }}>
-            Situation du Compte Client sur la Facture {invoice.number} :
+            {copy.receipt.accountTitle(invoice.number)}
           </strong>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-            <span>Montant total de la facture TTC :</span>
+            <span>{copy.receipt.totalInvoice}</span>
             <strong>{formatXof(invoice.totalXof)}</strong>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, color: "#15803d" }}>
-            <span>Total cumulé des encaissements :</span>
+            <span>{copy.receipt.totalCollected}</span>
             <strong>{formatXof(totalPaidOverall)}</strong>
           </div>
           <div
@@ -209,8 +205,12 @@ export default async function PaymentReceiptPage({
               color: isSettled ? "#15803d" : "#b91c1c",
             }}
           >
-            <span>Solde restant dû :</span>
-            <strong>{isSettled ? "0 FCFA (Facture Soldée)" : formatXof(remainingBalance)}</strong>
+            <span>{copy.receipt.balanceDue}</span>
+            <strong>
+              {isSettled
+                ? `${formatXof(0)} (${copy.receipt.settledTag})`
+                : formatXof(remainingBalance)}
+            </strong>
           </div>
         </div>
 
@@ -227,12 +227,12 @@ export default async function PaymentReceiptPage({
           }}
         >
           <div>
-            Quittance établie en bonne et due forme pour valoir ce que de droit.<br />
-            Document certifié émis par CARZONE SARL Cotonou.
+            {copy.receipt.footerLegal}<br />
+            {copy.receipt.footerCertified}
           </div>
           <div style={{ textAlign: "center", width: 200 }}>
-            <div style={{ fontWeight: 700, marginBottom: 40 }}>Pour Acquit / La Caisse</div>
-            <div style={{ fontSize: "0.75rem", fontStyle: "italic", opacity: 0.6 }}>Cachet &amp; Signature</div>
+            <div style={{ fontWeight: 700, marginBottom: 40 }}>{copy.receipt.forCashier}</div>
+            <div style={{ fontSize: "0.75rem", fontStyle: "italic", opacity: 0.6 }}>{copy.receipt.stamp}</div>
           </div>
         </footer>
       </article>

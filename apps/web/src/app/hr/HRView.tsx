@@ -21,6 +21,14 @@ import {
   Wallet,
 } from "lucide-react";
 import { PayrollTab, type SalaryPaymentData } from "./components/PayrollTab";
+import { usePrefs } from "@/components/PrefsProvider";
+import {
+  adminCopy,
+  contractTypeLabel,
+  contractTypeLongLabel,
+  employeeStatusLabel,
+  leaveStatusLabel,
+} from "@/lib/i18n/messages/admin";
 import {
   createEmployee,
   updateEmployee,
@@ -130,6 +138,10 @@ export function HRView({
 }) {
   const [activeTab, setActiveTab] = useState<"personnel" | "conges" | "paie" | "config">("personnel");
   const [isPending, startTransition] = useTransition();
+
+  const { locale } = usePrefs();
+  const copy = adminCopy[locale];
+  const hrCopy = copy.hr;
 
   // Local states
   const [employees, setEmployees] = useState<EmployeeData[]>(initialEmployees);
@@ -320,21 +332,21 @@ export function HRView({
         }
         setShowEmployeeModal(false);
       } catch (err) {
-        alert(err instanceof Error ? err.message : "Erreur lors de l'enregistrement de l'employé.");
+        alert(err instanceof Error ? err.message : hrCopy.alerts.errSaveEmployee);
       }
     });
   };
 
   // Delete Employee
   const handleDeleteEmployee = async (id: string, name: string) => {
-    if (!confirm(`Confirmez-vous la suppression du dossier de ${name} ?`)) return;
+    if (!confirm(hrCopy.alerts.confirmDeleteEmployee(name))) return;
     startTransition(async () => {
       try {
         await deleteEmployee(id);
         setEmployees((prev) => prev.filter((e) => e.id !== id));
         if (viewingEmployee?.id === id) setViewingEmployee(null);
       } catch (err) {
-        alert(err instanceof Error ? err.message : "Erreur lors de la suppression.");
+        alert(err instanceof Error ? err.message : hrCopy.alerts.errDelete);
       }
     });
   };
@@ -343,7 +355,7 @@ export function HRView({
   const handleSaveLeaveRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!leaveForm.employeeId || !leaveForm.leaveTypeId) {
-      alert("Veuillez sélectionner un employé et un type de congé.");
+      alert(hrCopy.alerts.selectEmployeeAndType);
       return;
     }
     startTransition(async () => {
@@ -383,7 +395,7 @@ export function HRView({
         ]);
         setShowLeaveModal(false);
       } catch (err) {
-        alert(err instanceof Error ? err.message : "Erreur lors de la création de la demande.");
+        alert(err instanceof Error ? err.message : hrCopy.alerts.errLeaveCreate);
       }
     });
   };
@@ -399,7 +411,7 @@ export function HRView({
           )
         );
       } catch (err) {
-        alert(err instanceof Error ? err.message : "Erreur lors de la validation du congé.");
+        alert(err instanceof Error ? err.message : hrCopy.alerts.errLeaveApprove);
       }
     });
   };
@@ -420,26 +432,22 @@ export function HRView({
         setRejectingRequestId(null);
         setRejectionReasonText("");
       } catch (err) {
-        alert(err instanceof Error ? err.message : "Erreur lors du refus de la demande.");
+        alert(err instanceof Error ? err.message : hrCopy.alerts.errLeaveReject);
       }
     });
   };
 
   // Seed standard base
   const handleSeedStandardBase = async () => {
-    if (
-      !confirm(
-        "Voulez-vous initialiser le référentiel RH standard (Départements & Types de congés selon le Code du Travail Béninois et les normes OHADA) ?"
-      )
-    )
+    if (!confirm(hrCopy.alerts.confirmSeed))
       return;
     startTransition(async () => {
       try {
         await seedStandardHrBase();
-        alert("Référentiel RH standard initialisé avec succès ! Rechargement...");
+        alert(hrCopy.alerts.seedDone);
         window.location.reload();
       } catch (err) {
-        alert(err instanceof Error ? err.message : "Erreur lors de l'initialisation.");
+        alert(err instanceof Error ? err.message : hrCopy.alerts.errSeed);
       }
     });
   };
@@ -496,10 +504,10 @@ export function HRView({
             </div>
             <div>
               <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.02em" }}>
-                Ressources Humaines (RH)
+                {hrCopy.title}
               </h1>
               <p style={{ margin: "2px 0 0", fontSize: "0.85rem", opacity: 0.75 }}>
-                Gestion du personnel, contrats, congés, soldes et référentiel d&apos;entreprise
+                {hrCopy.subtitle}
               </p>
             </div>
           </div>
@@ -513,7 +521,7 @@ export function HRView({
               className="ox-btn ox-btn-primary"
               style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}
             >
-              <Plus size={16} /> Nouveau Salarié
+              <Plus size={16} /> {hrCopy.actions.newEmployee}
             </button>
           )}
           {activeTab === "conges" && (
@@ -533,7 +541,7 @@ export function HRView({
               className="ox-btn ox-btn-primary"
               style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}
             >
-              <Plus size={16} /> Demande de Congé
+              <Plus size={16} /> {hrCopy.actions.newLeave}
             </button>
           )}
           {activeTab === "config" && (
@@ -549,7 +557,7 @@ export function HRView({
                 gap: "0.4rem",
               }}
             >
-              <Sparkles size={16} /> Initialiser Normes Bénin / OHADA
+              <Sparkles size={16} /> {hrCopy.actions.seedBase}
             </button>
           )}
         </div>
@@ -583,8 +591,8 @@ export function HRView({
             <Users size={18} />
           </div>
           <div>
-            <div style={{ fontSize: "0.75rem", opacity: 0.7 }}>Effectif Total</div>
-            <div style={{ fontSize: "1.25rem", fontWeight: 700 }}>{totalEmployees} salariés</div>
+            <div style={{ fontSize: "0.75rem", opacity: 0.7 }}>{hrCopy.kpi.headcount}</div>
+            <div style={{ fontSize: "1.25rem", fontWeight: 700 }}>{hrCopy.kpi.headcountValue(totalEmployees)}</div>
           </div>
         </div>
 
@@ -607,8 +615,8 @@ export function HRView({
             <UserCheck size={18} />
           </div>
           <div>
-            <div style={{ fontSize: "0.75rem", opacity: 0.7 }}>Salariés Actifs</div>
-            <div style={{ fontSize: "1.25rem", fontWeight: 700 }}>{activeEmployees} en poste ({onLeaveEmployees} en congé)</div>
+            <div style={{ fontSize: "0.75rem", opacity: 0.7 }}>{hrCopy.kpi.active}</div>
+            <div style={{ fontSize: "1.25rem", fontWeight: 700 }}>{hrCopy.kpi.activeValue(activeEmployees, onLeaveEmployees)}</div>
           </div>
         </div>
 
@@ -631,8 +639,8 @@ export function HRView({
             <Clock size={18} />
           </div>
           <div>
-            <div style={{ fontSize: "0.75rem", opacity: 0.7 }}>Congés en Attente</div>
-            <div style={{ fontSize: "1.25rem", fontWeight: 700 }}>{pendingLeaves} demande(s)</div>
+            <div style={{ fontSize: "0.75rem", opacity: 0.7 }}>{hrCopy.kpi.pending}</div>
+            <div style={{ fontSize: "1.25rem", fontWeight: 700 }}>{hrCopy.kpi.pendingValue(pendingLeaves)}</div>
           </div>
         </div>
 
@@ -655,8 +663,8 @@ export function HRView({
             <Building size={18} />
           </div>
           <div>
-            <div style={{ fontSize: "0.75rem", opacity: 0.7 }}>Départements</div>
-            <div style={{ fontSize: "1.25rem", fontWeight: 700 }}>{departments.length} services</div>
+            <div style={{ fontSize: "0.75rem", opacity: 0.7 }}>{hrCopy.kpi.departments}</div>
+            <div style={{ fontSize: "1.25rem", fontWeight: 700 }}>{hrCopy.kpi.departmentsValue(departments.length)}</div>
           </div>
         </div>
       </div>
@@ -686,7 +694,7 @@ export function HRView({
             fontSize: "0.95rem",
           }}
         >
-          <Users size={16} /> Personnel & Salariés ({employees.length})
+          <Users size={16} /> {hrCopy.tabs.personnel(employees.length)}
         </button>
 
         <button
@@ -706,7 +714,7 @@ export function HRView({
             position: "relative",
           }}
         >
-          <Calendar size={16} /> Congés & Absences
+          <Calendar size={16} /> {hrCopy.tabs.leaves}
           {pendingLeaves > 0 && (
             <span
               style={{
@@ -739,7 +747,7 @@ export function HRView({
             fontSize: "0.95rem",
           }}
         >
-          <Wallet size={16} /> Suivi Paie & Salaires (Comptabilité)
+          <Wallet size={16} /> {hrCopy.tabs.payroll}
         </button>
 
         <button
@@ -758,7 +766,7 @@ export function HRView({
             fontSize: "0.95rem",
           }}
         >
-          <Building size={16} /> Configuration & Référentiel RH
+          <Building size={16} /> {hrCopy.tabs.config}
         </button>
       </div>
 
@@ -786,7 +794,7 @@ export function HRView({
               />
               <input
                 type="text"
-                placeholder="Rechercher par nom, matricule, poste, téléphone..."
+                placeholder={hrCopy.personnel.searchPlaceholder}
                 value={empSearch}
                 onChange={(e) => setEmpSearch(e.target.value)}
                 className="ox-input"
@@ -801,7 +809,7 @@ export function HRView({
                 className="ox-select"
                 style={{ width: "100%" }}
               >
-                <option value="ALL">Tous départements</option>
+                <option value="ALL">{hrCopy.personnel.allDepartments}</option>
                 {departments.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.name}
@@ -817,12 +825,12 @@ export function HRView({
                 className="ox-select"
                 style={{ width: "100%" }}
               >
-                <option value="ALL">Tous contrats</option>
-                <option value="CDI">CDI</option>
-                <option value="CDD">CDD</option>
-                <option value="STAGE">Stage</option>
-                <option value="PRESTATION">Prestation</option>
-                <option value="ESSAI">Période d&apos;essai</option>
+                <option value="ALL">{hrCopy.personnel.allContracts}</option>
+                <option value="CDI">{contractTypeLabel(copy, "CDI")}</option>
+                <option value="CDD">{contractTypeLabel(copy, "CDD")}</option>
+                <option value="STAGE">{contractTypeLabel(copy, "STAGE")}</option>
+                <option value="PRESTATION">{contractTypeLabel(copy, "PRESTATION")}</option>
+                <option value="ESSAI">{contractTypeLongLabel(copy, "ESSAI")}</option>
               </select>
             </div>
 
@@ -833,11 +841,11 @@ export function HRView({
                 className="ox-select"
                 style={{ width: "100%" }}
               >
-                <option value="ALL">Tous statuts</option>
-                <option value="ACTIF">Actif</option>
-                <option value="CONGE">En Congé</option>
-                <option value="SUSPENDU">Suspendu</option>
-                <option value="QUITTE">Départ / Quitté</option>
+                <option value="ALL">{hrCopy.personnel.allStatuses}</option>
+                <option value="ACTIF">{employeeStatusLabel(copy, "ACTIF")}</option>
+                <option value="CONGE">{employeeStatusLabel(copy, "CONGE")}</option>
+                <option value="SUSPENDU">{employeeStatusLabel(copy, "SUSPENDU")}</option>
+                <option value="QUITTE">{employeeStatusLabel(copy, "QUITTE")}</option>
               </select>
             </div>
           </div>
@@ -847,21 +855,21 @@ export function HRView({
             <table className="ox-table" style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ textAlign: "left", fontSize: "0.8rem", opacity: 0.7 }}>
-                  <th style={{ padding: "0.8rem 1rem" }}>Matricule</th>
-                  <th style={{ padding: "0.8rem 1rem" }}>Salarié</th>
-                  <th style={{ padding: "0.8rem 1rem" }}>Poste</th>
-                  <th style={{ padding: "0.8rem 1rem" }}>Département</th>
-                  <th style={{ padding: "0.8rem 1rem" }}>Contrat</th>
-                  <th style={{ padding: "0.8rem 1rem" }}>Contact</th>
-                  <th style={{ padding: "0.8rem 1rem" }}>Statut</th>
-                  <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>Actions</th>
+                  <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.personnel.table.employeeNumber}</th>
+                  <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.personnel.table.employee}</th>
+                  <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.personnel.table.jobTitle}</th>
+                  <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.personnel.table.department}</th>
+                  <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.personnel.table.contract}</th>
+                  <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.personnel.table.contact}</th>
+                  <th style={{ padding: "0.8rem 1rem" }}>{copy.common.status}</th>
+                  <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>{copy.common.actions}</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredEmployees.length === 0 ? (
                   <tr>
                     <td colSpan={8} style={{ padding: "3rem", textAlign: "center", opacity: 0.6 }}>
-                      Aucun salarié trouvé avec ces critères de recherche.
+                      {hrCopy.personnel.empty}
                     </td>
                   </tr>
                 ) : (
@@ -899,7 +907,7 @@ export function HRView({
                               gap: 4,
                             }}
                           >
-                            <Shield size={12} /> Compte: {emp.user.email} ({emp.user.role})
+                            <Shield size={12} /> {hrCopy.personnel.account}: {emp.user.email} ({emp.user.role})
                           </div>
                         )}
                       </td>
@@ -914,7 +922,7 @@ export function HRView({
                             fontSize: "0.8rem",
                           }}
                         >
-                          {emp.department?.name || "Non assigné"}
+                          {emp.department?.name || hrCopy.personnel.unassigned}
                         </span>
                       </td>
                       <td style={{ padding: "0.8rem 1rem" }}>
@@ -927,7 +935,7 @@ export function HRView({
                             fontWeight: 600,
                           }}
                         >
-                          {emp.contractType}
+                          {contractTypeLabel(copy, emp.contractType)}
                         </span>
                       </td>
                       <td style={{ padding: "0.8rem 1rem", fontSize: "0.85rem" }}>
@@ -966,14 +974,14 @@ export function HRView({
                                 : "var(--bad)",
                           }}
                         >
-                          {emp.status}
+                          {employeeStatusLabel(copy, emp.status)}
                         </span>
                       </td>
                       <td style={{ padding: "0.8rem 1rem", textAlign: "right" }}>
                         <div style={{ display: "flex", gap: "0.4rem", justifyContent: "flex-end" }}>
                           <button
                             onClick={() => setViewingEmployee(emp)}
-                            title="Consulter le dossier"
+                            title={hrCopy.personnel.viewTitle}
                             className="ox-btn ox-btn-ghost"
                             style={{ padding: "4px 8px" }}
                           >
@@ -981,7 +989,7 @@ export function HRView({
                           </button>
                           <button
                             onClick={() => handleOpenEditEmployee(emp)}
-                            title="Modifier"
+                            title={hrCopy.personnel.editTitle}
                             className="ox-btn ox-btn-ghost"
                             style={{ padding: "4px 8px" }}
                           >
@@ -991,7 +999,7 @@ export function HRView({
                             onClick={() =>
                               handleDeleteEmployee(emp.id, `${emp.firstName} ${emp.lastName}`)
                             }
-                            title="Supprimer"
+                            title={hrCopy.personnel.deleteTitle}
                             className="ox-btn ox-btn-ghost"
                             style={{ padding: "4px 8px", color: "var(--bad)" }}
                           >
@@ -1016,27 +1024,27 @@ export function HRView({
           {/* Requests Section */}
           <div className="ox-card" style={{ padding: "1.2rem" }}>
             <h2 style={{ fontSize: "1.1rem", fontWeight: 700, margin: "0 0 1rem" }}>
-              Demandes de congés &amp; autorisations d&apos;absence
+              {hrCopy.leaves.requestsTitle}
             </h2>
 
             <div style={{ overflowX: "auto" }}>
               <table className="ox-table" style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                   <tr style={{ textAlign: "left", fontSize: "0.8rem", opacity: 0.7 }}>
-                    <th style={{ padding: "0.8rem 1rem" }}>Salarié</th>
-                    <th style={{ padding: "0.8rem 1rem" }}>Type de Congé</th>
-                    <th style={{ padding: "0.8rem 1rem" }}>Période</th>
-                    <th style={{ padding: "0.8rem 1rem" }}>Durée</th>
-                    <th style={{ padding: "0.8rem 1rem" }}>Motif</th>
-                    <th style={{ padding: "0.8rem 1rem" }}>Statut</th>
-                    <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>Actions</th>
+                    <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.leaves.table.employee}</th>
+                    <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.leaves.table.leaveType}</th>
+                    <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.leaves.table.period}</th>
+                    <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.leaves.table.duration}</th>
+                    <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.leaves.table.reason}</th>
+                    <th style={{ padding: "0.8rem 1rem" }}>{copy.common.status}</th>
+                    <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>{copy.common.actions}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {leaveRequests.length === 0 ? (
                     <tr>
                       <td colSpan={7} style={{ padding: "2.5rem", textAlign: "center", opacity: 0.6 }}>
-                        Aucune demande de congé enregistrée pour le moment.
+                        {hrCopy.leaves.empty}
                       </td>
                     </tr>
                   ) : (
@@ -1063,15 +1071,17 @@ export function HRView({
                           </span>
                         </td>
                         <td style={{ padding: "0.8rem 1rem", fontSize: "0.85rem" }}>
-                          Du {new Date(req.startDate).toLocaleDateString("fr-FR")} au{" "}
-                          {new Date(req.endDate).toLocaleDateString("fr-FR")}
+                          {hrCopy.leaves.period(
+                            new Date(req.startDate).toLocaleDateString(copy.dateLocale),
+                            new Date(req.endDate).toLocaleDateString(copy.dateLocale)
+                          )}
                         </td>
-                        <td style={{ padding: "0.8rem 1rem", fontWeight: 600 }}>{req.daysCount} jour(s)</td>
+                        <td style={{ padding: "0.8rem 1rem", fontWeight: 600 }}>{hrCopy.leaves.days(req.daysCount)}</td>
                         <td style={{ padding: "0.8rem 1rem", fontSize: "0.85rem", maxWidth: 200 }}>
                           {req.reason || "-"}
                           {req.rejectionReason && (
                             <div style={{ color: "var(--bad)", fontSize: "0.75rem", marginTop: 2 }}>
-                              Motif refus: {req.rejectionReason}
+                              {hrCopy.leaves.rejectionReason(req.rejectionReason)}
                             </div>
                           )}
                         </td>
@@ -1101,13 +1111,7 @@ export function HRView({
                                   : "inherit",
                             }}
                           >
-                            {req.status === "EN_ATTENTE"
-                              ? "En attente"
-                              : req.status === "APPROUVE"
-                              ? "Approuvé"
-                              : req.status === "REFUSE"
-                              ? "Refusé"
-                              : "Annulé"}
+                            {leaveStatusLabel(copy, req.status)}
                           </span>
                         </td>
                         <td style={{ padding: "0.8rem 1rem", textAlign: "right" }}>
@@ -1115,7 +1119,7 @@ export function HRView({
                             <div style={{ display: "flex", gap: "0.3rem", justifyContent: "flex-end" }}>
                               <button
                                 onClick={() => handleApproveLeave(req.id)}
-                                title="Approuver"
+                                title={hrCopy.leaves.approveTitle}
                                 className="ox-btn"
                                 style={{
                                   padding: "4px 8px",
@@ -1124,11 +1128,11 @@ export function HRView({
                                   borderColor: "var(--ok)",
                                 }}
                               >
-                                <CheckCircle2 size={15} /> Approuver
+                                <CheckCircle2 size={15} /> {hrCopy.leaves.approve}
                               </button>
                               <button
                                 onClick={() => setRejectingRequestId(req.id)}
-                                title="Refuser"
+                                title={hrCopy.leaves.rejectTitle}
                                 className="ox-btn"
                                 style={{
                                   padding: "4px 8px",
@@ -1137,14 +1141,14 @@ export function HRView({
                                   borderColor: "var(--bad)",
                                 }}
                               >
-                                <XCircle size={15} /> Refuser
+                                <XCircle size={15} /> {hrCopy.leaves.reject}
                               </button>
                             </div>
                           )}
                           {req.status === "APPROUVE" && (
                             <button
                               onClick={() => {
-                                if (confirm("Voulez-vous annuler ce congé validé ? Les jours seront réattribués au solde.")) {
+                                if (confirm(hrCopy.leaves.confirmCancelLeave)) {
                                   cancelLeaveRequest(req.id).then(() => {
                                     setLeaveRequests((prev) =>
                                       prev.map((r) => (r.id === req.id ? { ...r, status: "ANNULE" } : r))
@@ -1155,7 +1159,7 @@ export function HRView({
                               className="ox-btn ox-btn-ghost"
                               style={{ fontSize: "0.75rem", padding: "2px 6px" }}
                             >
-                              Annuler congé
+                              {hrCopy.leaves.cancelLeave}
                             </button>
                           )}
                         </td>
@@ -1170,19 +1174,19 @@ export function HRView({
           {/* Leave Balances Overview */}
           <div className="ox-card" style={{ padding: "1.2rem" }}>
             <h2 style={{ fontSize: "1.1rem", fontWeight: 700, margin: "0 0 1rem" }}>
-              Soldes de congés annuels ({currentYear}) · Norme Bénin (24 jours ouvrables / an)
+              {hrCopy.leaves.balancesTitle(currentYear)}
             </h2>
 
             <div style={{ overflowX: "auto" }}>
               <table className="ox-table" style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                   <tr style={{ textAlign: "left", fontSize: "0.8rem", opacity: 0.7 }}>
-                    <th style={{ padding: "0.8rem 1rem" }}>Matricule</th>
-                    <th style={{ padding: "0.8rem 1rem" }}>Salarié</th>
-                    <th style={{ padding: "0.8rem 1rem" }}>Département</th>
-                    <th style={{ padding: "0.8rem 1rem" }}>Quota Annuel</th>
-                    <th style={{ padding: "0.8rem 1rem" }}>Jours Pris</th>
-                    <th style={{ padding: "0.8rem 1rem" }}>Solde Restant</th>
+                    <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.leaves.balanceTable.employeeNumber}</th>
+                    <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.leaves.balanceTable.employee}</th>
+                    <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.leaves.balanceTable.department}</th>
+                    <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.leaves.balanceTable.allocated}</th>
+                    <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.leaves.balanceTable.used}</th>
+                    <th style={{ padding: "0.8rem 1rem" }}>{hrCopy.leaves.balanceTable.remaining}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1203,8 +1207,8 @@ export function HRView({
                           {emp.firstName} {emp.lastName}
                         </td>
                         <td style={{ padding: "0.8rem 1rem" }}>{emp.department?.name || "-"}</td>
-                        <td style={{ padding: "0.8rem 1rem" }}>{allocated} jours</td>
-                        <td style={{ padding: "0.8rem 1rem", color: "var(--warn)" }}>{used} jours</td>
+                        <td style={{ padding: "0.8rem 1rem" }}>{hrCopy.leaves.days(allocated)}</td>
+                        <td style={{ padding: "0.8rem 1rem", color: "var(--warn)" }}>{hrCopy.leaves.days(used)}</td>
                         <td style={{ padding: "0.8rem 1rem" }}>
                           <span
                             style={{
@@ -1212,7 +1216,7 @@ export function HRView({
                               color: remaining > 5 ? "var(--ok)" : "var(--bad)",
                             }}
                           >
-                            {remaining} jours
+                            {hrCopy.leaves.days(remaining)}
                           </span>
                         </td>
                       </tr>
@@ -1233,7 +1237,7 @@ export function HRView({
           {/* Departments */}
           <div className="ox-card" style={{ padding: "1.2rem" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <h2 style={{ fontSize: "1.1rem", fontWeight: 700, margin: 0 }}>Départements & Services</h2>
+              <h2 style={{ fontSize: "1.1rem", fontWeight: 700, margin: 0 }}>{hrCopy.config.departmentsTitle}</h2>
               <button
                 onClick={() => {
                   setEditingDept(null);
@@ -1243,7 +1247,7 @@ export function HRView({
                 className="ox-btn ox-btn-ghost"
                 style={{ fontSize: "0.8rem" }}
               >
-                <Plus size={14} /> Ajouter département
+                <Plus size={14} /> {hrCopy.config.addDepartment}
               </button>
             </div>
 
@@ -1282,7 +1286,7 @@ export function HRView({
                       <div style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: 2 }}>{dept.description}</div>
                     )}
                     <div style={{ fontSize: "0.75rem", opacity: 0.6, marginTop: 4 }}>
-                      {dept._count?.employees ?? 0} employé(s) rattaché(s)
+                      {hrCopy.config.employeesAttached(dept._count?.employees ?? 0)}
                     </div>
                   </div>
 
@@ -1305,7 +1309,7 @@ export function HRView({
                     </button>
                     <button
                       onClick={() => {
-                        if (confirm(`Supprimer le département ${dept.name} ?`)) {
+                        if (confirm(hrCopy.config.confirmDeleteDepartment(dept.name))) {
                           deleteDepartment(dept.id).then(() => {
                             setDepartments((prev) => prev.filter((d) => d.id !== dept.id));
                           });
@@ -1325,7 +1329,7 @@ export function HRView({
           {/* Leave Types */}
           <div className="ox-card" style={{ padding: "1.2rem" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <h2 style={{ fontSize: "1.1rem", fontWeight: 700, margin: 0 }}>Types de Congés & Rémunérations</h2>
+              <h2 style={{ fontSize: "1.1rem", fontWeight: 700, margin: 0 }}>{hrCopy.config.leaveTypesTitle}</h2>
               <button
                 onClick={() => {
                   setEditingLeaveType(null);
@@ -1335,7 +1339,7 @@ export function HRView({
                 className="ox-btn ox-btn-ghost"
                 style={{ fontSize: "0.8rem" }}
               >
-                <Plus size={14} /> Ajouter type
+                <Plus size={14} /> {hrCopy.config.addLeaveType}
               </button>
             </div>
 
@@ -1365,11 +1369,11 @@ export function HRView({
                           borderRadius: 4,
                         }}
                       >
-                        {lt.isPaid ? "Rémunéré" : "Non payé"}
+                        {lt.isPaid ? hrCopy.config.paid : hrCopy.config.unpaid}
                       </span>
                     </div>
                     <div style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: 2 }}>
-                      Quota: <strong>{lt.daysAllowedPerYear} jour(s)/an</strong>
+                      {hrCopy.config.quotaLabel}: <strong>{hrCopy.config.daysPerYear(lt.daysAllowedPerYear)}</strong>
                     </div>
                   </div>
 
@@ -1393,7 +1397,7 @@ export function HRView({
                     </button>
                     <button
                       onClick={() => {
-                        if (confirm(`Supprimer le type de congé ${lt.name} ?`)) {
+                        if (confirm(hrCopy.config.confirmDeleteLeaveType(lt.name))) {
                           deleteLeaveType(lt.id).then(() => {
                             setLeaveTypes((prev) => prev.filter((t) => t.id !== lt.id));
                           });
@@ -1464,7 +1468,7 @@ export function HRView({
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
               <h2 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700 }}>
-                {editingEmployee ? `Modifier la fiche : ${editingEmployee.employeeNumber}` : "Nouveau Salarié"}
+                {editingEmployee ? hrCopy.employeeModal.titleEdit(editingEmployee.employeeNumber) : hrCopy.employeeModal.titleNew}
               </h2>
               <button
                 onClick={() => setShowEmployeeModal(false)}
@@ -1479,7 +1483,7 @@ export function HRView({
               {/* Identity & Matricule */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem" }}>
                 <div>
-                  <label className="ox-label">Prénom *</label>
+                  <label className="ox-label">{hrCopy.employeeModal.firstName}</label>
                   <input
                     type="text"
                     required
@@ -1489,7 +1493,7 @@ export function HRView({
                   />
                 </div>
                 <div>
-                  <label className="ox-label">Nom de famille *</label>
+                  <label className="ox-label">{hrCopy.employeeModal.lastName}</label>
                   <input
                     type="text"
                     required
@@ -1502,21 +1506,21 @@ export function HRView({
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem" }}>
                 <div>
-                  <label className="ox-label">Matricule (optionnel, auto si vide)</label>
+                  <label className="ox-label">{hrCopy.employeeModal.employeeNumber}</label>
                   <input
                     type="text"
-                    placeholder="ex: EMP-2026-001"
+                    placeholder={hrCopy.employeeModal.employeeNumberPlaceholder}
                     value={empForm.employeeNumber}
                     onChange={(e) => setEmpForm({ ...empForm, employeeNumber: e.target.value })}
                     className="ox-input"
                   />
                 </div>
                 <div>
-                  <label className="ox-label">Poste / Intitulé de fonction *</label>
+                  <label className="ox-label">{hrCopy.employeeModal.jobTitle}</label>
                   <input
                     type="text"
                     required
-                    placeholder="ex: Conseiller Commercial Senior"
+                    placeholder={hrCopy.employeeModal.jobTitlePlaceholder}
                     value={empForm.jobTitle}
                     onChange={(e) => setEmpForm({ ...empForm, jobTitle: e.target.value })}
                     className="ox-input"
@@ -1526,14 +1530,14 @@ export function HRView({
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem" }}>
                 <div>
-                  <label className="ox-label">Département</label>
+                  <label className="ox-label">{hrCopy.employeeModal.department}</label>
                   <select
                     value={empForm.departmentId}
                     onChange={(e) => setEmpForm({ ...empForm, departmentId: e.target.value })}
                     className="ox-select"
                     style={{ width: "100%" }}
                   >
-                    <option value="">Sélectionner un département</option>
+                    <option value="">{hrCopy.employeeModal.selectDepartment}</option>
                     {departments.map((d) => (
                       <option key={d.id} value={d.id}>
                         {d.name}
@@ -1542,18 +1546,18 @@ export function HRView({
                   </select>
                 </div>
                 <div>
-                  <label className="ox-label">Type de Contrat</label>
+                  <label className="ox-label">{hrCopy.employeeModal.contractType}</label>
                   <select
                     value={empForm.contractType}
                     onChange={(e) => setEmpForm({ ...empForm, contractType: e.target.value })}
                     className="ox-select"
                     style={{ width: "100%" }}
                   >
-                    <option value="CDI">CDI (Contrat Durée Indéterminée)</option>
-                    <option value="CDD">CDD (Contrat Durée Déterminée)</option>
-                    <option value="STAGE">Stage Professionnel</option>
-                    <option value="PRESTATION">Prestation / Consultant</option>
-                    <option value="ESSAI">Période d&apos;essai</option>
+                    <option value="CDI">{contractTypeLongLabel(copy, "CDI")}</option>
+                    <option value="CDD">{contractTypeLongLabel(copy, "CDD")}</option>
+                    <option value="STAGE">{contractTypeLongLabel(copy, "STAGE")}</option>
+                    <option value="PRESTATION">{contractTypeLongLabel(copy, "PRESTATION")}</option>
+                    <option value="ESSAI">{contractTypeLongLabel(copy, "ESSAI")}</option>
                   </select>
                 </div>
               </div>
@@ -1561,7 +1565,7 @@ export function HRView({
               {/* Dates & Salaire */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem" }}>
                 <div>
-                  <label className="ox-label">Date d&apos;embauche *</label>
+                  <label className="ox-label">{hrCopy.employeeModal.hireDate}</label>
                   <input
                     type="date"
                     required
@@ -1571,7 +1575,7 @@ export function HRView({
                   />
                 </div>
                 <div>
-                  <label className="ox-label">Date de fin (si CDD / Stage)</label>
+                  <label className="ox-label">{hrCopy.employeeModal.contractEnd}</label>
                   <input
                     type="date"
                     value={empForm.contractEnd}
@@ -1583,27 +1587,27 @@ export function HRView({
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem" }}>
                 <div>
-                  <label className="ox-label">Salaire de Base Mensuel (XOF)</label>
+                  <label className="ox-label">{hrCopy.employeeModal.baseSalary}</label>
                   <input
                     type="number"
-                    placeholder="ex: 250000"
+                    placeholder={hrCopy.employeeModal.salaryPlaceholder}
                     value={empForm.baseSalaryXof}
                     onChange={(e) => setEmpForm({ ...empForm, baseSalaryXof: e.target.value })}
                     className="ox-input"
                   />
                 </div>
                 <div>
-                  <label className="ox-label">Statut</label>
+                  <label className="ox-label">{hrCopy.employeeModal.status}</label>
                   <select
                     value={empForm.status}
                     onChange={(e) => setEmpForm({ ...empForm, status: e.target.value })}
                     className="ox-select"
                     style={{ width: "100%" }}
                   >
-                    <option value="ACTIF">Actif</option>
-                    <option value="CONGE">En Congé</option>
-                    <option value="SUSPENDU">Suspendu</option>
-                    <option value="QUITTE">Départ / Quitté</option>
+                    <option value="ACTIF">{employeeStatusLabel(copy, "ACTIF")}</option>
+                    <option value="CONGE">{employeeStatusLabel(copy, "CONGE")}</option>
+                    <option value="SUSPENDU">{employeeStatusLabel(copy, "SUSPENDU")}</option>
+                    <option value="QUITTE">{employeeStatusLabel(copy, "QUITTE")}</option>
                   </select>
                 </div>
               </div>
@@ -1611,20 +1615,20 @@ export function HRView({
               {/* Contact & Social */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem" }}>
                 <div>
-                  <label className="ox-label">Téléphone</label>
+                  <label className="ox-label">{hrCopy.employeeModal.phone}</label>
                   <input
                     type="text"
-                    placeholder="ex: +229 97 00 00 00"
+                    placeholder={hrCopy.employeeModal.phonePlaceholder}
                     value={empForm.phone}
                     onChange={(e) => setEmpForm({ ...empForm, phone: e.target.value })}
                     className="ox-input"
                   />
                 </div>
                 <div>
-                  <label className="ox-label">Email professionnel / personnel</label>
+                  <label className="ox-label">{hrCopy.employeeModal.email}</label>
                   <input
                     type="email"
-                    placeholder="ex: prenom.nom@topcarzone.com"
+                    placeholder={hrCopy.employeeModal.emailPlaceholder}
                     value={empForm.email}
                     onChange={(e) => setEmpForm({ ...empForm, email: e.target.value })}
                     className="ox-input"
@@ -1634,20 +1638,20 @@ export function HRView({
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem" }}>
                 <div>
-                  <label className="ox-label">Numéro CNSS (Bénin)</label>
+                  <label className="ox-label">{hrCopy.employeeModal.cnss}</label>
                   <input
                     type="text"
-                    placeholder="ex: 123456789"
+                    placeholder={hrCopy.employeeModal.cnssPlaceholder}
                     value={empForm.cnssNumber}
                     onChange={(e) => setEmpForm({ ...empForm, cnssNumber: e.target.value })}
                     className="ox-input"
                   />
                 </div>
                 <div>
-                  <label className="ox-label">Numéro IFU</label>
+                  <label className="ox-label">{hrCopy.employeeModal.ifu}</label>
                   <input
                     type="text"
-                    placeholder="ex: 3202300000000"
+                    placeholder={hrCopy.employeeModal.ifuPlaceholder}
                     value={empForm.ifuNumber}
                     onChange={(e) => setEmpForm({ ...empForm, ifuNumber: e.target.value })}
                     className="ox-input"
@@ -1658,20 +1662,20 @@ export function HRView({
               {/* Banking & Emergency */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem" }}>
                 <div>
-                  <label className="ox-label">Banque</label>
+                  <label className="ox-label">{hrCopy.employeeModal.bank}</label>
                   <input
                     type="text"
-                    placeholder="ex: BOA, Ecobank, UBA..."
+                    placeholder={hrCopy.employeeModal.bankPlaceholder}
                     value={empForm.bankName}
                     onChange={(e) => setEmpForm({ ...empForm, bankName: e.target.value })}
                     className="ox-input"
                   />
                 </div>
                 <div>
-                  <label className="ox-label">N° Compte Bancaire / RIB</label>
+                  <label className="ox-label">{hrCopy.employeeModal.bankAccount}</label>
                   <input
                     type="text"
-                    placeholder="ex: 01001 00000000000 00"
+                    placeholder={hrCopy.employeeModal.bankAccountPlaceholder}
                     value={empForm.bankAccountNumber}
                     onChange={(e) => setEmpForm({ ...empForm, bankAccountNumber: e.target.value })}
                     className="ox-input"
@@ -1680,10 +1684,10 @@ export function HRView({
               </div>
 
               <div>
-                <label className="ox-label">Contact d&apos;urgence (Nom + Téléphone)</label>
+                <label className="ox-label">{hrCopy.employeeModal.emergency}</label>
                 <input
                   type="text"
-                  placeholder="ex: Conjoint(e) - +229 95 00 00 00"
+                  placeholder={hrCopy.employeeModal.emergencyPlaceholder}
                   value={empForm.emergencyContact}
                   onChange={(e) => setEmpForm({ ...empForm, emergencyContact: e.target.value })}
                   className="ox-input"
@@ -1692,14 +1696,14 @@ export function HRView({
 
               {/* Link with user account */}
               <div>
-                <label className="ox-label">Compte Utilisateur Système (Accès logiciel)</label>
+                <label className="ox-label">{hrCopy.employeeModal.userAccount}</label>
                 <select
                   value={empForm.userId}
                   onChange={(e) => setEmpForm({ ...empForm, userId: e.target.value })}
                   className="ox-select"
                   style={{ width: "100%" }}
                 >
-                  <option value="">Aucun compte lié</option>
+                  <option value="">{hrCopy.employeeModal.noUserAccount}</option>
                   {availableUsers.map((u) => (
                     <option key={u.id} value={u.id}>
                       {u.fullName} · {u.email} ({u.role})
@@ -1714,10 +1718,14 @@ export function HRView({
                   onClick={() => setShowEmployeeModal(false)}
                   className="ox-btn ox-btn-ghost"
                 >
-                  Annuler
+                  {copy.common.cancel}
                 </button>
                 <button type="submit" disabled={isPending} className="ox-btn ox-btn-primary">
-                  {isPending ? "Enregistrement..." : editingEmployee ? "Mettre à jour" : "Créer le salarié"}
+                  {isPending
+                    ? hrCopy.employeeModal.saving
+                    : editingEmployee
+                    ? hrCopy.employeeModal.update
+                    : hrCopy.employeeModal.create}
                 </button>
               </div>
             </form>
@@ -1782,7 +1790,7 @@ export function HRView({
                   {viewingEmployee.firstName} {viewingEmployee.lastName}
                 </h2>
                 <div style={{ fontSize: "0.85rem", opacity: 0.8 }}>
-                  {viewingEmployee.jobTitle} · {viewingEmployee.department?.name || "Non affecté"}
+                  {viewingEmployee.jobTitle} · {viewingEmployee.department?.name || hrCopy.personnel.unassigned}
                 </div>
               </div>
               <button onClick={() => setViewingEmployee(null)} className="ox-btn ox-btn-ghost" style={{ padding: 4 }}>
@@ -1801,24 +1809,24 @@ export function HRView({
                 }}
               >
                 <div style={{ fontWeight: 600, marginBottom: "0.5rem", color: "var(--ice-highlight)" }}>
-                  Informations Contractuelles & Salaire
+                  {hrCopy.detail.contractCard}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-                  <div>Type de contrat : <strong>{viewingEmployee.contractType}</strong></div>
-                  <div>Statut : <strong>{viewingEmployee.status}</strong></div>
+                  <div>{hrCopy.detail.contractTypeLabel} : <strong>{contractTypeLongLabel(copy, viewingEmployee.contractType)}</strong></div>
+                  <div>{hrCopy.detail.statusLabel} : <strong>{employeeStatusLabel(copy, viewingEmployee.status)}</strong></div>
                   <div>
-                    Embauche : <strong>{new Date(viewingEmployee.hireDate).toLocaleDateString("fr-FR")}</strong>
+                    {hrCopy.detail.hireLabel} : <strong>{new Date(viewingEmployee.hireDate).toLocaleDateString(copy.dateLocale)}</strong>
                   </div>
                   {viewingEmployee.contractEnd && (
                     <div>
-                      Fin de contrat : <strong>{new Date(viewingEmployee.contractEnd).toLocaleDateString("fr-FR")}</strong>
+                      {hrCopy.detail.endLabel} : <strong>{new Date(viewingEmployee.contractEnd).toLocaleDateString(copy.dateLocale)}</strong>
                     </div>
                   )}
                   {viewingEmployee.baseSalaryXof && (
                     <div>
-                      Salaire mensuel :{" "}
+                      {hrCopy.detail.salaryLabel} :{" "}
                       <strong>
-                        {Number(viewingEmployee.baseSalaryXof).toLocaleString("fr-FR")} XOF
+                        {Number(viewingEmployee.baseSalaryXof).toLocaleString(copy.dateLocale, { maximumFractionDigits: 0 })} FCFA
                       </strong>
                     </div>
                   )}
@@ -1835,13 +1843,13 @@ export function HRView({
                 }}
               >
                 <div style={{ fontWeight: 600, marginBottom: "0.5rem", color: "var(--ice-highlight)" }}>
-                  Conformité Sociale & Coordonnées Bancaires
+                  {hrCopy.detail.complianceCard}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-                  <div>N° CNSS : <strong>{viewingEmployee.cnssNumber || "Non renseigné"}</strong></div>
-                  <div>N° IFU : <strong>{viewingEmployee.ifuNumber || "Non renseigné"}</strong></div>
-                  <div>Banque : <strong>{viewingEmployee.bankName || "Non renseignée"}</strong></div>
-                  <div>N° Compte : <strong>{viewingEmployee.bankAccountNumber || "Non renseigné"}</strong></div>
+                  <div>{hrCopy.detail.cnssLabel} : <strong>{viewingEmployee.cnssNumber || hrCopy.detail.missing}</strong></div>
+                  <div>{hrCopy.detail.ifuLabel} : <strong>{viewingEmployee.ifuNumber || hrCopy.detail.missing}</strong></div>
+                  <div>{hrCopy.detail.bankLabel} : <strong>{viewingEmployee.bankName || hrCopy.detail.missing}</strong></div>
+                  <div>{hrCopy.detail.accountLabel} : <strong>{viewingEmployee.bankAccountNumber || hrCopy.detail.missing}</strong></div>
                 </div>
               </div>
 
@@ -1855,13 +1863,13 @@ export function HRView({
                 }}
               >
                 <div style={{ fontWeight: 600, marginBottom: "0.5rem", color: "var(--ice-highlight)" }}>
-                  Coordonnées & Urgence
+                  {hrCopy.detail.contactCard}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-                  <div>Téléphone : <strong>{viewingEmployee.phone || "-"}</strong></div>
-                  <div>Email : <strong>{viewingEmployee.email || "-"}</strong></div>
+                  <div>{hrCopy.detail.phoneLabel} : <strong>{viewingEmployee.phone || "-"}</strong></div>
+                  <div>{hrCopy.detail.emailLabel} : <strong>{viewingEmployee.email || "-"}</strong></div>
                   <div style={{ gridColumn: "1 / -1" }}>
-                    Urgence : <strong>{viewingEmployee.emergencyContact || "-"}</strong>
+                    {hrCopy.detail.emergencyLabel} : <strong>{viewingEmployee.emergencyContact || "-"}</strong>
                   </div>
                 </div>
               </div>
@@ -1876,7 +1884,7 @@ export function HRView({
                 }}
               >
                 <div style={{ fontWeight: 600, marginBottom: "0.5rem", color: "var(--gold)" }}>
-                  Soldes de Congés ({currentYear})
+                  {hrCopy.detail.leavesTitle(currentYear)}
                 </div>
                 {viewingEmployee.leaveBalances && viewingEmployee.leaveBalances.length > 0 ? (
                   <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -1890,16 +1898,17 @@ export function HRView({
                           borderBottom: "1px dashed rgba(255,255,255,0.06)",
                         }}
                       >
-                        <span>Congé {b.leaveTypeCode}</span>
+                        <span>{hrCopy.detail.leaveLine(b.leaveTypeCode)}</span>
                         <span>
-                          Pris: <strong>{b.usedDays}j</strong> / Alloué: <strong>{b.allocatedDays}j</strong> (Restant:{" "}
-                          <strong style={{ color: "var(--ok)" }}>{b.remainingDays}j</strong>)
+                          {hrCopy.detail.taken}: <strong>{hrCopy.detail.daysShort(b.usedDays)}</strong> / {hrCopy.detail.allocated}: <strong>{hrCopy.detail.daysShort(b.allocatedDays)}</strong>{" "}
+                          ({hrCopy.detail.remaining}:{" "}
+                          <strong style={{ color: "var(--ok)" }}>{hrCopy.detail.daysShort(b.remainingDays)}</strong>)
                         </span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div style={{ opacity: 0.6 }}>Aucun solde initialisé. Initialiser via l&apos;onglet Configuration.</div>
+                  <div style={{ opacity: 0.6 }}>{hrCopy.detail.emptyBalances}</div>
                 )}
               </div>
             </div>
@@ -1913,10 +1922,10 @@ export function HRView({
                 }}
                 className="ox-btn ox-btn-primary"
               >
-                Modifier le dossier
+                {hrCopy.detail.editFile}
               </button>
               <button onClick={() => setViewingEmployee(null)} className="ox-btn ox-btn-ghost">
-                Fermer
+                {copy.common.close}
               </button>
             </div>
           </div>
@@ -1963,7 +1972,7 @@ export function HRView({
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <h2 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700 }}>Demande de Congé</h2>
+              <h2 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700 }}>{hrCopy.leaveModal.title}</h2>
               <button onClick={() => setShowLeaveModal(false)} className="ox-btn ox-btn-ghost" style={{ padding: 4 }}>
                 <XCircle size={20} />
               </button>
@@ -1971,7 +1980,7 @@ export function HRView({
 
             <form onSubmit={handleSaveLeaveRequest} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
-                <label className="ox-label">Salarié concerné *</label>
+                <label className="ox-label">{hrCopy.leaveModal.employeeLabel}</label>
                 {employees.length === 0 ? (
                   <div
                     style={{
@@ -1983,7 +1992,7 @@ export function HRView({
                       color: "var(--warn)",
                     }}
                   >
-                    ⚠️ Aucun salarié enregistré. Veuillez d&apos;abord enregistrer au moins un salarié dans l&apos;onglet Personnel.
+                    {hrCopy.leaveModal.noEmployee}
                   </div>
                 ) : (
                   <select
@@ -1993,7 +2002,7 @@ export function HRView({
                     className="ox-select"
                     style={{ width: "100%" }}
                   >
-                    <option value="">Sélectionner un employé</option>
+                    <option value="">{hrCopy.leaveModal.selectEmployee}</option>
                     {employees.map((e) => (
                       <option key={e.id} value={e.id}>
                         {e.firstName} {e.lastName} ({e.employeeNumber}) · {e.jobTitle}
@@ -2004,7 +2013,7 @@ export function HRView({
               </div>
 
               <div>
-                <label className="ox-label">Type de congé *</label>
+                <label className="ox-label">{hrCopy.leaveModal.typeLabel}</label>
                 {leaveTypes.length === 0 ? (
                   <div
                     style={{
@@ -2017,7 +2026,7 @@ export function HRView({
                     }}
                   >
                     <p style={{ margin: "0 0 0.5rem" }}>
-                      ⚠️ Aucun type de congé n&apos;est configuré dans le référentiel.
+                      {hrCopy.leaveModal.noLeaveType}
                     </p>
                     <button
                       type="button"
@@ -2036,7 +2045,7 @@ export function HRView({
                       }}
                     >
                       <Sparkles size={14} />
-                      Charger les types légaux (Bénin 24j, Maladie, Maternité...)
+                      {hrCopy.leaveModal.loadLegal}
                     </button>
                   </div>
                 ) : (
@@ -2047,10 +2056,14 @@ export function HRView({
                     className="ox-select"
                     style={{ width: "100%" }}
                   >
-                    <option value="">Sélectionner le type</option>
+                    <option value="">{hrCopy.leaveModal.selectType}</option>
                     {leaveTypes.map((lt) => (
                       <option key={lt.id} value={lt.id}>
-                        {lt.name} ({lt.isPaid ? "Rémunéré" : "Non payé"}) · {lt.daysAllowedPerYear}j max
+                        {hrCopy.leaveModal.typeOption(
+                          lt.name,
+                          lt.isPaid ? hrCopy.config.paid : hrCopy.config.unpaid,
+                          lt.daysAllowedPerYear
+                        )}
                       </option>
                     ))}
                   </select>
@@ -2059,7 +2072,7 @@ export function HRView({
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem" }}>
                 <div>
-                  <label className="ox-label">Date de début *</label>
+                  <label className="ox-label">{hrCopy.leaveModal.startDate}</label>
                   <input
                     type="date"
                     required
@@ -2069,7 +2082,7 @@ export function HRView({
                   />
                 </div>
                 <div>
-                  <label className="ox-label">Date de fin *</label>
+                  <label className="ox-label">{hrCopy.leaveModal.endDate}</label>
                   <input
                     type="date"
                     required
@@ -2081,7 +2094,7 @@ export function HRView({
               </div>
 
               <div>
-                <label className="ox-label">Nombre de jours ouvrables *</label>
+                <label className="ox-label">{hrCopy.leaveModal.daysCount}</label>
                 <input
                   type="number"
                   step="0.5"
@@ -2094,10 +2107,10 @@ export function HRView({
               </div>
 
               <div>
-                <label className="ox-label">Motif ou justification</label>
+                <label className="ox-label">{hrCopy.leaveModal.reason}</label>
                 <textarea
                   rows={2}
-                  placeholder="ex: Vacances annuelles, événement familial, consultation..."
+                  placeholder={hrCopy.leaveModal.reasonPlaceholder}
                   value={leaveForm.reason}
                   onChange={(e) => setLeaveForm({ ...leaveForm, reason: e.target.value })}
                   className="ox-input"
@@ -2107,10 +2120,10 @@ export function HRView({
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginTop: "1rem" }}>
                 <button type="button" onClick={() => setShowLeaveModal(false)} className="ox-btn ox-btn-ghost">
-                  Annuler
+                  {copy.common.cancel}
                 </button>
                 <button type="submit" disabled={isPending} className="ox-btn ox-btn-primary">
-                  {isPending ? "Soumission..." : "Soumettre la demande"}
+                  {isPending ? hrCopy.leaveModal.submitting : hrCopy.leaveModal.submit}
                 </button>
               </div>
             </form>
@@ -2161,16 +2174,16 @@ export function HRView({
             }}
           >
             <h2 style={{ margin: "0 0 0.8rem", fontSize: "1.1rem", fontWeight: 700, color: "var(--bad)" }}>
-              Refus de la demande de congé
+              {hrCopy.rejectModal.title}
             </h2>
             <p style={{ fontSize: "0.85rem", opacity: 0.8, marginBottom: "1rem" }}>
-              Veuillez indiquer le motif du refus qui sera notifié et archivé.
+              {hrCopy.rejectModal.hint}
             </p>
 
             <textarea
               rows={3}
               required
-              placeholder="ex: Période de forte affluence en atelier, justificatif médical manquant..."
+              placeholder={hrCopy.rejectModal.placeholder}
               value={rejectionReasonText}
               onChange={(e) => setRejectionReasonText(e.target.value)}
               className="ox-input"
@@ -2186,7 +2199,7 @@ export function HRView({
                 }}
                 className="ox-btn ox-btn-ghost"
               >
-                Annuler
+                {copy.common.cancel}
               </button>
               <button
                 type="button"
@@ -2195,7 +2208,7 @@ export function HRView({
                 className="ox-btn"
                 style={{ background: "var(--bad)", color: "#fff", borderColor: "var(--bad)" }}
               >
-                Confirmer le refus
+                {hrCopy.rejectModal.confirm}
               </button>
             </div>
           </div>
@@ -2243,7 +2256,7 @@ export function HRView({
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
               <h2 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700 }}>
-                {editingDept ? "Modifier le département" : "Nouveau département"}
+                {editingDept ? hrCopy.deptModal.titleEdit : hrCopy.deptModal.titleNew}
               </h2>
               <button onClick={() => setShowDeptModal(false)} className="ox-btn ox-btn-ghost" style={{ padding: 4 }}>
                 <XCircle size={20} />
@@ -2264,18 +2277,18 @@ export function HRView({
                     }
                     setShowDeptModal(false);
                   } catch (err) {
-                    alert(err instanceof Error ? err.message : "Erreur enregistrement.");
+                    alert(err instanceof Error ? err.message : hrCopy.alerts.errSave);
                   }
                 });
               }}
               style={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}
             >
               <div>
-                <label className="ox-label">Nom du département *</label>
+                <label className="ox-label">{hrCopy.deptModal.name}</label>
                 <input
                   type="text"
                   required
-                  placeholder="ex: Logistique & Magasin"
+                  placeholder={hrCopy.deptModal.namePlaceholder}
                   value={deptForm.name}
                   onChange={(e) => setDeptForm({ ...deptForm, name: e.target.value })}
                   className="ox-input"
@@ -2283,11 +2296,11 @@ export function HRView({
               </div>
 
               <div>
-                <label className="ox-label">Code trigramme *</label>
+                <label className="ox-label">{hrCopy.deptModal.code}</label>
                 <input
                   type="text"
                   required
-                  placeholder="ex: LOG"
+                  placeholder={hrCopy.deptModal.codePlaceholder}
                   value={deptForm.code}
                   onChange={(e) => setDeptForm({ ...deptForm, code: e.target.value })}
                   className="ox-input"
@@ -2295,7 +2308,7 @@ export function HRView({
               </div>
 
               <div>
-                <label className="ox-label">Description / Rôle</label>
+                <label className="ox-label">{hrCopy.deptModal.description}</label>
                 <textarea
                   rows={2}
                   value={deptForm.description}
@@ -2306,10 +2319,10 @@ export function HRView({
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginTop: "1rem" }}>
                 <button type="button" onClick={() => setShowDeptModal(false)} className="ox-btn ox-btn-ghost">
-                  Annuler
+                  {copy.common.cancel}
                 </button>
                 <button type="submit" disabled={isPending} className="ox-btn ox-btn-primary">
-                  Enregistrer
+                  {copy.common.save}
                 </button>
               </div>
             </form>
@@ -2358,7 +2371,7 @@ export function HRView({
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
               <h2 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700 }}>
-                {editingLeaveType ? "Modifier type de congé" : "Nouveau type de congé"}
+                {editingLeaveType ? hrCopy.leaveTypeModal.titleEdit : hrCopy.leaveTypeModal.titleNew}
               </h2>
               <button onClick={() => setShowLeaveTypeModal(false)} className="ox-btn ox-btn-ghost" style={{ padding: 4 }}>
                 <XCircle size={20} />
@@ -2379,18 +2392,18 @@ export function HRView({
                     }
                     setShowLeaveTypeModal(false);
                   } catch (err) {
-                    alert(err instanceof Error ? err.message : "Erreur enregistrement.");
+                    alert(err instanceof Error ? err.message : hrCopy.alerts.errSave);
                   }
                 });
               }}
               style={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}
             >
               <div>
-                <label className="ox-label">Nom du congé *</label>
+                <label className="ox-label">{hrCopy.leaveTypeModal.name}</label>
                 <input
                   type="text"
                   required
-                  placeholder="ex: Congé Annuel Payé"
+                  placeholder={hrCopy.leaveTypeModal.namePlaceholder}
                   value={ltForm.name}
                   onChange={(e) => setLtForm({ ...ltForm, name: e.target.value })}
                   className="ox-input"
@@ -2398,11 +2411,11 @@ export function HRView({
               </div>
 
               <div>
-                <label className="ox-label">Code identifiant unique *</label>
+                <label className="ox-label">{hrCopy.leaveTypeModal.code}</label>
                 <input
                   type="text"
                   required
-                  placeholder="ex: ANNUEL"
+                  placeholder={hrCopy.leaveTypeModal.codePlaceholder}
                   value={ltForm.code}
                   onChange={(e) => setLtForm({ ...ltForm, code: e.target.value })}
                   className="ox-input"
@@ -2411,7 +2424,7 @@ export function HRView({
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem" }}>
                 <div>
-                  <label className="ox-label">Jours autorisés/an *</label>
+                  <label className="ox-label">{hrCopy.leaveTypeModal.days}</label>
                   <input
                     type="number"
                     required
@@ -2421,25 +2434,25 @@ export function HRView({
                   />
                 </div>
                 <div>
-                  <label className="ox-label">Maintien de salaire</label>
+                  <label className="ox-label">{hrCopy.leaveTypeModal.paid}</label>
                   <select
                     value={ltForm.isPaid ? "true" : "false"}
                     onChange={(e) => setLtForm({ ...ltForm, isPaid: e.target.value === "true" })}
                     className="ox-select"
                     style={{ width: "100%" }}
                   >
-                    <option value="true">Oui (Rémunéré)</option>
-                    <option value="false">Non (Sans solde)</option>
+                    <option value="true">{hrCopy.leaveTypeModal.paidYes}</option>
+                    <option value="false">{hrCopy.leaveTypeModal.paidNo}</option>
                   </select>
                 </div>
               </div>
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginTop: "1rem" }}>
                 <button type="button" onClick={() => setShowLeaveTypeModal(false)} className="ox-btn ox-btn-ghost">
-                  Annuler
+                  {copy.common.cancel}
                 </button>
                 <button type="submit" disabled={isPending} className="ox-btn ox-btn-primary">
-                  Enregistrer
+                  {copy.common.save}
                 </button>
               </div>
             </form>

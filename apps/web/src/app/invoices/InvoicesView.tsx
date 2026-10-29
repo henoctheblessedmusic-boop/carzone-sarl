@@ -15,7 +15,14 @@ import {
   Download,
   TrendingUp,
 } from "lucide-react";
-import { formatXof, formatDate } from "@/lib/format";
+import { formatXof } from "@/lib/format";
+import { usePrefs } from "@/components/PrefsProvider";
+import {
+  invoicesCopy,
+  invoiceStatusLabel,
+  paymentMethodLabel,
+  formatInvoiceDate,
+} from "@/lib/i18n/messages/invoices";
 import { voidInvoice, certifyInvoiceDgi } from "./actions";
 import { PaymentModal, type InvoiceOption } from "./PaymentModal";
 import {
@@ -82,16 +89,16 @@ export type PaymentRow = {
   };
 };
 
-const PAYMENT_METHOD_LABELS: Record<string, { label: string; color: string }> = {
-  MTN_MOMO: { label: "MTN MoMo", color: "#f59e0b" },
-  MOOV_MONEY: { label: "Moov Money", color: "#3b82f6" },
-  MOBILE_MONEY: { label: "Mobile Money", color: "#f59e0b" },
-  VIREMENT_ECOBANK: { label: "Virement Ecobank", color: "#10b981" },
-  VIREMENT_BOA: { label: "Virement BOA", color: "#10b981" },
-  VIREMENT: { label: "Virement Bancaire", color: "#10b981" },
-  CHEQUE: { label: "Chèque", color: "#8b5cf6" },
-  ESPECES: { label: "Espèces (Caisse)", color: "#14b8a6" },
-  CARTE: { label: "Carte Bancaire", color: "#ec4899" },
+const PAYMENT_METHOD_COLORS: Record<string, string> = {
+  MTN_MOMO: "#f59e0b",
+  MOOV_MONEY: "#3b82f6",
+  MOBILE_MONEY: "#f59e0b",
+  VIREMENT_ECOBANK: "#10b981",
+  VIREMENT_BOA: "#10b981",
+  VIREMENT: "#10b981",
+  CHEQUE: "#8b5cf6",
+  ESPECES: "#14b8a6",
+  CARTE: "#ec4899",
 };
 
 export function InvoicesView({
@@ -113,6 +120,8 @@ export function InvoicesView({
   currentYear?: number;
   userRole: string;
 }) {
+  const { locale } = usePrefs();
+  const copy = invoicesCopy[locale];
   const [activeTab, setActiveTab] = useState<"INVOICES" | "PAYMENTS" | "BILAN">("INVOICES");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -248,13 +257,13 @@ export function InvoicesView({
           }}
         >
           <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", textTransform: "uppercase", fontWeight: 600 }}>
-            Total Facturé TTC
+            {copy.kpi.invoicedLabel}
           </div>
           <div className="ox-metric-val" style={{ fontSize: "1.6rem" }}>
             {formatXof(totalInvoicedTtc)}
           </div>
           <div style={{ fontSize: "0.75rem", color: "var(--ice-text-muted)" }}>
-            {invoices.length} facture(s) émises
+            {copy.kpi.invoicedHint(invoices.length)}
           </div>
         </div>
 
@@ -270,13 +279,13 @@ export function InvoicesView({
           }}
         >
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
-            Total Encaissé
+            {copy.kpi.collectedLabel}
           </div>
           <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#10b981" }}>
             {formatXof(totalCollected)}
           </div>
           <div style={{ fontSize: "0.75rem", color: "#10b981", fontWeight: 600 }}>
-            {fullyPaidCount} facture(s) entièrement soldée(s)
+            {copy.kpi.collectedHint(fullyPaidCount)}
           </div>
         </div>
 
@@ -292,13 +301,13 @@ export function InvoicesView({
           }}
         >
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
-            Créances / Reste à Encaisser
+            {copy.kpi.outstandingLabel}
           </div>
           <div style={{ fontSize: "1.6rem", fontWeight: 800, color: totalOutstanding > 0 ? "var(--gold)" : "#10b981" }}>
             {formatXof(totalOutstanding)}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65 }}>
-            Solde restant dû à recouvrer
+            {copy.kpi.outstandingHint}
           </div>
         </div>
 
@@ -314,13 +323,13 @@ export function InvoicesView({
           }}
         >
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
-            Factures en Retard
+            {copy.kpi.overdueLabel}
           </div>
           <div style={{ fontSize: "1.6rem", fontWeight: 800, color: overdueCount > 0 ? "#ef4444" : "#4ade80" }}>
             {overdueCount}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65 }}>
-            Dépassement de la date d&apos;échéance
+            {copy.kpi.overdueHint}
           </div>
         </div>
       </div>
@@ -358,7 +367,7 @@ export function InvoicesView({
           }}
         >
           <FileText size={18} />
-          Factures Commerciales ({invoices.length})
+          {copy.tabs.invoices(invoices.length)}
         </button>
 
         <button
@@ -383,7 +392,7 @@ export function InvoicesView({
           }}
         >
           <CreditCard size={18} />
-          Règlements & Quittances ({allPayments.length})
+          {copy.tabs.payments(allPayments.length)}
         </button>
 
         <button
@@ -408,7 +417,7 @@ export function InvoicesView({
           }}
         >
           <TrendingUp size={18} />
-          Bilan Mensuel &amp; Rentabilité (P&amp;L)
+          {copy.tabs.bilan}
         </button>
       </div>
 
@@ -443,8 +452,8 @@ export function InvoicesView({
               type="text"
               placeholder={
                 activeTab === "INVOICES"
-                  ? "Rechercher par N° facture, proforma, client..."
-                  : "Rechercher par réf. paiement, client, N° facture..."
+                  ? copy.search.invoices
+                  : copy.search.payments
               }
               className="ox-input"
               style={{ width: "100%", paddingLeft: 36, fontSize: "0.85rem" }}
@@ -457,11 +466,11 @@ export function InvoicesView({
           {activeTab === "INVOICES" ? (
             <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
               {[
-                { id: "ALL", label: "Toutes" },
-                { id: "UNPAID", label: "Non soldées" },
-                { id: "PAID", label: "Soldées" },
-                { id: "OVERDUE", label: "En retard" },
-                { id: "VOID", label: "Annulées" },
+                { id: "ALL", label: copy.filters.all },
+                { id: "UNPAID", label: copy.filters.unpaid },
+                { id: "PAID", label: copy.filters.paid },
+                { id: "OVERDUE", label: copy.filters.overdue },
+                { id: "VOID", label: copy.filters.voided },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -486,13 +495,13 @@ export function InvoicesView({
           ) : (
             <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
               {[
-                { id: "ALL", label: "Tous modes" },
-                { id: "MTN_MOMO", label: "MTN MoMo" },
-                { id: "MOOV_MONEY", label: "Moov Money" },
-                { id: "VIREMENT_ECOBANK", label: "Ecobank" },
-                { id: "VIREMENT_BOA", label: "BOA" },
-                { id: "CHEQUE", label: "Chèques" },
-                { id: "ESPECES", label: "Espèces" },
+                { id: "ALL", label: copy.filters.methodAll },
+                { id: "MTN_MOMO", label: copy.filters.methodChips.MTN_MOMO },
+                { id: "MOOV_MONEY", label: copy.filters.methodChips.MOOV_MONEY },
+                { id: "VIREMENT_ECOBANK", label: copy.filters.methodChips.VIREMENT_ECOBANK },
+                { id: "VIREMENT_BOA", label: copy.filters.methodChips.VIREMENT_BOA },
+                { id: "CHEQUE", label: copy.filters.methodChips.CHEQUE },
+                { id: "ESPECES", label: copy.filters.methodChips.ESPECES },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -536,10 +545,10 @@ export function InvoicesView({
                 textDecoration: "none",
                 cursor: "pointer",
               }}
-              title="Extraction du bilan financier de l'entreprise (Excel .xlsx)"
+              title={copy.toolbar.exportExcelTitle}
             >
               <Download size={16} />
-              Extraire le Bilan Financier (Excel)
+              {copy.toolbar.exportExcel}
             </a>
           )}
 
@@ -566,7 +575,7 @@ export function InvoicesView({
               }}
             >
               <CreditCard size={18} />
-              Enregistrer un Règlement
+              {copy.toolbar.recordPayment}
             </button>
           )}
         </div>
@@ -587,21 +596,21 @@ export function InvoicesView({
                     opacity: 0.75,
                   }}
                 >
-                  <th style={{ padding: "0.85rem 1rem" }}>Facture</th>
-                  <th style={{ padding: "0.85rem 1rem" }}>Client</th>
-                  <th style={{ padding: "0.85rem 1rem" }}>Dates</th>
-                  <th style={{ padding: "0.85rem 1rem", textAlign: "right" }}>Total TTC</th>
-                  <th style={{ padding: "0.85rem 1rem", textAlign: "right" }}>Encaissé</th>
-                  <th style={{ padding: "0.85rem 1rem", textAlign: "right" }}>Solde Dû</th>
-                  <th style={{ padding: "0.85rem 1rem" }}>Statut</th>
-                  <th style={{ padding: "0.85rem 1rem", textAlign: "center" }}>Actions</th>
+                  <th style={{ padding: "0.85rem 1rem" }}>{copy.invoiceTable.headers.number}</th>
+                  <th style={{ padding: "0.85rem 1rem" }}>{copy.invoiceTable.headers.client}</th>
+                  <th style={{ padding: "0.85rem 1rem" }}>{copy.invoiceTable.headers.dates}</th>
+                  <th style={{ padding: "0.85rem 1rem", textAlign: "right" }}>{copy.invoiceTable.headers.totalTtc}</th>
+                  <th style={{ padding: "0.85rem 1rem", textAlign: "right" }}>{copy.invoiceTable.headers.collected}</th>
+                  <th style={{ padding: "0.85rem 1rem", textAlign: "right" }}>{copy.invoiceTable.headers.balance}</th>
+                  <th style={{ padding: "0.85rem 1rem" }}>{copy.invoiceTable.headers.status}</th>
+                  <th style={{ padding: "0.85rem 1rem", textAlign: "center" }}>{copy.invoiceTable.headers.actions}</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredInvoices.length === 0 ? (
                   <tr>
                     <td colSpan={8} style={{ padding: "2.5rem 1rem", textAlign: "center", opacity: 0.6 }}>
-                      Aucune facture ne correspond aux critères.
+                      {copy.invoiceTable.empty}
                     </td>
                   </tr>
                 ) : (
@@ -625,7 +634,7 @@ export function InvoicesView({
                           </div>
                           {inv.quote && (
                             <div style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)", marginTop: 2 }}>
-                              Devis : {inv.quote.number}
+                              {copy.invoiceTable.quoteRef(inv.quote.number)}
                             </div>
                           )}
                         </td>
@@ -647,9 +656,9 @@ export function InvoicesView({
 
                         {/* Dates */}
                         <td style={{ padding: "0.85rem 1rem" }}>
-                          <div style={{ fontSize: "0.82rem" }}>Émis : {formatDate(inv.createdAt)}</div>
+                          <div style={{ fontSize: "0.82rem" }}>{copy.invoiceTable.issued(formatInvoiceDate(copy, inv.createdAt))}</div>
                           <div style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)" }}>
-                            Échéance : {formatDate(inv.dueDate)}
+                            {copy.invoiceTable.due(formatInvoiceDate(copy, inv.dueDate))}
                           </div>
                         </td>
 
@@ -659,7 +668,7 @@ export function InvoicesView({
                             {formatXof(inv.totalXof)}
                           </div>
                           <div style={{ fontSize: "0.72rem", opacity: 0.65 }}>
-                            {formatXof(inv.subtotalHtXof)} HT {inv.taxRatePct > 0 ? `· TVA ${inv.taxRatePct}%` : ""}
+                            {copy.invoiceTable.htAndVat(formatXof(inv.subtotalHtXof), inv.taxRatePct)}
                           </div>
                         </td>
 
@@ -669,7 +678,7 @@ export function InvoicesView({
                             {formatXof(inv.paidXof)}
                           </div>
                           <div style={{ fontSize: "0.72rem", opacity: 0.6 }}>
-                            {inv.payments.length} règlement(s)
+                            {copy.invoiceTable.paymentsCount(inv.payments.length)}
                           </div>
                         </td>
 
@@ -685,7 +694,7 @@ export function InvoicesView({
                             {formatXof(balanceDue)}
                           </div>
                           <div style={{ fontSize: "0.7rem", opacity: 0.65 }}>
-                            {balanceDue === 0 ? "Soldé" : "Reste à payer"}
+                            {balanceDue === 0 ? copy.invoiceTable.settled : copy.invoiceTable.remaining}
                           </div>
                         </td>
 
@@ -725,15 +734,7 @@ export function InvoicesView({
                               }`,
                             }}
                           >
-                            {inv.status === "PAYEE"
-                              ? "Soldée"
-                              : inv.status === "PAYEE_PARTIEL"
-                                ? "Acompte reçu"
-                                : inv.status === "EN_RETARD"
-                                  ? "En retard"
-                                  : inv.status === "ANNULEE"
-                                    ? "Annulée"
-                                    : inv.status}
+                            {invoiceStatusLabel(copy, inv.status)}
                           </span>
                         </td>
 
@@ -754,10 +755,10 @@ export function InvoicesView({
                               target="_blank"
                               className="ox-btn ox-btn-ghost ox-btn-sm"
                               style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
-                              title="Imprimer la Facture Normalisée"
+                              title={copy.invoiceTable.rowActions.printTitle}
                             >
                               <Printer size={13} />
-                              Facture
+                              {copy.invoiceTable.rowActions.printLabel}
                             </Link>
 
                             {/* Certification DGI e-MECeF */}
@@ -775,7 +776,7 @@ export function InvoicesView({
                                   color: "#10b981",
                                   border: "1px solid rgba(16, 185, 129, 0.3)",
                                 }}
-                                title={`Certifiée DGI Bénin (Code: ${inv.mecefCode})`}
+                                title={copy.invoiceTable.rowActions.certifiedTitle(inv.mecefCode ?? "")}
                               >
                                 <ShieldCheck size={12} />
                                 e-MECeF
@@ -794,10 +795,10 @@ export function InvoicesView({
                                     color: "#38bdf8",
                                     border: "1px solid rgba(56, 189, 248, 0.3)",
                                   }}
-                                  title="Certifier cette facture auprès de la DGI Bénin (e-MECeF)"
+                                  title={copy.invoiceTable.rowActions.dgiTitle}
                                 >
                                   <ShieldCheck size={12} />
-                                  DGI
+                                  {copy.invoiceTable.rowActions.dgiLabel}
                                 </button>
                               </form>
                             ) : null}
@@ -816,10 +817,10 @@ export function InvoicesView({
                                   color: "#10b981",
                                   border: "1px solid rgba(16, 185, 129, 0.4)",
                                 }}
-                                title="Enregistrer un acompte ou solder la facture"
+                                title={copy.invoiceTable.rowActions.collectTitle}
                               >
                                 <CreditCard size={13} />
-                                Encaisser
+                                {copy.invoiceTable.rowActions.collectLabel}
                               </button>
                             )}
 
@@ -833,7 +834,7 @@ export function InvoicesView({
                                 }}
                                 className="ox-btn ox-btn-danger ox-btn-sm"
                                 style={{ display: "inline-flex", alignItems: "center", gap: 3 }}
-                                title="Annulation interne par la direction (justification obligatoire)"
+                                title={copy.invoiceTable.rowActions.voidTitle}
                               >
                                 <Ban size={12} />
                               </button>
@@ -864,29 +865,27 @@ export function InvoicesView({
                     opacity: 0.75,
                   }}
                 >
-                  <th style={{ padding: "0.85rem 1rem" }}>Réf. Règlement</th>
-                  <th style={{ padding: "0.85rem 1rem" }}>Date</th>
-                  <th style={{ padding: "0.85rem 1rem" }}>Facture Liée</th>
-                  <th style={{ padding: "0.85rem 1rem" }}>Client</th>
-                  <th style={{ padding: "0.85rem 1rem" }}>Mode d&apos;Encaissement</th>
-                  <th style={{ padding: "0.85rem 1rem" }}>Réf. Transaction</th>
-                  <th style={{ padding: "0.85rem 1rem", textAlign: "right" }}>Montant Encaissé</th>
-                  <th style={{ padding: "0.85rem 1rem", textAlign: "center" }}>Quittance / Reçu</th>
+                  <th style={{ padding: "0.85rem 1rem" }}>{copy.paymentsTable.headers.reference}</th>
+                  <th style={{ padding: "0.85rem 1rem" }}>{copy.paymentsTable.headers.date}</th>
+                  <th style={{ padding: "0.85rem 1rem" }}>{copy.paymentsTable.headers.invoice}</th>
+                  <th style={{ padding: "0.85rem 1rem" }}>{copy.paymentsTable.headers.client}</th>
+                  <th style={{ padding: "0.85rem 1rem" }}>{copy.paymentsTable.headers.method}</th>
+                  <th style={{ padding: "0.85rem 1rem" }}>{copy.paymentsTable.headers.transaction}</th>
+                  <th style={{ padding: "0.85rem 1rem", textAlign: "right" }}>{copy.paymentsTable.headers.amount}</th>
+                  <th style={{ padding: "0.85rem 1rem", textAlign: "center" }}>{copy.paymentsTable.headers.receipt}</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredPayments.length === 0 ? (
                   <tr>
                     <td colSpan={8} style={{ padding: "2.5rem 1rem", textAlign: "center", opacity: 0.6 }}>
-                      Aucun encaissement enregistré pour le moment.
+                      {copy.paymentsTable.empty}
                     </td>
                   </tr>
                 ) : (
                   filteredPayments.map((p) => {
-                    const methodInfo = PAYMENT_METHOD_LABELS[p.method] || {
-                      label: p.method,
-                      color: "#94a3b8",
-                    };
+                    const methodColor = PAYMENT_METHOD_COLORS[p.method] || "#94a3b8";
+                    const methodLabel = paymentMethodLabel(copy, p.method);
                     const regNumber = `REG-${new Date(p.paidAt).getFullYear()}-${p.id.slice(-4).toUpperCase()}`;
 
                     return (
@@ -912,7 +911,7 @@ export function InvoicesView({
 
                         {/* Date */}
                         <td style={{ padding: "0.85rem 1rem" }}>
-                          <div style={{ fontSize: "0.82rem" }}>{formatDate(p.paidAt)}</div>
+                          <div style={{ fontSize: "0.82rem" }}>{formatInvoiceDate(copy, p.paidAt)}</div>
                         </td>
 
                         {/* Facture */}
@@ -925,7 +924,7 @@ export function InvoicesView({
                             {p.invoice.number}
                           </Link>
                           <div style={{ fontSize: "0.72rem", opacity: 0.6 }}>
-                            Total : {formatXof(p.invoice.totalXof)}
+                            {copy.paymentsTable.invoiceTotal(formatXof(p.invoice.totalXof))}
                           </div>
                         </td>
 
@@ -948,12 +947,12 @@ export function InvoicesView({
                               borderRadius: 6,
                               fontSize: "0.75rem",
                               fontWeight: 650,
-                              background: `${methodInfo.color}22`,
-                              color: methodInfo.color,
-                              border: `1px solid ${methodInfo.color}44`,
+                              background: `${methodColor}22`,
+                              color: methodColor,
+                              border: `1px solid ${methodColor}44`,
                             }}
                           >
-                            {methodInfo.label}
+                            {methodLabel}
                           </span>
                         </td>
 
@@ -984,10 +983,10 @@ export function InvoicesView({
                               color: "var(--gold)",
                               borderColor: "rgba(212, 175, 55, 0.3)",
                             }}
-                            title="Imprimer la quittance d'encaissement"
+                            title={copy.paymentsTable.receiptTitle}
                           >
                             <Printer size={13} />
-                            Quittance
+                            {copy.paymentsTable.receiptLabel}
                           </Link>
                         </td>
                       </tr>
@@ -1056,7 +1055,7 @@ export function InvoicesView({
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#ef4444" }}>
                 <AlertTriangle size={20} />
-                <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Annulation Interne d&apos;une Facture</h3>
+                <h3 style={{ margin: 0, fontSize: "1.1rem" }}>{copy.voidModal.title}</h3>
               </div>
               <button
                 onClick={() => setVoidModalInvoiceId(null)}
@@ -1067,8 +1066,11 @@ export function InvoicesView({
             </div>
 
             <div style={{ fontSize: "0.85rem", opacity: 0.8 }}>
-              Cette action est strictement réservée à la <strong>Direction Générale</strong> et à la{" "}
-              <strong>Comptabilité</strong>. Une justification écrite auditée est obligatoire (minimum 8 caractères).
+              {copy.voidModal.bodyLead}
+              <strong>{copy.voidModal.roleDirection}</strong>
+              {copy.voidModal.bodyMiddle}
+              <strong>{copy.voidModal.roleAccounting}</strong>
+              {copy.voidModal.bodyTail}
             </div>
 
             <form action={voidInvoice}>
@@ -1079,7 +1081,7 @@ export function InvoicesView({
                 minLength={8}
                 value={voidReason}
                 onChange={(e) => setVoidReason(e.target.value)}
-                placeholder="Exemple: Erreur de saisie / Annulation commande justifiée par DG / Remplacement par FAC-..."
+                placeholder={copy.voidModal.reasonPlaceholder}
                 className="ox-input"
                 style={{ width: "100%", height: 80, fontSize: "0.85rem", marginBottom: "1rem" }}
               />
@@ -1090,7 +1092,7 @@ export function InvoicesView({
                   onClick={() => setVoidModalInvoiceId(null)}
                   className="ox-btn ox-btn-ghost"
                 >
-                  Fermer
+                  {copy.common.close}
                 </button>
                 <button
                   type="submit"
@@ -1099,7 +1101,7 @@ export function InvoicesView({
                   style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
                 >
                   <Ban size={14} />
-                  Confirmer l&apos;annulation
+                  {copy.voidModal.confirm}
                 </button>
               </div>
             </form>

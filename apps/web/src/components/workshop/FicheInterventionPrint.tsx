@@ -4,6 +4,8 @@ import React, { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Printer, ArrowLeft, Check, ShieldCheck } from "lucide-react";
+import { usePrefs } from "@/components/PrefsProvider";
+import { workshopCopy } from "@/lib/i18n/messages/workshop";
 
 export type InterventionData = {
   id: string;
@@ -38,6 +40,8 @@ export type InterventionData = {
 
 export function FicheInterventionPrint({ data }: { data: InterventionData }) {
   const printAreaRef = useRef<HTMLDivElement>(null);
+  const { locale } = usePrefs();
+  const copy = workshopCopy[locale].print.intervention;
 
   const handlePrint = () => {
     window.print();
@@ -147,7 +151,7 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
           }}
         >
           <ArrowLeft size={16} />
-          Retour à l&apos;Atelier
+          {copy.back}
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -165,7 +169,7 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
               fontWeight: 700,
             }}
           >
-            <ShieldCheck size={14} /> Fiche Officielle d&apos;Intervention A4
+            <ShieldCheck size={14} /> {copy.badge}
           </span>
 
           <button
@@ -187,7 +191,7 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
             }}
           >
             <Printer size={16} />
-            Imprimer / Exporter PDF
+            {copy.print}
           </button>
         </div>
       </div>
@@ -220,16 +224,16 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
             </div>
             <div>
               <div style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "1px", color: "#0f172a", textTransform: "uppercase" }}>
-                CONCESSION DE VÉHICULES MULTI-MARQUES
+                {copy.companyActivity}
               </div>
               <div style={{ fontSize: "20px", fontWeight: 900, color: "#e11d48", lineHeight: 1.1, margin: "2px 0" }}>
                 CARZONE SARL
               </div>
               <div style={{ fontSize: "9px", fontWeight: 700, color: "#334155" }}>
-                Service Après-Vente &amp; Atelier Agréé · Tél : +229 01 92 61 61 61
+                {copy.afterSales} · {copy.telLabel} +229 01 92 61 61 61
               </div>
               <div style={{ fontSize: "8.5px", color: "#64748b" }}>
-                Maro-Militaire, Gbèdomidji, Cotonou · République du Bénin
+                {copy.address} · {copy.country}
               </div>
             </div>
           </div>
@@ -254,13 +258,14 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
                 borderRadius: "2px",
               }}
             >
-              FICHE D&apos;INTERVENTION
+              {copy.docTitle}
             </div>
             <div style={{ fontSize: "11px", fontWeight: 800, color: "#e11d48", marginTop: "4px" }}>
-              ORDRE DE RÉPARATION : #{data.orNumber}
+              {copy.orLabel}
+              {data.orNumber}
             </div>
             <div style={{ fontSize: "9.5px", fontWeight: 650, color: "#334155" }}>
-              Date d&apos;entrée : <strong>{data.entryDate}</strong>
+              {copy.entryDate} <strong>{data.entryDate}</strong>
             </div>
           </div>
         </div>
@@ -269,11 +274,11 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
         <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "8px" }}>
           <tbody>
             <tr>
-              <td style={{ ...tdHeader, width: "12%" }}>Marque :</td>
+              <td style={{ ...tdHeader, width: "12%" }}>{copy.brand}</td>
               <td style={{ ...tdData, width: "21%" }}><strong>{data.brand || "-"}</strong></td>
-              <td style={{ ...tdHeader, width: "12%" }}>Modèle :</td>
+              <td style={{ ...tdHeader, width: "12%" }}>{copy.model}</td>
               <td style={{ ...tdData, width: "21%" }}><strong>{data.model || "-"}</strong></td>
-              <td style={{ ...tdHeader, width: "16%" }}>Immatriculation :</td>
+              <td style={{ ...tdHeader, width: "16%" }}>{copy.immat}</td>
               <td style={{ ...tdData, width: "18%" }}>
                 <span style={{ fontSize: "11px", fontWeight: 900, color: "#0f172a" }}>
                   {data.immatriculation}
@@ -281,19 +286,19 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
               </td>
             </tr>
             <tr>
-              <td style={{ ...tdHeader }}>Date :</td>
+              <td style={{ ...tdHeader }}>{copy.date}</td>
               <td style={{ ...tdData }}>{data.entryDate}</td>
-              <td style={{ ...tdHeader }}>S/N (Châssis) :</td>
+              <td style={{ ...tdHeader }}>{copy.chassis}</td>
               <td style={{ ...tdData, fontFamily: "monospace", fontSize: "9.5px" }}>{data.chassis || "-"}</td>
-              <td style={{ ...tdHeader }}>N° Fiche / OR :</td>
+              <td style={{ ...tdHeader }}>{copy.orNumber}</td>
               <td style={{ ...tdData }}><strong>#{data.orNumber}</strong></td>
             </tr>
             <tr>
-              <td style={{ ...tdHeader }}>Client &amp; Tél :</td>
+              <td style={{ ...tdHeader }}>{copy.clientPhone}</td>
               <td colSpan={3} style={{ ...tdData }}>
-                <strong>{data.clientName}</strong> {data.phone ? `· Tél : ${data.phone}` : ""}
+                <strong>{data.clientName}</strong> {data.phone ? `· ${copy.phoneInline} ${data.phone}` : ""}
               </td>
-              <td style={{ ...tdHeader }}>Compteur (KM) :</td>
+              <td style={{ ...tdHeader }}>{copy.mileageLabel}</td>
               <td style={{ ...tdData }}>
                 <strong style={{ fontSize: "11px" }}>
                   {data.mileage ? `${data.mileage.toLocaleString()} KM` : "-"}
@@ -306,17 +311,17 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
         {/* 3. PANNE SIGNALÉE PAR LE CLIENT */}
         <div style={{ border: "1.5px solid #0f172a", marginBottom: "8px" }}>
           <div style={sectionBanner}>
-            <span>1. PANNE SIGNALÉE PAR LE CLIENT (CONSTAT À LA RÉCEPTION)</span>
+            <span>{copy.sectionFault}</span>
           </div>
           <div style={{ padding: "6px 8px", minHeight: "32px", fontSize: "10px", lineHeight: 1.35, color: "#0f172a" }}>
-            {data.reportedFault || "Entretien périodique programmé & révision générale."}
+            {data.reportedFault || copy.faultDefault}
           </div>
         </div>
 
         {/* 4. TYPE D'ENTRETIEN KILOMÉTRIQUE (LES 5 PALIERS - EXACT PHOTO 1) */}
         <div style={{ border: "1.5px solid #0f172a", marginBottom: "8px" }}>
           <div style={sectionBanner}>
-            <span>2. TYPE D&apos;ENTRETIEN KILOMÉTRIQUE (PALIERS RECOMMANDÉS)</span>
+            <span>{copy.sectionTier}</span>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", textAlign: "center" }}>
             {TIERS.map((tier) => {
@@ -362,33 +367,33 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
         {/* 5. DIAGNOSTICS & TRAVAUX PAR SECTEUR TECHNIQUE (LES 4 PÔLES - EXACT PHOTO 1) */}
         <div style={{ border: "1.5px solid #0f172a", marginBottom: "8px" }}>
           <div style={sectionBanner}>
-            <span>3. TRAVAUX PAR SECTEUR TECHNIQUE (DIAGNOSTIC &amp; INSPECTION)</span>
+            <span>{copy.sectionPoles}</span>
           </div>
 
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <tbody>
               <tr>
-                <td style={{ ...poleHeader, width: "25%" }}>MOTEUR TRANSMISSION</td>
+                <td style={{ ...poleHeader, width: "25%" }}>{copy.poleMotor}</td>
                 <td style={{ ...poleContent, width: "75%" }}>
-                  {data.faultMotorTransmission || "Contrôle moteur, niveau et étanchéité transmission OK."}
+                  {data.faultMotorTransmission || copy.poleMotorDefault}
                 </td>
               </tr>
               <tr>
-                <td style={{ ...poleHeader }}>SUSPENSION</td>
+                <td style={{ ...poleHeader }}>{copy.poleSuspension}</td>
                 <td style={{ ...poleContent }}>
-                  {data.faultSuspension || "Contrôle amortisseurs, rotules, pneumatiques et freinage OK."}
+                  {data.faultSuspension || copy.poleSuspensionDefault}
                 </td>
               </tr>
               <tr>
-                <td style={{ ...poleHeader }}>ÉLECTRICITÉ</td>
+                <td style={{ ...poleHeader }}>{copy.poleElectricity}</td>
                 <td style={{ ...poleContent }}>
-                  {data.faultElectricity || "Scan calculateur, batterie, alternateur et circuit éclairage OK."}
+                  {data.faultElectricity || copy.poleElectricityDefault}
                 </td>
               </tr>
               <tr>
-                <td style={{ ...poleHeader }}>AUTRES</td>
+                <td style={{ ...poleHeader }}>{copy.poleOthers}</td>
                 <td style={{ ...poleContent }}>
-                  {data.faultOthers || "Climatisation, carrosserie et accessoires conformes."}
+                  {data.faultOthers || copy.poleOthersDefault}
                 </td>
               </tr>
             </tbody>
@@ -398,7 +403,7 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
         {/* 6. TRAVAUX EFFECTUÉS (BILAN D'INTERVENTION) */}
         <div style={{ border: "1.5px solid #0f172a", marginBottom: "8px" }}>
           <div style={sectionBanner}>
-            <span>4. TRAVAUX EFFECTUÉS PAR L&apos;ATELIER</span>
+            <span>{copy.sectionWorks}</span>
           </div>
           <div
             style={{
@@ -410,7 +415,7 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
               backgroundImage: "repeating-linear-gradient(transparent, transparent 15px, #e2e8f0 16px)",
             }}
           >
-            {data.worksDone || "Travaux d'entretien réalisés conformément aux préconisations d'atelier."}
+            {data.worksDone || copy.worksDefault}
           </div>
         </div>
 
@@ -419,15 +424,15 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
           <tbody>
             <tr>
               <td style={{ width: "50%", verticalAlign: "top", border: "1.5px solid #0f172a", padding: 0 }}>
-                <div style={subBanner}>OBSERVATIONS TECHNIQUES</div>
+                <div style={subBanner}>{copy.observationsTitle}</div>
                 <div style={{ padding: "6px 8px", minHeight: "36px", fontSize: "9.5px", color: "#0f172a", lineHeight: 1.35 }}>
-                  {data.observations || "Véhicule propre et en bon état général à la restitution."}
+                  {data.observations || copy.observationsDefault}
                 </div>
               </td>
               <td style={{ width: "50%", verticalAlign: "top", border: "1.5px solid #0f172a", padding: 0 }}>
-                <div style={subBanner}>PIÈCES À COMMANDER / MAGASIN</div>
+                <div style={subBanner}>{copy.partsTitle}</div>
                 <div style={{ padding: "6px 8px", minHeight: "36px", fontSize: "9.5px", color: "#0f172a", lineHeight: 1.35 }}>
-                  {data.partsToOrder || "Fournitures et pièces d'origine Carzone déstockées."}
+                  {data.partsToOrder || copy.partsDefault}
                 </div>
               </td>
             </tr>
@@ -449,28 +454,28 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
           }}
         >
           <div>
-            Heure de début : <strong>{data.startTime || "-"}</strong>
+            {copy.startLabel} <strong>{data.startTime || "-"}</strong>
           </div>
           <div>
-            Heure de fin : <strong>{data.endTime || "-"}</strong>
+            {copy.endLabel} <strong>{data.endTime || "-"}</strong>
           </div>
           <div>
-            Technicien assigné : <strong>{data.technicianName || "Équipe SAV Carzone"}</strong>
+            {copy.technicianLabel} <strong>{data.technicianName || copy.technicianTeamDefault}</strong>
           </div>
         </div>
 
         {/* 9. VALIDATIONS & SIGNATURES TRIPARTITE (EXACT PHOTO 1) */}
         <div style={{ border: "1.5px solid #0f172a", marginBottom: "6px" }}>
           <div style={{ ...sectionBanner, textAlign: "center" }}>
-            <span>VALIDATIONS &amp; SIGNATURES (ORDRE DE RÉPARATION ET RESTITUTION)</span>
+            <span>{copy.signaturesTitle}</span>
           </div>
 
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ backgroundColor: "#f1f5f9" }}>
-                <th style={{ ...signatureHeader, width: "33.3%" }}>CLIENT</th>
-                <th style={{ ...signatureHeader, width: "33.3%" }}>TECHNICIENS</th>
-                <th style={{ ...signatureHeader, width: "33.4%" }}>RESPONSABLE ATELIER</th>
+                <th style={{ ...signatureHeader, width: "33.3%" }}>{copy.colClient}</th>
+                <th style={{ ...signatureHeader, width: "33.3%" }}>{copy.colTechnicians}</th>
+                <th style={{ ...signatureHeader, width: "33.4%" }}>{copy.colManager}</th>
               </tr>
             </thead>
             <tbody>
@@ -478,7 +483,7 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
                 {/* 1. CLIENT */}
                 <td style={signatureCell}>
                   <div style={{ fontSize: "8.5px", color: "#64748b", marginBottom: "4px" }}>
-                    Bon pour accord &amp; réception
+                    {copy.clientAgreement}
                   </div>
                   <div style={{ fontSize: "9.5px", fontWeight: 700, color: "#0f172a", minHeight: "14px" }}>
                     {data.clientName}
@@ -488,12 +493,12 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={data.signatures.client}
-                        alt="Signature Client"
+                        alt={copy.clientSignatureAlt}
                         style={{ maxHeight: "44px", maxWidth: "90%", objectFit: "contain" }}
                       />
                     ) : (
                       <span style={{ fontSize: "8.5px", color: "#94a3b8", fontStyle: "italic" }}>
-                        Signature client
+                        {copy.clientSignature}
                       </span>
                     )}
                   </div>
@@ -502,22 +507,22 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
                 {/* 2. TECHNICIEN */}
                 <td style={signatureCell}>
                   <div style={{ fontSize: "8.5px", color: "#64748b", marginBottom: "4px" }}>
-                    Visa de réalisation
+                    {copy.technicianVisa}
                   </div>
                   <div style={{ fontSize: "9.5px", fontWeight: 700, color: "#0f172a", minHeight: "14px" }}>
-                    {data.technicianName || "Technicien Carzone"}
+                    {data.technicianName || copy.technicianDefault}
                   </div>
                   <div style={{ height: "46px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     {data.signatures?.technician ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={data.signatures.technician}
-                        alt="Signature Technicien"
+                        alt={copy.technicianSignatureAlt}
                         style={{ maxHeight: "44px", maxWidth: "90%", objectFit: "contain" }}
                       />
                     ) : (
                       <span style={{ fontSize: "8.5px", color: "#94a3b8", fontStyle: "italic" }}>
-                        Visa mécanicien
+                        {copy.technicianSignature}
                       </span>
                     )}
                   </div>
@@ -526,22 +531,22 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
                 {/* 3. RESPONSABLE ATELIER */}
                 <td style={signatureCell}>
                   <div style={{ fontSize: "8.5px", color: "#64748b", marginBottom: "4px" }}>
-                    Contrôle qualité &amp; sortie
+                    {copy.managerControl}
                   </div>
                   <div style={{ fontSize: "9.5px", fontWeight: 700, color: "#0f172a", minHeight: "14px" }}>
-                    {data.workshopManagerName || "Chef d'Atelier SAV"}
+                    {data.workshopManagerName || copy.managerDefault}
                   </div>
                   <div style={{ height: "46px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     {data.signatures?.workshopManager ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={data.signatures.workshopManager}
-                        alt="Signature Chef Atelier"
+                        alt={copy.managerSignatureAlt}
                         style={{ maxHeight: "44px", maxWidth: "90%", objectFit: "contain" }}
                       />
                     ) : (
                       <span style={{ fontSize: "8.5px", color: "#94a3b8", fontStyle: "italic" }}>
-                        Cachet &amp; visa atelier
+                        {copy.managerSignature}
                       </span>
                     )}
                   </div>
@@ -562,7 +567,7 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
             paddingTop: "3px",
           }}
         >
-          CARZONE SARL · Société à Responsabilité Limitée · Concessionnaire Officiel Automobile · Système Informatique de Gestion SAV Carzone Ops
+          {copy.footer}
         </div>
       </div>
     </div>

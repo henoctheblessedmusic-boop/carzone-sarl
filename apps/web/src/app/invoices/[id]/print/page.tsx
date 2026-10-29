@@ -2,7 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
-import { formatDate, formatXof } from "@/lib/format";
+import { formatXof } from "@/lib/format";
+import { getServerMessages } from "@/lib/i18n/server";
+import {
+  invoicesCopy,
+  invoiceStatusLabel,
+  paymentMethodLabel,
+  formatInvoiceDate,
+} from "@/lib/i18n/messages/invoices";
 import { PrintButton } from "@/components/PrintButton";
 import { getDefaultCgv, type CgvType } from "@/lib/cgv";
 import { formatLegalAmountNotice } from "@/lib/number-to-words-fr";
@@ -13,6 +20,8 @@ export default async function InvoicePrintPage({
   params: Promise<{ id: string }>;
 }) {
   await requireUser(["DG", "COMMERCIAL", "COMPTA", "ADMIN"]);
+  const { locale } = await getServerMessages();
+  const copy = invoicesCopy[locale];
   const { id } = await params;
 
   const invoice = await prisma.invoice.findUnique({
@@ -61,11 +70,11 @@ export default async function InvoicePrintPage({
         }}
       >
         <Link href="/invoices" className="ox-btn ox-btn-ghost" style={{ color: "#fff" }}>
-          ← Retour Factures & Règlements
+          {copy.print.back}
         </Link>
         <PrintButton />
         <span style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.7)" }}>
-          Facture commerciale normalisée · CARZONE SARL Bénin
+          {copy.print.actionHint}
         </span>
       </div>
 
@@ -107,24 +116,24 @@ export default async function InvoicePrintPage({
             />
             <div style={{ fontWeight: 700, fontSize: "1.05rem" }}>CARZONE SARL</div>
             <div style={{ fontSize: "0.85rem", opacity: 0.8, lineHeight: 1.4 }}>
-              SARL Showroom & Mobilité SARL<br />
-              Zone Maro-Militaire, Quartier Gbèdomidji · Cotonou<br />
-              Tél : +229 21 33 00 00 / 97 00 00 00<br />
-              Email : contact@topcarzone.com · Web : www.topcarzone.com<br />
-              IFU : 0202314589201 · RCCM : RB/COT/23 B 34567
+              {copy.print.companyTagline}<br />
+              {copy.print.companyAddress}<br />
+              {copy.print.companyPhone}<br />
+              {copy.print.companyMailWeb}<br />
+              {copy.print.companyFiscal}
             </div>
           </div>
 
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "#0078d4" }}>
-              FACTURE NORMALISÉE
+              {copy.print.docTitle}
             </div>
             <div style={{ fontSize: "1.1rem", fontWeight: 700, marginTop: 4 }}>
               {invoice.number}
             </div>
             {invoice.quote && (
               <div style={{ fontSize: "0.85rem", opacity: 0.7, marginTop: 2 }}>
-                Réf. Devis : {invoice.quote.number}
+                {copy.print.quoteRef(invoice.quote.number)}
               </div>
             )}
             <div
@@ -140,7 +149,7 @@ export default async function InvoicePrintPage({
                 border: `1px solid ${balanceDue === 0 ? "#86efac" : "#fde68a"}`,
               }}
             >
-              {balanceDue === 0 ? "FACTURE SOLDÉE" : "PAIEMENT EN ATTENTE"}
+              {balanceDue === 0 ? copy.print.badgeSettled : copy.print.badgePending}
             </div>
           </div>
         </header>
@@ -160,7 +169,7 @@ export default async function InvoicePrintPage({
         >
           <div>
             <div style={{ fontSize: "0.8rem", textTransform: "uppercase", opacity: 0.6, fontWeight: 700, marginBottom: 4 }}>
-              Facturé à :
+              {copy.print.billedTo}
             </div>
             <div style={{ fontWeight: 700, fontSize: "1.05rem" }}>{invoice.customer.contactName}</div>
             {invoice.customer.companyName && (
@@ -168,23 +177,23 @@ export default async function InvoicePrintPage({
             )}
             {invoice.customer.ifu && (
               <div style={{ color: "#0078d4", fontWeight: 700, fontSize: "0.92rem", marginTop: 2 }}>
-                N° IFU : {invoice.customer.ifu}
+                {copy.print.ifu(invoice.customer.ifu)}
               </div>
             )}
             <div style={{ fontSize: "0.85rem", opacity: 0.85, marginTop: 4, lineHeight: 1.4 }}>
-              {invoice.customer.address && <div>Adresse : {invoice.customer.address}</div>}
-              {invoice.customer.city && <div>Ville : {invoice.customer.city}</div>}
-              {invoice.customer.phone && <div>Téléphone : {invoice.customer.phone}</div>}
-              {invoice.customer.email && <div>Email : {invoice.customer.email}</div>}
+              {invoice.customer.address && <div>{copy.print.address} {invoice.customer.address}</div>}
+              {invoice.customer.city && <div>{copy.print.city} {invoice.customer.city}</div>}
+              {invoice.customer.phone && <div>{copy.print.phone} {invoice.customer.phone}</div>}
+              {invoice.customer.email && <div>{copy.print.email} {invoice.customer.email}</div>}
             </div>
           </div>
 
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: "0.85rem", lineHeight: 1.6 }}>
-              <div><strong>Date d&apos;émission :</strong> {formatDate(invoice.createdAt)}</div>
-              <div><strong>Date d&apos;échéance :</strong> {formatDate(invoice.dueDate)}</div>
-              <div><strong>Régime fiscal :</strong> {invoice.taxMode} ({invoice.taxRatePct > 0 ? `TVA ${invoice.taxRatePct}%` : "Exonéré"})</div>
-              <div><strong>Statut :</strong> {invoice.status}</div>
+              <div><strong>{copy.print.dateIssued}</strong> {formatInvoiceDate(copy, invoice.createdAt)}</div>
+              <div><strong>{copy.print.dateDue}</strong> {formatInvoiceDate(copy, invoice.dueDate)}</div>
+              <div><strong>{copy.print.taxRegime}</strong> {invoice.taxMode} ({invoice.taxRatePct > 0 ? copy.print.vatRate(invoice.taxRatePct) : copy.print.exempt})</div>
+              <div><strong>{copy.print.status}</strong> {invoiceStatusLabel(copy, invoice.status)}</div>
             </div>
           </div>
         </div>
@@ -194,16 +203,16 @@ export default async function InvoicePrintPage({
           <thead>
             <tr style={{ background: "#eef5f9" }}>
               <th style={{ textAlign: "left", padding: "0.75rem 0.6rem", borderBottom: "2px solid #0078d4", fontSize: "0.85rem" }}>
-                Désignation des Prestations / Véhicules / Équipements
+                {copy.print.columns.designation}
               </th>
               <th style={{ textAlign: "center", padding: "0.75rem 0.6rem", borderBottom: "2px solid #0078d4", fontSize: "0.85rem", width: "10%" }}>
-                Qté
+                {copy.print.columns.quantity}
               </th>
               <th style={{ textAlign: "right", padding: "0.75rem 0.6rem", borderBottom: "2px solid #0078d4", fontSize: "0.85rem", width: "22%" }}>
-                P.U. HT
+                {copy.print.columns.unitHt}
               </th>
               <th style={{ textAlign: "right", padding: "0.75rem 0.6rem", borderBottom: "2px solid #0078d4", fontSize: "0.85rem", width: "22%" }}>
-                Total HT
+                {copy.print.columns.totalHt}
               </th>
             </tr>
           </thead>
@@ -215,7 +224,7 @@ export default async function InvoicePrintPage({
                     <div style={{ fontWeight: 600 }}>{l.description.replace(/\s*\(\s*\)/g, "").trim()}</div>
                     {l.vehicle && (
                       <div style={{ fontSize: "0.75rem", opacity: 0.7, marginTop: 2 }}>
-                        VIN : {l.vehicle.vin || "Non assigné"} · {l.vehicle.brand} {l.vehicle.model}
+                        {copy.print.vin(l.vehicle.vin || copy.print.vinUnassigned)} · {l.vehicle.brand} {l.vehicle.model}
                       </div>
                     )}
                   </td>
@@ -233,8 +242,8 @@ export default async function InvoicePrintPage({
             ) : (
               <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
                 <td style={{ padding: "0.75rem 0.6rem", fontSize: "0.9rem" }}>
-                  <div style={{ fontWeight: 600 }}>Prestations commerciales CARZONE SARL</div>
-                  <div style={{ fontSize: "0.75rem", opacity: 0.7 }}>Conformément à la commande client</div>
+                  <div style={{ fontWeight: 600 }}>{copy.print.defaultLineTitle}</div>
+                  <div style={{ fontSize: "0.75rem", opacity: 0.7 }}>{copy.print.defaultLineSub}</div>
                 </td>
                 <td style={{ padding: "0.75rem 0.6rem", textAlign: "center", fontSize: "0.9rem" }}>1</td>
                 <td style={{ padding: "0.75rem 0.6rem", textAlign: "right", fontSize: "0.9rem" }}>
@@ -253,11 +262,11 @@ export default async function InvoicePrintPage({
           {/* Historique des acomptes reçus */}
           <div style={{ background: "#f8fafc", padding: "1rem", borderRadius: 8, border: "1px solid #e2e8f0" }}>
             <div style={{ fontWeight: 700, fontSize: "0.85rem", marginBottom: 8, textTransform: "uppercase", color: "#0078d4" }}>
-              Historique des Règlements Reçus
+              {copy.print.paymentsTitle}
             </div>
             {invoice.payments.length === 0 ? (
               <div style={{ fontSize: "0.82rem", opacity: 0.65, fontStyle: "italic" }}>
-                Aucun règlement enregistré sur cette facture pour le moment.
+                {copy.print.noPayments}
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: "0.82rem" }}>
@@ -272,7 +281,7 @@ export default async function InvoicePrintPage({
                     }}
                   >
                     <span>
-                      {formatDate(p.paidAt)} · {p.method} {p.reference ? `(${p.reference})` : ""}
+                      {formatInvoiceDate(copy, p.paidAt)} · {paymentMethodLabel(copy, p.method)} {p.reference ? `(${p.reference})` : ""}
                     </span>
                     <strong style={{ color: "#166534" }}>{formatXof(p.amountXof)}</strong>
                   </div>
@@ -284,11 +293,11 @@ export default async function InvoicePrintPage({
           {/* Totaux */}
           <div style={{ fontSize: "0.95rem" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-              <span>Sous-total HT :</span>
+              <span>{copy.print.subtotalHt}</span>
               <strong>{formatXof(invoice.subtotalHtXof)}</strong>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-              <span>TVA ({invoice.taxRatePct}%) :</span>
+              <span>{copy.print.vat(invoice.taxRatePct)}</span>
               <strong>{formatXof(invoice.taxXof)}</strong>
             </div>
             <div
@@ -301,7 +310,7 @@ export default async function InvoicePrintPage({
                 fontSize: "1.05rem",
               }}
             >
-              <span>Total TTC :</span>
+              <span>{copy.print.totalTtc}</span>
               <strong>{formatXof(invoice.totalXof)}</strong>
             </div>
             <div
@@ -312,7 +321,7 @@ export default async function InvoicePrintPage({
                 color: "#166534",
               }}
             >
-              <span>Total Encaissé :</span>
+              <span>{copy.print.totalCollected}</span>
               <strong>- {formatXof(totalPaid)}</strong>
             </div>
             <div
@@ -325,7 +334,7 @@ export default async function InvoicePrintPage({
                 color: balanceDue > 0 ? "#b91c1c" : "#166534",
               }}
             >
-              <span>Net à Payer (Solde) :</span>
+              <span>{copy.print.netToPay}</span>
               <strong>{formatXof(balanceDue)}</strong>
             </div>
           </div>
@@ -355,7 +364,7 @@ export default async function InvoicePrintPage({
               marginBottom: 3,
             }}
           >
-            Mention Légale et Fiscale Obligatoire
+            {copy.print.legalHeading}
           </span>
           <strong style={{ color: "#0f172a" }}>
             {formatLegalAmountNotice(invoice.totalXof, "facture")}
@@ -379,14 +388,14 @@ export default async function InvoicePrintPage({
           >
             <div>
               <div style={{ fontWeight: 800, fontSize: "0.95rem", color: "#166534", display: "flex", alignItems: "center", gap: 6 }}>
-                RÉPUBLIQUE DU BÉNIN · DIRECTION GÉNÉRALE DES IMPÔTS (DGI)
+                {copy.print.dgiHeading}
               </div>
               <div style={{ fontSize: "0.85rem", marginTop: 6, color: "#1e293b", lineHeight: 1.6 }}>
-                <div><strong>Code Sécurité MECeF / DGI :</strong> <span style={{ fontFamily: "monospace", fontSize: "0.98rem", fontWeight: 700, letterSpacing: "0.04em", color: "#0078d4" }}>{invoice.mecefCode}</span></div>
-                <div><strong>NIM (Machine e-MCF) :</strong> {invoice.mecefNim || "MCF01-CARZONE-BJ01"}</div>
-                <div><strong>Compteurs fiscaux :</strong> {invoice.mecefCounters || "1/1 F"} · {formatDate(invoice.mecefDateTime || invoice.createdAt)}</div>
+                <div><strong>{copy.print.mecefCode}</strong> <span style={{ fontFamily: "monospace", fontSize: "0.98rem", fontWeight: 700, letterSpacing: "0.04em", color: "#0078d4" }}>{invoice.mecefCode}</span></div>
+                <div><strong>{copy.print.nim}</strong> {invoice.mecefNim || "MCF01-CARZONE-BJ01"}</div>
+                <div><strong>{copy.print.counters}</strong> {invoice.mecefCounters || "1/1 F"} · {formatInvoiceDate(copy, invoice.mecefDateTime || invoice.createdAt)}</div>
                 <div style={{ fontSize: "0.75rem", opacity: 0.7, marginTop: 4 }}>
-                  Facture certifiée et télétransmise au serveur central e-MECeF de la DGI.
+                  {copy.print.certifiedNote}
                 </div>
               </div>
             </div>
@@ -408,7 +417,7 @@ export default async function InvoicePrintPage({
                 {/* eslint-disable-next-line @next/next/no-img-element -- print QR code */}
                 <img
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${encodeURIComponent(invoice.mecefQrCode || `https://e-mecef.impots.bj/verify?code=${invoice.mecefCode}`)}`}
-                  alt="QR Code e-MECeF"
+                  alt={copy.print.qrAlt}
                   width={82}
                   height={82}
                   style={{ display: "block" }}
@@ -431,18 +440,18 @@ export default async function InvoicePrintPage({
             lineHeight: 1.5,
           }}
         >
-          <strong style={{ color: "#0078d4" }}>Modalités de Règlement CARZONE SARL Bénin :</strong>
+          <strong style={{ color: "#0078d4" }}>{copy.print.paymentHeading}</strong>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginTop: 6 }}>
             <div>
-              <strong>Virement Bancaire :</strong><br />
-              • Ecobank Bénin : BJ061 01001 001234567890 12<br />
-              • BOA Bénin : BJ062 01002 009876543210 34
+              <strong>{copy.print.bankTransfer}</strong><br />
+              • {copy.print.ecobank} BJ061 01001 001234567890 12<br />
+              • {copy.print.boa} BJ062 01002 009876543210 34
             </div>
             <div>
-              <strong>Mobile Money &amp; Caisse :</strong><br />
-              • MTN MoMo Marchand : *880*41*CARZONE# (+229 97 00 00 00)<br />
-              • Moov Money Marchand : *855*1*CARZONE# (+229 95 00 00 00)<br />
-              • Caisse Showroom Maro-Militaire (Chèque ou Espèces)
+              <strong>{copy.print.mobileMoney}</strong><br />
+              • {copy.print.mtnMerchant} *880*41*CARZONE# (+229 97 00 00 00)<br />
+              • {copy.print.moovMerchant} *855*1*CARZONE# (+229 95 00 00 00)<br />
+              • {copy.print.cashDesk}
             </div>
           </div>
         </div>
@@ -461,15 +470,15 @@ export default async function InvoicePrintPage({
           }}
         >
           <div>
-            Facture établie sous le régime fiscal de la République du Bénin.<br />
-            En cas de contestation, seuls les tribunaux de Cotonou sont compétents.<br />
+            {copy.print.footerRegime}<br />
+            {copy.print.footerCourt}<br />
             <strong style={{ color: "#0f172a", display: "inline-block", marginTop: 4 }}>
               {formatLegalAmountNotice(invoice.totalXof, "facture")}
             </strong>
           </div>
           <div style={{ textAlign: "center", width: 200 }}>
-            <div style={{ fontWeight: 700, marginBottom: 40 }}>Pour CARZONE SARL</div>
-            <div style={{ fontSize: "0.75rem", fontStyle: "italic", opacity: 0.6 }}>Cachet &amp; Visa Comptabilité</div>
+            <div style={{ fontWeight: 700, marginBottom: 40 }}>{copy.print.forCompany}</div>
+            <div style={{ fontSize: "0.75rem", fontStyle: "italic", opacity: 0.6 }}>{copy.print.stampCompta}</div>
           </div>
         </footer>
       </article>
@@ -498,15 +507,18 @@ export default async function InvoicePrintPage({
         >
           <div>
             <div style={{ fontSize: "1.1rem", fontWeight: 700, letterSpacing: "0.02em" }}>
-              CONDITIONS GÉNÉRALES DE VENTE &amp; DE GARANTIE
+              {copy.print.cgv.title}
             </div>
             <div style={{ fontSize: "0.82rem", opacity: 0.7, marginTop: 2 }}>
-              Adossées à la Facture Normalisée N° {invoice.number} · {cgvType === "ATELIER" ? "Prestations Atelier SAV & Réparations" : "Vente de Véhicules (Showroom & Import)"}
+              {copy.print.cgv.subtitle(
+                invoice.number,
+                cgvType === "ATELIER" ? copy.print.cgv.kindWorkshop : copy.print.cgv.kindVehicle,
+              )}
             </div>
           </div>
           <div style={{ textAlign: "right", fontSize: "0.82rem", opacity: 0.75 }}>
-            <strong>CARZONE SARL</strong> (SARL Showroom & Mobilité)<br />
-            Zone Maro-Militaire, Quartier Gbèdomidji · Cotonou
+            <strong>{copy.print.cgv.company}</strong><br />
+            {copy.print.cgv.companyAddress}
           </div>
         </header>
 
@@ -534,15 +546,15 @@ export default async function InvoicePrintPage({
           }}
         >
           <div>
-            <strong>Pour CARZONE SARL Bénin :</strong>
-            <div style={{ height: 60, marginTop: 6, opacity: 0.6 }}>Direction Commerciale / Signature &amp; Cachet</div>
+            <strong>{copy.print.cgv.forCompany}</strong>
+            <div style={{ height: 60, marginTop: 6, opacity: 0.6 }}>{copy.print.cgv.salesDirection}</div>
           </div>
           <div style={{ textAlign: "right" }}>
-            <strong>Pour le Client :</strong>
+            <strong>{copy.print.cgv.forClient}</strong>
             <div style={{ fontStyle: "italic", fontSize: "0.8rem", opacity: 0.8, marginTop: 2 }}>
-              « Lu et approuvé, bon pour accord »
+              {copy.print.cgv.readApproved}
             </div>
-            <div style={{ height: 60, marginTop: 6, opacity: 0.6 }}>Signature &amp; Cachet du Client</div>
+            <div style={{ height: 60, marginTop: 6, opacity: 0.6 }}>{copy.print.cgv.signStamp}</div>
           </div>
         </div>
       </article>

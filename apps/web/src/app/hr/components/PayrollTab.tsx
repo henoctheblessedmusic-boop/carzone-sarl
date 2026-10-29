@@ -13,6 +13,8 @@ import {
   Printer,
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
+import { usePrefs } from "@/components/PrefsProvider";
+import { adminCopy, paymentMethodLabel } from "@/lib/i18n/messages/admin";
 import {
   recordSalaryPayment,
   deleteSalaryPayment,
@@ -33,29 +35,14 @@ export type SalaryPaymentData = {
   paidByUserId: string | null;
 };
 
-const MONTHS = [
-  { value: 1, label: "Janvier" },
-  { value: 2, label: "Février" },
-  { value: 3, label: "Mars" },
-  { value: 4, label: "Avril" },
-  { value: 5, label: "Mai" },
-  { value: 6, label: "Juin" },
-  { value: 7, label: "Juillet" },
-  { value: 8, label: "Août" },
-  { value: 9, label: "Septembre" },
-  { value: 10, label: "Octobre" },
-  { value: 11, label: "Novembre" },
-  { value: 12, label: "Décembre" },
-];
-
-const PAYMENT_METHODS = [
-  { value: "VIREMENT_ECOBANK", label: "Virement Ecobank" },
-  { value: "VIREMENT_BOA", label: "Virement BOA" },
-  { value: "VIREMENT", label: "Virement Bancaire (Autre)" },
-  { value: "CHEQUE", label: "Chèque Bancaire" },
-  { value: "ESPECES", label: "Espèces (Caisse)" },
-  { value: "MOBILE_MONEY", label: "Mobile Money (MoMo / Moov)" },
-];
+const PAYMENT_METHOD_VALUES = [
+  "VIREMENT_ECOBANK",
+  "VIREMENT_BOA",
+  "VIREMENT",
+  "CHEQUE",
+  "ESPECES",
+  "MOBILE_MONEY",
+] as const;
 
 export function PayrollTab({
   employees,
@@ -83,6 +70,11 @@ export function PayrollTab({
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"ALL" | "PAID" | "PENDING">("ALL");
+
+  const { locale } = usePrefs();
+  const copy = adminCopy[locale];
+  const payrollCopy = copy.payroll;
+  const months = payrollCopy.months.map((label, index) => ({ value: index + 1, label }));
 
   const [isPending, startTransition] = useTransition();
 
@@ -199,20 +191,20 @@ export function PayrollTab({
 
         setPayingEmployee(null);
       } catch (err) {
-        alert(err instanceof Error ? err.message : "Erreur enregistrement.");
+        alert(err instanceof Error ? err.message : payrollCopy.alerts.errSave);
       }
     });
   };
 
   // Delete payment
   const handleDeletePayment = async (paymentId: string) => {
-    if (!confirm("Voulez-vous annuler l'enregistrement de ce paiement de salaire ?")) return;
+    if (!confirm(payrollCopy.cancelPaymentTitle)) return;
     startTransition(async () => {
       try {
         await deleteSalaryPayment(paymentId);
         setPayments((prev) => prev.filter((p) => p.id !== paymentId));
       } catch (err) {
-        alert(err instanceof Error ? err.message : "Erreur annulation.");
+        alert(err instanceof Error ? err.message : payrollCopy.alerts.errCancel);
       }
     });
   };
@@ -264,12 +256,13 @@ export function PayrollTab({
 
         setShowBulkModal(false);
       } catch (err) {
-        alert(err instanceof Error ? err.message : "Erreur paiement groupé.");
+        alert(err instanceof Error ? err.message : payrollCopy.alerts.errBulk);
       }
     });
   };
 
-  const selectedMonthName = MONTHS.find((m) => m.value === selectedMonth)?.label || "Mois";
+  const selectedMonthName =
+    months.find((m) => m.value === selectedMonth)?.label || payrollCopy.periodLabel;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
@@ -287,14 +280,14 @@ export function PayrollTab({
       >
         <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-            <span style={{ fontSize: "0.85rem", opacity: 0.75, fontWeight: 600 }}>Période :</span>
+            <span style={{ fontSize: "0.85rem", opacity: 0.75, fontWeight: 600 }}>{payrollCopy.periodLabel} :</span>
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(Number(e.target.value))}
               className="ox-select"
               style={{ fontWeight: 600 }}
             >
-              {MONTHS.map((m) => (
+              {months.map((m) => (
                 <option key={m.value} value={m.value}>
                   {m.label}
                 </option>
@@ -331,7 +324,7 @@ export function PayrollTab({
               fontWeight: 600,
             }}
           >
-            <Wallet size={16} /> Régler Tous les Salaires ({selectedMonthName} {selectedYear})
+            <Wallet size={16} /> {payrollCopy.bulkButton(selectedMonthName, String(selectedYear))}
           </button>
         </div>
       </div>
@@ -360,13 +353,13 @@ export function PayrollTab({
             >
               <Users size={16} />
             </div>
-            <span style={{ fontSize: "0.78rem", opacity: 0.7 }}>Masse Salariale Mensuelle</span>
+            <span style={{ fontSize: "0.78rem", opacity: 0.7 }}>{payrollCopy.kpi.payrollLabel}</span>
           </div>
           <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "var(--ice-text)" }}>
             {formatXof(totalMonthlyPayroll)}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: 4 }}>
-            {activeEmployees.length} salarié(s) en poste actif
+            {payrollCopy.kpi.payrollHint(activeEmployees.length)}
           </div>
         </div>
 
@@ -386,13 +379,13 @@ export function PayrollTab({
             >
               <CheckCircle2 size={16} />
             </div>
-            <span style={{ fontSize: "0.78rem", opacity: 0.7 }}>Salaires Réglés ce Mois</span>
+            <span style={{ fontSize: "0.78rem", opacity: 0.7 }}>{payrollCopy.kpi.paidLabel}</span>
           </div>
           <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "var(--ok)" }}>
             {formatXof(totalPaidThisMonth)}
           </div>
           <div style={{ fontSize: "0.75rem", color: "var(--ok)", marginTop: 4 }}>
-            {currentMonthPayments.length} sur {activeEmployees.length} salariés payés ({payPercentage}%)
+            {payrollCopy.kpi.paidHint(currentMonthPayments.length, activeEmployees.length, payPercentage)}
           </div>
         </div>
 
@@ -412,13 +405,13 @@ export function PayrollTab({
             >
               <Clock size={16} />
             </div>
-            <span style={{ fontSize: "0.78rem", opacity: 0.7 }}>Reste à Payer ({selectedMonthName})</span>
+            <span style={{ fontSize: "0.78rem", opacity: 0.7 }}>{payrollCopy.kpi.remainingLabel(selectedMonthName)}</span>
           </div>
           <div style={{ fontSize: "1.4rem", fontWeight: 700, color: remainingToPay > 0 ? "var(--warn)" : "var(--ok)" }}>
             {formatXof(remainingToPay)}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: 4 }}>
-            {remainingToPay === 0 ? "Tous les salaires sont à jour !" : "En attente de virement"}
+            {remainingToPay === 0 ? payrollCopy.kpi.allClear : payrollCopy.kpi.awaitingTransfer}
           </div>
         </div>
       </div>
@@ -437,10 +430,10 @@ export function PayrollTab({
         >
           <div>
             <h2 style={{ fontSize: "1.1rem", fontWeight: 700, margin: 0 }}>
-              Livre de Paie &amp; Suivi des Virements · {selectedMonthName} {selectedYear}
+              {payrollCopy.registerTitle(selectedMonthName, String(selectedYear))}
             </h2>
             <p style={{ margin: "2px 0 0", fontSize: "0.8rem", opacity: 0.7 }}>
-              Visualisation et validation des rémunérations pour la comptabilité et la direction
+              {payrollCopy.registerHint}
             </p>
           </div>
 
@@ -450,7 +443,7 @@ export function PayrollTab({
               <Search size={15} style={{ position: "absolute", left: 10, top: 11, opacity: 0.5 }} />
               <input
                 type="text"
-                placeholder="Chercher salarié ou matricule..."
+                placeholder={payrollCopy.searchPlaceholder}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="ox-input"
@@ -463,9 +456,9 @@ export function PayrollTab({
               onChange={(e) => setStatusFilter(e.target.value as "ALL" | "PAID" | "PENDING")}
               className="ox-select"
             >
-              <option value="ALL">Tous les statuts</option>
-              <option value="PAID">Uniquement payés</option>
-              <option value="PENDING">En attente de paiement</option>
+              <option value="ALL">{payrollCopy.filterAll}</option>
+              <option value="PAID">{payrollCopy.filterPaid}</option>
+              <option value="PENDING">{payrollCopy.filterPending}</option>
             </select>
           </div>
         </div>
@@ -475,20 +468,20 @@ export function PayrollTab({
           <table className="ox-table" style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ textAlign: "left", fontSize: "0.78rem", opacity: 0.7 }}>
-                <th style={{ padding: "0.8rem 1rem" }}>Salarié</th>
-                <th style={{ padding: "0.8rem 1rem" }}>Poste &amp; Service</th>
-                <th style={{ padding: "0.8rem 1rem" }}>Compte Bancaire</th>
-                <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>Salaire de Base (XOF)</th>
-                <th style={{ padding: "0.8rem 1rem", textAlign: "center" }}>Statut Paiement</th>
-                <th style={{ padding: "0.8rem 1rem" }}>Règlement &amp; Réf.</th>
-                <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>Actions</th>
+                <th style={{ padding: "0.8rem 1rem" }}>{payrollCopy.table.employee}</th>
+                <th style={{ padding: "0.8rem 1rem" }}>{payrollCopy.table.jobAndDepartment}</th>
+                <th style={{ padding: "0.8rem 1rem" }}>{payrollCopy.table.bankAccount}</th>
+                <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>{payrollCopy.table.baseSalary}</th>
+                <th style={{ padding: "0.8rem 1rem", textAlign: "center" }}>{payrollCopy.table.payStatus}</th>
+                <th style={{ padding: "0.8rem 1rem" }}>{payrollCopy.table.settlement}</th>
+                <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>{copy.common.actions}</th>
               </tr>
             </thead>
             <tbody>
               {filteredList.length === 0 ? (
                 <tr>
                   <td colSpan={7} style={{ textAlign: "center", padding: "2rem", opacity: 0.6 }}>
-                    Aucun salarié ne correspond aux critères.
+                    {payrollCopy.empty}
                   </td>
                 </tr>
               ) : (
@@ -516,7 +509,7 @@ export function PayrollTab({
                       <td style={{ padding: "0.8rem 1rem" }}>
                         <div>{emp.jobTitle}</div>
                         <div style={{ fontSize: "0.75rem", opacity: 0.65 }}>
-                          {emp.department?.name || "Général"}
+                          {emp.department?.name || payrollCopy.noDepartment}
                         </div>
                       </td>
 
@@ -526,11 +519,11 @@ export function PayrollTab({
                           <div>
                             <div style={{ fontWeight: 500 }}>{emp.bankName}</div>
                             <div style={{ fontSize: "0.72rem", opacity: 0.65, fontFamily: "monospace" }}>
-                              {emp.bankAccountNumber || "N° non renseigné"}
+                              {emp.bankAccountNumber || payrollCopy.noAccount}
                             </div>
                           </div>
                         ) : (
-                          <span style={{ opacity: 0.5, fontSize: "0.75rem" }}>Espèces / Caisse</span>
+                          <span style={{ opacity: 0.5, fontSize: "0.75rem" }}>{payrollCopy.cashDesk}</span>
                         )}
                       </td>
 
@@ -555,7 +548,7 @@ export function PayrollTab({
                               fontWeight: 600,
                             }}
                           >
-                            <CheckCircle2 size={13} /> Payé
+                            <CheckCircle2 size={13} /> {payrollCopy.paidBadge}
                           </span>
                         ) : (
                           <span
@@ -571,7 +564,7 @@ export function PayrollTab({
                               fontWeight: 600,
                             }}
                           >
-                            <Clock size={13} /> En attente
+                            <Clock size={13} /> {payrollCopy.pendingBadge}
                           </span>
                         )}
                       </td>
@@ -581,11 +574,11 @@ export function PayrollTab({
                         {isPaid && payment ? (
                           <div>
                             <div style={{ fontWeight: 500 }}>
-                              {payment.paymentMethod?.replace("_", " ")}
+                              {paymentMethodLabel(copy, payment.paymentMethod)}
                             </div>
                             {payment.reference && (
                               <div style={{ opacity: 0.65, fontFamily: "monospace" }}>
-                                Réf: {payment.reference}
+                                {payrollCopy.referencePrefix} {payment.reference}
                               </div>
                             )}
                             <div style={{ opacity: 0.5, fontSize: "0.72rem" }}>
@@ -606,17 +599,17 @@ export function PayrollTab({
                                 onClick={() => setViewingReceipt({ employee: emp, payment })}
                                 className="ox-btn ox-btn-ghost"
                                 style={{ padding: "4px 8px", fontSize: "0.75rem" }}
-                                title="Voir le bulletin de paie"
+                                title={payrollCopy.viewPayslipTitle}
                               >
-                                <FileText size={14} /> Reçu
+                                <FileText size={14} /> {payrollCopy.receiptButton}
                               </button>
                               <button
                                 onClick={() => handleDeletePayment(payment.id)}
                                 className="ox-btn ox-btn-ghost"
                                 style={{ padding: "4px 8px", fontSize: "0.75rem", color: "var(--bad)" }}
-                                title="Annuler le paiement"
+                                title={payrollCopy.cancelPaymentTitle}
                               >
-                                Annuler
+                                {payrollCopy.cancelPayment}
                               </button>
                             </>
                           ) : (
@@ -625,7 +618,7 @@ export function PayrollTab({
                               className="ox-btn ox-btn-primary"
                               style={{ padding: "4px 10px", fontSize: "0.75rem" }}
                             >
-                              <CreditCard size={14} /> Payer
+                              <CreditCard size={14} /> {payrollCopy.payButton}
                             </button>
                           )}
                         </div>
@@ -676,7 +669,7 @@ export function PayrollTab({
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
               <div>
-                <h2 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 700 }}>Régler le Salaire</h2>
+                <h2 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 700 }}>{payrollCopy.payModal.title}</h2>
                 <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>
                   {payingEmployee.firstName} {payingEmployee.lastName} ({payingEmployee.employeeNumber})
                 </div>
@@ -695,19 +688,22 @@ export function PayrollTab({
                   borderRadius: 8,
                 }}
               >
-                <div style={{ fontSize: "0.78rem", opacity: 0.8 }}>Période de rémunération :</div>
+                <div style={{ fontSize: "0.78rem", opacity: 0.8 }}>{payrollCopy.payModal.periodLabel} :</div>
                 <div style={{ fontSize: "1rem", fontWeight: 700, color: "var(--brand)" }}>
                   {selectedMonthName} {selectedYear}
                 </div>
                 {payingEmployee.bankName && (
                   <div style={{ fontSize: "0.75rem", opacity: 0.75, marginTop: 4 }}>
-                    Compte : {payingEmployee.bankName} · {payingEmployee.bankAccountNumber || "N° non renseigné"}
+                    {payrollCopy.payModal.accountLine(
+                      payingEmployee.bankName,
+                      payingEmployee.bankAccountNumber || payrollCopy.noAccount
+                    )}
                   </div>
                 )}
               </div>
 
               <div>
-                <label className="ox-label">Montant à verser (XOF) *</label>
+                <label className="ox-label">{payrollCopy.payModal.amountLabel}</label>
                 <input
                   type="number"
                   required
@@ -720,7 +716,7 @@ export function PayrollTab({
               </div>
 
               <div>
-                <label className="ox-label">Mode de règlement *</label>
+                <label className="ox-label">{payrollCopy.payModal.methodLabel}</label>
                 <select
                   required
                   value={payForm.paymentMethod}
@@ -728,19 +724,19 @@ export function PayrollTab({
                   className="ox-select"
                   style={{ width: "100%" }}
                 >
-                  {PAYMENT_METHODS.map((m) => (
-                    <option key={m.value} value={m.value}>
-                      {m.label}
+                  {PAYMENT_METHOD_VALUES.map((value) => (
+                    <option key={value} value={value}>
+                      {payrollCopy.methods[value]}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="ox-label">Référence bancaire / N° transaction / Chèque</label>
+                <label className="ox-label">{payrollCopy.payModal.referenceLabel}</label>
                 <input
                   type="text"
-                  placeholder="ex: VIR-2026-OCT-042 ou N° Chèque"
+                  placeholder={payrollCopy.payModal.referencePlaceholder}
                   value={payForm.reference}
                   onChange={(e) => setPayForm({ ...payForm, reference: e.target.value })}
                   className="ox-input"
@@ -748,10 +744,10 @@ export function PayrollTab({
               </div>
 
               <div>
-                <label className="ox-label">Observations / Notes comptables</label>
+                <label className="ox-label">{payrollCopy.payModal.notesLabel}</label>
                 <textarea
                   rows={2}
-                  placeholder="ex: Prime inclus, acompte déduit..."
+                  placeholder={payrollCopy.payModal.notesPlaceholder}
                   value={payForm.notes}
                   onChange={(e) => setPayForm({ ...payForm, notes: e.target.value })}
                   className="ox-input"
@@ -760,10 +756,10 @@ export function PayrollTab({
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginTop: "0.5rem" }}>
                 <button type="button" onClick={() => setPayingEmployee(null)} className="ox-btn ox-btn-ghost">
-                  Annuler
+                  {copy.common.cancel}
                 </button>
                 <button type="submit" disabled={isPending} className="ox-btn ox-btn-primary">
-                  {isPending ? "Validation..." : "Valider le Paiement"}
+                  {isPending ? payrollCopy.payModal.validating : payrollCopy.payModal.validate}
                 </button>
               </div>
             </form>
@@ -808,7 +804,7 @@ export function PayrollTab({
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
               <h2 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 700 }}>
-                Règlement Groupé des Salaires
+                {payrollCopy.bulkModal.title}
               </h2>
               <button onClick={() => setShowBulkModal(false)} className="ox-btn ox-btn-ghost" style={{ padding: 4 }}>
                 <XCircle size={20} />
@@ -817,12 +813,13 @@ export function PayrollTab({
 
             <form onSubmit={handleBulkPay} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <p style={{ margin: 0, fontSize: "0.85rem", opacity: 0.85, lineHeight: 1.5 }}>
-                Cette action va enregistrer le versement des salaires de l&apos;ensemble du personnel actif pour le mois de{" "}
-                <strong>{selectedMonthName} {selectedYear}</strong> (Total estimé : <strong>{formatXof(remainingToPay)}</strong>).
+                {payrollCopy.bulkModal.intro}{" "}
+                <strong>{selectedMonthName} {selectedYear}</strong>{" "}
+                {payrollCopy.bulkModal.total(formatXof(remainingToPay))}
               </p>
 
               <div>
-                <label className="ox-label">Mode de règlement groupé *</label>
+                <label className="ox-label">{payrollCopy.bulkModal.methodLabel}</label>
                 <select
                   required
                   value={bulkForm.paymentMethod}
@@ -830,16 +827,16 @@ export function PayrollTab({
                   className="ox-select"
                   style={{ width: "100%" }}
                 >
-                  {PAYMENT_METHODS.map((m) => (
-                    <option key={m.value} value={m.value}>
-                      {m.label}
+                  {PAYMENT_METHOD_VALUES.map((value) => (
+                    <option key={value} value={value}>
+                      {payrollCopy.methods[value]}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="ox-label">Référence du virement global / Ordre de virement</label>
+                <label className="ox-label">{payrollCopy.bulkModal.referenceLabel}</label>
                 <input
                   type="text"
                   required
@@ -851,7 +848,7 @@ export function PayrollTab({
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginTop: "0.5rem" }}>
                 <button type="button" onClick={() => setShowBulkModal(false)} className="ox-btn ox-btn-ghost">
-                  Annuler
+                  {copy.common.cancel}
                 </button>
                 <button
                   type="submit"
@@ -859,7 +856,7 @@ export function PayrollTab({
                   className="ox-btn ox-btn-primary"
                   style={{ background: "var(--ok)", borderColor: "var(--ok)" }}
                 >
-                  {isPending ? "Exécution..." : "Confirmer le Virement Groupé"}
+                  {isPending ? payrollCopy.bulkModal.running : payrollCopy.bulkModal.confirm}
                 </button>
               </div>
             </form>
@@ -908,7 +905,7 @@ export function PayrollTab({
                   CARZONE SARL BÉNIN
                 </h2>
                 <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                  Reçu &amp; Justificatif de Règlement de Salaire
+                  {payrollCopy.receipt.title}
                 </div>
               </div>
               <button onClick={() => setViewingReceipt(null)} className="ox-btn ox-btn-ghost" style={{ padding: 4, color: "#64748b" }}>
@@ -918,42 +915,42 @@ export function PayrollTab({
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.2rem", fontSize: "0.85rem" }}>
               <div>
-                <div style={{ color: "#64748b", fontSize: "0.75rem" }}>Salarié :</div>
+                <div style={{ color: "#64748b", fontSize: "0.75rem" }}>{payrollCopy.receipt.employeeLabel} :</div>
                 <div style={{ fontWeight: 700 }}>{viewingReceipt.employee.firstName} {viewingReceipt.employee.lastName}</div>
-                <div>Matricule : <strong>{viewingReceipt.employee.employeeNumber}</strong></div>
-                <div>Poste : {viewingReceipt.employee.jobTitle}</div>
+                <div>{payrollCopy.receipt.staffIdLabel} : <strong>{viewingReceipt.employee.employeeNumber}</strong></div>
+                <div>{payrollCopy.receipt.jobLabel} : {viewingReceipt.employee.jobTitle}</div>
               </div>
               <div>
-                <div style={{ color: "#64748b", fontSize: "0.75rem" }}>Période :</div>
+                <div style={{ color: "#64748b", fontSize: "0.75rem" }}>{payrollCopy.receipt.periodLabel} :</div>
                 <div style={{ fontWeight: 700 }}>{selectedMonthName} {selectedYear}</div>
-                <div>Date de règlement : {viewingReceipt.payment.paymentDate.slice(0, 10)}</div>
-                <div>Mode : <strong>{viewingReceipt.payment.paymentMethod?.replace("_", " ")}</strong></div>
+                <div>{payrollCopy.receipt.paymentDateLabel} : {viewingReceipt.payment.paymentDate.slice(0, 10)}</div>
+                <div>{payrollCopy.receipt.methodLabel} : <strong>{paymentMethodLabel(copy, viewingReceipt.payment.paymentMethod)}</strong></div>
               </div>
             </div>
 
             <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, padding: "1rem", marginBottom: "1.2rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                <span>Salaire de base brut</span>
+                <span>{payrollCopy.receipt.gross}</span>
                 <strong>{formatXof(viewingReceipt.payment.amountXof)}</strong>
               </div>
               {viewingReceipt.payment.reference && (
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem", color: "#64748b" }}>
-                  <span>Référence virement/chèque :</span>
+                  <span>{payrollCopy.receipt.referenceLabel} :</span>
                   <span>{viewingReceipt.payment.reference}</span>
                 </div>
               )}
               <div style={{ borderTop: "2px solid #cbd5e1", marginTop: 8, paddingTop: 8, display: "flex", justifyContent: "space-between", fontSize: "1.1rem", fontWeight: 800, color: "#10b981" }}>
-                <span>Net Payé</span>
+                <span>{payrollCopy.receipt.net}</span>
                 <span>{formatXof(viewingReceipt.payment.amountXof)}</span>
               </div>
             </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
               <button onClick={() => window.print()} className="ox-btn" style={{ background: "#0078d4", color: "#fff", display: "flex", alignItems: "center", gap: 4 }}>
-                <Printer size={15} /> Imprimer Reçu
+                <Printer size={15} /> {payrollCopy.receipt.print}
               </button>
               <button onClick={() => setViewingReceipt(null)} className="ox-btn ox-btn-ghost" style={{ color: "#64748b" }}>
-                Fermer
+                {copy.common.close}
               </button>
             </div>
           </div>

@@ -13,6 +13,8 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
+import { usePrefs } from "@/components/PrefsProvider";
+import { invoicesCopy } from "@/lib/i18n/messages/invoices";
 import type { InvoiceItem, PaymentRow } from "./InvoicesView";
 
 export type ExpenseItem = {
@@ -67,21 +69,6 @@ export type WorkOrderStat = {
   closedAt: string | null;
 };
 
-const MONTH_NAMES = [
-  "Janvier",
-  "Février",
-  "Mars",
-  "Avril",
-  "Mai",
-  "Juin",
-  "Juillet",
-  "Août",
-  "Septembre",
-  "Octobre",
-  "Novembre",
-  "Décembre",
-];
-
 export function FinancialBilanTab({
   invoices,
   payments,
@@ -99,6 +86,8 @@ export function FinancialBilanTab({
   workOrders: WorkOrderStat[];
   currentYear: number;
 }) {
+  const { locale } = usePrefs();
+  const copy = invoicesCopy[locale];
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const [selectedMonth, setSelectedMonth] = useState<number | "ALL">("ALL");
 
@@ -239,7 +228,7 @@ export function FinancialBilanTab({
 
       return {
         monthNum,
-        monthName: MONTH_NAMES[idx],
+        monthName: copy.bilan.monthNames[idx],
         invoiced: invMonth,
         collected: cashMonth,
         salaries: salMonth,
@@ -249,7 +238,7 @@ export function FinancialBilanTab({
         net: netMonth,
       };
     });
-  }, [invoices, payments, salaries, expenses, selectedYear]);
+  }, [invoices, payments, salaries, expenses, selectedYear, copy.bilan.monthNames]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
@@ -268,7 +257,7 @@ export function FinancialBilanTab({
         <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <Calendar size={18} style={{ color: "var(--brand)" }} />
-            <span style={{ fontSize: "0.9rem", fontWeight: 600 }}>Période d&apos;analyse :</span>
+            <span style={{ fontSize: "0.9rem", fontWeight: 600 }}>{copy.bilan.periodLabel}</span>
           </div>
 
           <select
@@ -279,7 +268,7 @@ export function FinancialBilanTab({
           >
             {[currentYear, currentYear - 1, currentYear - 2].map((y) => (
               <option key={y} value={y}>
-                Année {y}
+                {copy.bilan.yearOption(y)}
               </option>
             ))}
           </select>
@@ -290,8 +279,8 @@ export function FinancialBilanTab({
             className="ox-select"
             style={{ minWidth: 160 }}
           >
-            <option value="ALL">Toute l&apos;année ({selectedYear})</option>
-            {MONTH_NAMES.map((name, i) => (
+            <option value="ALL">{copy.bilan.allYear(selectedYear)}</option>
+            {copy.bilan.monthNames.map((name, i) => (
               <option key={i + 1} value={i + 1}>
                 {name} {selectedYear}
               </option>
@@ -304,7 +293,7 @@ export function FinancialBilanTab({
           className="ox-btn ox-btn-primary"
           style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}
         >
-          <Printer size={16} /> Imprimer le Bilan Financier
+          <Printer size={16} /> {copy.bilan.print}
         </button>
       </div>
 
@@ -320,7 +309,7 @@ export function FinancialBilanTab({
         <div className="ox-card" style={{ padding: "1.3rem", borderLeft: "4px solid var(--brand)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
-              <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>Chiffre d&apos;Affaires Facturé</div>
+              <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>{copy.bilan.kpi.revenueLabel}</div>
               <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--brand)", marginTop: 4 }}>
                 {formatXof(totalInvoicedRevenue)}
               </div>
@@ -337,7 +326,7 @@ export function FinancialBilanTab({
             </div>
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.7, marginTop: 8 }}>
-            Encaissé réel : <strong style={{ color: "#10b981" }}>{formatXof(totalCashCollected)}</strong>
+            {copy.bilan.kpi.collectedPrefix}<strong style={{ color: "#10b981" }}>{formatXof(totalCashCollected)}</strong>
           </div>
         </div>
 
@@ -345,7 +334,7 @@ export function FinancialBilanTab({
         <div className="ox-card" style={{ padding: "1.3rem", borderLeft: "4px solid #38bdf8" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
-              <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>Marge Brute Dégagée</div>
+              <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>{copy.bilan.kpi.grossLabel}</div>
               <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#38bdf8", marginTop: 4 }}>
                 {formatXof(grossProfit)}
               </div>
@@ -362,7 +351,7 @@ export function FinancialBilanTab({
             </div>
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.7, marginTop: 8 }}>
-            Taux de marge brute : <strong>{grossMarginPct.toFixed(1)}%</strong> (Coûts d&apos;achat déduits)
+            {copy.bilan.kpi.marginPrefix}<strong>{grossMarginPct.toFixed(1)}%</strong>{copy.bilan.kpi.marginSuffix}
           </div>
         </div>
 
@@ -370,7 +359,7 @@ export function FinancialBilanTab({
         <div className="ox-card" style={{ padding: "1.3rem", borderLeft: "4px solid var(--warn)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
-              <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>Charges d&apos;Exploitation (OPEX)</div>
+              <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>{copy.bilan.kpi.opexLabel}</div>
               <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--warn)", marginTop: 4 }}>
                 {formatXof(totalOpex)}
               </div>
@@ -387,7 +376,7 @@ export function FinancialBilanTab({
             </div>
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.7, marginTop: 8 }}>
-            Salaires : <strong>{formatXof(totalPayroll)}</strong> | Prestataires &amp; frais : <strong>{formatXof(totalOperatingExpenses)}</strong>
+            {copy.bilan.kpi.payrollPrefix}<strong>{formatXof(totalPayroll)}</strong> | {copy.bilan.kpi.providersPrefix}<strong>{formatXof(totalOperatingExpenses)}</strong>
           </div>
         </div>
 
@@ -403,7 +392,7 @@ export function FinancialBilanTab({
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
               <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>
-                Bénéfice Net Réel (Résultat Net)
+                {copy.bilan.kpi.netLabel}
               </div>
               <div
                 style={{
@@ -428,7 +417,7 @@ export function FinancialBilanTab({
             </div>
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.7, marginTop: 8 }}>
-            Rentabilité nette : <strong>{netProfitMarginPct.toFixed(1)}%</strong> du chiffre d&apos;affaires
+            {copy.bilan.kpi.netMarginPrefix}<strong>{netProfitMarginPct.toFixed(1)}%</strong>{copy.bilan.kpi.netMarginSuffix}
           </div>
         </div>
       </div>
@@ -436,7 +425,7 @@ export function FinancialBilanTab({
       {/* Cascading P&L Decomposition */}
       <div className="ox-card" style={{ padding: "1.5rem" }}>
         <h2 style={{ fontSize: "1.15rem", fontWeight: 700, margin: "0 0 1rem" }}>
-          Décomposition Analytique du Bilan (Compte de Résultat P&amp;L)
+          {copy.bilan.pl.title}
         </h2>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
@@ -471,11 +460,11 @@ export function FinancialBilanTab({
               </span>
               <div>
                 <span style={{ fontSize: "0.92rem", fontWeight: 700 }}>
-                  Chiffre d&apos;Affaires Global Facturé (Ventes, Atelier, Énergie)
+                  {copy.bilan.pl.revenue}
                 </span>
                 {workshopRevenue > 0 && (
                   <div style={{ fontSize: "0.75rem", opacity: 0.7, fontWeight: 400, marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
-                    <Wrench size={12} /> dont Prestations Atelier SAV : {formatXof(workshopRevenue)}
+                    <Wrench size={12} /> {copy.bilan.pl.revenueWorkshop(formatXof(workshopRevenue))}
                   </div>
                 )}
               </div>
@@ -514,7 +503,7 @@ export function FinancialBilanTab({
                 <ArrowDownRight size={13} />
               </span>
               <span style={{ fontSize: "0.88rem", opacity: 0.9 }}>
-                Coûts d&apos;achat des matériels vendus &amp; pièces atelier
+                {copy.bilan.pl.cogs}
               </span>
             </div>
             <span style={{ color: "var(--bad)", fontWeight: 600 }}>− {formatXof(totalDirectCosts)}</span>
@@ -551,7 +540,7 @@ export function FinancialBilanTab({
               </span>
               <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap" }}>
                 <span style={{ fontSize: "0.92rem", letterSpacing: "0.2px" }}>
-                  MARGE BRUTE OPÉRATIONNELLE
+                  {copy.bilan.pl.gross}
                 </span>
                 <span
                   style={{
@@ -563,7 +552,7 @@ export function FinancialBilanTab({
                     fontWeight: 700,
                   }}
                 >
-                  {grossMarginPct.toFixed(1)}% du CA
+                  {copy.bilan.pl.grossBadge(grossMarginPct.toFixed(1))}
                 </span>
               </div>
             </div>
@@ -601,7 +590,7 @@ export function FinancialBilanTab({
                 <ArrowDownRight size={13} />
               </span>
               <span style={{ fontSize: "0.88rem", opacity: 0.9 }}>
-                Masse salariale &amp; Rémunérations du personnel (RH)
+                {copy.bilan.pl.payroll}
               </span>
             </div>
             <span style={{ color: "var(--bad)", fontWeight: 600 }}>− {formatXof(totalPayroll)}</span>
@@ -637,11 +626,11 @@ export function FinancialBilanTab({
               </span>
               <div>
                 <span style={{ fontSize: "0.88rem", opacity: 0.9 }}>
-                  Charges externes &amp; prestataires (Climatisation, SBEE, SONEB, Télécoms, Loyer...)
+                  {copy.bilan.pl.opex}
                 </span>
                 {Object.keys(expensesByCategory).length > 0 && (
                   <div style={{ fontSize: "0.75rem", opacity: 0.7, fontWeight: 400, marginTop: 2 }}>
-                    dont Prestataires extérieurs : {formatXof(expensesByCategory["PRESTATAIRE_SERVICE"] || 0)}
+                    {copy.bilan.pl.opexProviders(formatXof(expensesByCategory["PRESTATAIRE_SERVICE"] || 0))}
                   </div>
                 )}
               </div>
@@ -682,7 +671,7 @@ export function FinancialBilanTab({
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
                   <span style={{ fontSize: "1rem", letterSpacing: "0.3px" }}>
-                    RÉSULTAT NET D&apos;EXPLOITATION
+                    {copy.bilan.pl.net}
                   </span>
                   <span
                     style={{
@@ -694,7 +683,7 @@ export function FinancialBilanTab({
                       fontWeight: 700,
                     }}
                   >
-                    BÉNÉFICE NET APRÈS CHARGES &amp; SALAIRES
+                    {copy.bilan.pl.netBadge}
                   </span>
                 </div>
               </div>
@@ -715,19 +704,19 @@ export function FinancialBilanTab({
       {/* Monthly Evolution Matrix */}
       <div className="ox-card" style={{ padding: "1.5rem" }}>
         <h2 style={{ fontSize: "1.15rem", fontWeight: 700, margin: "0 0 1rem" }}>
-          Tableau de Bord Mensuel Récapitulatif ({selectedYear})
+          {copy.bilan.monthly.title(selectedYear)}
         </h2>
 
         <div style={{ overflowX: "auto" }}>
           <table className="ox-table" style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ textAlign: "left", fontSize: "0.8rem", opacity: 0.7 }}>
-                <th style={{ padding: "0.8rem 1rem" }}>Mois</th>
-                <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>CA Facturé</th>
-                <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>Encaissé Réel</th>
-                <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>Salaires Décaissés</th>
-                <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>Dépenses Prestataires</th>
-                <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>Résultat Net Estimé</th>
+                <th style={{ padding: "0.8rem 1rem" }}>{copy.bilan.monthly.headers.month}</th>
+                <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>{copy.bilan.monthly.headers.invoiced}</th>
+                <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>{copy.bilan.monthly.headers.collected}</th>
+                <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>{copy.bilan.monthly.headers.salaries}</th>
+                <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>{copy.bilan.monthly.headers.expenses}</th>
+                <th style={{ padding: "0.8rem 1rem", textAlign: "right" }}>{copy.bilan.monthly.headers.net}</th>
               </tr>
             </thead>
             <tbody>
@@ -767,7 +756,7 @@ export function FinancialBilanTab({
                   background: "rgba(0, 120, 212, 0.05)",
                 }}
               >
-                <td style={{ padding: "1rem" }}>TOTAL CUMULÉ ({selectedYear})</td>
+                <td style={{ padding: "1rem" }}>{copy.bilan.monthly.total(selectedYear)}</td>
                 <td style={{ padding: "1rem", textAlign: "right", color: "var(--brand)" }}>
                   {formatXof(monthlyData.reduce((s, r) => s + r.invoiced, 0))}
                 </td>

@@ -3,7 +3,21 @@
 import { useState, useTransition } from "react";
 import { X, CreditCard, Check, AlertCircle } from "lucide-react";
 import { formatXof } from "@/lib/format";
+import { usePrefs } from "@/components/PrefsProvider";
+import { invoicesCopy, paymentMethodLabel } from "@/lib/i18n/messages/invoices";
 import { addPayment } from "./actions";
+
+/** Modes de règlement proposés, dans l'ordre d'affichage du formulaire. */
+const PAYMENT_METHOD_CODES = [
+  "MTN_MOMO",
+  "MOOV_MONEY",
+  "VIREMENT_ECOBANK",
+  "VIREMENT_BOA",
+  "VIREMENT",
+  "CHEQUE",
+  "ESPECES",
+  "CARTE",
+];
 
 export type InvoiceOption = {
   id: string;
@@ -29,6 +43,8 @@ export function PaymentModal({
   onClose: () => void;
   onSuccess?: () => void;
 }) {
+  const { locale } = usePrefs();
+  const copy = invoicesCopy[locale];
   const [invoiceId, setInvoiceId] = useState<string>(selectedInvoiceId || invoices[0]?.id || "");
   const [amountXof, setAmountXof] = useState<number>(0);
   const [method, setMethod] = useState<string>("MTN_MOMO");
@@ -52,15 +68,20 @@ export function PaymentModal({
 
   function handleSubmit() {
     if (!activeInvoice) {
-      setError("Veuillez sélectionner une facture.");
+      setError(copy.paymentModal.errors.selectInvoice);
       return;
     }
     if (!amountXof || amountXof <= 0) {
-      setError("Le montant du règlement doit être supérieur à 0.");
+      setError(copy.paymentModal.errors.amountPositive);
       return;
     }
     if (amountXof > remainingXof) {
-      setError(`Le montant (${formatXof(amountXof)}) dépasse le solde restant dû (${formatXof(remainingXof)}).`);
+      setError(
+        copy.paymentModal.errors.exceeds(
+          formatXof(amountXof),
+          formatXof(remainingXof),
+        ),
+      );
       return;
     }
 
@@ -79,7 +100,7 @@ export function PaymentModal({
         onClose();
         if (onSuccess) onSuccess();
       } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Erreur lors de l'enregistrement du règlement";
+        const msg = err instanceof Error ? err.message : copy.paymentModal.errors.generic;
         setError(msg);
       }
     });
@@ -142,10 +163,10 @@ export function PaymentModal({
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700, color: "var(--ice-text-strong)" }}>
-                Enregistrer un Règlement
+                {copy.paymentModal.title}
               </h3>
               <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)" }}>
-                Émission de quittance d&apos;encaissement · Caisse & Banque CARZONE SARL
+                {copy.paymentModal.subtitle}
               </div>
             </div>
           </div>
@@ -180,7 +201,7 @@ export function PaymentModal({
         {/* Facture cible & Résumé */}
         <div>
           <label style={{ display: "block", fontSize: "0.8rem", opacity: 0.8, marginBottom: 4 }}>
-            Facture concernée *
+            {copy.paymentModal.invoiceLabel}
           </label>
           <select
             className="ox-select"
@@ -191,7 +212,12 @@ export function PaymentModal({
           >
             {invoices.map((inv) => (
               <option key={inv.id} value={inv.id}>
-                {inv.number} · {inv.customer.contactName} ({formatXof(inv.totalXof)}) · Reste: {formatXof(inv.totalXof - inv.paidXof)}
+                {copy.paymentModal.invoiceOption(
+                  inv.number,
+                  inv.customer.contactName,
+                  formatXof(inv.totalXof),
+                  formatXof(inv.totalXof - inv.paidXof),
+                )}
               </option>
             ))}
           </select>
@@ -209,19 +235,19 @@ export function PaymentModal({
             }}
           >
             <div>
-              <div style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)" }}>Total Facture</div>
+              <div style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)" }}>{copy.paymentModal.totalInvoice}</div>
               <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--ice-text-strong)" }}>
                 {formatXof(activeInvoice.totalXof)}
               </div>
             </div>
             <div>
-              <div style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)" }}>Déjà Encaissé</div>
+              <div style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)" }}>{copy.paymentModal.alreadyCollected}</div>
               <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "#16a34a" }}>
                 {formatXof(activeInvoice.paidXof)}
               </div>
             </div>
             <div>
-              <div style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)" }}>Solde Restant Dû</div>
+              <div style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)" }}>{copy.paymentModal.balanceRemaining}</div>
               <div style={{ fontWeight: 800, fontSize: "1.05rem", color: remainingXof > 0 ? "var(--gold)" : "#16a34a" }}>
                 {formatXof(remainingXof)}
               </div>
@@ -233,7 +259,7 @@ export function PaymentModal({
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))", gap: "1rem" }}>
           <div>
             <label style={{ display: "block", fontSize: "0.8rem", opacity: 0.8, marginBottom: 4 }}>
-              Montant à encaisser (FCFA) *
+              {copy.paymentModal.amountLabel}
             </label>
             <input
               type="number"
@@ -260,14 +286,14 @@ export function PaymentModal({
                   textDecoration: "underline",
                 }}
               >
-                Régler la totalité du solde ({formatXof(remainingXof)})
+                {copy.paymentModal.payFull(formatXof(remainingXof))}
               </button>
             )}
           </div>
 
           <div>
             <label style={{ display: "block", fontSize: "0.8rem", opacity: 0.8, marginBottom: 4 }}>
-              Mode d&apos;encaissement *
+              {copy.paymentModal.methodLabel}
             </label>
             <select
               className="ox-select"
@@ -276,14 +302,11 @@ export function PaymentModal({
               onChange={(e) => setMethod(e.target.value)}
               disabled={isPending}
             >
-              <option value="MTN_MOMO">MTN Mobile Money Bénin</option>
-              <option value="MOOV_MONEY">Moov Money Bénin</option>
-              <option value="VIREMENT_ECOBANK">Virement Ecobank Bénin</option>
-              <option value="VIREMENT_BOA">Virement BOA Bénin</option>
-              <option value="VIREMENT">Autre Virement Bancaire</option>
-              <option value="CHEQUE">Chèque Bancaire</option>
-              <option value="ESPECES">Espèces (Caisse Showroom)</option>
-              <option value="CARTE">Carte Bancaire (TPE)</option>
+              {PAYMENT_METHOD_CODES.map((code) => (
+                <option key={code} value={code}>
+                  {paymentMethodLabel(copy, code)}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -291,13 +314,13 @@ export function PaymentModal({
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))", gap: "1rem" }}>
           <div>
             <label style={{ display: "block", fontSize: "0.8rem", opacity: 0.8, marginBottom: 4 }}>
-              Réf. Transaction / Chèque / Bordereau
+              {copy.paymentModal.referenceLabel}
             </label>
             <input
               type="text"
               className="ox-input"
               style={{ width: "100%", fontSize: "0.85rem" }}
-              placeholder="Ex: MTN-849202, CHQ-BOA-7491..."
+              placeholder={copy.paymentModal.referencePlaceholder}
               value={reference}
               onChange={(e) => setReference(e.target.value)}
               disabled={isPending}
@@ -306,7 +329,7 @@ export function PaymentModal({
 
           <div>
             <label style={{ display: "block", fontSize: "0.8rem", opacity: 0.8, marginBottom: 4 }}>
-              Date de paiement
+              {copy.paymentModal.paidAtLabel}
             </label>
             <input
               type="date"
@@ -321,13 +344,13 @@ export function PaymentModal({
 
         <div>
           <label style={{ display: "block", fontSize: "0.8rem", opacity: 0.8, marginBottom: 4 }}>
-            Remarques & Mémo interne
+            {copy.paymentModal.notesLabel}
           </label>
           <input
             type="text"
             className="ox-input"
             style={{ width: "100%", fontSize: "0.85rem" }}
-            placeholder="Ex: Acompte 50% commande véhicule BYD Dolphin"
+            placeholder={copy.paymentModal.notesPlaceholder}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             disabled={isPending}
@@ -350,7 +373,7 @@ export function PaymentModal({
             className="ox-btn ox-btn-ghost"
             disabled={isPending}
           >
-            Annuler
+            {copy.common.cancel}
           </button>
           <button
             type="button"
@@ -370,11 +393,11 @@ export function PaymentModal({
             }}
           >
             {isPending ? (
-              <span>Enregistrement...</span>
+              <span>{copy.paymentModal.saving}</span>
             ) : (
               <>
                 <Check size={18} />
-                Valider l&apos;encaissement
+                {copy.paymentModal.submit}
               </>
             )}
           </button>

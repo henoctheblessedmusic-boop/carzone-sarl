@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Printer, ArrowLeft, ShieldCheck } from "lucide-react";
 import { WORKSHOP_CHECKLIST_TEMPLATE } from "@/lib/workshop-checklist-data";
+import { usePrefs } from "@/components/PrefsProvider";
+import { workshopCopy } from "@/lib/i18n/messages/workshop";
 
 export type ChecklistTaskExecution = {
   taskLabel: string;
@@ -43,6 +45,8 @@ export type SystematicMaintenanceData = {
 
 export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMaintenanceData }) {
   const printAreaRef = useRef<HTMLDivElement>(null);
+  const { locale } = usePrefs();
+  const copy = workshopCopy[locale].print.maintenance;
 
   const handlePrint = () => {
     window.print();
@@ -145,7 +149,7 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
           }}
         >
           <ArrowLeft size={16} />
-          Retour à l&apos;Atelier
+          {copy.back}
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -163,7 +167,7 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
               fontWeight: 700,
             }}
           >
-            <ShieldCheck size={14} /> Fiche Matrice d&apos;Entretien Systématique (22 Points)
+            <ShieldCheck size={14} /> {copy.badge}
           </span>
 
           <button
@@ -185,7 +189,7 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
             }}
           >
             <Printer size={16} />
-            Imprimer / Exporter PDF
+            {copy.print}
           </button>
         </div>
       </div>
@@ -218,13 +222,13 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
             </div>
             <div>
               <div style={{ fontSize: "10.5px", fontWeight: 800, letterSpacing: "1px", color: "#0f172a", textTransform: "uppercase" }}>
-                CONCESSION DE VÉHICULES MULTI-MARQUES
+                {copy.companyActivity}
               </div>
               <div style={{ fontSize: "18px", fontWeight: 900, color: "#e11d48", lineHeight: 1.1, margin: "1px 0" }}>
                 CARZONE SARL
               </div>
               <div style={{ fontSize: "8.5px", fontWeight: 700, color: "#334155" }}>
-                Service Après-Vente &amp; Maintenance Agréée · Tél : +229 01 92 61 61 61
+                {copy.afterSales} · {copy.telLabel} +229 01 92 61 61 61
               </div>
             </div>
           </div>
@@ -249,13 +253,14 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
                 borderRadius: "2px",
               }}
             >
-              FICHE D&apos;ENTRETIEN SYSTÉMATIQUE
+              {copy.docTitle}
             </div>
             <div style={{ fontSize: "10.5px", fontWeight: 800, color: "#e11d48", marginTop: "3px" }}>
-              N° FICHE : #{data.orNumber}
+              {copy.sheetNumber}
+              {data.orNumber}
             </div>
             <div style={{ fontSize: "9px", fontWeight: 650, color: "#334155" }}>
-              Date : <strong>{data.entryDate}</strong>
+              {copy.dateLabel} <strong>{data.entryDate}</strong>
             </div>
           </div>
         </div>
@@ -264,11 +269,11 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
         <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "6px" }}>
           <tbody>
             <tr>
-              <td style={{ ...tdHeader, width: "13%" }}>Marque :</td>
+              <td style={{ ...tdHeader, width: "13%" }}>{copy.brand}</td>
               <td style={{ ...tdData, width: "20%" }}><strong>{data.brand || "-"}</strong></td>
-              <td style={{ ...tdHeader, width: "12%" }}>Modèle :</td>
+              <td style={{ ...tdHeader, width: "12%" }}>{copy.model}</td>
               <td style={{ ...tdData, width: "20%" }}><strong>{data.model || "-"}</strong></td>
-              <td style={{ ...tdHeader, width: "16%" }}>Immatriculation :</td>
+              <td style={{ ...tdHeader, width: "16%" }}>{copy.immat}</td>
               <td style={{ ...tdData, width: "19%" }}>
                 <span style={{ fontSize: "10.5px", fontWeight: 900, color: "#0f172a" }}>
                   {data.immatriculation}
@@ -276,21 +281,21 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
               </td>
             </tr>
             <tr>
-              <td style={{ ...tdHeader }}>Date :</td>
+              <td style={{ ...tdHeader }}>{copy.date}</td>
               <td style={{ ...tdData }}>{data.entryDate}</td>
-              <td style={{ ...tdHeader }}>S/N (Châssis) :</td>
+              <td style={{ ...tdHeader }}>{copy.chassis}</td>
               <td style={{ ...tdData, fontFamily: "monospace", fontSize: "9px" }}>{data.chassis || "-"}</td>
-              <td style={{ ...tdHeader }}>Type de vidange :</td>
+              <td style={{ ...tdHeader }}>{copy.oilLabel}</td>
               <td style={{ ...tdData, fontSize: "9px" }}>
-                <strong>{data.oilType || "Huile Synthèse 5W-30 Norme Constructeur"}</strong>
+                <strong>{data.oilType || copy.oilDefault}</strong>
               </td>
             </tr>
             <tr>
-              <td style={{ ...tdHeader }}>Nom &amp; N° client :</td>
+              <td style={{ ...tdHeader }}>{copy.clientName}</td>
               <td colSpan={3} style={{ ...tdData }}>
                 <strong>{data.clientName}</strong> {data.phone ? `(${data.phone})` : ""}
               </td>
-              <td style={{ ...tdHeader }}>Compteur :</td>
+              <td style={{ ...tdHeader }}>{copy.mileageLabel}</td>
               <td style={{ ...tdData }}>
                 <strong style={{ fontSize: "10.5px" }}>
                   {data.mileage ? `${data.mileage.toLocaleString()} KM` : "-"}
@@ -298,13 +303,13 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
               </td>
             </tr>
             <tr>
-              <td style={{ ...tdHeader }}>Heures travaux :</td>
+              <td style={{ ...tdHeader }}>{copy.hoursLabel}</td>
               <td colSpan={3} style={{ ...tdData, fontSize: "9px" }}>
-                Début : <strong>{data.startTime || "-"}</strong> · Fin : <strong>{data.endTime || "-"}</strong>
+                {copy.start} <strong>{data.startTime || "-"}</strong> · {copy.end} <strong>{data.endTime || "-"}</strong>
               </td>
-              <td style={{ ...tdHeader }}>PV Contrôle :</td>
+              <td style={{ ...tdHeader }}>{copy.pvLabel}</td>
               <td style={{ ...tdData, fontWeight: 750, color: "#166534" }}>
-                {data.pv || "PV-CONFORME"}
+                {data.pv || copy.pvDefault}
               </td>
             </tr>
           </tbody>
@@ -315,12 +320,12 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "8.5px" }}>
             <thead>
               <tr style={{ backgroundColor: "#0f172a", color: "#ffffff" }}>
-                <th style={{ ...thMatrix, width: "14%" }}>Palier KM</th>
-                <th style={{ ...thMatrix, width: "5%" }}>N°</th>
-                <th style={{ ...thMatrix, width: "47%", textAlign: "left", paddingLeft: "8px" }}>Tâche à effectuer</th>
-                <th style={{ ...thMatrix, width: "9%" }}>Effectué</th>
-                <th style={{ ...thMatrix, width: "9%" }}>Non fait</th>
-                <th style={{ ...thMatrix, width: "16%" }}>Observation / Mesure</th>
+                <th style={{ ...thMatrix, width: "14%" }}>{copy.colTier}</th>
+                <th style={{ ...thMatrix, width: "5%" }}>{copy.colNumber}</th>
+                <th style={{ ...thMatrix, width: "47%", textAlign: "left", paddingLeft: "8px" }}>{copy.colTask}</th>
+                <th style={{ ...thMatrix, width: "9%" }}>{copy.colDone}</th>
+                <th style={{ ...thMatrix, width: "9%" }}>{copy.colNotDone}</th>
+                <th style={{ ...thMatrix, width: "16%" }}>{copy.colObservation}</th>
               </tr>
             </thead>
             <tbody>
@@ -431,7 +436,7 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
         {/* 4. OBSERVATIONS GÉNÉRALES & RAPPORT SCANNER OBD (EXACT PHOTO 2) */}
         <div style={{ border: "1.5px solid #0f172a", marginBottom: "6px" }}>
           <div style={sectionBanner}>
-            <span>OBSERVATIONS DU CHEF D&apos;ATELIER &amp; RAPPORT SCANNER DIAGNOSTIC OBD-II</span>
+            <span>{copy.observationsTitle}</span>
           </div>
           <div
             style={{
@@ -443,23 +448,22 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
               backgroundImage: "repeating-linear-gradient(transparent, transparent 13px, #e2e8f0 14px)",
             }}
           >
-            {data.observations ||
-              "Diagnostic calculateurs conforme. Pression pneumatiques ajustée, niveaux des fluides au repère MAX. Véhicule prêt pour livraison."}
+            {data.observations || copy.observationsDefault}
           </div>
         </div>
 
         {/* 5. VALIDATIONS & SIGNATURES (EXACT PHOTO 2) */}
         <div style={{ border: "1.5px solid #0f172a", marginBottom: "4px" }}>
           <div style={{ ...sectionBanner, textAlign: "center" }}>
-            <span>VALIDATIONS OFFICIELLES (RESTITUTION ET SORTIE D&apos;ATELIER)</span>
+            <span>{copy.signaturesTitle}</span>
           </div>
 
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ backgroundColor: "#f1f5f9" }}>
-                <th style={{ ...signatureHeader, width: "33.3%" }}>CLIENT</th>
-                <th style={{ ...signatureHeader, width: "33.3%" }}>TECHNICIENS</th>
-                <th style={{ ...signatureHeader, width: "33.4%" }}>RESPONSABLE ATELIER</th>
+                <th style={{ ...signatureHeader, width: "33.3%" }}>{copy.colClient}</th>
+                <th style={{ ...signatureHeader, width: "33.3%" }}>{copy.colTechnicians}</th>
+                <th style={{ ...signatureHeader, width: "33.4%" }}>{copy.colManager}</th>
               </tr>
             </thead>
             <tbody>
@@ -467,7 +471,7 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
                 {/* 1. CLIENT */}
                 <td style={signatureCell}>
                   <div style={{ fontSize: "8px", color: "#64748b", marginBottom: "3px" }}>
-                    Bon pour accord &amp; réception
+                    {copy.clientAgreement}
                   </div>
                   <div style={{ fontSize: "9px", fontWeight: 700, color: "#0f172a", minHeight: "13px" }}>
                     {data.clientName}
@@ -477,12 +481,12 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={data.signatures.client}
-                        alt="Signature Client"
+                        alt={copy.clientSignatureAlt}
                         style={{ maxHeight: "40px", maxWidth: "90%", objectFit: "contain" }}
                       />
                     ) : (
                       <span style={{ fontSize: "8px", color: "#94a3b8", fontStyle: "italic" }}>
-                        Signature client
+                        {copy.clientSignature}
                       </span>
                     )}
                   </div>
@@ -491,22 +495,22 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
                 {/* 2. TECHNICIENS */}
                 <td style={signatureCell}>
                   <div style={{ fontSize: "8px", color: "#64748b", marginBottom: "3px" }}>
-                    Visa de conformité travaux
+                    {copy.technicianVisa}
                   </div>
                   <div style={{ fontSize: "9px", fontWeight: 700, color: "#0f172a", minHeight: "13px" }}>
-                    {data.technicianName || "Technicien Référent"}
+                    {data.technicianName || copy.technicianDefault}
                   </div>
                   <div style={{ height: "42px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     {data.signatures?.technician ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={data.signatures.technician}
-                        alt="Signature Technicien"
+                        alt={copy.technicianSignatureAlt}
                         style={{ maxHeight: "40px", maxWidth: "90%", objectFit: "contain" }}
                       />
                     ) : (
                       <span style={{ fontSize: "8px", color: "#94a3b8", fontStyle: "italic" }}>
-                        Visa technicien
+                        {copy.technicianSignature}
                       </span>
                     )}
                   </div>
@@ -515,22 +519,22 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
                 {/* 3. RESPONSABLE ATELIER */}
                 <td style={signatureCell}>
                   <div style={{ fontSize: "8px", color: "#64748b", marginBottom: "3px" }}>
-                    Visa sortie atelier &amp; garantie
+                    {copy.managerVisa}
                   </div>
                   <div style={{ fontSize: "9px", fontWeight: 700, color: "#0f172a", minHeight: "13px" }}>
-                    {data.workshopManagerName || "Chef d'Atelier SAV"}
+                    {data.workshopManagerName || copy.managerDefault}
                   </div>
                   <div style={{ height: "42px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     {data.signatures?.workshopManager ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={data.signatures.workshopManager}
-                        alt="Signature Chef Atelier"
+                        alt={copy.managerSignatureAlt}
                         style={{ maxHeight: "40px", maxWidth: "90%", objectFit: "contain" }}
                       />
                     ) : (
                       <span style={{ fontSize: "8px", color: "#94a3b8", fontStyle: "italic" }}>
-                        Cachet &amp; visa atelier
+                        {copy.managerSignature}
                       </span>
                     )}
                   </div>
@@ -551,7 +555,7 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
             paddingTop: "2px",
           }}
         >
-          CARZONE SARL · Fiche d&apos;Entretien Systématique Constructeur certifiée conforme · Système ERP Carzone Ops
+          {copy.footer}
         </div>
       </div>
     </div>

@@ -278,6 +278,7 @@ export type QuotesCopy = {
       insert: string;
     };
     feedback: {
+      emptyLineAdded: string;
       quantityIncreased: (title: string, quantity: number) => string;
       articleAdded: (title: string, quantity: number, price: string) => string;
     };
@@ -668,6 +669,7 @@ Web : www.topcarzone.com`,
       insert: "Insérer",
     },
     feedback: {
+      emptyLineAdded: "Nouvelle ligne vide ajoutée.",
       quantityIncreased: (title, quantity) =>
         `${title} passe à ${quantity} unité(s).`,
       articleAdded: (title, quantity, price) =>
@@ -707,7 +709,7 @@ Web : www.topcarzone.com`,
   },
   print: {
     back: "← Retour aux devis",
-    techSheetLink: (brand, model) => `📄 Fiche technique (${brand} ${model})`,
+    techSheetLink: (brand, model) => `Fiche technique (${brand} ${model})`,
     mailtoTitle: "Ouvre votre logiciel de messagerie",
     mailtoLabel: "Ouvrir l'e-mail (mailto)",
     mailStub: "E-mail serveur : bouchon vers le journal console, SMTP pas encore branché",
@@ -1067,6 +1069,7 @@ Web: www.topcarzone.com`,
       insert: "Insert",
     },
     feedback: {
+      emptyLineAdded: "Empty line added.",
       quantityIncreased: (title, quantity) =>
         `${title} is now ${quantity} unit(s).`,
       articleAdded: (title, quantity, price) =>
@@ -1106,7 +1109,7 @@ Web: www.topcarzone.com`,
   },
   print: {
     back: "← Back to quotes",
-    techSheetLink: (brand, model) => `📄 Spec sheet (${brand} ${model})`,
+    techSheetLink: (brand, model) => `Spec sheet (${brand} ${model})`,
     mailtoTitle: "Opens your mail app",
     mailtoLabel: "Open email (mailto)",
     mailStub: "Server email: stub to the console log, SMTP not wired yet",
@@ -1458,6 +1461,7 @@ CARZONE SARL 销售团队
       insert: "插入",
     },
     feedback: {
+      emptyLineAdded: "已添加空白行。",
       quantityIncreased: (title, quantity) => `${title} 已增至 ${quantity} 件。`,
       articleAdded: (title, quantity, price) =>
         `已添加 ${title}(${quantity}x,单价 ${price})。`,
@@ -1495,7 +1499,7 @@ CARZONE SARL 销售团队
   },
   print: {
     back: "← 返回报价单",
-    techSheetLink: (brand, model) => `📄 配置单(${brand} ${model})`,
+    techSheetLink: (brand, model) => `配置单(${brand} ${model})`,
     mailtoTitle: "打开本机邮件客户端",
     mailtoLabel: "打开邮件(mailto)",
     mailStub: "服务器邮件:暂为控制台日志占位,SMTP 尚未接入",

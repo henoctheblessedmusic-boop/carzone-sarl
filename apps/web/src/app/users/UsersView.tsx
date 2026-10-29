@@ -19,6 +19,8 @@ import {
   EyeOff,
 } from "lucide-react";
 import { ROLE_LABELS, type Role } from "@/lib/roles";
+import { usePrefs } from "@/components/PrefsProvider";
+import { adminCopy, type AdminCopy } from "@/lib/i18n/messages/admin";
 import {
   FEATURE_GROUPS,
   DEFAULT_ROLE_CAPABILITIES,
@@ -57,6 +59,10 @@ export function UsersView({
   const [roleFilter, setRoleFilter] = useState("ALL");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [isPending, startTransition] = useTransition();
+
+  const { locale } = usePrefs();
+  const copy = adminCopy[locale];
+  const teamCopy = copy.team;
 
   const isPrivileged =
     currentUserRole === "DEVELOPER" ||
@@ -125,9 +131,7 @@ export function UsersView({
   const handleEditRoleChange = (newR: Role) => {
     setEditRole(newR);
     if (
-      confirm(
-        `Voulez-vous aussi réinitialiser les capacités avec les valeurs par défaut du rôle ${ROLE_LABELS[newR]} ?`
-      )
+      confirm(teamCopy.editModal.confirmResetRole(ROLE_LABELS[newR]))
     ) {
       setEditPermissions([...(DEFAULT_ROLE_CAPABILITIES[newR] || [])]);
     }
@@ -208,7 +212,7 @@ export function UsersView({
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newFullName.trim() || !newEmail.trim()) {
-      alert("Veuillez renseigner le nom complet et l'adresse email.");
+      alert(teamCopy.alerts.missingFields);
       return;
     }
 
@@ -225,7 +229,7 @@ export function UsersView({
         setShowAddModal(false);
         window.location.reload();
       } catch (err: unknown) {
-        alert(err instanceof Error ? err.message : "Erreur lors de la création.");
+        alert(err instanceof Error ? err.message : teamCopy.alerts.errCreate);
       }
     });
   };
@@ -260,7 +264,7 @@ export function UsersView({
 
         setEditingUser(null);
       } catch (err: unknown) {
-        alert(err instanceof Error ? err.message : "Erreur lors de la modification.");
+        alert(err instanceof Error ? err.message : teamCopy.alerts.errEdit);
       }
     });
   };
@@ -283,21 +287,21 @@ export function UsersView({
           prev.map((u) => (u.id === id ? { ...u, active: !active } : u))
         );
       } catch (err: unknown) {
-        alert(err instanceof Error ? err.message : "Erreur statut");
+        alert(err instanceof Error ? err.message : teamCopy.alerts.errStatus);
       }
     });
   };
 
   // Delete user
   const handleDelete = (id: string, name: string) => {
-    if (!confirm(`Confirmer la suppression définitive de l'utilisateur ${name} ?`))
+    if (!confirm(teamCopy.alerts.confirmDelete(name)))
       return;
     startTransition(async () => {
       try {
         await deleteUser(id);
         setUsers((prev) => prev.filter((u) => u.id !== id));
       } catch (err: unknown) {
-        alert(err instanceof Error ? err.message : "Erreur suppression");
+        alert(err instanceof Error ? err.message : teamCopy.alerts.errDelete);
       }
     });
   };
@@ -317,7 +321,7 @@ export function UsersView({
     if (!pwdModalUser || !newPwdValue.trim()) return;
 
     if (newPwdValue.trim().length < 4) {
-      setPwdError("Le mot de passe doit comporter au moins 4 caractères.");
+      setPwdError(teamCopy.passwordModal.tooShort);
       return;
     }
 
@@ -338,13 +342,13 @@ export function UsersView({
           )
         );
 
-        setPwdSuccess(`Mot de passe de ${pwdModalUser.fullName} mis à jour avec succès ! Notification envoyée.`);
+        setPwdSuccess(teamCopy.passwordModal.success(pwdModalUser.fullName));
         setTimeout(() => {
           setPwdModalUser(null);
           setPwdSuccess(null);
         }, 1500);
       } catch (err: unknown) {
-        setPwdError(err instanceof Error ? err.message : "Erreur mise à jour mot de passe");
+        setPwdError(err instanceof Error ? err.message : teamCopy.passwordModal.errUpdate);
       }
     });
   };
@@ -386,7 +390,7 @@ export function UsersView({
                 color: "var(--ice-text)",
               }}
             >
-              Flotte des Utilisateurs & Rôles
+              {teamCopy.title}
             </h1>
             <span
               style={{
@@ -409,9 +413,7 @@ export function UsersView({
               maxWidth: 720,
             }}
           >
-            Contrôle en temps réel des accès de l&apos;entreprise : créez de
-            nouveaux utilisateurs, assignez leurs rôles hiérarchiques et cochez
-            précisément leurs capacités par fonctionnalité.
+            {teamCopy.subtitle}
           </p>
         </div>
 
@@ -436,7 +438,7 @@ export function UsersView({
           }}
         >
           <UserPlus size={18} />
-          Nouvel Utilisateur
+          {teamCopy.newUser}
         </button>
       </div>
 
@@ -473,7 +475,7 @@ export function UsersView({
             <div style={{ fontSize: "1.4rem", fontWeight: 750, color: "var(--ice-text)" }}>
               {stats.total}
             </div>
-            <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>Total Utilisateurs</div>
+            <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>{teamCopy.kpi.total}</div>
           </div>
         </div>
 
@@ -502,7 +504,7 @@ export function UsersView({
             <div style={{ fontSize: "1.4rem", fontWeight: 750, color: "var(--ice-text)" }}>
               {stats.active}
             </div>
-            <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>Comptes Actifs</div>
+            <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>{teamCopy.kpi.active}</div>
           </div>
         </div>
 
@@ -531,7 +533,7 @@ export function UsersView({
             <div style={{ fontSize: "1.4rem", fontWeight: 750, color: "var(--ice-text)" }}>
               {stats.rolesCount}
             </div>
-            <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>Rôles Distincts</div>
+            <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>{teamCopy.kpi.roles}</div>
           </div>
         </div>
 
@@ -560,7 +562,7 @@ export function UsersView({
             <div style={{ fontSize: "1.4rem", fontWeight: 750, color: "var(--ice-text)" }}>
               {stats.customized}
             </div>
-            <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>Profils Personnalisés</div>
+            <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>{teamCopy.kpi.customized}</div>
           </div>
         </div>
       </div>
@@ -594,7 +596,7 @@ export function UsersView({
           <Search size={16} opacity={0.6} />
           <input
             type="text"
-            placeholder="Rechercher par nom, email, rôle..."
+            placeholder={teamCopy.searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
@@ -625,7 +627,7 @@ export function UsersView({
 
         {/* Role Filter */}
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <label style={{ fontSize: "0.8rem", opacity: 0.7 }}>Rôle :</label>
+          <label style={{ fontSize: "0.8rem", opacity: 0.7 }}>{teamCopy.roleLabel} :</label>
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
@@ -639,7 +641,7 @@ export function UsersView({
               cursor: "pointer",
             }}
           >
-            <option value="ALL">Tous les rôles</option>
+            <option value="ALL">{teamCopy.allRoles}</option>
             {availableRoleEntries.map(([k, label]) => (
               <option key={k} value={k}>
                 {label} ({k})
@@ -650,7 +652,7 @@ export function UsersView({
 
         {/* Status Filter */}
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <label style={{ fontSize: "0.8rem", opacity: 0.7 }}>Statut :</label>
+          <label style={{ fontSize: "0.8rem", opacity: 0.7 }}>{teamCopy.statusLabel} :</label>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -664,14 +666,14 @@ export function UsersView({
               cursor: "pointer",
             }}
           >
-            <option value="ALL">Tous les statuts</option>
-            <option value="ACTIVE">Comptes Actifs</option>
-            <option value="INACTIVE">Comptes Inactifs</option>
+            <option value="ALL">{teamCopy.allStatuses}</option>
+            <option value="ACTIVE">{teamCopy.activeAccounts}</option>
+            <option value="INACTIVE">{teamCopy.inactiveAccounts}</option>
           </select>
         </div>
 
         <div style={{ marginLeft: "auto", fontSize: "0.8rem", opacity: 0.65 }}>
-          {filteredUsers.length} résultat{filteredUsers.length > 1 ? "s" : ""}
+          {teamCopy.results(filteredUsers.length)}
         </div>
       </div>
 
@@ -704,14 +706,14 @@ export function UsersView({
                   letterSpacing: "0.05em",
                 }}
               >
-                <th style={{ padding: "14px 18px" }}>Utilisateur & Email</th>
-                <th style={{ padding: "14px 18px" }}>Rôle Attribué</th>
-                <th style={{ padding: "14px 18px" }}>Capacités & Permissions</th>
+                <th style={{ padding: "14px 18px" }}>{teamCopy.table.userAndEmail}</th>
+                <th style={{ padding: "14px 18px" }}>{teamCopy.table.role}</th>
+                <th style={{ padding: "14px 18px" }}>{teamCopy.table.capabilities}</th>
                 {isPrivileged && (
-                  <th style={{ padding: "14px 18px" }}>🔑 Mot de Passe (Accès DG/Admin)</th>
+                  <th style={{ padding: "14px 18px" }}>{teamCopy.table.password}</th>
                 )}
-                <th style={{ padding: "14px 18px", textAlign: "center" }}>Statut</th>
-                <th style={{ padding: "14px 18px", textAlign: "right" }}>Actions</th>
+                <th style={{ padding: "14px 18px", textAlign: "center" }}>{copy.common.status}</th>
+                <th style={{ padding: "14px 18px", textAlign: "right" }}>{copy.common.actions}</th>
               </tr>
             </thead>
             <tbody>
@@ -754,7 +756,7 @@ export function UsersView({
                         </div>
                         <div>
                           <div style={{ fontWeight: 650, color: "var(--ice-text)" }}>
-                            {u.fullName} {isSelf && <span style={{ opacity: 0.6, fontSize: "0.75rem" }}>(Vous)</span>}
+                            {u.fullName} {isSelf && <span style={{ opacity: 0.6, fontSize: "0.75rem" }}>{teamCopy.you}</span>}
                           </div>
                           <div style={{ fontSize: "0.8rem", opacity: 0.65 }}>
                             {u.email}
@@ -815,7 +817,7 @@ export function UsersView({
                           }}
                         >
                           <Sliders size={12} />
-                          {countPerms} / {ALL_CAPABILITY_IDS.length} capacités
+                          {teamCopy.capabilitiesCount(countPerms, ALL_CAPABILITY_IDS.length)}
                         </span>
                         {hasCustom ? (
                           <span
@@ -827,7 +829,7 @@ export function UsersView({
                               color: "#eab308",
                             }}
                           >
-                            Personnalisé
+                            {teamCopy.customized}
                           </span>
                         ) : (
                           <span
@@ -836,7 +838,7 @@ export function UsersView({
                               opacity: 0.55,
                             }}
                           >
-                            Par défaut du rôle
+                            {teamCopy.roleDefault}
                           </span>
                         )}
                       </div>
@@ -860,7 +862,7 @@ export function UsersView({
                               fontWeight: 650,
                               fontFamily: "monospace",
                             }}
-                            title="Mot de passe chiffré de façon irréversible avec l'algorithme Bcrypt (Sécurité maximale)"
+                            title={teamCopy.bcryptTitle}
                           >
                             <Shield size={13} />
                             •••••••• (Bcrypt)
@@ -869,7 +871,7 @@ export function UsersView({
                           <button
                             type="button"
                             onClick={() => handleOpenPwdModal(u)}
-                            title="Définir ou réinitialiser le mot de passe de cet utilisateur"
+                            title={teamCopy.changePasswordTitle}
                             style={{
                               padding: "4px 8px",
                               borderRadius: 6,
@@ -885,12 +887,19 @@ export function UsersView({
                             }}
                           >
                             <Key size={12} />
-                            Changer
+                            {teamCopy.changePassword}
                           </button>
                         </div>
                         {u.lastPasswordChange && (
                           <div style={{ fontSize: "0.68rem", opacity: 0.5, marginTop: 4 }}>
-                            Modifié le {new Date(u.lastPasswordChange).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                            {teamCopy.modifiedOn(
+                              new Date(u.lastPasswordChange).toLocaleDateString(copy.dateLocale, {
+                                day: "2-digit",
+                                month: "2-digit",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            )}
                           </div>
                         )}
                       </td>
@@ -903,10 +912,10 @@ export function UsersView({
                         disabled={isPending || isSelf}
                         title={
                           isSelf
-                            ? "Vous ne pouvez pas désactiver votre propre compte"
+                            ? teamCopy.toggleSelfTitle
                             : u.active
-                            ? "Cliquer pour désactiver"
-                            : "Cliquer pour activer"
+                            ? teamCopy.toggleOffTitle
+                            : teamCopy.toggleOnTitle
                         }
                         style={{
                           display: "inline-flex",
@@ -928,12 +937,12 @@ export function UsersView({
                         {u.active ? (
                           <>
                             <CheckCircle2 size={13} />
-                            Actif
+                            {teamCopy.active}
                           </>
                         ) : (
                           <>
                             <XCircle size={13} />
-                            Inactif
+                            {teamCopy.inactive}
                           </>
                         )}
                       </button>
@@ -966,7 +975,7 @@ export function UsersView({
                           }}
                         >
                           <Sliders size={14} />
-                          Capacités & Rôle
+                          {teamCopy.manageButton}
                         </button>
 
                         {/* Delete Button */}
@@ -974,7 +983,7 @@ export function UsersView({
                           <button
                             onClick={() => handleDelete(u.id, u.fullName)}
                             disabled={isPending}
-                            title="Supprimer définitivement l'utilisateur"
+                            title={teamCopy.deleteTitle}
                             style={{
                               padding: "6px 9px",
                               borderRadius: 8,
@@ -1006,7 +1015,7 @@ export function UsersView({
                       opacity: 0.6,
                     }}
                   >
-                    Aucun utilisateur trouvé pour cette recherche ou ce filtre.
+                    {teamCopy.empty}
                   </td>
                 </tr>
               )}
@@ -1071,10 +1080,10 @@ export function UsersView({
                 </span>
                 <div>
                   <h2 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 700, color: "var(--ice-text)" }}>
-                    Créer un Utilisateur & Configurer ses Droits
+                    {teamCopy.addModal.title}
                   </h2>
                   <p style={{ margin: "2px 0 0 0", fontSize: "0.78rem", opacity: 0.7 }}>
-                    Renseignez les identifiants puis cochez ou décochez les fonctionnalités autorisées.
+                    {teamCopy.addModal.subtitle}
                   </p>
                 </div>
               </div>
@@ -1119,12 +1128,12 @@ export function UsersView({
               >
                 <div>
                   <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 650, marginBottom: 6, color: "var(--ice-text)" }}>
-                    Nom & Prénom *
+                    {teamCopy.addModal.fullName}
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="ex: Jean Dupont"
+                    placeholder={teamCopy.addModal.fullNamePlaceholder}
                     value={newFullName}
                     onChange={(e) => setNewFullName(e.target.value)}
                     style={{
@@ -1142,12 +1151,12 @@ export function UsersView({
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 650, marginBottom: 6, color: "var(--ice-text)" }}>
-                    Adresse Email *
+                    {teamCopy.addModal.email}
                   </label>
                   <input
                     type="email"
                     required
-                    placeholder="jean.dupont@entreprise.com"
+                    placeholder={teamCopy.addModal.emailPlaceholder}
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
                     style={{
@@ -1165,7 +1174,7 @@ export function UsersView({
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 650, marginBottom: 6, color: "var(--ice-text)" }}>
-                    Rôle de Base *
+                    {teamCopy.addModal.role}
                   </label>
                   <select
                     value={newRole}
@@ -1193,7 +1202,7 @@ export function UsersView({
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 650, marginBottom: 6, color: "var(--ice-text)" }}>
-                    Mot de passe initial
+                    {teamCopy.addModal.password}
                   </label>
                   <input
                     type="text"
@@ -1227,7 +1236,7 @@ export function UsersView({
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <h3 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "var(--ice-text)" }}>
-                      Grille des Capacités & Permissions
+                      {teamCopy.addModal.gridTitle}
                     </h3>
                     <span
                       style={{
@@ -1239,7 +1248,7 @@ export function UsersView({
                         fontWeight: 650,
                       }}
                     >
-                      {newPermissions.length} / {ALL_CAPABILITY_IDS.length} cochées
+                      {teamCopy.addModal.checkedCount(newPermissions.length, ALL_CAPABILITY_IDS.length)}
                     </span>
                   </div>
 
@@ -1261,12 +1270,13 @@ export function UsersView({
                     }}
                   >
                     <RotateCcw size={12} />
-                    Rétablir par défaut du rôle ({ROLE_LABELS[newRole]})
+                    {teamCopy.addModal.resetToRole(ROLE_LABELS[newRole])}
                   </button>
                 </div>
 
                 {/* The Checklist Table */}
                 <CapabilitiesTable
+                  copy={copy}
                   currentPermissions={newPermissions}
                   onTogglePermission={(id) =>
                     togglePermission(id, newPermissions, setNewPermissions)
@@ -1301,7 +1311,7 @@ export function UsersView({
                     cursor: "pointer",
                   }}
                 >
-                  Annuler
+                  {copy.common.cancel}
                 </button>
                 <button
                   type="submit"
@@ -1322,7 +1332,7 @@ export function UsersView({
                   }}
                 >
                   <Check size={16} />
-                  {isPending ? "Création en cours..." : "Créer l'Utilisateur"}
+                  {isPending ? teamCopy.addModal.creating : teamCopy.addModal.create}
                 </button>
               </div>
             </form>
@@ -1386,10 +1396,10 @@ export function UsersView({
                 </span>
                 <div>
                   <h2 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 700, color: "var(--ice-text)" }}>
-                    Modifier les Capacités & le Rôle de {editingUser.fullName}
+                    {teamCopy.editModal.title(editingUser.fullName)}
                   </h2>
                   <p style={{ margin: "2px 0 0 0", fontSize: "0.78rem", opacity: 0.7 }}>
-                    Contrôlez en temps réel ce que cet utilisateur peut faire sur chaque fonctionnalité.
+                    {teamCopy.editModal.subtitle}
                   </p>
                 </div>
               </div>
@@ -1434,7 +1444,7 @@ export function UsersView({
               >
                 <div>
                   <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 650, marginBottom: 5, opacity: 0.7 }}>
-                    Nom Complet
+                    {teamCopy.editModal.fullName}
                   </label>
                   <input
                     type="text"
@@ -1456,7 +1466,7 @@ export function UsersView({
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 650, marginBottom: 5, opacity: 0.7 }}>
-                    Adresse Email (Identifiant)
+                    {teamCopy.editModal.email}
                   </label>
                   <input
                     type="text"
@@ -1479,7 +1489,7 @@ export function UsersView({
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 650, marginBottom: 5, opacity: 0.7 }}>
-                    Rôle de Référence
+                    {teamCopy.editModal.role}
                   </label>
                   <select
                     value={editRole}
@@ -1520,7 +1530,7 @@ export function UsersView({
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <h3 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "var(--ice-text)" }}>
-                      Tableau des Droits & Capacités (Cocher ce que cet utilisateur peut faire)
+                      {teamCopy.editModal.gridTitle}
                     </h3>
                     <span
                       style={{
@@ -1532,7 +1542,7 @@ export function UsersView({
                         fontWeight: 650,
                       }}
                     >
-                      {editPermissions.length} / {ALL_CAPABILITY_IDS.length} capacités autorisées
+                      {teamCopy.editModal.allowedCount(editPermissions.length, ALL_CAPABILITY_IDS.length)}
                     </span>
                   </div>
 
@@ -1554,11 +1564,12 @@ export function UsersView({
                     }}
                   >
                     <RotateCcw size={12} />
-                    Rétablir par défaut du rôle {ROLE_LABELS[editRole]}
+                    {teamCopy.editModal.resetToRole(ROLE_LABELS[editRole])}
                   </button>
                 </div>
 
                 <CapabilitiesTable
+                  copy={copy}
                   currentPermissions={editPermissions}
                   onTogglePermission={(id) =>
                     togglePermission(id, editPermissions, setEditPermissions)
@@ -1581,7 +1592,7 @@ export function UsersView({
                 }}
               >
                 <div style={{ fontSize: "0.78rem", opacity: 0.65 }}>
-                  Les modifications sont appliquées immédiatement dès enregistrement.
+                  {teamCopy.editModal.noteTitle}
                 </div>
                 <div style={{ display: "flex", gap: 10 }}>
                   <button
@@ -1597,7 +1608,7 @@ export function UsersView({
                       cursor: "pointer",
                     }}
                   >
-                    Annuler
+                    {copy.common.cancel}
                   </button>
                   <button
                     type="submit"
@@ -1618,7 +1629,7 @@ export function UsersView({
                     }}
                   >
                     <Check size={16} />
-                    {isPending ? "Enregistrement..." : "Enregistrer les Capacités"}
+                    {isPending ? teamCopy.editModal.saving : teamCopy.editModal.save}
                   </button>
                 </div>
               </div>
@@ -1679,10 +1690,10 @@ export function UsersView({
                 </span>
                 <div>
                   <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 700, color: "var(--ice-text)" }}>
-                    Modifier le Mot de Passe
+                    {teamCopy.passwordModal.title}
                   </h3>
                   <div style={{ fontSize: "0.78rem", opacity: 0.65 }}>
-                    Pour {pwdModalUser.fullName} ({pwdModalUser.email})
+                    {teamCopy.passwordModal.forUser(pwdModalUser.fullName, pwdModalUser.email)}
                   </div>
                 </div>
               </div>
@@ -1735,14 +1746,14 @@ export function UsersView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 650, marginBottom: 6, color: "var(--ice-text)" }}>
-                  Nouveau mot de passe
+                  {teamCopy.passwordModal.newPassword}
                 </label>
                 <div style={{ position: "relative" }}>
                   <input
                     type={showPwdValue ? "text" : "password"}
                     required
                     minLength={4}
-                    placeholder="Tapez le nouveau mot de passe..."
+                    placeholder={teamCopy.passwordModal.placeholder}
                     value={newPwdValue}
                     onChange={(e) => setNewPwdValue(e.target.value)}
                     style={{
@@ -1777,7 +1788,7 @@ export function UsersView({
                   </button>
                 </div>
                 <div style={{ fontSize: "0.72rem", opacity: 0.55, marginTop: 4 }}>
-                  Le nouveau mot de passe sera immédiatement enregistré, visible en clair par la Direction et une notification sera émise.
+                  {teamCopy.passwordModal.hint}
                 </div>
               </div>
 
@@ -1795,7 +1806,7 @@ export function UsersView({
                     cursor: "pointer",
                   }}
                 >
-                  Annuler
+                  {copy.common.cancel}
                 </button>
                 <button
                   type="submit"
@@ -1816,7 +1827,7 @@ export function UsersView({
                   }}
                 >
                   <Check size={15} />
-                  {isPending ? "Mise à jour..." : "Valider le mot de passe"}
+                  {isPending ? teamCopy.passwordModal.validating : teamCopy.passwordModal.validate}
                 </button>
               </div>
             </form>
@@ -1832,10 +1843,12 @@ export function UsersView({
  * Deux colonnes : Fonctionnalité | Capacités (cases à cocher)
  */
 function CapabilitiesTable({
+  copy,
   currentPermissions,
   onTogglePermission,
   onToggleGroup,
 }: {
+  copy: AdminCopy;
   currentPermissions: string[];
   onTogglePermission: (id: string) => void;
   onToggleGroup: (groupId: string) => void;
@@ -1873,7 +1886,7 @@ function CapabilitiesTable({
                 fontSize: "0.85rem",
               }}
             >
-              Fonctionnalité
+              {copy.team.capabilitiesTable.feature}
             </th>
             <th
               style={{
@@ -1883,7 +1896,7 @@ function CapabilitiesTable({
                 fontSize: "0.85rem",
               }}
             >
-              Capacités
+              {copy.team.capabilitiesTable.capabilities}
             </th>
           </tr>
         </thead>
@@ -1937,7 +1950,9 @@ function CapabilitiesTable({
                       fontWeight: 600,
                     }}
                   >
-                    {allChecked ? "Tout décocher" : "Tout cocher"}
+                    {allChecked
+                      ? copy.team.capabilitiesTable.uncheckAll
+                      : copy.team.capabilitiesTable.checkAll}
                   </button>
                 </td>
 

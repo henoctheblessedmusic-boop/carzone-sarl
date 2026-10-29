@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/require-user";
 import { FicheInterventionPrint } from "@/components/workshop/FicheInterventionPrint";
+import { getServerMessages } from "@/lib/i18n/server";
+import { workshopCopy } from "@/lib/i18n/messages/workshop";
 
 export default async function FicheInterventionPage({
   params,
@@ -9,6 +11,8 @@ export default async function FicheInterventionPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const { locale } = await getServerMessages();
+  const copy = workshopCopy[locale];
 
   // Sécurité d'accès selon les rôles
   await requireUser([
@@ -47,15 +51,17 @@ export default async function FicheInterventionPage({
   const printData = {
     id: entry.id,
     orNumber: entry.orNumber || "OR-2026",
-    entryDate: entry.entryDate || new Date(entry.createdAt).toLocaleDateString("fr-FR"),
+    entryDate:
+      entry.entryDate || new Date(entry.createdAt).toLocaleDateString(copy.dateLocale),
     brand: entry.brand || "-",
     model: entry.model || "-",
-    immatriculation: entry.immatriculation || "EN ATTENTE",
+    immatriculation: entry.immatriculation || copy.print.fallbacks.immatPending,
     chassis: entry.chassis || "-",
     mileage: entry.mileage || 0,
-    clientName: entry.clientName || "Client Carzone",
+    clientName: entry.clientName || copy.print.fallbacks.clientName,
     phone: entry.phone || "",
-    reportedFault: entry.reportedFault || entry.observations || "Entretien périodique programmé.",
+    reportedFault:
+      entry.reportedFault || entry.observations || copy.print.fallbacks.faultDefault,
     maintenanceTier: entry.maintenanceTier,
     faultMotorTransmission: entry.faultMotorTransmission || undefined,
     faultSuspension: entry.faultSuspension || undefined,

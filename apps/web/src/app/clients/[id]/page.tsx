@@ -17,7 +17,9 @@ import { AppShell } from "@/components/AppShell";
 import { Badge, DataTable } from "@/components/ui";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
-import { formatDate, formatXof } from "@/lib/format";
+import { formatXof } from "@/lib/format";
+import { getServerMessages } from "@/lib/i18n/server";
+import { clientsCopy } from "@/lib/i18n/messages/clients";
 
 export default async function CustomerDetailPage({
   params,
@@ -25,6 +27,8 @@ export default async function CustomerDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const user = await requireUser();
+  const { locale } = await getServerMessages();
+  const copy = clientsCopy[locale];
   const { id } = await params;
 
   const customer = await prisma.customer.findUnique({
@@ -87,7 +91,7 @@ export default async function CustomerDetailPage({
     .toUpperCase();
 
   return (
-    <AppShell user={user} title={`Fiche Client : ${customer.contactName}`}>
+    <AppShell user={user} title={copy.detail.pageTitle(customer.contactName)}>
       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
         {/* Top Navigation */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -97,14 +101,14 @@ export default async function CustomerDetailPage({
             style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: "0.88rem" }}
           >
             <ArrowLeft size={16} />
-            Retour à la liste des clients
+            {copy.detail.backToList}
           </Link>
           <div style={{ display: "flex", gap: 8 }}>
             <span
               className={`ox-badge ox-badge--${customer.active ? "ok" : "bad"}`}
               style={{ fontSize: "0.85rem", padding: "0.3rem 0.8rem" }}
             >
-              {customer.active ? "Compte Actif" : "Compte Inactif"}
+              {customer.active ? copy.detail.accountActive : copy.detail.accountInactive}
             </span>
           </div>
         </div>
@@ -178,7 +182,7 @@ export default async function CustomerDetailPage({
                       border: "1px solid rgba(0, 120, 212, 0.3)",
                     }}
                   >
-                    IFU : {customer.ifu}
+                    {copy.detail.ifuPrefix}{customer.ifu}
                   </span>
                 )}
                 <span
@@ -189,7 +193,7 @@ export default async function CustomerDetailPage({
                     fontSize: "0.8rem",
                   }}
                 >
-                  {customer.category || "Particulier"}
+                  {customer.category ? copy.categoryLabel(customer.category) : copy.category.individual}
                 </span>
               </div>
 
@@ -234,7 +238,7 @@ export default async function CustomerDetailPage({
                 </span>
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 5, opacity: 0.65 }}>
                   <Calendar size={14} />
-                  Client depuis le {formatDate(customer.createdAt)}
+                  {copy.detail.clientSince(copy.formatDate(customer.createdAt))}
                 </span>
               </div>
             </div>
@@ -244,15 +248,15 @@ export default async function CustomerDetailPage({
           <div style={{ display: "flex", gap: 10 }}>
             <Link href="/quotes" className="ox-btn ox-btn-ghost ox-btn-sm">
               <FileText size={14} style={{ marginRight: 5 }} />
-              Nouveau Devis
+              {copy.detail.quickNewQuote}
             </Link>
             <Link href="/clients" className="ox-btn ox-btn-ghost ox-btn-sm">
               <FolderCheck size={14} style={{ marginRight: 5 }} />
-              Dossier Documents
+              {copy.detail.quickDocuments}
             </Link>
             <Link href="/charge-requests" className="ox-btn ox-btn-ghost ox-btn-sm">
               <Zap size={14} style={{ marginRight: 5 }} />
-              Demande Borne
+              {copy.detail.quickChargeRequest}
             </Link>
           </div>
         </div>
@@ -274,7 +278,7 @@ export default async function CustomerDetailPage({
             <span style={{ fontSize: "1.2rem", marginTop: 2 }}>🏷️</span>
             <div>
               <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--gold)" }}>
-                Visite Showroom &amp; Échanges Commerciaux
+                {copy.detail.showroomNotesTitle}
               </div>
               <div style={{ fontSize: "0.88rem", opacity: 0.9, marginTop: 4, lineHeight: 1.5 }}>
                 {customer.showroomNotes}
@@ -293,31 +297,31 @@ export default async function CustomerDetailPage({
         >
           <div className="ox-glass" style={{ padding: "1.1rem 1.25rem", borderRadius: 16 }}>
             <span style={{ fontSize: "0.82rem", opacity: 0.7, fontWeight: 550 }}>
-              Total Facturé
+              {copy.detail.kpi.totalInvoiced}
             </span>
             <div style={{ fontSize: "1.55rem", fontWeight: 750, marginTop: 4 }}>
               {formatXof(totalInvoicedXof)}
             </div>
             <div style={{ fontSize: "0.78rem", opacity: 0.6, marginTop: 2 }}>
-              {customer.invoices.length} facture(s) émise(s)
+              {copy.detail.kpi.invoicesIssued(customer.invoices.length)}
             </div>
           </div>
 
           <div className="ox-glass" style={{ padding: "1.1rem 1.25rem", borderRadius: 16 }}>
             <span style={{ fontSize: "0.82rem", opacity: 0.7, fontWeight: 550 }}>
-              Total Encaissé
+              {copy.detail.kpi.totalCollected}
             </span>
             <div style={{ fontSize: "1.55rem", fontWeight: 750, marginTop: 4, color: "var(--ok)" }}>
               {formatXof(totalPaidXof)}
             </div>
             <div style={{ fontSize: "0.78rem", opacity: 0.6, marginTop: 2 }}>
-              Règlements reçus
+              {copy.detail.kpi.paymentsReceived}
             </div>
           </div>
 
           <div className="ox-glass" style={{ padding: "1.1rem 1.25rem", borderRadius: 16 }}>
             <span style={{ fontSize: "0.82rem", opacity: 0.7, fontWeight: 550 }}>
-              Reste à Payer (Solde)
+              {copy.detail.kpi.remainingDue}
             </span>
             <div
               style={{
@@ -330,16 +334,16 @@ export default async function CustomerDetailPage({
               {formatXof(remainingDueXof)}
             </div>
             <div style={{ fontSize: "0.78rem", opacity: 0.6, marginTop: 2 }}>
-              {remainingDueXof > 0 ? "Factures en attente ou retard" : "À jour de paiement"}
+              {copy.detail.kpi.remainingDueHint(remainingDueXof > 0)}
             </div>
           </div>
 
           <div className="ox-glass" style={{ padding: "1.1rem 1.25rem", borderRadius: 16 }}>
             <span style={{ fontSize: "0.82rem", opacity: 0.7, fontWeight: 550 }}>
-              Abonnement Borne
+              {copy.detail.kpi.chargingPlan}
             </span>
             <div style={{ fontSize: "1.2rem", fontWeight: 750, marginTop: 6, color: "var(--brand)" }}>
-              {activeSub ? activeSub.plan.name : "Aucun (Tarif Public)"}
+              {activeSub ? activeSub.plan.name : copy.detail.kpi.noPlan}
             </div>
             <div style={{ fontSize: "0.78rem", opacity: 0.65, marginTop: 2 }}>
               {activeSub ? `${formatXof(activeSub.plan.kwhPriceXof)}/kWh` : "125 XOF/kWh"}
@@ -352,26 +356,26 @@ export default async function CustomerDetailPage({
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
             <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
               <Receipt size={18} style={{ color: "var(--brand)" }} />
-              Factures & Règlements ({customer.invoices.length})
+              {copy.detail.invoices.title(customer.invoices.length)}
             </h3>
             <Link href="/invoices" className="ox-btn ox-btn-ghost ox-btn-sm">
-              Voir toutes les factures
+              {copy.detail.invoices.viewAll}
             </Link>
           </div>
 
           {customer.invoices.length === 0 ? (
             <p style={{ opacity: 0.6, fontSize: "0.9rem", margin: "1rem 0" }}>
-              Aucune facture émise pour ce client pour le moment.
+              {copy.detail.invoices.empty}
             </p>
           ) : (
             <DataTable
-              headers={["Numéro", "Type", "Échéance", "Total Facturé", "Déjà Payé", "Solde Restant", "Statut", "Règlements"]}
+              headers={copy.detail.invoices.headers}
               rows={customer.invoices.map((inv) => {
                 const bal = inv.totalXof - inv.paidXof;
                 return [
                   <strong key={`inv-num-${inv.id}`}>{inv.number}</strong>,
-                  inv.kind,
-                  formatDate(inv.dueDate),
+                  copy.invoiceKindLabel(inv.kind),
+                  copy.formatDate(inv.dueDate),
                   formatXof(inv.totalXof),
                   <span key={`p-${inv.id}`} style={{ color: "var(--ok)", fontWeight: 600 }}>
                     {formatXof(inv.paidXof)}
@@ -386,10 +390,10 @@ export default async function CustomerDetailPage({
                     key={`s-${inv.id}`}
                     tone={inv.status === "PAYEE" ? "ok" : inv.status === "EN_RETARD" ? "bad" : "warn"}
                   >
-                    {inv.status}
+                    {copy.statusLabel(inv.status)}
                   </Badge>,
                   <span key={`pay-${inv.id}`} style={{ fontSize: "0.8rem", opacity: 0.8 }}>
-                    {inv.payments.length} paiement(s)
+                    {copy.detail.invoices.payments(inv.payments.length)}
                   </span>,
                 ];
               })}
@@ -402,23 +406,23 @@ export default async function CustomerDetailPage({
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
             <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
               <FileText size={18} style={{ color: "var(--ice-highlight)" }} />
-              Devis & Proformas ({customer.quotes.length})
+              {copy.detail.quotes.title(customer.quotes.length)}
             </h3>
             <Link href="/quotes" className="ox-btn ox-btn-ghost ox-btn-sm">
-              Gérer les devis
+              {copy.detail.quotes.manage}
             </Link>
           </div>
 
           {customer.quotes.length === 0 ? (
             <p style={{ opacity: 0.6, fontSize: "0.9rem", margin: "1rem 0" }}>
-              Aucun devis ni proforma généré pour ce client.
+              {copy.detail.quotes.empty}
             </p>
           ) : (
             <DataTable
-              headers={["N° Proforma", "Date émission", "Lignes / Véhicules", "Total XOF", "Validité", "Statut", "Action"]}
+              headers={copy.detail.quotes.headers}
               rows={customer.quotes.map((q) => [
                 <strong key={`q-num-${q.id}`}>{q.number}</strong>,
-                formatDate(q.createdAt),
+                copy.formatDate(q.createdAt),
                 <div key={`lines-${q.id}`}>
                   {q.lines.map((l, idx) => (
                     <div key={idx} style={{ fontSize: "0.85rem" }}>
@@ -427,7 +431,7 @@ export default async function CustomerDetailPage({
                   ))}
                 </div>,
                 <strong key={`q-tot-${q.id}`}>{formatXof(q.totalXof)}</strong>,
-                formatDate(q.validUntil),
+                copy.formatDate(q.validUntil),
                 <Badge
                   key={`qs-${q.id}`}
                   tone={
@@ -438,7 +442,7 @@ export default async function CustomerDetailPage({
                       : "ice"
                   }
                 >
-                  {q.status}
+                  {copy.statusLabel(q.status)}
                 </Badge>,
                 <Link
                   key={`print-${q.id}`}
@@ -446,7 +450,7 @@ export default async function CustomerDetailPage({
                   target="_blank"
                   className="ox-btn ox-btn-ghost ox-btn-sm"
                 >
-                  Imprimer
+                  {copy.detail.quotes.print}
                 </Link>,
               ])}
             />
@@ -458,16 +462,16 @@ export default async function CustomerDetailPage({
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
             <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
               <FolderCheck size={18} style={{ color: "var(--gold)" }} />
-              Dossier Documents &amp; Immatriculation ANaTT ({customer.documents.length})
+              {copy.detail.documents.title(customer.documents.length)}
             </h3>
             <Link href="/clients" className="ox-btn ox-btn-ghost ox-btn-sm">
-              Ajouter / Téléverser des pièces
+              {copy.detail.documents.add}
             </Link>
           </div>
 
           {customer.documents.length === 0 ? (
             <p style={{ opacity: 0.6, fontSize: "0.9rem", margin: "1rem 0" }}>
-              Aucun document téléversé pour ce client (CIP, attestation IFU, justificatif de domicile). Vous pouvez en ajouter depuis la liste des clients.
+              {copy.detail.documents.empty}
             </p>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
@@ -488,10 +492,10 @@ export default async function CustomerDetailPage({
                   <div>
                     <div style={{ fontWeight: 650, fontSize: "0.9rem" }}>{doc.title}</div>
                     <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: 2 }}>
-                      {doc.docType} · {doc.fileName}
+                      {copy.docTypeLabel(doc.docType)} · {doc.fileName}
                     </div>
                     <div style={{ fontSize: "0.72rem", opacity: 0.5, marginTop: 1 }}>
-                      Ajouté le {formatDate(doc.uploadedAt)}
+                      {copy.detail.documents.addedOn(copy.formatDate(doc.uploadedAt))}
                     </div>
                     {doc.notes && (
                       <div style={{ fontSize: "0.74rem", color: "var(--gold)", marginTop: 3 }}>
@@ -501,7 +505,7 @@ export default async function CustomerDetailPage({
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
                     <Badge tone={doc.status === "TRANSMIS_ANATT" ? "ok" : "ice"}>
-                      {doc.status === "TRANSMIS_ANATT" ? "Transmis ANaTT" : "Validé"}
+                      {doc.status === "TRANSMIS_ANATT" ? copy.documentStatus.transmitted : copy.documentStatus.validated}
                     </Badge>
                     <a
                       href={doc.fileUrl}
@@ -511,7 +515,7 @@ export default async function CustomerDetailPage({
                       className="ox-btn ox-btn-ghost ox-btn-sm"
                       style={{ padding: "0.25rem 0.55rem", fontSize: "0.75rem" }}
                     >
-                      Télécharger
+                      {copy.detail.documents.download}
                     </a>
                   </div>
                 </div>
@@ -524,17 +528,17 @@ export default async function CustomerDetailPage({
         <div className="ox-glass" style={{ padding: "1.25rem 1.5rem", borderRadius: 16 }}>
           <h3 style={{ margin: "0 0 14px 0", fontSize: "1.1rem", fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
             <Zap size={18} style={{ color: "var(--ok)" }} />
-            Écosystème Bornes & Recharge
+            {copy.detail.charging.title}
           </h3>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
             {/* Demandes d'installation bornes */}
             <div>
               <h4 style={{ fontSize: "0.95rem", margin: "0 0 8px 0", opacity: 0.85 }}>
-                Demandes d&apos;installation à domicile / entreprise ({customer.installRequests.length})
+                {copy.detail.charging.installTitle(customer.installRequests.length)}
               </h4>
               {customer.installRequests.length === 0 ? (
-                <p style={{ opacity: 0.55, fontSize: "0.85rem" }}>Aucune demande d&apos;installation enregistrée.</p>
+                <p style={{ opacity: 0.55, fontSize: "0.85rem" }}>{copy.detail.charging.installEmpty}</p>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {customer.installRequests.map((req) => (
@@ -549,14 +553,16 @@ export default async function CustomerDetailPage({
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <strong>{req.address} ({req.city})</strong>
-                        <Badge tone={req.status === "TERMINEE" ? "ok" : "warn"}>{req.status}</Badge>
+                        <Badge tone={req.status === "TERMINEE" ? "ok" : "warn"}>{copy.statusLabel(req.status)}</Badge>
                       </div>
                       <div style={{ fontSize: "0.82rem", opacity: 0.7, marginTop: 4 }}>
-                        Puissance : {req.powerKw ? `${req.powerKw} kW` : "N/A"} · Véhicule :{" "}
+                        {copy.detail.charging.powerLabel}
+                        {req.powerKw ? `${req.powerKw} kW` : copy.detail.notAvailable} ·{" "}
+                        {copy.detail.charging.vehicleLabel}
                         {req.vehicleBrand} {req.vehicleModel}
                       </div>
                       <div style={{ fontSize: "0.8rem", color: "var(--ice-highlight)", marginTop: 6 }}>
-                        {req.installerQuotes.length} devis reçu(s) d&apos;installateurs partenaires
+                        {copy.detail.charging.installerQuotes(req.installerQuotes.length)}
                       </div>
                     </div>
                   ))}
@@ -567,10 +573,10 @@ export default async function CustomerDetailPage({
             {/* Sessions de recharge publiques */}
             <div>
               <h4 style={{ fontSize: "0.95rem", margin: "0 0 8px 0", opacity: 0.85 }}>
-                Historique des recharges aux bornes CARZONE ({customer.chargingInvoices.length})
+                {copy.detail.charging.historyTitle(customer.chargingInvoices.length)}
               </h4>
               {customer.chargingInvoices.length === 0 ? (
-                <p style={{ opacity: 0.55, fontSize: "0.85rem" }}>Aucune recharge aux bornes enregistrée.</p>
+                <p style={{ opacity: 0.55, fontSize: "0.85rem" }}>{copy.detail.charging.historyEmpty}</p>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {customer.chargingInvoices.slice(0, 5).map((ci) => (
@@ -588,12 +594,12 @@ export default async function CustomerDetailPage({
                       <div>
                         <div style={{ fontWeight: 600, fontSize: "0.85rem" }}>{ci.session.station.name}</div>
                         <div style={{ fontSize: "0.78rem", opacity: 0.6 }}>
-                          {ci.session.kwhDelivered} kWh délivrés @ {ci.session.pricePerKwh} XOF/kWh
+                          {copy.detail.charging.kwhLine(ci.session.kwhDelivered, ci.session.pricePerKwh)}
                         </div>
                       </div>
                       <div style={{ textAlign: "right" }}>
                         <div style={{ fontWeight: 700, color: "var(--brand)" }}>{formatXof(ci.totalXof)}</div>
-                        <Badge tone="ok">{ci.status}</Badge>
+                        <Badge tone="ok">{copy.statusLabel(ci.status)}</Badge>
                       </div>
                     </div>
                   ))}
@@ -608,7 +614,7 @@ export default async function CustomerDetailPage({
           <div className="ox-glass" style={{ padding: "1.25rem 1.5rem", borderRadius: 16 }}>
             <h3 style={{ margin: "0 0 14px 0", fontSize: "1.1rem", fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
               <Car size={18} style={{ color: "var(--gold)" }} />
-              Véhicules, Flotte & Locations
+              {copy.detail.vehicles.title}
             </h3>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
@@ -623,14 +629,18 @@ export default async function CustomerDetailPage({
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <strong>Contrat {r.type}</strong>
-                    <Badge tone={r.status === "ACTIF" ? "ok" : "neutral"}>{r.status}</Badge>
+                    <strong>{copy.detail.vehicles.contract(copy.rentalTypeLabel(r.type))}</strong>
+                    <Badge tone={r.status === "ACTIF" ? "ok" : "neutral"}>{copy.statusLabel(r.status)}</Badge>
                   </div>
                   <div style={{ marginTop: 6, fontWeight: 600 }}>
-                    {r.vehicle.brand} {r.vehicle.model} ({r.vehicle.vin || "Sans VIN"})
+                    {r.vehicle.brand} {r.vehicle.model} ({r.vehicle.vin || copy.detail.vehicles.noVin})
                   </div>
                   <div style={{ fontSize: "0.82rem", opacity: 0.7, marginTop: 4 }}>
-                    Loyer : {r.monthlyXof ? `${formatXof(r.monthlyXof)}/mois` : "N/A"} · Du {formatDate(r.startDate)} au {formatDate(r.endDate)}
+                    {copy.detail.vehicles.rent(r.monthlyXof ? formatXof(r.monthlyXof) : null)} ·{" "}
+                    {copy.detail.vehicles.period(
+                      copy.formatDate(r.startDate),
+                      copy.formatDate(r.endDate)
+                    )}
                   </div>
                 </div>
               ))}
@@ -646,14 +656,17 @@ export default async function CustomerDetailPage({
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <strong>Flotte : {fv.fleetAccount.name}</strong>
-                    <Badge tone={fv.active ? "ok" : "bad"}>{fv.active ? "Actif" : "Inactif"}</Badge>
+                    <strong>{copy.detail.vehicles.fleet(fv.fleetAccount.name)}</strong>
+                    <Badge tone={fv.active ? "ok" : "bad"}>{fv.active ? copy.status.active : copy.status.inactive}</Badge>
                   </div>
                   <div style={{ marginTop: 6, fontWeight: 600 }}>
-                    {fv.vehicle ? `${fv.vehicle.brand} ${fv.vehicle.model}` : "Véhicule Flotte"}
+                    {fv.vehicle ? `${fv.vehicle.brand} ${fv.vehicle.model}` : copy.detail.vehicles.fleetVehicle}
                   </div>
                   <div style={{ fontSize: "0.82rem", opacity: 0.7, marginTop: 4 }}>
-                    Immatriculation : {fv.plateNumber || "N/A"} · Chauffeur : {fv.driverName || "N/A"}
+                    {copy.detail.vehicles.plateLabel}
+                    {fv.plateNumber || copy.detail.notAvailable} ·{" "}
+                    {copy.detail.vehicles.driverLabel}
+                    {fv.driverName || copy.detail.notAvailable}
                   </div>
                 </div>
               ))}

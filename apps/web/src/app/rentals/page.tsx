@@ -3,7 +3,13 @@ import { AppShell } from "@/components/AppShell";
 import { Badge, DataTable } from "@/components/ui";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
-import { formatDate, formatXof } from "@/lib/format";
+import { formatXof } from "@/lib/format";
+import { getServerMessages } from "@/lib/i18n/server";
+import {
+  crmCopy,
+  rentalStatusLabel,
+  rentalTypeLabel,
+} from "@/lib/i18n/messages/crm";
 
 async function createRental(formData: FormData) {
   "use server";
@@ -28,6 +34,9 @@ async function createRental(formData: FormData) {
 
 export default async function RentalsPage() {
   const user = await requireUser(["DG", "COMMERCIAL", "COMPTA"]);
+  const { locale } = await getServerMessages();
+  const copy = crmCopy[locale];
+  const rentalsCopy = copy.rentals;
   const [rentals, customers, vehicles] = await Promise.all([
     prisma.rental.findMany({
       include: { customer: true, vehicle: true },
@@ -41,36 +50,44 @@ export default async function RentalsPage() {
     <AppShell user={user} titleKey="rentals">
       <form action={createRental} style={formRow}>
         <select name="type" style={input} defaultValue="LCD">
-          <option value="LCD">LCD · courte durée</option>
-          <option value="LLD">LLD · longue durée</option>
-          <option value="LOA">LOA · option d&apos;achat</option>
+          <option value="LCD">{rentalsCopy.types.LCD}</option>
+          <option value="LLD">{rentalsCopy.types.LLD}</option>
+          <option value="LOA">{rentalsCopy.types.LOA}</option>
         </select>
         <select name="customerId" required style={input} defaultValue="">
-          <option value="" disabled>Client *</option>
+          <option value="" disabled>{rentalsCopy.form.customer}</option>
           {customers.map((c) => <option key={c.id} value={c.id}>{c.contactName}</option>)}
         </select>
         <select name="vehicleId" required style={input} defaultValue="">
-          <option value="" disabled>Véhicule stock *</option>
+          <option value="" disabled>{rentalsCopy.form.vehicle}</option>
           {vehicles.map((v) => (
             <option key={v.id} value={v.id}>{v.brand} {v.model}</option>
           ))}
         </select>
         <input name="startDate" type="date" style={input} />
         <input name="endDate" type="date" style={input} />
-        <input name="monthlyXof" type="number" placeholder="Mensualité XOF" style={input} />
-        <input name="depositXof" type="number" placeholder="Caution XOF" style={input} />
-        <button type="submit" style={btn}>Créer contrat</button>
+        <input name="monthlyXof" type="number" placeholder={rentalsCopy.form.monthlyPlaceholder} style={input} />
+        <input name="depositXof" type="number" placeholder={rentalsCopy.form.depositPlaceholder} style={input} />
+        <button type="submit" style={btn}>{rentalsCopy.form.submit}</button>
       </form>
       <DataTable
-        headers={["Type", "Client", "Véhicule", "Début", "Fin", "Mensualité", "Statut"]}
+        headers={[
+          rentalsCopy.table.type,
+          rentalsCopy.table.customer,
+          rentalsCopy.table.vehicle,
+          rentalsCopy.table.start,
+          rentalsCopy.table.end,
+          rentalsCopy.table.monthly,
+          rentalsCopy.table.status,
+        ]}
         rows={rentals.map((r) => [
-          r.type,
+          rentalTypeLabel(copy, r.type),
           r.customer.contactName,
           `${r.vehicle.brand} ${r.vehicle.model}`,
-          formatDate(r.startDate),
-          formatDate(r.endDate),
+          copy.formatDate(r.startDate),
+          copy.formatDate(r.endDate),
           r.monthlyXof ? formatXof(r.monthlyXof) : "-",
-          <Badge key={r.id} tone={r.status === "ACTIF" ? "ok" : "neutral"}>{r.status}</Badge>,
+          <Badge key={r.id} tone={r.status === "ACTIF" ? "ok" : "neutral"}>{rentalStatusLabel(copy, r.status)}</Badge>,
         ])}
       />
     </AppShell>

@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/require-user";
+import { getLocale } from "@/lib/i18n/server";
+import { quotesCopy } from "@/lib/i18n/messages/quotes";
 import { prisma } from "@/lib/prisma";
 import { nextDocNumber, formatXof, formatDate } from "@/lib/format";
 import {
@@ -65,8 +67,9 @@ export async function createProformaWithLines(payload: {
     discountValue = 0,
     lines,
   } = payload;
-  if (!customerId) throw new Error("Client requis");
-  if (!lines || lines.length === 0) throw new Error("Au moins une ligne requise");
+  const copy = quotesCopy[await getLocale()];
+  if (!customerId) throw new Error(copy.server.customerRequired);
+  if (!lines || lines.length === 0) throw new Error(copy.server.lineRequired);
 
   const grossTotal = lines.reduce((s, l) => s + l.quantity * l.unitPriceXof, 0);
   const discountAmount = calculateDiscountAmount(grossTotal, {
@@ -316,9 +319,7 @@ export async function deleteQuote(id: string) {
     include: { invoice: true },
   });
   if (quote.status === "FACTURE_NORMALISEE" || quote.invoice) {
-    throw new Error(
-      "Impossible de supprimer cette proforma car elle a déjà été convertie en facture normalisée officielle."
-    );
+    throw new Error(quotesCopy[await getLocale()].server.deleteNormalized);
   }
 
   await prisma.quoteLine.deleteMany({ where: { quoteId: id } });
@@ -375,14 +376,16 @@ export async function updateProformaWithLines(payload: {
     lines,
   } = payload;
 
-  if (!quoteId) throw new Error("ID du devis manquant");
-  if (!customerId) throw new Error("Client requis");
-  if (!lines || lines.length === 0) throw new Error("Au moins une ligne requise");
+  const copy = quotesCopy[await getLocale()];
+
+  if (!quoteId) throw new Error(copy.server.missingId);
+  if (!customerId) throw new Error(copy.server.customerRequired);
+  if (!lines || lines.length === 0) throw new Error(copy.server.lineRequired);
 
   const existing = await prisma.quote.findUnique({
     where: { id: quoteId },
   });
-  if (!existing) throw new Error("Devis introuvable");
+  if (!existing) throw new Error(copy.server.quoteNotFound);
 
   // RÈGLE COMMERCIALE & LÉGALE STRICTE :
   // Non modifiable si le bon de commande a déjà été confirmé ou s'il y a une facture normalisée !
@@ -391,9 +394,7 @@ export async function updateProformaWithLines(payload: {
     existing.status === "FACTURE_NORMALISEE" ||
     existing.status === "ACCEPTE"
   ) {
-    throw new Error(
-      "Ce document a été validé en bon de commande ferme ou facture fiscale normalisée. Conformément aux règles de gestion, il ne peut plus être modifié."
-    );
+    throw new Error(copy.server.quoteLocked);
   }
 
   const grossTotal = lines.reduce((s, l) => s + l.quantity * l.unitPriceXof, 0);

@@ -14,6 +14,8 @@ import {
   Tag,
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
+import { usePrefs } from "@/components/PrefsProvider";
+import { quotesCopy } from "@/lib/i18n/messages/quotes";
 import { computeTaxTotals, type TaxMode } from "@/lib/billing";
 import { getDefaultCgv, type CgvType } from "@/lib/cgv";
 import { createCustomer } from "@/app/clients/actions";
@@ -84,6 +86,9 @@ export function QuoteCreator({
   opportunities: OpportunityOption[];
   onCreated?: () => void;
 }) {
+  const { locale } = usePrefs();
+  const copy = quotesCopy[locale];
+
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -190,7 +195,7 @@ export function QuoteCreator({
   async function handleQuickCreateClient(e: React.FormEvent) {
     e.preventDefault();
     if (!newContactName.trim()) {
-      setNewClientError("Le nom du client est requis.");
+      setNewClientError(copy.creator.newClient.nameRequired);
       return;
     }
     setNewClientError(null);
@@ -228,7 +233,7 @@ export function QuoteCreator({
       setNewIfu("");
       setNewAddress("");
     } catch (err: unknown) {
-      setNewClientError(err instanceof Error ? err.message : "Erreur lors de la création du client");
+      setNewClientError(err instanceof Error ? err.message : copy.creator.newClient.createFailed);
     } finally {
       setIsCreatingClient(false);
     }
@@ -246,7 +251,7 @@ export function QuoteCreator({
         vehicleId: null,
       },
     ]);
-    triggerActionFeedback("Nouvelle ligne vide ajoutée", newId);
+    triggerActionFeedback(copy.creator.feedback.emptyLineAdded, newId);
   }
 
   function addOrIncrementLine(params: {
@@ -278,14 +283,14 @@ export function QuoteCreator({
           unitPriceXof: unitPriceXof !== undefined ? unitPriceXof : existing.unitPriceXof,
         };
         triggerActionFeedback(
-          `✨ Quantité augmentée : "${title || cleanDesc}" passe à ${newQty} unité(s)`,
+          copy.creator.feedback.quantityIncreased(title || cleanDesc, newQty),
           existing.id
         );
         return updated;
       } else {
         const newId = `line-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
         triggerActionFeedback(
-          `✅ Article ajouté au devis : "${title || cleanDesc}" (${quantity}x ${formatXof(unitPriceXof)})`,
+          copy.creator.feedback.articleAdded(title || cleanDesc, quantity, formatXof(unitPriceXof)),
           newId
         );
         return [
@@ -388,13 +393,13 @@ export function QuoteCreator({
 
   function handleSubmit() {
     if (!customerId) {
-      setError("Veuillez sélectionner un client destinataire.");
+      setError(copy.creator.errors.clientRequired);
       return;
     }
 
     const validLines = lines.filter((l) => l.description.trim().length > 0 && l.unitPriceXof >= 0);
     if (validLines.length === 0) {
-      setError("Veuillez ajouter au moins une ligne avec une désignation valide.");
+      setError(copy.creator.errors.lineRequired);
       return;
     }
 
@@ -423,7 +428,7 @@ export function QuoteCreator({
         setIsOpen(false);
         if (onCreated) onCreated();
       } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : "Erreur lors de la création de la proforma";
+        const message = err instanceof Error ? err.message : copy.creator.errors.createFailed;
         setError(message);
       }
     });
@@ -451,7 +456,7 @@ export function QuoteCreator({
         }}
       >
         <Plus size={18} />
-        Nouvelle Proforma Multi-lignes
+        {copy.creator.openButton}
       </button>
 
       {isOpen && mounted && createPortal(
@@ -515,11 +520,11 @@ export function QuoteCreator({
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <ShoppingCart size={22} color="var(--gold)" />
                   <h2 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 700, color: "var(--ice-text-strong)" }}>
-                    Création de Devis Proforma
+                    {copy.creator.title}
                   </h2>
                 </div>
                 <div style={{ fontSize: "0.85rem", color: "var(--ice-text-muted)", marginTop: 4 }}>
-                  CARZONE SARL · Showroom Zone Maro-Militaire, Gbèdomidji, Cotonou · Devis catalogue & véhicules
+                  {copy.creator.subtitle}
                 </div>
               </div>
               <button
@@ -574,7 +579,7 @@ export function QuoteCreator({
                 <div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                     <label style={{ fontSize: "0.8rem", opacity: 0.8, margin: 0, fontWeight: 600 }}>
-                      Client destinataire *
+                      {copy.creator.client.label}
                     </label>
                     <button
                       type="button"
@@ -593,7 +598,7 @@ export function QuoteCreator({
                       }}
                     >
                       <UserPlus size={13} />
-                      + Nouveau Client
+                      {copy.creator.client.newClient}
                     </button>
                   </div>
                   <select
@@ -603,7 +608,7 @@ export function QuoteCreator({
                     onChange={(e) => setCustomerId(e.target.value)}
                     disabled={isPending}
                   >
-                    <option value="">-- Sélectionner un client --</option>
+                    <option value="">{copy.creator.client.selectPlaceholder}</option>
                     {customerList.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.contactName} {c.companyName ? `(${c.companyName})` : ""} {c.phone ? `· ${c.phone}` : ""}
@@ -614,7 +619,7 @@ export function QuoteCreator({
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.8rem", opacity: 0.8, marginBottom: 4, fontWeight: 600 }}>
-                    Opportunité commerciale (optionnel)
+                    {copy.creator.client.opportunityLabel}
                   </label>
                   <select
                     className="ox-select"
@@ -623,7 +628,7 @@ export function QuoteCreator({
                     onChange={(e) => setOpportunityId(e.target.value)}
                     disabled={isPending}
                   >
-                    <option value="">-- Aucune opportunité liée --</option>
+                    <option value="">{copy.creator.client.noOpportunity}</option>
                     {opportunities
                       .filter((o) => !customerId || o.customerId === customerId)
                       .map((o) => (
@@ -656,7 +661,7 @@ export function QuoteCreator({
                   {selectedCustomer.email && <span style={{ opacity: 0.8 }}>✉️ {selectedCustomer.email}</span>}
                   {selectedCustomer.ifu && (
                     <span style={{ color: "var(--ice-highlight)", fontWeight: 600 }}>
-                      IFU : {selectedCustomer.ifu}
+                      {copy.creator.client.ifuPrefix}{selectedCustomer.ifu}
                     </span>
                   )}
                 </div>
@@ -666,7 +671,7 @@ export function QuoteCreator({
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 140px), 1fr))", gap: "0.75rem" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.75rem", opacity: 0.75, marginBottom: 3 }}>
-                    Base fiscale
+                    {copy.creator.tax.baseLabel}
                   </label>
                   <select
                     className="ox-select"
@@ -675,14 +680,14 @@ export function QuoteCreator({
                     onChange={(e) => setTaxMode(e.target.value as TaxMode)}
                     disabled={isPending}
                   >
-                    <option value="HT">Montants HT</option>
-                    <option value="TTC">Montants TTC</option>
+                    <option value="HT">{copy.creator.tax.htOption}</option>
+                    <option value="TTC">{copy.creator.tax.ttcOption}</option>
                   </select>
                 </div>
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.75rem", opacity: 0.75, marginBottom: 3 }}>
-                    Taux TVA
+                    {copy.creator.tax.vatRateLabel}
                   </label>
                   <select
                     className="ox-select"
@@ -691,14 +696,14 @@ export function QuoteCreator({
                     onChange={(e) => setTaxRatePct(Number(e.target.value))}
                     disabled={isPending}
                   >
-                    <option value="18">18 % (Standard)</option>
-                    <option value="0">0 % (Exonéré)</option>
+                    <option value="18">{copy.creator.tax.vatStandard}</option>
+                    <option value="0">{copy.creator.tax.vatExempt}</option>
                   </select>
                 </div>
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.75rem", opacity: 0.75, marginBottom: 3 }}>
-                    Validité
+                    {copy.creator.tax.validityLabel}
                   </label>
                   <select
                     className="ox-select"
@@ -707,10 +712,10 @@ export function QuoteCreator({
                     onChange={(e) => setValidDays(Number(e.target.value))}
                     disabled={isPending}
                   >
-                    <option value="7">7 jours</option>
-                    <option value="14">14 jours</option>
-                    <option value="30">30 jours</option>
-                    <option value="60">60 jours</option>
+                    <option value="7">{copy.creator.tax.days(7)}</option>
+                    <option value="14">{copy.creator.tax.days(14)}</option>
+                    <option value="30">{copy.creator.tax.days(30)}</option>
+                    <option value="60">{copy.creator.tax.days(60)}</option>
                   </select>
                 </div>
               </div>
@@ -730,7 +735,7 @@ export function QuoteCreator({
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
                 <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--gold)" }}>
-                  ⚡ Ajout rapide depuis le catalogue & stock :
+                  {copy.creator.quickAdd.title}
                 </span>
                 <button
                   type="button"
@@ -739,7 +744,7 @@ export function QuoteCreator({
                   style={{ fontSize: "0.78rem", padding: "0.3rem 0.65rem" }}
                   disabled={isPending}
                 >
-                  + Ligne libre
+                  {copy.creator.quickAdd.freeLine}
                 </button>
               </div>
 
@@ -754,7 +759,7 @@ export function QuoteCreator({
                   }}
                   disabled={isPending}
                 >
-                  <option value="">⚡ + Article / Borne / Service...</option>
+                  <option value="">{copy.creator.quickAdd.articleOption}</option>
                   {articles.map((art) => (
                     <option key={art.id} value={art.id}>
                       [{art.category}] {art.name} · {formatXof(art.unitPriceXof)}
@@ -772,19 +777,19 @@ export function QuoteCreator({
                   }}
                   disabled={isPending}
                 >
-                  <option value="">🚗 + Véhicule en stock / arrivage...</option>
+                  <option value="">{copy.creator.quickAdd.vehicleOption}</option>
                   {vehicles.map((v) => {
                     const statusBadge =
                       v.status === "EN_MAGASIN" || v.status === "EN_STOCK"
-                        ? "🟢 Showroom"
+                        ? copy.creator.quickAdd.vehicleStatus.showroom
                         : v.status === "AU_PORT"
-                        ? "⚓ Au Port"
+                        ? copy.creator.quickAdd.vehicleStatus.port
                         : v.status === "EN_TRANSIT"
-                        ? "🚢 En Transit"
+                        ? copy.creator.quickAdd.vehicleStatus.transit
                         : v.status === "EN_PRODUCTION"
-                        ? "🏭 Production"
+                        ? copy.creator.quickAdd.vehicleStatus.production
                         : v.status === "COMMANDE"
-                        ? "📋 Commande"
+                        ? copy.creator.quickAdd.vehicleStatus.order
                         : "";
                     const badgeText = statusBadge ? ` [${statusBadge}]` : "";
                     const variantText = v.variant ? ` · ${v.variant}` : "";
@@ -824,7 +829,7 @@ export function QuoteCreator({
                           borderRadius: 4,
                         }}
                       >
-                        {stagedItem.type === "VEHICLE" ? "🚗 VÉHICULE EN STOCK" : "⚡ ARTICLE / SERVICE"}
+                        {stagedItem.type === "VEHICLE" ? copy.creator.staged.vehicleBadge : copy.creator.staged.articleBadge}
                       </span>
                       <strong style={{ color: "var(--ice-text-strong)", fontSize: "0.95rem" }}>
                         {stagedItem.title}
@@ -846,7 +851,7 @@ export function QuoteCreator({
                   <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 14 }}>
                     {/* Quantité avec stepper */}
                     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                      <label style={{ fontSize: "0.75rem", opacity: 0.8 }}>Quantité à ajouter :</label>
+                      <label style={{ fontSize: "0.75rem", opacity: 0.8 }}>{copy.creator.staged.quantityLabel}</label>
                       <div
                         style={{
                           display: "inline-flex",
@@ -915,11 +920,11 @@ export function QuoteCreator({
                     <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1, minWidth: 200 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <label style={{ fontSize: "0.75rem", opacity: 0.8 }}>
-                          Prix unitaire (modifiable selon négociation) :
+                          {copy.creator.staged.unitPriceLabel}
                         </label>
                         {stagedItem.unitPriceXof !== stagedItem.catalogPriceXof && (
                           <span style={{ fontSize: "0.7rem", color: "var(--gold)" }}>
-                            Base catalogue : {formatXof(stagedItem.catalogPriceXof)}
+                            {copy.creator.staged.catalogBase(formatXof(stagedItem.catalogPriceXof))}
                           </span>
                         )}
                       </div>
@@ -954,7 +959,7 @@ export function QuoteCreator({
                     {/* Total et validation */}
                     <div style={{ display: "flex", alignItems: "flex-end", gap: 12, marginLeft: "auto" }}>
                       <div style={{ textAlign: "right", marginRight: 6 }}>
-                        <div style={{ fontSize: "0.7rem", opacity: 0.65 }}>Ligne calculée</div>
+                        <div style={{ fontSize: "0.7rem", opacity: 0.65 }}>{copy.creator.staged.lineCalc}</div>
                         <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--gold)" }}>
                           {formatXof(stagedItem.quantity * stagedItem.unitPriceXof)}
                         </div>
@@ -983,7 +988,7 @@ export function QuoteCreator({
                         }}
                       >
                         <Plus size={16} />
-                        Insérer dans le devis
+                        {copy.creator.staged.insert}
                       </button>
                     </div>
                   </div>
@@ -1042,10 +1047,13 @@ export function QuoteCreator({
                 }}
               >
                 <span style={{ fontWeight: 650, color: "var(--ice-text)" }}>
-                  Lignes du devis ({lines.length}) · {lines.reduce((s, l) => s + (l.quantity || 0), 0)} article(s) au total
+                  {copy.creator.lines.header(
+                    lines.length,
+                    lines.reduce((s, l) => s + (l.quantity || 0), 0)
+                  )}
                 </span>
                 <span style={{ opacity: 0.65, fontSize: "0.75rem" }}>
-                  💡 Vous pouvez modifier la désignation, la quantité et le prix unitaire directement sur chaque ligne.
+                  {copy.creator.lines.tip}
                 </span>
               </div>
 
@@ -1066,10 +1074,10 @@ export function QuoteCreator({
                         opacity: 0.7,
                       }}
                     >
-                      <th style={{ padding: "0.6rem 0.5rem", width: "42%" }}>Désignation / Article</th>
-                      <th style={{ padding: "0.6rem 0.5rem", width: "16%", textAlign: "center" }}>Quantité</th>
-                      <th style={{ padding: "0.6rem 0.5rem", width: "22%", textAlign: "right" }}>P.U. (XOF)</th>
-                      <th style={{ padding: "0.6rem 0.5rem", width: "15%", textAlign: "right" }}>Total</th>
+                      <th style={{ padding: "0.6rem 0.5rem", width: "42%" }}>{copy.creator.lines.colDescription}</th>
+                      <th style={{ padding: "0.6rem 0.5rem", width: "16%", textAlign: "center" }}>{copy.creator.lines.colQuantity}</th>
+                      <th style={{ padding: "0.6rem 0.5rem", width: "22%", textAlign: "right" }}>{copy.creator.lines.colUnitPrice}</th>
+                      <th style={{ padding: "0.6rem 0.5rem", width: "15%", textAlign: "right" }}>{copy.creator.lines.colTotal}</th>
                       <th style={{ padding: "0.6rem 0.5rem", width: "5%", textAlign: "center" }}></th>
                     </tr>
                   </thead>
@@ -1091,7 +1099,7 @@ export function QuoteCreator({
                               type="text"
                               className="ox-input"
                               style={{ width: "100%", fontSize: "0.85rem" }}
-                              placeholder={`Ligne ${idx + 1} · ex: TOYOTA COROLLA CROSS, Borne Wallbox...`}
+                              placeholder={copy.creator.lines.placeholder(idx + 1)}
                               value={line.description}
                               onChange={(e) => updateLine(line.id, "description", e.target.value)}
                               disabled={isPending}
@@ -1119,7 +1127,7 @@ export function QuoteCreator({
                                   padding: "4px 7px",
                                   cursor: "pointer",
                                 }}
-                                title="Diminuer la quantité"
+                                title={copy.creator.lines.decrease}
                                 disabled={isPending}
                               >
                                 <Minus size={12} />
@@ -1155,7 +1163,7 @@ export function QuoteCreator({
                                   padding: "4px 7px",
                                   cursor: "pointer",
                                 }}
-                                title="Augmenter la quantité"
+                                title={copy.creator.lines.increase}
                                 disabled={isPending}
                               >
                                 <Plus size={12} />
@@ -1205,7 +1213,7 @@ export function QuoteCreator({
                                 cursor: "pointer",
                                 opacity: 0.7,
                               }}
-                              title="Supprimer cette ligne"
+                              title={copy.creator.lines.remove}
                               disabled={isPending}
                             >
                               <Trash2 size={16} />
@@ -1242,7 +1250,7 @@ export function QuoteCreator({
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                   <span style={{ fontWeight: 700, fontSize: "0.82rem", color: "var(--ice-highlight)" }}>
-                    📜 CGV adossées en Page 2 :
+                    {copy.creator.cgv.title}
                   </span>
                   <div
                     style={{
@@ -1265,7 +1273,7 @@ export function QuoteCreator({
                         color: cgvType === "VEHICULE" ? "#fff" : "var(--ice-text)",
                       }}
                     >
-                      🚗 Véhicules
+                      🚗 {copy.creator.cgv.vehicle}
                     </button>
                     <button
                       type="button"
@@ -1280,7 +1288,7 @@ export function QuoteCreator({
                         color: cgvType === "ATELIER" ? "#fff" : "var(--ice-text)",
                       }}
                     >
-                      🔧 Atelier SAV
+                      🔧 {copy.creator.cgv.workshop}
                     </button>
                   </div>
                 </div>
@@ -1291,7 +1299,7 @@ export function QuoteCreator({
                   className="ox-btn ox-btn-ghost ox-btn-sm"
                   style={{ fontSize: "0.75rem", padding: "0.25rem 0.55rem" }}
                 >
-                  {showCgvEditor ? "Masquer texte" : "Personnaliser le texte"}
+                  {showCgvEditor ? copy.creator.cgv.hideText : copy.creator.cgv.editText}
                 </button>
               </div>
 
@@ -1308,7 +1316,11 @@ export function QuoteCreator({
                     }}
                   >
                     <span>
-                      Texte contractuel applicable ({cgvType === "VEHICULE" ? "Vente Véhicules" : "Atelier SAV"}) :
+                      {copy.creator.cgv.applicable(
+                        cgvType === "VEHICULE"
+                          ? copy.creator.cgv.kindVehicle
+                          : copy.creator.cgv.kindWorkshop
+                      )}
                     </span>
                     {isCgvCustomized && (
                       <button
@@ -1326,7 +1338,7 @@ export function QuoteCreator({
                           fontWeight: 600,
                         }}
                       >
-                        ↺ Réinitialiser au texte officiel
+                        {copy.creator.cgv.reset}
                       </button>
                     )}
                   </div>
@@ -1366,7 +1378,7 @@ export function QuoteCreator({
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <Tag size={16} color="var(--gold)" />
                   <span style={{ fontWeight: 700, fontSize: "0.82rem", color: "var(--gold)" }}>
-                    Stratégie Commerciale &amp; Remise :
+                    {copy.creator.discount.title}
                   </span>
                 </div>
 
@@ -1395,7 +1407,7 @@ export function QuoteCreator({
                       color: discountType === "NONE" ? "#fff" : "var(--ice-text-muted)",
                     }}
                   >
-                    Sans remise
+                    {copy.creator.discount.none}
                   </button>
                   <button
                     type="button"
@@ -1413,7 +1425,7 @@ export function QuoteCreator({
                       color: discountType === "PERCENT" ? "#fff" : "var(--ice-text-muted)",
                     }}
                   >
-                    % Pourcentage
+                    {copy.creator.discount.percent}
                   </button>
                   <button
                     type="button"
@@ -1431,14 +1443,14 @@ export function QuoteCreator({
                       color: discountType === "AMOUNT" ? "#0a1622" : "var(--ice-text-muted)",
                     }}
                   >
-                    Montant Fixe
+                    {copy.creator.discount.fixed}
                   </button>
                 </div>
               </div>
 
               {discountType === "PERCENT" && (
                 <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10, paddingTop: 4 }}>
-                  <span style={{ fontSize: "0.8rem", opacity: 0.8 }}>Paliers rapides :</span>
+                  <span style={{ fontSize: "0.8rem", opacity: 0.8 }}>{copy.creator.discount.tiers}</span>
                   {[2, 5, 7, 10, 15, 20].map((pct) => (
                     <button
                       key={pct}
@@ -1455,12 +1467,12 @@ export function QuoteCreator({
                         cursor: "pointer",
                       }}
                     >
-                      -{pct} %
+                      {copy.creator.discount.percentOff(pct)}
                     </button>
                   ))}
 
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: "auto" }}>
-                    <label style={{ fontSize: "0.8rem", opacity: 0.8 }}>Taux personnalisé :</label>
+                    <label style={{ fontSize: "0.8rem", opacity: 0.8 }}>{copy.creator.discount.customRate}</label>
                     <div style={{ position: "relative", width: 85 }}>
                       <input
                         type="number"
@@ -1479,14 +1491,14 @@ export function QuoteCreator({
                   </div>
 
                   <div style={{ width: "100%", fontSize: "0.82rem", color: "var(--gold)", fontWeight: 650 }}>
-                    ✨ Remise accordée : -{formatXof(discountAmount)} déduite du montant brut
+                    ✨ {copy.creator.discount.granted(formatXof(discountAmount))}
                   </div>
                 </div>
               )}
 
               {discountType === "AMOUNT" && (
                 <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10, paddingTop: 4 }}>
-                  <label style={{ fontSize: "0.8rem", opacity: 0.8 }}>Montant net de la remise accordée :</label>
+                  <label style={{ fontSize: "0.8rem", opacity: 0.8 }}>{copy.creator.discount.amountLabel}</label>
                   <div style={{ position: "relative", width: 220 }}>
                     <input
                       type="number"
@@ -1503,7 +1515,7 @@ export function QuoteCreator({
                   </div>
 
                   <div style={{ fontSize: "0.82rem", color: "var(--gold)", fontWeight: 650, marginLeft: "auto" }}>
-                    ✨ Remise déduite : -{formatXof(discountAmount)} ({grossTotal > 0 ? ((discountAmount / grossTotal) * 100).toFixed(1) : 0}% du brut)
+                    ✨ {copy.creator.discount.deducted(formatXof(discountAmount), (grossTotal > 0 ? ((discountAmount / grossTotal) * 100).toFixed(1) : "0"))}
                   </div>
                 </div>
               )}
@@ -1521,12 +1533,12 @@ export function QuoteCreator({
             >
               <div>
                 <label style={{ display: "block", fontSize: "0.8rem", opacity: 0.8, marginBottom: 4 }}>
-                  Notes & Conditions particulières (imprimées sur le devis)
+                  {copy.creator.totals.notesLabel}
                 </label>
                 <textarea
                   className="ox-input"
                   style={{ width: "100%", height: 90, fontSize: "0.85rem" }}
-                  placeholder="Ex: Livraison sous 48h au Showroom (Zone Maro-Militaire, Gbèdomidji). Câble de recharge Type 2 et première révision offerts. Garantie batterie 8 ans / 150 000 km."
+                  placeholder={copy.creator.totals.notesPlaceholder}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   disabled={isPending}
@@ -1545,7 +1557,7 @@ export function QuoteCreator({
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem" }}>
-                  <span style={{ opacity: 0.7 }}>Sous-total Brut HT :</span>
+                  <span style={{ opacity: 0.7 }}>{copy.creator.totals.gross}</span>
                   <span style={{ fontWeight: 600 }}>{formatXof(totals.grossHtXof)}</span>
                 </div>
 
@@ -1553,7 +1565,9 @@ export function QuoteCreator({
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem", color: "var(--gold)" }}>
                     <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
                       <Tag size={13} />
-                      Remise Commerciale {discountType === "PERCENT" ? `(-${discountValue}%)` : ""} :
+                      {copy.creator.totals.commercialDiscount(
+                        discountType === "PERCENT" ? String(discountValue) : null
+                      )}
                     </span>
                     <span style={{ fontWeight: 700 }}>-{formatXof(totals.discountXof)}</span>
                   </div>
@@ -1569,13 +1583,13 @@ export function QuoteCreator({
                       paddingTop: 4,
                     }}
                   >
-                    <span style={{ opacity: 0.7 }}>Net Commercial HT :</span>
+                    <span style={{ opacity: 0.7 }}>{copy.creator.totals.netHt}</span>
                     <span style={{ fontWeight: 600 }}>{formatXof(totals.subtotalHtXof)}</span>
                   </div>
                 )}
 
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem" }}>
-                  <span style={{ opacity: 0.7 }}>TVA Bénin ({taxRatePct}%) :</span>
+                  <span style={{ opacity: 0.7 }}>{copy.creator.totals.vat(taxRatePct)}</span>
                   <span style={{ fontWeight: 600 }}>{formatXof(totals.taxXof)}</span>
                 </div>
 
@@ -1590,7 +1604,7 @@ export function QuoteCreator({
                   }}
                 >
                   <span style={{ fontWeight: 700, fontSize: "1.05rem", color: "var(--gold)" }}>
-                    Total TTC Net ({taxMode}) :
+                    {copy.creator.totals.totalTtc(taxMode)}
                   </span>
                   <span style={{ fontWeight: 800, fontSize: "1.35rem", color: "var(--ice-text-strong)" }}>
                     {formatXof(totals.totalXof)}
@@ -1629,7 +1643,7 @@ export function QuoteCreator({
                 className="ox-btn ox-btn-ghost"
                 disabled={isPending}
               >
-                Annuler
+                {copy.common.cancel}
               </button>
               <button
                 type="button"
@@ -1646,11 +1660,11 @@ export function QuoteCreator({
                 }}
               >
                 {isPending ? (
-                  <span>Génération en cours...</span>
+                  <span>{copy.creator.submit.creating}</span>
                 ) : (
                   <>
                     <Check size={18} />
-                    Créer la Proforma
+                    {copy.creator.submit.create}
                   </>
                 )}
               </button>
@@ -1715,10 +1729,10 @@ export function QuoteCreator({
             >
               <div>
                 <h3 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700, color: "var(--ice-text-strong)" }}>
-                  Nouveau Client (Ajout express)
+                  {copy.creator.newClient.title}
                 </h3>
                 <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", marginTop: 2 }}>
-                  Coordonnées client &amp; identifiant fiscal IFU pour le devis
+                  {copy.creator.newClient.subtitle}
                 </div>
               </div>
               <button
@@ -1755,12 +1769,12 @@ export function QuoteCreator({
             <form onSubmit={handleQuickCreateClient} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div>
                 <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: 4 }}>
-                  Nom &amp; Prénom du Contact *
+                  {copy.creator.newClient.nameLabel}
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Ex: Dr. Nadine HOUVI, M. Michel DOSSOU"
+                  placeholder={copy.creator.newClient.namePlaceholder}
                   value={newContactName}
                   onChange={(e) => setNewContactName(e.target.value)}
                   className="ox-input"
@@ -1771,11 +1785,11 @@ export function QuoteCreator({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: 4 }}>
-                  Entreprise / Société (optionnel)
+                  {copy.creator.newClient.companyLabel}
                 </label>
                 <input
                   type="text"
-                  placeholder="Ex: Benin Logistics SA, Cabinet Alpha..."
+                  placeholder={copy.creator.newClient.companyPlaceholder}
                   value={newCompanyName}
                   onChange={(e) => setNewCompanyName(e.target.value)}
                   className="ox-input"
@@ -1786,21 +1800,21 @@ export function QuoteCreator({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: 4 }}>
-                    N° IFU Bénin (Fiscal &amp; Immatriculation)
+                    {copy.creator.newClient.ifuLabel}
                   </label>
                   <input
                     type="text"
-                    placeholder="Ex: 0201910815523"
+                    placeholder={copy.creator.newClient.ifuPlaceholder}
                     value={newIfu}
                     onChange={(e) => setNewIfu(e.target.value)}
                     className="ox-input"
                     style={{ width: "100%", fontSize: "0.88rem", borderColor: newIfu ? "var(--ok)" : undefined }}
                   />
-                  <span style={{ fontSize: "0.7rem", opacity: 0.65 }}>Requis pour facture &amp; ANaTT</span>
+                  <span style={{ fontSize: "0.7rem", opacity: 0.65 }}>{copy.creator.newClient.ifuHint}</span>
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: 4 }}>
-                    Catégorie
+                    {copy.creator.newClient.categoryLabel}
                   </label>
                   <select
                     value={newCategory}
@@ -1808,10 +1822,10 @@ export function QuoteCreator({
                     className="ox-select"
                     style={{ width: "100%", fontSize: "0.88rem" }}
                   >
-                    <option value="Particulier">Particulier</option>
-                    <option value="Entreprise">Entreprise</option>
-                    <option value="ONG / Diplomate">ONG / Diplomate</option>
-                    <option value="Flotte">Flotte</option>
+                    <option value="Particulier">{copy.creator.newClient.categories.particulier}</option>
+                    <option value="Entreprise">{copy.creator.newClient.categories.entreprise}</option>
+                    <option value="ONG / Diplomate">{copy.creator.newClient.categories.ong}</option>
+                    <option value="Flotte">{copy.creator.newClient.categories.flotte}</option>
                   </select>
                 </div>
               </div>
@@ -1819,11 +1833,11 @@ export function QuoteCreator({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: 4 }}>
-                    Téléphone
+                    {copy.creator.newClient.phoneLabel}
                   </label>
                   <input
                     type="tel"
-                    placeholder="+229 01 97 00 00 00"
+                    placeholder={copy.creator.newClient.phonePlaceholder}
                     value={newPhone}
                     onChange={(e) => setNewPhone(e.target.value)}
                     className="ox-input"
@@ -1832,11 +1846,11 @@ export function QuoteCreator({
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: 4 }}>
-                    Adresse E-mail
+                    {copy.creator.newClient.emailLabel}
                   </label>
                   <input
                     type="email"
-                    placeholder="client@domaine.bj"
+                    placeholder={copy.creator.newClient.emailPlaceholder}
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
                     className="ox-input"
@@ -1847,11 +1861,11 @@ export function QuoteCreator({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: 4 }}>
-                  Adresse physique (Showroom / Livraison)
+                  {copy.creator.newClient.addressLabel}
                 </label>
                 <input
                   type="text"
-                  placeholder="Ex: Haie Vive, Rue 340, Cotonou"
+                  placeholder={copy.creator.newClient.addressPlaceholder}
                   value={newAddress}
                   onChange={(e) => setNewAddress(e.target.value)}
                   className="ox-input"
@@ -1875,7 +1889,7 @@ export function QuoteCreator({
                   className="ox-btn ox-btn-ghost"
                   disabled={isCreatingClient}
                 >
-                  Annuler
+                  {copy.common.cancel}
                 </button>
                 <button
                   type="submit"
@@ -1889,7 +1903,9 @@ export function QuoteCreator({
                     color: "#fff",
                   }}
                 >
-                  {isCreatingClient ? "Création..." : "Enregistrer et Sélectionner"}
+                  {isCreatingClient
+                    ? copy.creator.newClient.creating
+                    : copy.creator.newClient.submit}
                 </button>
               </div>
             </form>

@@ -3,6 +3,13 @@
 import { useState } from "react";
 import { Badge, DataTable } from "@/components/ui";
 import { Edit2, X, Search } from "lucide-react";
+import { usePrefs } from "@/components/PrefsProvider";
+import {
+  crmCopy,
+  leadEnergyLabel,
+  leadSourceLabel,
+  leadStatusLabel,
+} from "@/lib/i18n/messages/crm";
 import { createLead, updateLead, advanceLead } from "./actions";
 
 export const LEAD_SOURCES = [
@@ -37,6 +44,9 @@ export type LeadItem = {
 };
 
 export function LeadsView({ leads }: { leads: LeadItem[] }) {
+  const { locale } = usePrefs();
+  const copy = crmCopy[locale];
+  const leadsCopy = copy.leads;
   const [editingLead, setEditingLead] = useState<LeadItem | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterSource, setFilterSource] = useState("");
@@ -58,27 +68,27 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
     <>
       {/* Formulaire de création rapide */}
       <form action={createLead} style={formRow} className="ox-glass">
-        <input name="contactName" placeholder="Nom *" required style={input} />
-        <input name="email" placeholder="Email" style={input} />
-        <input name="phone" placeholder="Téléphone" style={input} />
+        <input name="contactName" placeholder={leadsCopy.form.contactPlaceholder} required style={input} />
+        <input name="email" placeholder={leadsCopy.form.emailPlaceholder} style={input} />
+        <input name="phone" placeholder={leadsCopy.form.phonePlaceholder} style={input} />
         <select name="source" style={input} defaultValue="showroom">
           {LEAD_SOURCES.map((s) => (
             <option key={s.value} value={s.value}>
-              {s.label}
+              {leadSourceLabel(copy, s.value)}
             </option>
           ))}
         </select>
-        <input name="interest" placeholder="Intérêt (SUV, berline…)" style={input} />
+        <input name="interest" placeholder={leadsCopy.form.interestPlaceholder} style={input} />
         <select name="energyPref" style={input} defaultValue="">
-          <option value="">Énergie (opt.)</option>
-          <option value="ELECTRIQUE">Électrique</option>
-          <option value="HYBRIDE">Hybride</option>
-          <option value="PHEV">PHEV</option>
-          <option value="ESSENCE">Essence</option>
-          <option value="DIESEL">Diesel</option>
+          <option value="">{leadsCopy.form.energyPlaceholder}</option>
+          <option value="ELECTRIQUE">{leadsCopy.energy.ELECTRIQUE}</option>
+          <option value="HYBRIDE">{leadsCopy.energy.HYBRIDE}</option>
+          <option value="PHEV">{leadsCopy.energy.PHEV}</option>
+          <option value="ESSENCE">{leadsCopy.energy.ESSENCE}</option>
+          <option value="DIESEL">{leadsCopy.energy.DIESEL}</option>
         </select>
         <button type="submit" style={btn}>
-          + Nouveau prospect
+          {leadsCopy.form.submit}
         </button>
       </form>
 
@@ -88,7 +98,7 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
           <Search size={14} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", opacity: 0.5 }} />
           <input
             type="text"
-            placeholder="Rechercher par nom, email, téléphone, intérêt..."
+            placeholder={leadsCopy.search.placeholder}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ ...input, width: "100%", paddingLeft: 32 }}
@@ -100,10 +110,10 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
           onChange={(e) => setFilterSource(e.target.value)}
           style={{ ...input, minWidth: 160 }}
         >
-          <option value="">Toutes les sources</option>
+          <option value="">{leadsCopy.search.allSources}</option>
           {LEAD_SOURCES.map((s) => (
             <option key={s.value} value={s.value}>
-              {s.label}
+              {leadSourceLabel(copy, s.value)}
             </option>
           ))}
         </select>
@@ -111,7 +121,15 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
 
       {/* Table des prospects avec action Modifier */}
       <DataTable
-        headers={["Contact", "Source", "Intérêt", "Énergie", "Assigné", "Statut", "Actions"]}
+        headers={[
+          leadsCopy.table.contact,
+          leadsCopy.table.source,
+          leadsCopy.table.interest,
+          leadsCopy.table.energy,
+          leadsCopy.table.assignee,
+          leadsCopy.table.status,
+          leadsCopy.table.actions,
+        ]}
         rows={filteredLeads.map((l) => [
           <div key={l.id}>
             <div style={{ fontWeight: 650 }}>{l.contactName}</div>
@@ -129,12 +147,12 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
               fontSize: "0.78rem",
             }}
           >
-            {SOURCE_LABELS[l.source] || l.source}
+            {leadSourceLabel(copy, l.source)}
           </span>,
           l.interest || "-",
-          l.energyPref || "-",
+          l.energyPref ? leadEnergyLabel(copy, l.energyPref) : "-",
           l.assignee?.fullName || "-",
-          <Badge key={`s-${l.id}`}>{l.status}</Badge>,
+          <Badge key={`s-${l.id}`}>{leadStatusLabel(copy, l.status)}</Badge>,
           <div key={`act-${l.id}`} style={{ display: "flex", alignItems: "center", gap: 6 }}>
             {/* Bouton Modifier */}
             <button
@@ -153,10 +171,10 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
                 fontWeight: 600,
                 cursor: "pointer",
               }}
-              title="Modifier les données de ce prospect"
+              title={leadsCopy.actions.editTitle}
             >
               <Edit2 size={12} color="var(--gold, #d4af37)" />
-              <span>Modifier</span>
+              <span>{leadsCopy.actions.edit}</span>
             </button>
 
             {/* Changement de statut */}
@@ -164,17 +182,17 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
               <input type="hidden" name="id" value={l.id} />
               <select name="status" defaultValue={l.status} style={{ ...input, minWidth: 105, padding: "3px 6px", fontSize: "0.78rem" }}>
                 {["NEW", "CONTACTED", "QUALIFIED", "MATCHED", "TEST_DRIVE", "QUOTE_SENT", "WON", "LOST"].map((s) => (
-                  <option key={s} value={s}>{s}</option>
+                  <option key={s} value={s}>{leadStatusLabel(copy, s)}</option>
                 ))}
               </select>
-              <button type="submit" style={{ ...btnSmall, padding: "4px 8px" }}>OK</button>
+              <button type="submit" style={{ ...btnSmall, padding: "4px 8px" }}>{leadsCopy.actions.apply}</button>
             </form>
           </div>,
         ])}
       />
 
       <p style={{ opacity: 0.65, fontSize: "0.85rem", marginTop: 12 }}>
-        Semi-auto : faire passer le statut QUALIFIED → MATCHED après sélection stock, puis essai / devis.
+        {leadsCopy.hint}
       </p>
 
       {/* Modal de Modification Prospect */}
@@ -205,7 +223,7 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
               <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700, color: "var(--ice-text)" }}>
-                ✏️ Modifier le Prospect
+                {leadsCopy.modal.title}
               </h3>
               <button
                 type="button"
@@ -227,7 +245,7 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                  Nom complet / Contact *
+                  {leadsCopy.modal.nameLabel}
                 </label>
                 <input
                   name="contactName"
@@ -240,7 +258,7 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Email
+                    {leadsCopy.modal.emailLabel}
                   </label>
                   <input
                     name="email"
@@ -251,7 +269,7 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Téléphone
+                    {leadsCopy.modal.phoneLabel}
                   </label>
                   <input
                     name="phone"
@@ -264,7 +282,7 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Source d&apos;acquisition
+                    {leadsCopy.modal.sourceLabel}
                   </label>
                   <select
                     name="source"
@@ -273,7 +291,7 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
                   >
                     {LEAD_SOURCES.map((s) => (
                       <option key={s.value} value={s.value}>
-                        {s.label}
+                        {leadSourceLabel(copy, s.value)}
                       </option>
                     ))}
                   </select>
@@ -281,7 +299,7 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Statut actuel
+                    {leadsCopy.modal.statusLabel}
                   </label>
                   <select
                     name="status"
@@ -289,7 +307,7 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
                     style={{ ...input, width: "100%" }}
                   >
                     {["NEW", "CONTACTED", "QUALIFIED", "MATCHED", "TEST_DRIVE", "QUOTE_SENT", "WON", "LOST"].map((s) => (
-                      <option key={s} value={s}>{s}</option>
+                      <option key={s} value={s}>{leadStatusLabel(copy, s)}</option>
                     ))}
                   </select>
                 </div>
@@ -298,7 +316,7 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Intérêt (Modèle / Catégorie)
+                    {leadsCopy.modal.interestLabel}
                   </label>
                   <input
                     name="interest"
@@ -309,19 +327,19 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Préférence Énergie
+                    {leadsCopy.modal.energyLabel}
                   </label>
                   <select
                     name="energyPref"
                     defaultValue={editingLead.energyPref || ""}
                     style={{ ...input, width: "100%" }}
                   >
-                    <option value="">Aucune</option>
-                    <option value="ELECTRIQUE">Électrique</option>
-                    <option value="HYBRIDE">Hybride</option>
-                    <option value="PHEV">PHEV</option>
-                    <option value="ESSENCE">Essence</option>
-                    <option value="DIESEL">Diesel</option>
+                    <option value="">{leadsCopy.energyNone}</option>
+                    <option value="ELECTRIQUE">{leadsCopy.energy.ELECTRIQUE}</option>
+                    <option value="HYBRIDE">{leadsCopy.energy.HYBRIDE}</option>
+                    <option value="PHEV">{leadsCopy.energy.PHEV}</option>
+                    <option value="ESSENCE">{leadsCopy.energy.ESSENCE}</option>
+                    <option value="DIESEL">{leadsCopy.energy.DIESEL}</option>
                   </select>
                 </div>
               </div>
@@ -340,7 +358,7 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
                     cursor: "pointer",
                   }}
                 >
-                  Annuler
+                  {leadsCopy.modal.cancel}
                 </button>
                 <button
                   type="submit"
@@ -355,7 +373,7 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
                     cursor: "pointer",
                   }}
                 >
-                  Enregistrer les modifications
+                  {leadsCopy.modal.save}
                 </button>
               </div>
             </form>

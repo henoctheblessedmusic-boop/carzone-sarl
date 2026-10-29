@@ -25,7 +25,8 @@ import {
   Paperclip,
   FileCheck2,
 } from "lucide-react";
-import { formatDate } from "@/lib/format";
+import { usePrefs } from "@/components/PrefsProvider";
+import { clientsCopy } from "@/lib/i18n/messages/clients";
 import {
   createCustomer,
   updateCustomer,
@@ -81,6 +82,8 @@ export function ClientsView({
   initialCustomers: CustomerItem[];
   canManage: boolean;
 }) {
+  const { locale } = usePrefs();
+  const copy = clientsCopy[locale];
   const [customers, setCustomers] = useState(initialCustomers);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL");
@@ -125,7 +128,7 @@ export function ClientsView({
     try {
       const fd = new FormData();
       fd.append("customerId", selectedDocCustomer.id);
-      fd.append("title", docTitle || docFileName || "Document Client");
+      fd.append("title", docTitle || docFileName || copy.docsModal.defaultTitle);
       fd.append("docType", docType);
       fd.append("fileName", docFileName);
       fd.append("fileSize", String(docFileSize));
@@ -164,7 +167,7 @@ export function ClientsView({
 
   async function handleDeleteDoc(docId: string) {
     if (!selectedDocCustomer) return;
-    if (!window.confirm("Supprimer ce document ?")) return;
+    if (!window.confirm(copy.confirmations.deleteDocument)) return;
     setIsUploadingDoc(true);
     try {
       await deleteCustomerDocument(docId, selectedDocCustomer.id);
@@ -194,7 +197,7 @@ export function ClientsView({
 
   async function handleTransmitImmatriculation() {
     if (!selectedDocCustomer || !selectedDocCustomer.documents || selectedDocCustomer.documents.length === 0) {
-      alert("Veuillez d'abord téléverser au moins un document pour ce client (CIP, IFU...)");
+      alert(copy.confirmations.uploadFirst);
       return;
     }
     setIsUploadingDoc(true);
@@ -221,7 +224,7 @@ export function ClientsView({
             }
           : null
       );
-      setImmatriculationSuccessMsg("Dossier client et documents KYC transmis avec succès au service Immatriculation (ANaTT) !");
+      setImmatriculationSuccessMsg(copy.confirmations.transferSuccess);
     } finally {
       setIsUploadingDoc(false);
     }
@@ -262,23 +265,7 @@ export function ClientsView({
   });
 
   function exportCsv() {
-    const headers = [
-      "ID",
-      "Contact",
-      "Entreprise",
-      "N° IFU",
-      "Email",
-      "Téléphone",
-      "Adresse",
-      "Ville",
-      "Catégorie",
-      "Notes Showroom",
-      "Documents",
-      "Statut",
-      "Devis",
-      "Factures",
-      "Date Création",
-    ];
+    const headers = copy.csv.headers;
     const rows = filteredCustomers.map((c) => [
       c.id,
       `"${c.contactName.replace(/"/g, '""')}"`,
@@ -291,10 +278,10 @@ export function ClientsView({
       `"${(c.category || "").replace(/"/g, '""')}"`,
       `"${(c.showroomNotes || "").replace(/"/g, '""')}"`,
       c.documents?.length || 0,
-      c.active ? "Actif" : "Inactif",
+      c.active ? copy.status.active : copy.status.inactive,
       c._count.quotes,
       c._count.invoices,
-      formatDate(c.createdAt),
+      copy.formatDate(c.createdAt),
     ]);
 
     const csvContent = "\uFEFF" + [headers.join(";"), ...rows.map((r) => r.join(";"))].join("\r\n");
@@ -322,8 +309,8 @@ export function ClientsView({
     const hasHistory =
       customer._count.quotes > 0 || customer._count.invoices > 0 || customer._count.rentals > 0;
     const msg = hasHistory
-      ? `Ce client possède des devis ou factures liés. Il sera désactivé pour préserver l'historique comptable. Confirmer ?`
-      : `Voulez-vous vraiment supprimer définitivement le client "${customer.contactName}" ?`;
+      ? copy.confirmations.deleteWithHistory
+      : copy.confirmations.deletePermanent(customer.contactName);
 
     if (!window.confirm(msg)) return;
 
@@ -352,20 +339,20 @@ export function ClientsView({
         <div className="ox-glass" style={{ padding: "1.1rem 1.25rem", borderRadius: 16 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: "0.85rem", color: "var(--ice-text-muted)", fontWeight: 550 }}>
-              Total Clients
+              {copy.stats.totalTitle}
             </span>
             <User size={18} style={{ color: "var(--brand)" }} />
           </div>
           <div className="ox-metric-val" style={{ fontSize: "1.85rem", marginTop: 4 }}>{totalCount}</div>
           <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", marginTop: 2 }}>
-            Base active CARZONE Motors
+            {copy.stats.totalHint}
           </div>
         </div>
 
         <div className="ox-glass" style={{ padding: "1.1rem 1.25rem", borderRadius: 16 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: "0.85rem", opacity: 0.7, fontWeight: 550 }}>
-              Clients Actifs
+              {copy.stats.activeTitle}
             </span>
             <CheckCircle2 size={18} style={{ color: "var(--ok)" }} />
           </div>
@@ -373,14 +360,14 @@ export function ClientsView({
             {activeCount}
           </div>
           <div style={{ fontSize: "0.8rem", opacity: 0.65, marginTop: 2 }}>
-            {totalCount > 0 ? Math.round((activeCount / totalCount) * 100) : 0}% du portefeuille
+            {copy.stats.activeShare(totalCount > 0 ? Math.round((activeCount / totalCount) * 100) : 0)}
           </div>
         </div>
 
         <div className="ox-glass" style={{ padding: "1.1rem 1.25rem", borderRadius: 16 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: "0.85rem", opacity: 0.7, fontWeight: 550 }}>
-              Entreprises & Flottes
+              {copy.stats.companiesTitle}
             </span>
             <Building2 size={18} style={{ color: "var(--gold)" }} />
           </div>
@@ -388,14 +375,14 @@ export function ClientsView({
             {companyCount}
           </div>
           <div style={{ fontSize: "0.8rem", opacity: 0.65, marginTop: 2 }}>
-            Comptes professionnels
+            {copy.stats.companiesHint}
           </div>
         </div>
 
         <div className="ox-glass" style={{ padding: "1.1rem 1.25rem", borderRadius: 16 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: "0.85rem", opacity: 0.7, fontWeight: 550 }}>
-              Particuliers
+              {copy.stats.individualsTitle}
             </span>
             <User size={18} style={{ opacity: 0.7 }} />
           </div>
@@ -403,7 +390,7 @@ export function ClientsView({
             {individualCount}
           </div>
           <div style={{ fontSize: "0.8rem", opacity: 0.65, marginTop: 2 }}>
-            Acheteurs individuels
+            {copy.stats.individualsHint}
           </div>
         </div>
       </div>
@@ -436,7 +423,7 @@ export function ClientsView({
             />
             <input
               type="text"
-              placeholder="Rechercher par nom, société, email, tél..."
+              placeholder={copy.search.placeholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="ox-input"
@@ -469,9 +456,9 @@ export function ClientsView({
             className="ox-select"
             style={{ height: 38, fontSize: "0.88rem" }}
           >
-            <option value="ALL">Tous les statuts</option>
-            <option value="ACTIVE">Actifs uniquement</option>
-            <option value="INACTIVE">Inactifs</option>
+            <option value="ALL">{copy.filters.statusAll}</option>
+            <option value="ACTIVE">{copy.filters.statusActiveOnly}</option>
+            <option value="INACTIVE">{copy.filters.statusInactive}</option>
           </select>
 
           {/* Category Filter */}
@@ -481,12 +468,12 @@ export function ClientsView({
             className="ox-select"
             style={{ height: 38, fontSize: "0.88rem" }}
           >
-            <option value="ALL">Toutes catégories</option>
-            <option value="Entreprise">Entreprises</option>
-            <option value="Particulier">Particuliers</option>
-            <option value="ONG / Diplomate">ONG / Diplomates</option>
-            <option value="Flotte">Flottes</option>
-            <option value="Autre">Autre</option>
+            <option value="ALL">{copy.filters.categoryAll}</option>
+            <option value="Entreprise">{copy.filters.categoryCompanies}</option>
+            <option value="Particulier">{copy.filters.categoryIndividuals}</option>
+            <option value="ONG / Diplomate">{copy.filters.categoryNgos}</option>
+            <option value="Flotte">{copy.filters.categoryFleets}</option>
+            <option value="Autre">{copy.filters.categoryOther}</option>
           </select>
         </div>
 
@@ -497,10 +484,10 @@ export function ClientsView({
             onClick={exportCsv}
             className="ox-btn ox-btn-ghost"
             style={{ height: 38, padding: "0 0.9rem", fontSize: "0.88rem" }}
-            title="Exporter la liste au format CSV"
+            title={copy.toolbar.exportCsvTitle}
           >
             <Download size={15} style={{ marginRight: 6 }} />
-            Exporter CSV
+            {copy.toolbar.exportCsv}
           </button>
 
           {canManage && (
@@ -511,7 +498,7 @@ export function ClientsView({
               style={{ height: 38, padding: "0 1.1rem", fontSize: "0.88rem" }}
             >
               <Plus size={16} style={{ marginRight: 6 }} />
-              Nouveau client
+              {copy.toolbar.newCustomer}
             </button>
           )}
         </div>
@@ -522,22 +509,22 @@ export function ClientsView({
         <table className="ox-table">
           <thead>
             <tr>
-              <th style={{ width: 45 }}>N°</th>
-              <th>Contact principal</th>
-              <th>Entreprise</th>
-              <th>Coordonnées</th>
-              <th>Localisation</th>
-              <th>Catégorie</th>
-              <th>Activité liée</th>
-              <th>Statut</th>
-              <th style={{ textAlign: "right", paddingRight: "1.2rem" }}>Actions</th>
+              <th style={{ width: 45 }}>{copy.table.index}</th>
+              <th>{copy.table.contact}</th>
+              <th>{copy.table.company}</th>
+              <th>{copy.table.contactInfo}</th>
+              <th>{copy.table.location}</th>
+              <th>{copy.table.category}</th>
+              <th>{copy.table.activity}</th>
+              <th>{copy.table.status}</th>
+              <th style={{ textAlign: "right", paddingRight: "1.2rem" }}>{copy.table.actions}</th>
             </tr>
           </thead>
           <tbody>
             {filteredCustomers.length === 0 ? (
               <tr>
                 <td colSpan={9} style={{ textAlign: "center", padding: "2.5rem 1rem", opacity: 0.6 }}>
-                  Aucun client trouvé pour ces critères de recherche.
+                  {copy.table.empty}
                 </td>
               </tr>
             ) : (
@@ -586,15 +573,15 @@ export function ClientsView({
                           </Link>
                           {customer.ifu ? (
                             <div style={{ fontSize: "0.75rem", color: "var(--ice-highlight)", fontWeight: 600 }}>
-                              IFU : {customer.ifu}
+                              {copy.table.ifuPrefix}{customer.ifu}
                             </div>
                           ) : (
                             <div style={{ fontSize: "0.7rem", color: "#f59e0b", opacity: 0.85 }}>
-                              ⚠️ Sans IFU
+                              {copy.table.missingIfu}
                             </div>
                           )}
                           <div style={{ fontSize: "0.74rem", opacity: 0.55, marginTop: 1 }}>
-                            Ajouté le {formatDate(customer.createdAt)}
+                            {copy.table.addedOn(copy.formatDate(customer.createdAt))}
                           </div>
                           {customer.showroomNotes && (
                             <div
@@ -612,7 +599,7 @@ export function ClientsView({
                                 border: "1px solid rgba(212, 175, 55, 0.25)",
                               }}
                             >
-                              🏷️ Visite Showroom
+                              {copy.table.showroomVisit}
                             </div>
                           )}
                         </div>
@@ -693,7 +680,11 @@ export function ClientsView({
                               : "rgba(126, 200, 227, 0.25)",
                         }}
                       >
-                        {customer.category || (customer.companyName ? "Entreprise" : "Particulier")}
+                        {customer.category
+                          ? copy.categoryLabel(customer.category)
+                          : customer.companyName
+                          ? copy.category.company
+                          : copy.category.individual}
                       </span>
                     </td>
 
@@ -701,7 +692,7 @@ export function ClientsView({
                       <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.78rem" }}>
                         {customer._count.quotes > 0 && (
                           <span
-                            title={`${customer._count.quotes} devis/proformas`}
+                            title={copy.table.quotesTooltip(customer._count.quotes)}
                             style={{ display: "inline-flex", alignItems: "center", gap: 3, opacity: 0.85 }}
                           >
                             <FileText size={12} style={{ color: "var(--ice-highlight)" }} />
@@ -710,7 +701,7 @@ export function ClientsView({
                         )}
                         {customer._count.invoices > 0 && (
                           <span
-                            title={`${customer._count.invoices} factures`}
+                            title={copy.table.invoicesTooltip(customer._count.invoices)}
                             style={{ display: "inline-flex", alignItems: "center", gap: 3, opacity: 0.85 }}
                           >
                             <Receipt size={12} style={{ color: "var(--brand)" }} />
@@ -719,7 +710,7 @@ export function ClientsView({
                         )}
                         {customer._count.subscriptions > 0 && (
                           <span
-                            title={`${customer._count.subscriptions} abonnement(s) borne`}
+                            title={copy.table.subscriptionsTooltip(customer._count.subscriptions)}
                             style={{ display: "inline-flex", alignItems: "center", gap: 3, color: "var(--ok)" }}
                           >
                             <Zap size={12} />
@@ -729,7 +720,7 @@ export function ClientsView({
                         {customer._count.quotes === 0 &&
                           customer._count.invoices === 0 &&
                           customer._count.subscriptions === 0 && (
-                            <span style={{ opacity: 0.4 }}>Nouveau</span>
+                            <span style={{ opacity: 0.4 }}>{copy.table.noActivity}</span>
                           )}
                       </div>
                     </td>
@@ -741,9 +732,9 @@ export function ClientsView({
                         disabled={isPending || !canManage}
                         className={`ox-badge ox-badge--${customer.active ? "ok" : "bad"}`}
                         style={{ cursor: canManage ? "pointer" : "default", border: 0 }}
-                        title={canManage ? "Cliquer pour basculer le statut" : undefined}
+                        title={canManage ? copy.table.toggleTitle : undefined}
                       >
-                        {customer.active ? "Actif" : "Inactif"}
+                        {customer.active ? copy.status.active : copy.status.inactive}
                       </button>
                     </td>
 
@@ -752,7 +743,7 @@ export function ClientsView({
                         <Link
                           href={`/clients/${customer.id}`}
                           className="ox-btn ox-btn-ghost ox-btn-sm"
-                          title="Fiche 360°"
+                          title={copy.table.viewTitle}
                           style={{ padding: "0.3rem 0.5rem" }}
                         >
                           <Eye size={14} />
@@ -765,7 +756,7 @@ export function ClientsView({
                             setImmatriculationSuccessMsg(null);
                           }}
                           className="ox-btn ox-btn-ghost ox-btn-sm"
-                          title="Dossier Documents & Immatriculation (CIP, IFU...)"
+                          title={copy.table.documentsTitle}
                           style={{
                             padding: "0.3rem 0.5rem",
                             display: "inline-flex",
@@ -787,7 +778,7 @@ export function ClientsView({
                               type="button"
                               onClick={() => setEditingCustomer(customer)}
                               className="ox-btn ox-btn-ghost ox-btn-sm"
-                              title="Modifier"
+                              title={copy.table.editTitle}
                               style={{ padding: "0.3rem 0.5rem" }}
                             >
                               <Edit2 size={14} />
@@ -797,7 +788,7 @@ export function ClientsView({
                               type="button"
                               onClick={() => handleDelete(customer)}
                               className="ox-btn ox-btn-ghost ox-btn-sm"
-                              title="Supprimer / Désactiver"
+                              title={copy.table.deleteTitle}
                               style={{ padding: "0.3rem 0.5rem", color: "var(--bad)" }}
                             >
                               <Trash2 size={14} />
@@ -845,9 +836,9 @@ export function ClientsView({
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700 }}>Nouveau Client</h3>
+                <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700 }}>{copy.createModal.title}</h3>
                 <p style={{ margin: "4px 0 0", fontSize: "0.85rem", opacity: 0.65 }}>
-                  Enregistrez un nouveau client particulier ou entreprise
+                  {copy.createModal.subtitle}
                 </p>
               </div>
               <button
@@ -869,12 +860,12 @@ export function ClientsView({
             >
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  Contact principal <span style={{ color: "var(--bad)" }}>*</span>
+                  {copy.createModal.contactLabel} <span style={{ color: "var(--bad)" }}>*</span>
                 </label>
                 <input
                   name="contactName"
                   required
-                  placeholder="Ex: Augustin JOHNSON, Dr Nadine HOUVI"
+                  placeholder={copy.createModal.contactPlaceholder}
                   className="ox-input"
                   style={{ width: "100%" }}
                   autoFocus
@@ -883,11 +874,11 @@ export function ClientsView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  Entreprise / Raison sociale (optionnel)
+                  {copy.createModal.companyLabel}
                 </label>
                 <input
                   name="companyName"
-                  placeholder="Ex: Impact Plus Consulting, DHL Bénin, J-J Telecom"
+                  placeholder={copy.createModal.companyPlaceholder}
                   className="ox-input"
                   style={{ width: "100%" }}
                 />
@@ -895,11 +886,11 @@ export function ClientsView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  N° IFU Bénin <span style={{ color: "var(--gold)", fontSize: "0.75rem" }}>(Fiscalité MECEF &amp; Immatriculation ANaTT)</span>
+                  {copy.createModal.ifuLabel} <span style={{ color: "var(--gold)", fontSize: "0.75rem" }}>{copy.createModal.ifuHint}</span>
                 </label>
                 <input
                   name="ifu"
-                  placeholder="Ex: 0201910815523 (13 chiffres)"
+                  placeholder={copy.createModal.ifuPlaceholder}
                   className="ox-input"
                   style={{ width: "100%" }}
                 />
@@ -908,23 +899,23 @@ export function ClientsView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                    E-mail
+                    {copy.createModal.emailLabel}
                   </label>
                   <input
                     name="email"
                     type="email"
-                    placeholder="contact@domaine.bj"
+                    placeholder={copy.createModal.emailPlaceholder}
                     className="ox-input"
                     style={{ width: "100%" }}
                   />
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                    Téléphone
+                    {copy.createModal.phoneLabel}
                   </label>
                   <input
                     name="phone"
-                    placeholder="+229 01 48 65 50 40"
+                    placeholder={copy.createModal.phonePlaceholder}
                     className="ox-input"
                     style={{ width: "100%" }}
                   />
@@ -933,11 +924,11 @@ export function ClientsView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  Adresse physique / Quartier (Showroom / Domicile)
+                  {copy.createModal.addressLabel}
                 </label>
                 <input
                   name="address"
-                  placeholder="Ex: Haie Vive, Rue 340, Cotonou"
+                  placeholder={copy.createModal.addressPlaceholder}
                   className="ox-input"
                   style={{ width: "100%" }}
                 />
@@ -946,7 +937,7 @@ export function ClientsView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                    Ville / Localisation
+                    {copy.createModal.cityLabel}
                   </label>
                   <input
                     name="city"
@@ -957,26 +948,26 @@ export function ClientsView({
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                    Catégorie
+                    {copy.createModal.categoryLabel}
                   </label>
                   <select name="category" className="ox-select" style={{ width: "100%" }}>
-                    <option value="Particulier">Particulier</option>
-                    <option value="Entreprise">Entreprise</option>
-                    <option value="ONG / Diplomate">ONG / Diplomate</option>
-                    <option value="Flotte">Flotte</option>
-                    <option value="Autre">Autre</option>
+                    <option value="Particulier">{copy.category.individual}</option>
+                    <option value="Entreprise">{copy.category.company}</option>
+                    <option value="ONG / Diplomate">{copy.category.ngo}</option>
+                    <option value="Flotte">{copy.category.fleet}</option>
+                    <option value="Autre">{copy.category.other}</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  Récapitulatif Visite Showroom &amp; Projet
+                  {copy.createModal.showroomNotesLabel}
                 </label>
                 <textarea
                   name="showroomNotes"
                   rows={2}
-                  placeholder="Passé en showroom le 08/10, intéressé par BYD Dolphin ou Song Plus, devis demandé avec borne de recharge..."
+                  placeholder={copy.createModal.showroomNotesPlaceholder}
                   className="ox-textarea"
                   style={{ width: "100%", resize: "vertical" }}
                 />
@@ -984,12 +975,12 @@ export function ClientsView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  Notes &amp; Préférences complémentaires
+                  {copy.createModal.notesLabel}
                 </label>
                 <textarea
                   name="notes"
                   rows={2}
-                  placeholder="Intérêt véhicule électrique, besoin d'une borne à domicile..."
+                  placeholder={copy.createModal.notesPlaceholder}
                   className="ox-textarea"
                   style={{ width: "100%", resize: "vertical" }}
                 />
@@ -1001,10 +992,10 @@ export function ClientsView({
                   onClick={() => setIsCreateModalOpen(false)}
                   className="ox-btn ox-btn-ghost"
                 >
-                  Annuler
+                  {copy.createModal.cancel}
                 </button>
                 <button type="submit" className="ox-btn">
-                  Enregistrer le client
+                  {copy.createModal.submit}
                 </button>
               </div>
             </form>
@@ -1043,9 +1034,9 @@ export function ClientsView({
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700 }}>Modifier le client</h3>
+                <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700 }}>{copy.editModal.title}</h3>
                 <p style={{ margin: "4px 0 0", fontSize: "0.85rem", opacity: 0.65 }}>
-                  Mise à jour des coordonnées et statuts
+                  {copy.editModal.subtitle}
                 </p>
               </div>
               <button
@@ -1069,7 +1060,7 @@ export function ClientsView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  Contact principal <span style={{ color: "var(--bad)" }}>*</span>
+                  {copy.editModal.contactLabel} <span style={{ color: "var(--bad)" }}>*</span>
                 </label>
                 <input
                   name="contactName"
@@ -1082,7 +1073,7 @@ export function ClientsView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  Entreprise / Raison sociale
+                  {copy.editModal.companyLabel}
                 </label>
                 <input
                   name="companyName"
@@ -1094,12 +1085,12 @@ export function ClientsView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  N° IFU Bénin <span style={{ color: "var(--gold)", fontSize: "0.75rem" }}>(Fiscalité MECEF &amp; Immatriculation ANaTT)</span>
+                  {copy.editModal.ifuLabel} <span style={{ color: "var(--gold)", fontSize: "0.75rem" }}>{copy.editModal.ifuHint}</span>
                 </label>
                 <input
                   name="ifu"
                   defaultValue={editingCustomer.ifu || ""}
-                  placeholder="Ex: 0201910815523 (13 chiffres)"
+                  placeholder={copy.editModal.ifuPlaceholder}
                   className="ox-input"
                   style={{ width: "100%" }}
                 />
@@ -1108,7 +1099,7 @@ export function ClientsView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                    E-mail
+                    {copy.editModal.emailLabel}
                   </label>
                   <input
                     name="email"
@@ -1120,7 +1111,7 @@ export function ClientsView({
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                    Téléphone
+                    {copy.editModal.phoneLabel}
                   </label>
                   <input
                     name="phone"
@@ -1133,12 +1124,12 @@ export function ClientsView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  Adresse physique / Quartier
+                  {copy.editModal.addressLabel}
                 </label>
                 <input
                   name="address"
                   defaultValue={editingCustomer.address || ""}
-                  placeholder="Ex: Haie Vive, Rue 340, Cotonou"
+                  placeholder={copy.editModal.addressPlaceholder}
                   className="ox-input"
                   style={{ width: "100%" }}
                 />
@@ -1147,7 +1138,7 @@ export function ClientsView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                    Ville / Localisation
+                    {copy.editModal.cityLabel}
                   </label>
                   <input
                     name="city"
@@ -1158,7 +1149,7 @@ export function ClientsView({
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                    Catégorie
+                    {copy.editModal.categoryLabel}
                   </label>
                   <select
                     name="category"
@@ -1166,24 +1157,24 @@ export function ClientsView({
                     className="ox-select"
                     style={{ width: "100%" }}
                   >
-                    <option value="Particulier">Particulier</option>
-                    <option value="Entreprise">Entreprise</option>
-                    <option value="ONG / Diplomate">ONG / Diplomate</option>
-                    <option value="Flotte">Flotte</option>
-                    <option value="Autre">Autre</option>
+                    <option value="Particulier">{copy.category.individual}</option>
+                    <option value="Entreprise">{copy.category.company}</option>
+                    <option value="ONG / Diplomate">{copy.category.ngo}</option>
+                    <option value="Flotte">{copy.category.fleet}</option>
+                    <option value="Autre">{copy.category.other}</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  Récapitulatif Visite Showroom &amp; Échanges
+                  {copy.editModal.showroomNotesLabel}
                 </label>
                 <textarea
                   name="showroomNotes"
                   rows={2}
                   defaultValue={editingCustomer.showroomNotes || ""}
-                  placeholder="Passé au showroom le 08/10, intéressé par BYD Song Plus ou Dolphin, essai routier souhaité..."
+                  placeholder={copy.editModal.showroomNotesPlaceholder}
                   className="ox-textarea"
                   style={{ width: "100%", resize: "vertical" }}
                 />
@@ -1191,7 +1182,7 @@ export function ClientsView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  Notes &amp; Préférences complémentaires
+                  {copy.editModal.notesLabel}
                 </label>
                 <textarea
                   name="notes"
@@ -1212,7 +1203,7 @@ export function ClientsView({
                   style={{ width: 16, height: 16, accentColor: "var(--brand)" }}
                 />
                 <label htmlFor="activeCheckbox" style={{ fontSize: "0.85rem", cursor: "pointer" }}>
-                  Client actif (autoriser nouvelles opportunités, devis et commandes)
+                  {copy.editModal.activeLabel}
                 </label>
               </div>
 
@@ -1222,10 +1213,10 @@ export function ClientsView({
                   onClick={() => setEditingCustomer(null)}
                   className="ox-btn ox-btn-ghost"
                 >
-                  Annuler
+                  {copy.editModal.cancel}
                 </button>
                 <button type="submit" className="ox-btn">
-                  Enregistrer les modifications
+                  {copy.editModal.submit}
                 </button>
               </div>
             </form>
@@ -1276,10 +1267,10 @@ export function ClientsView({
                 <FolderCheck size={24} color="var(--gold)" />
                 <div>
                   <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700 }}>
-                    Documents Client &amp; Immatriculation (ANaTT)
+                    {copy.docsModal.title}
                   </h3>
                   <div style={{ fontSize: "0.82rem", opacity: 0.75, marginTop: 2 }}>
-                    Client : <strong>{selectedDocCustomer.contactName}</strong> {selectedDocCustomer.companyName ? `(${selectedDocCustomer.companyName})` : ""}
+                    {copy.docsModal.clientPrefix}<strong>{selectedDocCustomer.contactName}</strong> {selectedDocCustomer.companyName ? `(${selectedDocCustomer.companyName})` : ""}
                   </div>
                 </div>
               </div>
@@ -1307,21 +1298,21 @@ export function ClientsView({
               }}
             >
               <div>
-                <span style={{ opacity: 0.65 }}>N° IFU Bénin : </span>
+                <span style={{ opacity: 0.65 }}>{copy.docsModal.ifuLabel}</span>
                 <strong style={{ color: selectedDocCustomer.ifu ? "var(--ice-highlight)" : "#f59e0b" }}>
-                  {selectedDocCustomer.ifu || "⚠️ Non renseigné"}
+                  {selectedDocCustomer.ifu || copy.docsModal.ifuMissing}
                 </strong>
               </div>
               <div>
-                <span style={{ opacity: 0.65 }}>Téléphone : </span>
+                <span style={{ opacity: 0.65 }}>{copy.docsModal.phoneLabel}</span>
                 <strong>{selectedDocCustomer.phone || "-"}</strong>
               </div>
               <div>
-                <span style={{ opacity: 0.65 }}>Email : </span>
+                <span style={{ opacity: 0.65 }}>{copy.docsModal.emailLabel}</span>
                 <strong>{selectedDocCustomer.email || "-"}</strong>
               </div>
               <div>
-                <span style={{ opacity: 0.65 }}>Adresse : </span>
+                <span style={{ opacity: 0.65 }}>{copy.docsModal.addressLabel}</span>
                 <strong>{selectedDocCustomer.address || selectedDocCustomer.city || "Cotonou"}</strong>
               </div>
             </div>
@@ -1349,10 +1340,10 @@ export function ClientsView({
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                 <h4 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700 }}>
-                  Pièces du dossier ({selectedDocCustomer.documents?.length || 0})
+                  {copy.docsModal.piecesTitle(selectedDocCustomer.documents?.length || 0)}
                 </h4>
                 <span style={{ fontSize: "0.75rem", opacity: 0.65 }}>
-                  CIP / IFU / Domicile / Permis / Conformité
+                  {copy.docsModal.piecesHint}
                 </span>
               </div>
 
@@ -1368,7 +1359,7 @@ export function ClientsView({
                     fontSize: "0.85rem",
                   }}
                 >
-                  Aucun document téléversé pour ce client pour le moment.
+                  {copy.docsModal.empty}
                 </div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -1393,13 +1384,13 @@ export function ClientsView({
                             {doc.title}
                           </div>
                           <div style={{ fontSize: "0.75rem", opacity: 0.65, display: "flex", gap: 8, flexWrap: "wrap", marginTop: 2 }}>
-                            <span>Fichier : {doc.fileName}</span>
-                            <span>· Type : {doc.docType}</span>
-                            <span>· Ajouté le {formatDate(doc.uploadedAt)}</span>
+                            <span>{copy.docsModal.filePrefix}{doc.fileName}</span>
+                            <span>· {copy.docsModal.typePrefix}{copy.docTypeLabel(doc.docType)}</span>
+                            <span>· {copy.docsModal.addedOn(copy.formatDate(doc.uploadedAt))}</span>
                           </div>
                           {doc.notes && (
                             <div style={{ fontSize: "0.73rem", opacity: 0.8, color: "var(--gold)", marginTop: 2 }}>
-                              Note : {doc.notes}
+                              {copy.docsModal.notePrefix}{doc.notes}
                             </div>
                           )}
                         </div>
@@ -1415,7 +1406,7 @@ export function ClientsView({
                             borderColor: doc.status === "TRANSMIS_ANATT" ? "rgba(56, 189, 248, 0.3)" : "rgba(74, 222, 128, 0.3)",
                           }}
                         >
-                          {doc.status === "TRANSMIS_ANATT" ? "Transmis ANaTT" : "Validé"}
+                          {doc.status === "TRANSMIS_ANATT" ? copy.documentStatus.transmitted : copy.documentStatus.validated}
                         </span>
 
                         <a
@@ -1425,10 +1416,10 @@ export function ClientsView({
                           rel="noreferrer"
                           className="ox-btn ox-btn-ghost ox-btn-sm"
                           style={{ padding: "0.3rem 0.6rem", fontSize: "0.78rem" }}
-                          title="Télécharger / Visualiser la pièce"
+                          title={copy.docsModal.downloadTitle}
                         >
                           <Download size={13} style={{ marginRight: 4 }} />
-                          Télécharger
+                          {copy.docsModal.download}
                         </a>
 
                         <button
@@ -1436,7 +1427,7 @@ export function ClientsView({
                           onClick={() => handleDeleteDoc(doc.id)}
                           className="ox-btn ox-btn-ghost ox-btn-sm"
                           style={{ padding: "0.3rem 0.5rem", color: "var(--bad)" }}
-                          title="Supprimer la pièce"
+                          title={copy.docsModal.deleteTitle}
                           disabled={isUploadingDoc}
                         >
                           <Trash2 size={13} />
@@ -1464,13 +1455,13 @@ export function ClientsView({
             >
               <div style={{ fontWeight: 650, fontSize: "0.88rem", color: "var(--ice-highlight)", display: "flex", alignItems: "center", gap: 6 }}>
                 <Upload size={16} />
-                Ajouter une pièce justificative au dossier
+                {copy.docsModal.uploadTitle}
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 600, marginBottom: 4 }}>
-                    Type de document *
+                    {copy.docsModal.docTypeLabel}
                   </label>
                   <select
                     value={docType}
@@ -1478,23 +1469,23 @@ export function ClientsView({
                     className="ox-select"
                     style={{ width: "100%", fontSize: "0.82rem" }}
                   >
-                    <option value="CIP_CNI">🆔 CIP ou CNI (Identité)</option>
-                    <option value="ATTESTATION_IFU">📄 Attestation IFU (Fiscal)</option>
-                    <option value="JUSTIFICATIF_DOMICILE">🏠 Justificatif de domicile / Résidence</option>
-                    <option value="PERMIS_CONDUIRE">🚗 Permis de conduire</option>
-                    <option value="CERTIFICAT_CONFORMITE">🚢 Conformité / Dédouanement Port</option>
-                    <option value="FACTURE_OU_DEVIS">📑 Facture de vente / Proforma</option>
-                    <option value="AUTRE">📎 Autre pièce jointe</option>
+                    <option value="CIP_CNI">{copy.docsModal.docTypeIdentity}</option>
+                    <option value="ATTESTATION_IFU">{copy.docsModal.docTypeIfu}</option>
+                    <option value="JUSTIFICATIF_DOMICILE">{copy.docsModal.docTypeResidence}</option>
+                    <option value="PERMIS_CONDUIRE">{copy.docsModal.docTypeLicense}</option>
+                    <option value="CERTIFICAT_CONFORMITE">{copy.docsModal.docTypeCustoms}</option>
+                    <option value="FACTURE_OU_DEVIS">{copy.docsModal.docTypeInvoice}</option>
+                    <option value="AUTRE">{copy.docsModal.docTypeOther}</option>
                   </select>
                 </div>
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 600, marginBottom: 4 }}>
-                    Intitulé / Nom du document
+                    {copy.docsModal.docTitleLabel}
                   </label>
                   <input
                     type="text"
-                    placeholder="Ex: CIP M. Dossou, IFU 020..."
+                    placeholder={copy.docsModal.docTitlePlaceholder}
                     value={docTitle}
                     onChange={(e) => setDocTitle(e.target.value)}
                     className="ox-input"
@@ -1506,7 +1497,7 @@ export function ClientsView({
               <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 10, alignItems: "end" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 600, marginBottom: 4 }}>
-                    Fichier (PDF, image JPG/PNG) *
+                    {copy.docsModal.fileLabel}
                   </label>
                   <input
                     type="file"
@@ -1527,7 +1518,7 @@ export function ClientsView({
                     style={{ width: "100%", height: 38, fontSize: "0.82rem", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6 }}
                   >
                     <Upload size={14} />
-                    {isUploadingDoc ? "Téléversement..." : "Téléverser le document"}
+                    {isUploadingDoc ? copy.docsModal.uploading : copy.docsModal.upload}
                   </button>
                 </div>
               </div>
@@ -1545,7 +1536,7 @@ export function ClientsView({
               }}
             >
               <div style={{ fontSize: "0.78rem", opacity: 0.7 }}>
-                Dossier vérifié par CARZONE Motors Showroom
+                {copy.docsModal.footerNote}
               </div>
 
               <div style={{ display: "flex", gap: 8 }}>
@@ -1554,7 +1545,7 @@ export function ClientsView({
                   onClick={() => setSelectedDocCustomer(null)}
                   className="ox-btn ox-btn-ghost"
                 >
-                  Fermer
+                  {copy.docsModal.close}
                 </button>
                 <button
                   type="button"
@@ -1569,10 +1560,10 @@ export function ClientsView({
                     alignItems: "center",
                     gap: 6,
                   }}
-                  title="Marquer le dossier complet et le transmettre pour immatriculation"
+                  title={copy.docsModal.transmitTitle}
                 >
                   <FileCheck2 size={16} />
-                  Transmettre au service Immatriculation (ANaTT)
+                  {copy.docsModal.transmit}
                 </button>
               </div>
             </div>

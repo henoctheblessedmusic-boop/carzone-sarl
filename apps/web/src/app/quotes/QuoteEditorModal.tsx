@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { X, Plus, Minus, Trash2, AlertCircle, Check, Tag } from "lucide-react";
 import { formatXof } from "@/lib/format";
+import { usePrefs } from "@/components/PrefsProvider";
+import { quotesCopy } from "@/lib/i18n/messages/quotes";
 import { computeTaxTotals, type TaxMode } from "@/lib/billing";
 import {
   decodeDiscountFromNotes,
@@ -36,6 +38,9 @@ export function QuoteEditorModal({
   vehicles: VehicleOption[];
   onClose: () => void;
 }) {
+  const { locale } = usePrefs();
+  const copy = quotesCopy[locale];
+
   const { discount: initialDiscount, cleanNotes: initialCleanNotes } = decodeDiscountFromNotes(quote.notes);
   const [customerId, setCustomerId] = useState(quote.customer?.id || quote.customerId || "");
   const [taxMode, setTaxMode] = useState<TaxMode>((quote.taxMode as TaxMode) || "HT");
@@ -103,12 +108,12 @@ export function QuoteEditorModal({
         unitPriceXof: 0,
       },
     ]);
-    triggerActionFeedback("Nouvelle ligne vide ajoutée", newId);
+    triggerActionFeedback(copy.creator.feedback.emptyLineAdded, newId);
   };
 
   const removeLine = (id: string) => {
     if (lines.length <= 1) {
-      alert("Une proforma doit comporter au moins une ligne.");
+      alert(copy.editor.errors.minLines);
       return;
     }
     setLines((prev) => prev.filter((l) => l.id !== id));
@@ -147,14 +152,14 @@ export function QuoteEditorModal({
           unitPriceXof: unitPriceXof !== undefined ? unitPriceXof : existing.unitPriceXof,
         };
         triggerActionFeedback(
-          `✨ Quantité augmentée : "${title || cleanDesc}" passe à ${newQty} unité(s)`,
+          copy.editor.feedback.quantityIncreased(title || cleanDesc, newQty),
           existing.id
         );
         return updated;
       } else {
         const newId = `line-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
         triggerActionFeedback(
-          `✅ Article ajouté au devis : "${title || cleanDesc}" (${quantity}x à ${formatXof(unitPriceXof)})`,
+          copy.editor.feedback.articleAdded(title || cleanDesc, quantity, formatXof(unitPriceXof)),
           newId
         );
         return [
@@ -208,11 +213,11 @@ export function QuoteEditorModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!customerId) {
-      setError("Veuillez sélectionner un client.");
+      setError(copy.editor.errors.clientRequired);
       return;
     }
     if (lines.some((l) => !l.description.trim())) {
-      setError("Toutes les lignes doivent avoir une désignation.");
+      setError(copy.editor.errors.designationRequired);
       return;
     }
 
@@ -237,7 +242,7 @@ export function QuoteEditorModal({
         });
         onClose();
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Erreur mise à jour proforma");
+        setError(err instanceof Error ? err.message : copy.editor.errors.updateFailed);
       }
     });
   };
@@ -275,10 +280,10 @@ export function QuoteEditorModal({
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
           <div>
             <h3 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700, color: "var(--ice-text)" }}>
-              ✏️ Modifier la Proforma {quote.number}
+              {copy.editor.title(quote.number)}
             </h3>
             <span style={{ fontSize: "0.78rem", opacity: 0.7 }}>
-              Statut actuel : {quote.status} · Modifiable tant qu&apos;elle n&apos;est pas validée en commande ferme
+              {copy.editor.subtitle(copy.statuses[quote.status] || quote.status)}
             </span>
           </div>
           <button
@@ -314,7 +319,7 @@ export function QuoteEditorModal({
           {/* Client & Taxe */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 12 }}>
             <div>
-              <label style={labelStyle}>Client destinataire *</label>
+              <label style={labelStyle}>{copy.editor.clientLabel}</label>
               <select
                 value={customerId}
                 onChange={(e) => setCustomerId(e.target.value)}
@@ -331,28 +336,28 @@ export function QuoteEditorModal({
             </div>
 
             <div>
-              <label style={labelStyle}>Mode fiscal</label>
+              <label style={labelStyle}>{copy.editor.taxModeLabel}</label>
               <select
                 value={taxMode}
                 onChange={(e) => setTaxMode(e.target.value as TaxMode)}
                 className="ox-select"
                 style={{ width: "100%" }}
               >
-                <option value="HT">Hors Taxe (HT)</option>
-                <option value="TTC">Toutes Taxes (TTC)</option>
+                <option value="HT">{copy.editor.taxHtOption}</option>
+                <option value="TTC">{copy.editor.taxTtcOption}</option>
               </select>
             </div>
 
             <div>
-              <label style={labelStyle}>Taux TVA</label>
+              <label style={labelStyle}>{copy.editor.vatRateLabel}</label>
               <select
                 value={taxRatePct}
                 onChange={(e) => setTaxRatePct(Number(e.target.value))}
                 className="ox-select"
                 style={{ width: "100%" }}
               >
-                <option value={18}>18% (Taux normal)</option>
-                <option value={0}>0% (Exonéré / Export)</option>
+                <option value={18}>{copy.editor.vatNormal}</option>
+                <option value={0}>{copy.editor.vatExempt}</option>
               </select>
             </div>
           </div>
@@ -371,7 +376,7 @@ export function QuoteEditorModal({
           >
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
               <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--gold, #d4af37)" }}>
-                + Sélectionner depuis le stock / catalogue :
+                {copy.editor.pickStock}
               </span>
               <select
                 defaultValue=""
@@ -384,7 +389,7 @@ export function QuoteEditorModal({
                 className="ox-select"
                 style={{ fontSize: "0.78rem", flex: 1, minWidth: 200 }}
               >
-                <option value="">🚗 + Sélectionner un véhicule en stock...</option>
+                <option value="">{copy.editor.vehicleOption}</option>
                 {vehicles.map((v) => (
                   <option key={v.id} value={v.id}>
                     {v.brand} {v.model} ({formatXof(v.priceXof)})
@@ -403,7 +408,7 @@ export function QuoteEditorModal({
                 className="ox-select"
                 style={{ fontSize: "0.78rem", flex: 1, minWidth: 200 }}
               >
-                <option value="">⚡ + Sélectionner un article / service...</option>
+                <option value="">{copy.editor.articleOption}</option>
                 {articles.map((a) => (
                   <option key={a.id} value={a.id}>
                     [{a.category}] {a.name} ({formatXof(a.unitPriceXof)})
@@ -437,7 +442,7 @@ export function QuoteEditorModal({
                         borderRadius: 4,
                       }}
                     >
-                      {stagedItem.type === "VEHICLE" ? "🚗 VÉHICULE EN STOCK" : "⚡ ARTICLE / SERVICE"}
+                      {stagedItem.type === "VEHICLE" ? copy.editor.staged.vehicleBadge : copy.editor.staged.articleBadge}
                     </span>
                     <strong style={{ color: "var(--ice-text-strong)", fontSize: "0.95rem" }}>
                       {stagedItem.title}
@@ -459,7 +464,7 @@ export function QuoteEditorModal({
                 <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
                   {/* Stepper Quantité */}
                   <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                    <label style={{ fontSize: "0.72rem", opacity: 0.8 }}>Quantité :</label>
+                    <label style={{ fontSize: "0.72rem", opacity: 0.8 }}>{copy.editor.staged.quantityLabel}</label>
                     <div
                       style={{
                         display: "inline-flex",
@@ -519,7 +524,7 @@ export function QuoteEditorModal({
 
                   {/* Prix Unitaire Modifiable */}
                   <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1, minWidth: 180 }}>
-                    <label style={{ fontSize: "0.72rem", opacity: 0.8 }}>Prix unitaire (modifiable) :</label>
+                    <label style={{ fontSize: "0.72rem", opacity: 0.8 }}>{copy.editor.staged.unitPriceLabel}</label>
                     <div style={{ position: "relative" }}>
                       <input
                         type="number"
@@ -541,7 +546,7 @@ export function QuoteEditorModal({
 
                   <div style={{ display: "flex", alignItems: "flex-end", gap: 10, marginLeft: "auto" }}>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: "0.68rem", opacity: 0.65 }}>Ligne calculée</div>
+                      <div style={{ fontSize: "0.68rem", opacity: 0.65 }}>{copy.editor.staged.lineCalc}</div>
                       <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gold)" }}>
                         {formatXof(stagedItem.quantity * stagedItem.unitPriceXof)}
                       </div>
@@ -568,7 +573,7 @@ export function QuoteEditorModal({
                       }}
                     >
                       <Plus size={14} />
-                      Insérer
+                      {copy.editor.staged.insert}
                     </button>
                   </div>
                 </div>
@@ -610,7 +615,10 @@ export function QuoteEditorModal({
           <div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
               <label style={labelStyle}>
-                Lignes du devis proforma ({lines.length}) · {lines.reduce((s, l) => s + (l.quantity || 0), 0)} article(s) au total
+                {copy.editor.lines.header(
+                  lines.length,
+                  lines.reduce((s, l) => s + (l.quantity || 0), 0)
+                )}
               </label>
               <button
                 type="button"
@@ -619,7 +627,7 @@ export function QuoteEditorModal({
                 style={{ fontSize: "0.74rem", display: "inline-flex", alignItems: "center", gap: 4 }}
               >
                 <Plus size={13} />
-                Ajouter une ligne vide
+                {copy.editor.lines.add}
               </button>
             </div>
 
@@ -643,7 +651,7 @@ export function QuoteEditorModal({
                   >
                     <input
                       value={l.description}
-                      placeholder="Description de la prestation / véhicule *"
+                      placeholder={copy.editor.lines.placeholder}
                       required
                       onChange={(e) => updateLineField(l.id, "description", e.target.value)}
                       className="ox-input"
@@ -692,7 +700,7 @@ export function QuoteEditorModal({
                           fontWeight: 700,
                           padding: "3px 0",
                         }}
-                        title="Quantité"
+                        title={copy.editor.lines.quantityTitle}
                       />
                       <button
                         type="button"
@@ -722,7 +730,7 @@ export function QuoteEditorModal({
                         }
                         className="ox-input"
                         style={{ width: "100%", fontSize: "0.82rem", textAlign: "right", paddingRight: 45 }}
-                        title="Prix unitaire XOF"
+                        title={copy.editor.lines.unitPriceTitle}
                       />
                       <span
                         style={{
@@ -756,7 +764,7 @@ export function QuoteEditorModal({
                         alignItems: "center",
                         justifyContent: "center",
                       }}
-                      title="Supprimer cette ligne"
+                      title={copy.editor.lines.removeTitle}
                     >
                       <Trash2 size={16} />
                     </button>
@@ -782,7 +790,7 @@ export function QuoteEditorModal({
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <Tag size={15} color="var(--gold)" />
                 <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--gold)" }}>
-                  Stratégie Commerciale & Remise
+                  {copy.editor.discount.title}
                 </span>
               </div>
 
@@ -811,7 +819,7 @@ export function QuoteEditorModal({
                     color: discountType === "NONE" ? "#fff" : "var(--ice-text-muted)",
                   }}
                 >
-                  Sans remise
+                  {copy.editor.discount.none}
                 </button>
                 <button
                   type="button"
@@ -829,7 +837,7 @@ export function QuoteEditorModal({
                     color: discountType === "PERCENT" ? "#fff" : "var(--ice-text-muted)",
                   }}
                 >
-                  % Pourcentage
+                  {copy.editor.discount.percent}
                 </button>
                 <button
                   type="button"
@@ -847,7 +855,7 @@ export function QuoteEditorModal({
                     color: discountType === "AMOUNT" ? "#0a1622" : "var(--ice-text-muted)",
                   }}
                 >
-                  Montant Fixe
+                  {copy.editor.discount.fixed}
                 </button>
               </div>
             </div>
@@ -889,7 +897,7 @@ export function QuoteEditorModal({
                 </div>
 
                 <div style={{ width: "100%", fontSize: "0.76rem", color: "var(--gold)", fontWeight: 650 }}>
-                  ✨ Remise accordée : -{formatXof(discountAmount)}
+                  ✨ {copy.editor.discount.granted(formatXof(discountAmount))}
                 </div>
               </div>
             )}
@@ -907,7 +915,7 @@ export function QuoteEditorModal({
                 />
                 <span style={{ fontSize: "0.74rem", opacity: 0.7 }}>FCFA</span>
                 <div style={{ fontSize: "0.76rem", color: "var(--gold)", fontWeight: 650, marginLeft: "auto" }}>
-                  ✨ Déduction de -{formatXof(discountAmount)}
+                  ✨ {copy.editor.discount.deduction(formatXof(discountAmount))}
                 </div>
               </div>
             )}
@@ -929,26 +937,26 @@ export function QuoteEditorModal({
           >
             <div>
               <div style={{ fontSize: "0.78rem", opacity: 0.75 }}>
-                Sous-total Brut HT : <strong>{formatXof(totals.grossHtXof)}</strong>
+                {copy.editor.totals.gross} : <strong>{formatXof(totals.grossHtXof)}</strong>
               </div>
               {totals.discountXof > 0 && (
                 <div style={{ fontSize: "0.78rem", color: "var(--gold)", marginTop: 2 }}>
-                  Remise Commerciale : <strong>-{formatXof(totals.discountXof)}</strong>
+                  {copy.editor.totals.commercialDiscount} : <strong>-{formatXof(totals.discountXof)}</strong>
                 </div>
               )}
               {totals.discountXof > 0 && (
                 <div style={{ fontSize: "0.78rem", opacity: 0.85, marginTop: 2 }}>
-                  Net Commercial HT : <strong>{formatXof(totals.subtotalHtXof)}</strong>
+                  {copy.editor.totals.netHt} : <strong>{formatXof(totals.subtotalHtXof)}</strong>
                 </div>
               )}
               <div style={{ fontSize: "0.78rem", opacity: 0.75, marginTop: 2 }}>
-                TVA ({taxRatePct}%) : <strong>{formatXof(totals.taxXof)}</strong>
+                {copy.editor.totals.vat(taxRatePct)} : <strong>{formatXof(totals.taxXof)}</strong>
               </div>
             </div>
 
             <div style={{ textAlign: "right" }}>
               <div style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", color: "var(--gold, #d4af37)" }}>
-                Montant Total TTC Net ({taxMode})
+                {copy.editor.totals.totalTtc(taxMode)}
               </div>
               <div style={{ fontSize: "1.35rem", fontWeight: 800, color: "var(--gold, #d4af37)" }}>
                 {formatXof(totals.totalXof)}
@@ -974,17 +982,17 @@ export function QuoteEditorModal({
           {/* Notes et validité */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 140px", gap: 12 }}>
             <div>
-              <label style={labelStyle}>Notes / Observations (opt.)</label>
+              <label style={labelStyle}>{copy.editor.notesLabel}</label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Conditions particulières, délai de livraison, remise..."
+                placeholder={copy.editor.notesPlaceholder}
                 className="ox-input"
                 style={{ width: "100%", height: 50, resize: "vertical" }}
               />
             </div>
             <div>
-              <label style={labelStyle}>Validité (jours)</label>
+              <label style={labelStyle}>{copy.editor.validityLabel}</label>
               <input
                 type="number"
                 min="1"
@@ -1012,7 +1020,7 @@ export function QuoteEditorModal({
                 cursor: "pointer",
               }}
             >
-              Annuler
+              {copy.common.cancel}
             </button>
             <button
               type="submit"
@@ -1032,7 +1040,7 @@ export function QuoteEditorModal({
               }}
             >
               <Check size={16} />
-              <span>{isPending ? "Enregistrement..." : "Enregistrer les modifications"}</span>
+              <span>{isPending ? copy.editor.submit.saving : copy.editor.submit.save}</span>
             </button>
           </div>
         </form>

@@ -3,6 +3,8 @@ import { AppShell } from "@/components/AppShell";
 import { Badge, DataTable } from "@/components/ui";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
+import { getServerMessages } from "@/lib/i18n/server";
+import { crmCopy } from "@/lib/i18n/messages/crm";
 
 async function createFleet(formData: FormData) {
   "use server";
@@ -33,6 +35,9 @@ async function addFleetVehicle(formData: FormData) {
 
 export default async function FleetPage() {
   const user = await requireUser(["DG", "COMMERCIAL", "BORNES_OPS"]);
+  const { locale } = await getServerMessages();
+  const copy = crmCopy[locale];
+  const fleetCopy = copy.fleet;
   const [fleets, vehicles, customers] = await Promise.all([
     prisma.fleetAccount.findMany({
       include: { vehicles: { include: { vehicle: true, customer: true } } },
@@ -45,27 +50,27 @@ export default async function FleetPage() {
   return (
     <AppShell user={user} titleKey="fleet">
       <form action={createFleet} style={formRow}>
-        <input name="name" placeholder="Nom flotte *" required style={input} />
-        <input name="company" placeholder="Entreprise" style={input} />
-        <button type="submit" style={btn}>Créer compte flotte</button>
+        <input name="name" placeholder={fleetCopy.form.namePlaceholder} required style={input} />
+        <input name="company" placeholder={fleetCopy.form.companyPlaceholder} style={input} />
+        <button type="submit" style={btn}>{fleetCopy.form.create}</button>
       </form>
 
       <form action={addFleetVehicle} style={formRow}>
         <select name="fleetAccountId" required style={input} defaultValue="">
-          <option value="" disabled>Flotte *</option>
+          <option value="" disabled>{fleetCopy.form.accountSelect}</option>
           {fleets.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
         </select>
         <select name="vehicleId" style={input} defaultValue="">
-          <option value="">Véhicule CARZONE</option>
+          <option value="">{fleetCopy.form.vehicleSelect}</option>
           {vehicles.map((v) => <option key={v.id} value={v.id}>{v.brand} {v.model}</option>)}
         </select>
         <select name="customerId" style={input} defaultValue="">
-          <option value="">Client</option>
+          <option value="">{fleetCopy.form.customerSelect}</option>
           {customers.map((c) => <option key={c.id} value={c.id}>{c.contactName}</option>)}
         </select>
-        <input name="plateNumber" placeholder="Immatriculation" style={input} />
-        <input name="driverName" placeholder="Conducteur" style={input} />
-        <button type="submit" style={btn}>Ajouter véhicule</button>
+        <input name="plateNumber" placeholder={fleetCopy.form.platePlaceholder} style={input} />
+        <input name="driverName" placeholder={fleetCopy.form.driverPlaceholder} style={input} />
+        <button type="submit" style={btn}>{fleetCopy.form.addVehicle}</button>
       </form>
 
       {fleets.map((f) => (
@@ -74,13 +79,19 @@ export default async function FleetPage() {
             {f.name} {f.company ? <span style={{ opacity: 0.65 }}>· {f.company}</span> : null}
           </h2>
           <DataTable
-            headers={["Immat.", "Véhicule", "Conducteur", "Client", "Actif"]}
+            headers={[
+              fleetCopy.table.plate,
+              fleetCopy.table.vehicle,
+              fleetCopy.table.driver,
+              fleetCopy.table.customer,
+              fleetCopy.table.active,
+            ]}
             rows={f.vehicles.map((fv) => [
               fv.plateNumber || "-",
               fv.vehicle ? `${fv.vehicle.brand} ${fv.vehicle.model}` : "-",
               fv.driverName || "-",
               fv.customer?.contactName || "-",
-              <Badge key={fv.id} tone={fv.active ? "ok" : "bad"}>{fv.active ? "Oui" : "Non"}</Badge>,
+              <Badge key={fv.id} tone={fv.active ? "ok" : "bad"}>{fv.active ? fleetCopy.yes : fleetCopy.no}</Badge>,
             ])}
           />
         </div>

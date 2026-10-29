@@ -18,14 +18,15 @@ import {
   Tag,
   Trash2,
 } from "lucide-react";
-import { formatXof, formatDate } from "@/lib/format";
+import { formatXof } from "@/lib/format";
 import {
   canConfirmOrder,
   canNormalizeInvoice,
   canSendProforma,
   canStaffVoid,
-  QUOTE_STATUS_LABELS,
 } from "@/lib/billing";
+import { usePrefs } from "@/components/PrefsProvider";
+import { quotesCopy, formatQuoteDate } from "@/lib/i18n/messages/quotes";
 import { decodeDiscountFromNotes } from "@/lib/quote-discount";
 import {
   sendProforma,
@@ -99,6 +100,9 @@ export function QuotesView({
   opportunities: OpportunityOption[];
   userRole: string;
 }) {
+  const { locale } = usePrefs();
+  const copy = quotesCopy[locale];
+
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -120,18 +124,14 @@ export function QuotesView({
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   async function handleDeleteQuote(id: string, number: string) {
-    if (
-      !window.confirm(
-        `Êtes-vous sûr de vouloir supprimer définitivement la facture proforma ${number} ? Cette action est irréversible.`
-      )
-    ) {
+    if (!window.confirm(copy.list.actions.deleteConfirm(number))) {
       return;
     }
     setDeletingId(id);
     try {
       await deleteQuote(id);
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Erreur lors de la suppression de la proforma.");
+      alert(err instanceof Error ? err.message : copy.list.actions.deleteError);
     } finally {
       setDeletingId(null);
     }
@@ -140,28 +140,18 @@ export function QuotesView({
   function openEmailModal(quote: QuoteItem) {
     setEmailModalQuote(quote);
     setEmailTo(quote.customer.email || "");
-    setEmailSubject(`Facture Proforma ${quote.number} · CARZONE SARL`);
+    setEmailSubject(copy.list.emailModal.defaultSubject(quote.number));
     const linesSummary = quote.lines
       .map((l) => `• ${l.quantity}x ${l.description.replace(/\s*\(\s*\)/g, "").trim()} : ${formatXof(l.unitPriceXof * l.quantity)}`)
       .join("\n");
-    const body = `Bonjour ${quote.customer.contactName},
-
-Veuillez trouver ci-joint votre devis proforma ${quote.number} d'un montant total de ${formatXof(quote.totalXof)} (${quote.taxMode}).
-
-Détail des prestations et véhicules :
-${linesSummary}
-
-Ce devis proforma est valable jusqu'au ${formatDate(quote.validUntil)}.
-
-Conformément à nos engagements de transparence, nos Conditions Générales de Vente sont adossées en Page 2 du document officiel (garanties batterie 8 ans / véhicule 5 ans, SAV, modalités de livraison en showroom et conditions de paiement).
-
-Restant à votre entière disposition pour validation de votre commande ou tout essai au showroom,
-
-Bien cordialement,
-L'équipe commerciale CARZONE SARL
-Showroom Zone Maro-Militaire, Gbèdomidji · Cotonou, Bénin
-Tél : +229 21 33 00 00 / 97 00 00 00
-Web : www.topcarzone.com`;
+    const body = copy.list.emailModal.defaultBody({
+      contactName: quote.customer.contactName,
+      number: quote.number,
+      total: formatXof(quote.totalXof),
+      taxMode: quote.taxMode,
+      linesSummary,
+      validUntil: formatQuoteDate(copy, quote.validUntil),
+    });
     setEmailBody(body);
   }
 
@@ -255,13 +245,13 @@ Web : www.topcarzone.com`;
           }}
         >
           <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", textTransform: "uppercase", fontWeight: 600 }}>
-            Total Proformas
+            {copy.list.kpi.totalLabel}
           </div>
           <div className="ox-metric-val" style={{ fontSize: "1.6rem" }}>
             {totalCount}
           </div>
           <div style={{ fontSize: "0.75rem", color: "var(--ice-text-muted)" }}>
-            Toutes périodes confondues
+            {copy.list.kpi.totalHint}
           </div>
         </div>
 
@@ -277,13 +267,13 @@ Web : www.topcarzone.com`;
           }}
         >
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
-            En attente / Envoyées
+            {copy.list.kpi.pendingLabel}
           </div>
           <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#38bdf8" }}>
             {pendingQuotes.length}
           </div>
           <div style={{ fontSize: "0.75rem", color: "var(--ice)", fontWeight: 600 }}>
-            {formatXof(potentialRevenue)} potentiel
+            {copy.list.kpi.pendingHint(formatXof(potentialRevenue))}
           </div>
         </div>
 
@@ -299,13 +289,13 @@ Web : www.topcarzone.com`;
           }}
         >
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
-            Commandes Confirmées
+            {copy.list.kpi.confirmedLabel}
           </div>
           <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--gold)" }}>
             {confirmedQuotes.length}
           </div>
           <div style={{ fontSize: "0.75rem", color: "var(--gold)", fontWeight: 600 }}>
-            {formatXof(confirmedRevenue)} engagé ferme
+            {copy.list.kpi.confirmedHint(formatXof(confirmedRevenue))}
           </div>
         </div>
 
@@ -321,13 +311,13 @@ Web : www.topcarzone.com`;
           }}
         >
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
-            Factures Normalisées
+            {copy.list.kpi.invoicedLabel}
           </div>
           <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#4ade80" }}>
             {invoicedQuotes.length}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65 }}>
-            Transférées en comptabilité
+            {copy.list.kpi.invoicedHint}
           </div>
         </div>
       </div>
@@ -367,7 +357,7 @@ Web : www.topcarzone.com`;
             />
             <input
               type="text"
-              placeholder="Rechercher par N°, client, article..."
+              placeholder={copy.list.searchPlaceholder}
               className="ox-input"
               style={{ width: "100%", paddingLeft: 36, fontSize: "0.85rem" }}
               value={searchTerm}
@@ -378,11 +368,11 @@ Web : www.topcarzone.com`;
           {/* Filter Tabs */}
           <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
             {[
-              { id: "ALL", label: "Toutes" },
-              { id: "PENDING", label: "En cours" },
-              { id: "CONFIRMED", label: "Confirmées" },
-              { id: "INVOICED", label: "Normalisées" },
-              { id: "VOID", label: "Annulées" },
+              { id: "ALL", label: copy.list.filters.all },
+              { id: "PENDING", label: copy.list.filters.pending },
+              { id: "CONFIRMED", label: copy.list.filters.confirmed },
+              { id: "INVOICED", label: copy.list.filters.invoiced },
+              { id: "VOID", label: copy.list.filters.voided },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -425,13 +415,13 @@ Web : www.topcarzone.com`;
                   opacity: 0.75,
                 }}
               >
-                <th style={{ padding: "0.85rem 1rem" }}>Proforma</th>
-                <th style={{ padding: "0.85rem 1rem" }}>Client</th>
-                <th style={{ padding: "0.85rem 1rem" }}>Prestations / Lignes</th>
-                <th style={{ padding: "0.85rem 1rem", textAlign: "right" }}>Montant Total</th>
-                <th style={{ padding: "0.85rem 1rem" }}>Validité</th>
-                <th style={{ padding: "0.85rem 1rem" }}>Statut</th>
-                <th style={{ padding: "0.85rem 1rem", textAlign: "center" }}>Actions</th>
+                <th style={{ padding: "0.85rem 1rem" }}>{copy.list.table.proforma}</th>
+                <th style={{ padding: "0.85rem 1rem" }}>{copy.list.table.client}</th>
+                <th style={{ padding: "0.85rem 1rem" }}>{copy.list.table.items}</th>
+                <th style={{ padding: "0.85rem 1rem", textAlign: "right" }}>{copy.list.table.total}</th>
+                <th style={{ padding: "0.85rem 1rem" }}>{copy.list.table.validity}</th>
+                <th style={{ padding: "0.85rem 1rem" }}>{copy.list.table.status}</th>
+                <th style={{ padding: "0.85rem 1rem", textAlign: "center" }}>{copy.list.table.actions}</th>
               </tr>
             </thead>
             <tbody>
@@ -445,7 +435,7 @@ Web : www.topcarzone.com`;
                       opacity: 0.6,
                     }}
                   >
-                    Aucune facture proforma ne correspond aux critères de recherche.
+                    {copy.list.empty}
                   </td>
                 </tr>
               ) : (
@@ -470,7 +460,7 @@ Web : www.topcarzone.com`;
                           {q.number}
                         </div>
                         <div style={{ fontSize: "0.72rem", opacity: 0.6, marginTop: 2 }}>
-                          {formatDate(q.createdAt)} · {q.docKind}
+                          {formatQuoteDate(copy, q.createdAt)} · {copy.docKinds[q.docKind] || q.docKind}
                         </div>
                       </td>
 
@@ -508,7 +498,7 @@ Web : www.topcarzone.com`;
                           ))}
                           {q.lines.length > 2 && (
                             <div style={{ fontSize: "0.72rem", opacity: 0.6, fontStyle: "italic" }}>
-                              + {q.lines.length - 2} autre(s) ligne(s)
+                              {copy.list.moreLines(q.lines.length - 2)}
                             </div>
                           )}
                         </div>
@@ -520,7 +510,7 @@ Web : www.topcarzone.com`;
                           {formatXof(q.totalXof)}
                         </div>
                         <div style={{ fontSize: "0.72rem", opacity: 0.65 }}>
-                          {formatXof(q.subtotalHtXof)} HT {q.taxRatePct > 0 ? `· TVA ${q.taxRatePct}%` : ""}
+                          {formatXof(q.subtotalHtXof)} {copy.list.amountBase} {q.taxRatePct > 0 ? copy.list.amountVat(q.taxRatePct) : ""}
                         </div>
                         {(() => {
                           const { discount } = decodeDiscountFromNotes(q.notes);
@@ -542,7 +532,7 @@ Web : www.topcarzone.com`;
                                 }}
                               >
                                 <Tag size={10} />
-                                {discount.type === "PERCENT" ? `Remise -${discount.value}%` : `Remise -${formatXof(discount.value)}`}
+                                {discount.type === "PERCENT" ? copy.list.discountPercent(discount.value) : copy.list.discountAmount(formatXof(discount.value))}
                               </span>
                             </div>
                           );
@@ -551,10 +541,10 @@ Web : www.topcarzone.com`;
 
                       {/* Validité */}
                       <td style={{ padding: "0.85rem 1rem" }}>
-                        <div style={{ fontSize: "0.82rem" }}>{formatDate(q.validUntil)}</div>
+                        <div style={{ fontSize: "0.82rem" }}>{formatQuoteDate(copy, q.validUntil)}</div>
                         {q.sentAt && (
                           <div style={{ fontSize: "0.7rem", opacity: 0.55, display: "flex", alignItems: "center", gap: 3 }}>
-                            <Mail size={11} /> Envoyé
+                            <Mail size={11} /> {copy.list.sent}
                           </div>
                         )}
                       </td>
@@ -595,11 +585,11 @@ Web : www.topcarzone.com`;
                             }`,
                           }}
                         >
-                          {QUOTE_STATUS_LABELS[q.status] || q.status}
+                          {copy.statuses[q.status] || q.status}
                         </span>
                         {q.invoice && (
                           <div style={{ fontSize: "0.72rem", opacity: 0.7, marginTop: 4 }}>
-                            Facture : <strong>{q.invoice.number}</strong>
+                            {copy.list.invoiceRef(q.invoice.number)}
                           </div>
                         )}
                       </td>
@@ -621,7 +611,7 @@ Web : www.topcarzone.com`;
                             target="_blank"
                             className="ox-btn ox-btn-ghost ox-btn-sm"
                             style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
-                            title="Imprimer / Télécharger PDF (Proforma + CGV + Fiche Technique)"
+                            title={copy.list.actions.pdfTitle}
                           >
                             <Printer size={13} />
                             PDF
@@ -642,10 +632,10 @@ Web : www.topcarzone.com`;
                                   color: "var(--brand)",
                                   borderColor: "rgba(0, 120, 212, 0.3)",
                                 }}
-                                title="Voir la Fiche Technique officielle (FR)"
+                                title={copy.list.actions.ficheTitle}
                               >
                                 <FileText size={12} />
-                                Fiche
+                                {copy.list.actions.ficheLabel}
                               </Link>
                             );
                           })()}
@@ -664,10 +654,10 @@ Web : www.topcarzone.com`;
                                 color: "#38bdf8",
                                 border: "1px solid rgba(56, 189, 248, 0.35)",
                               }}
-                              title="Modifier ce devis / cette facture proforma"
+                              title={copy.list.actions.editTitle}
                             >
                               <Edit2 size={13} />
-                              Modifier
+                              {copy.list.actions.editLabel}
                             </button>
                           ) : (
                             <span
@@ -684,14 +674,14 @@ Web : www.topcarzone.com`;
                               }}
                               title={
                                 q.status === "COMMANDE_CONFIRMEE"
-                                  ? "Bon de commande ferme : non modifiable (Réglementation commerciale)"
+                                  ? copy.list.actions.lockedConfirmedTitle
                                   : q.status === "FACTURE_NORMALISEE"
-                                  ? "Facture normalisée certifiée : document fiscal figé non modifiable"
-                                  : "Document annulé en interne"
+                                  ? copy.list.actions.lockedInvoicedTitle
+                                  : copy.list.actions.lockedCancelledTitle
                               }
                             >
                               <Lock size={11} />
-                              Figé
+                              {copy.list.actions.lockedLabel}
                             </span>
                           )}
 
@@ -702,10 +692,10 @@ Web : www.topcarzone.com`;
                               onClick={() => openEmailModal(q)}
                               className="ox-btn ox-btn-sm"
                               style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
-                              title={`Préparer et envoyer l'e-mail avec personnalisation du texte`}
+                              title={copy.list.actions.sendTitle}
                             >
                               <Mail size={13} />
-                              {q.sentAt ? "Renvoyer" : "Envoyer"}
+                              {q.sentAt ? copy.list.actions.resendLabel : copy.list.actions.sendLabel}
                             </button>
                           )}
 
@@ -724,10 +714,10 @@ Web : www.topcarzone.com`;
                                   color: "var(--gold)",
                                   border: "1px solid rgba(212, 175, 55, 0.4)",
                                 }}
-                                title="Valider la commande ferme du client"
+                                title={copy.list.actions.confirmTitle}
                               >
                                 <CheckCircle size={13} />
-                                Confirmer
+                                {copy.list.actions.confirmLabel}
                               </button>
                             </form>
                           )}
@@ -747,10 +737,10 @@ Web : www.topcarzone.com`;
                                   color: "#4ade80",
                                   border: "1px solid rgba(74, 222, 128, 0.4)",
                                 }}
-                                title="Transformer en facture normalisée"
+                                title={copy.list.actions.invoiceTitle}
                               >
                                 <FileCheck size={13} />
-                                Facturer
+                                {copy.list.actions.invoiceLabel}
                               </button>
                             </form>
                           )}
@@ -765,7 +755,7 @@ Web : www.topcarzone.com`;
                               }}
                               className="ox-btn ox-btn-danger ox-btn-sm"
                               style={{ display: "inline-flex", alignItems: "center", gap: 3 }}
-                              title="Annulation interne par la direction avec motif obligatoire"
+                              title={copy.list.actions.voidTitle}
                             >
                               <Ban size={12} />
                             </button>
@@ -784,7 +774,7 @@ Web : www.topcarzone.com`;
                                 gap: 3,
                                 opacity: deletingId === q.id ? 0.5 : 1,
                               }}
-                              title="Supprimer définitivement cette facture proforma"
+                              title={copy.list.actions.deleteTitle}
                             >
                               <Trash2 size={12} />
                               {deletingId === q.id ? "..." : ""}
@@ -801,7 +791,7 @@ Web : www.topcarzone.com`;
                               fontStyle: "italic",
                             }}
                           >
-                            Annulation client verrouillée
+                            {copy.list.actions.clientCancelLocked}
                           </div>
                         )}
                       </td>
@@ -855,7 +845,7 @@ Web : www.topcarzone.com`;
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#ef4444" }}>
                 <AlertTriangle size={20} />
-                <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Annulation Interne d&apos;un Devis</h3>
+                <h3 style={{ margin: 0, fontSize: "1.1rem" }}>{copy.list.voidModal.title}</h3>
               </div>
               <button
                 onClick={() => setVoidModalQuoteId(null)}
@@ -866,8 +856,11 @@ Web : www.topcarzone.com`;
             </div>
 
             <div style={{ fontSize: "0.85rem", opacity: 0.8 }}>
-              Cette action est strictement réservée à la <strong>Direction Générale</strong> et à la{" "}
-              <strong>Comptabilité</strong>. Une justification écrite auditée est obligatoire (minimum 8 caractères).
+              {copy.list.voidModal.bodyLead}
+              <strong>{copy.list.voidModal.roleDirection}</strong>
+              {copy.list.voidModal.bodyMiddle}
+              <strong>{copy.list.voidModal.roleAccounting}</strong>
+              {copy.list.voidModal.bodyTail}
             </div>
 
             <form action={voidInternally}>
@@ -878,7 +871,7 @@ Web : www.topcarzone.com`;
                 minLength={8}
                 value={voidReason}
                 onChange={(e) => setVoidReason(e.target.value)}
-                placeholder="Exemple: Client a décliné le modèle après essai / Changement de projet / Remplacement par PRO-..."
+                placeholder={copy.list.voidModal.reasonPlaceholder}
                 className="ox-input"
                 style={{ width: "100%", height: 80, fontSize: "0.85rem", marginBottom: "1rem" }}
               />
@@ -889,7 +882,7 @@ Web : www.topcarzone.com`;
                   onClick={() => setVoidModalQuoteId(null)}
                   className="ox-btn ox-btn-ghost"
                 >
-                  Fermer
+                  {copy.common.close}
                 </button>
                 <button
                   type="submit"
@@ -898,7 +891,7 @@ Web : www.topcarzone.com`;
                   style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
                 >
                   <Ban size={14} />
-                  Confirmer l&apos;annulation
+                  {copy.list.voidModal.confirm}
                 </button>
               </div>
             </form>
@@ -965,10 +958,10 @@ Web : www.topcarzone.com`;
                 <Mail size={22} color="var(--gold)" />
                 <div>
                   <h3 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700, color: "var(--ice-text-strong)" }}>
-                    Envoi du Devis Proforma par E-mail
+                    {copy.list.emailModal.title}
                   </h3>
                   <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", marginTop: 2 }}>
-                    Proforma <strong>{emailModalQuote.number}</strong> · {formatXof(emailModalQuote.totalXof)} TTC
+                    {copy.list.emailModal.subtitleLead} <strong>{emailModalQuote.number}</strong> · {formatXof(emailModalQuote.totalXof)} {copy.list.emailModal.taxIncluded}
                   </div>
                 </div>
               </div>
@@ -1001,10 +994,10 @@ Web : www.topcarzone.com`;
               }}
             >
               <div style={{ fontWeight: 650, color: "var(--ice-highlight)" }}>
-                📜 Conditions Générales de Vente automatiquement adossées (Page 2)
+                📜 {copy.list.emailModal.cgvTitle}
               </div>
               <div style={{ opacity: 0.85, marginTop: 2 }}>
-                Le document officiel attaché comprend les clauses contractuelles ({emailModalQuote.customer.companyName ? "Professionnel" : "Particulier"}, garanties batterie et véhicule, livraison showroom Zone Maro-Militaire, Gbèdomidji).
+                {copy.list.emailModal.cgvBody(Boolean(emailModalQuote.customer.companyName))}
               </div>
             </div>
 
@@ -1024,7 +1017,7 @@ Web : www.topcarzone.com`;
 
               <div>
                 <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: 4 }}>
-                  Destinataire (Email du client) *
+                  {copy.list.emailModal.toLabel}
                 </label>
                 <input
                   type="email"
@@ -1032,7 +1025,7 @@ Web : www.topcarzone.com`;
                   required
                   value={emailTo}
                   onChange={(e) => setEmailTo(e.target.value)}
-                  placeholder="contact@client.bj"
+                  placeholder={copy.list.emailModal.toPlaceholder}
                   className="ox-input"
                   style={{ width: "100%", fontSize: "0.88rem" }}
                   disabled={isSendingEmail}
@@ -1041,7 +1034,7 @@ Web : www.topcarzone.com`;
 
               <div>
                 <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: 4 }}>
-                  Objet de l&apos;e-mail *
+                  {copy.list.emailModal.subjectLabel}
                 </label>
                 <input
                   type="text"
@@ -1057,7 +1050,7 @@ Web : www.topcarzone.com`;
 
               <div>
                 <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: 4 }}>
-                  Corps du message (personnalisable selon l&apos;échange showroom) *
+                  {copy.list.emailModal.bodyLabel}
                 </label>
                 <textarea
                   name="body"
@@ -1093,7 +1086,7 @@ Web : www.topcarzone.com`;
                   className="ox-btn ox-btn-ghost"
                   disabled={isSendingEmail}
                 >
-                  Annuler
+                  {copy.common.cancel}
                 </button>
                 <button
                   type="submit"
@@ -1108,11 +1101,11 @@ Web : www.topcarzone.com`;
                   }}
                 >
                   {isSendingEmail ? (
-                    <span>Envoi en cours...</span>
+                    <span>{copy.list.emailModal.sending}</span>
                   ) : (
                     <>
                       <Mail size={15} />
-                      <span>Envoyer au client</span>
+                      <span>{copy.list.emailModal.send}</span>
                     </>
                   )}
                 </button>

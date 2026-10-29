@@ -2,8 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
-import { formatDate, formatXof } from "@/lib/format";
-import { QUOTE_STATUS_LABELS } from "@/lib/billing";
+import { formatXof } from "@/lib/format";
+import { getServerMessages } from "@/lib/i18n/server";
+import { quotesCopy, formatQuoteDate } from "@/lib/i18n/messages/quotes";
 import { PrintButton } from "@/components/PrintButton";
 import { getDefaultCgv, type CgvType } from "@/lib/cgv";
 import {
@@ -21,6 +22,8 @@ export default async function QuotePrintPage({
   params: Promise<{ id: string }>;
 }) {
   await requireUser(["DG", "COMMERCIAL", "COMPTA", "ADMIN"]);
+  const { locale } = await getServerMessages();
+  const copy = quotesCopy[locale];
   const { id } = await params;
   const quote = await prisma.quote.findUnique({
     where: { id },
@@ -44,8 +47,8 @@ export default async function QuotePrintPage({
 
   const to = quote.emailTo || quote.customer.email;
   const mailto = to
-    ? `mailto:${to}?subject=${encodeURIComponent(`Proforma ${quote.number} · CARZONE`)}&body=${encodeURIComponent(
-        `Bonjour,\n\nVeuillez trouver la facture proforma ${quote.number} d'un montant de ${formatXof(quote.totalXof)}.\n\nCordialement,\nCARZONE`,
+    ? `mailto:${to}?subject=${encodeURIComponent(copy.print.mailto.subject(quote.number))}&body=${encodeURIComponent(
+        copy.print.mailto.body(quote.number, formatXof(quote.totalXof)),
       )}`
     : null;
 
@@ -70,7 +73,7 @@ export default async function QuotePrintPage({
         }}
       >
         <Link href="/quotes" className="ox-btn ox-btn-ghost">
-          ← Retour devis
+          {copy.print.back}
         </Link>
         <PrintButton />
         {vehiclesWithSheets.map(({ vehicle }) => (
@@ -87,16 +90,16 @@ export default async function QuotePrintPage({
               fontWeight: 600,
             }}
           >
-            📄 Fiche Technique ({vehicle.brand} {vehicle.model})
+            📄 {copy.print.techSheetLink(vehicle.brand, vehicle.model)}
           </Link>
         ))}
         {mailto ? (
-          <a href={mailto} className="ox-btn" title="Ouvre le client mail local">
-            Ouvrir e-mail (mailto)
+          <a href={mailto} className="ox-btn" title={copy.print.mailtoTitle}>
+            {copy.print.mailtoLabel}
           </a>
         ) : null}
         <span style={{ fontSize: "0.8rem", opacity: 0.7 }}>
-          E-mail serveur : stub (journal console), SMTP non branché
+          {copy.print.mailStub}
         </span>
       </div>
 
@@ -133,25 +136,25 @@ export default async function QuotePrintPage({
                 marginBottom: 6,
               }}
             />
-            <div style={{ opacity: 0.7, fontSize: "0.9rem" }}>SARL · Zone Maro-Militaire, Gbèdomidji · Cotonou</div>
+            <div style={{ opacity: 0.7, fontSize: "0.9rem" }}>{copy.print.companyLine}</div>
           </div>
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: "1.25rem", fontWeight: 700 }}>FACTURE PROFORMA</div>
+            <div style={{ fontSize: "1.25rem", fontWeight: 700 }}>{copy.print.docTitle}</div>
             <div>{quote.number}</div>
             <div style={{ fontSize: "0.85rem", marginTop: 4 }}>
-              {QUOTE_STATUS_LABELS[quote.status] || quote.status}
+              {copy.statuses[quote.status] || quote.status}
             </div>
           </div>
         </header>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }}>
           <div>
-            <strong>Client</strong>
+            <strong>{copy.print.clientBlockTitle}</strong>
             <div style={{ fontSize: "1.05rem", fontWeight: 700 }}>{quote.customer.contactName}</div>
             {quote.customer.companyName ? <div style={{ fontWeight: 600 }}>{quote.customer.companyName}</div> : null}
             {quote.customer.ifu ? (
               <div style={{ color: "#0078d4", fontWeight: 600, fontSize: "0.92rem", marginTop: 2 }}>
-                N° IFU : {quote.customer.ifu}
+                {copy.print.ifu(quote.customer.ifu)}
               </div>
             ) : null}
             {quote.customer.address ? <div style={{ fontSize: "0.9rem", opacity: 0.85 }}>{quote.customer.address}</div> : null}
@@ -160,13 +163,15 @@ export default async function QuotePrintPage({
             {quote.customer.phone ? <div style={{ fontSize: "0.9rem" }}>{quote.customer.phone}</div> : null}
           </div>
           <div style={{ textAlign: "right" }}>
-            <div>Date : {formatDate(quote.createdAt)}</div>
-            <div>Validité : {formatDate(quote.validUntil)}</div>
+            <div>{copy.print.date(formatQuoteDate(copy, quote.createdAt))}</div>
+            <div>{copy.print.validUntil(formatQuoteDate(copy, quote.validUntil))}</div>
             <div>
-              Base : {quote.taxMode} · TVA {quote.taxRatePct}%
+              {copy.print.taxBase(quote.taxMode, quote.taxRatePct)}
             </div>
             <div style={{ fontSize: "0.85rem", opacity: 0.75, marginTop: 4 }}>
-              Réf. CGV : {quote.cgvType === "ATELIER" ? "Atelier SAV Carzone Cotonou" : "Vente Véhicules Showroom"}
+              {copy.print.cgvRef(
+                quote.cgvType === "ATELIER" ? copy.print.cgvKindWorkshop : copy.print.cgvKindVehicle
+              )}
             </div>
           </div>
         </div>
@@ -174,10 +179,10 @@ export default async function QuotePrintPage({
         <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "1.25rem" }}>
           <thead>
             <tr style={{ background: "#eef5f9" }}>
-              <th style={{ textAlign: "left", padding: "0.6rem", borderBottom: "1px solid #c5d8e4" }}>Désignation</th>
-              <th style={{ textAlign: "right", padding: "0.6rem", borderBottom: "1px solid #c5d8e4" }}>Qté</th>
-              <th style={{ textAlign: "right", padding: "0.6rem", borderBottom: "1px solid #c5d8e4" }}>P.U.</th>
-              <th style={{ textAlign: "right", padding: "0.6rem", borderBottom: "1px solid #c5d8e4" }}>Montant</th>
+              <th style={{ textAlign: "left", padding: "0.6rem", borderBottom: "1px solid #c5d8e4" }}>{copy.print.columns.designation}</th>
+              <th style={{ textAlign: "right", padding: "0.6rem", borderBottom: "1px solid #c5d8e4" }}>{copy.print.columns.quantity}</th>
+              <th style={{ textAlign: "right", padding: "0.6rem", borderBottom: "1px solid #c5d8e4" }}>{copy.print.columns.unitPrice}</th>
+              <th style={{ textAlign: "right", padding: "0.6rem", borderBottom: "1px solid #c5d8e4" }}>{copy.print.columns.amount}</th>
             </tr>
           </thead>
           <tbody>
@@ -202,28 +207,28 @@ export default async function QuotePrintPage({
           {discountAmount > 0 ? (
             <>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                <span>Sous-total Brut HT</span>
+                <span>{copy.print.totals.gross}</span>
                 <strong>{formatXof(grossTotal)}</strong>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, color: "#16a34a", fontWeight: 700 }}>
                 <span>
-                  Remise Commerciale {discount.type === "PERCENT" ? `(-${discount.value}%)` : "accordée"}
+                  {copy.print.totals.discount(discount.type === "PERCENT" ? String(discount.value) : null)}
                 </span>
                 <span>- {formatXof(discountAmount)}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, paddingTop: 4, borderTop: "1px dashed #cbd5e1", fontWeight: 650 }}>
-                <span>Net Commercial HT</span>
+                <span>{copy.print.totals.netHt}</span>
                 <span>{formatXof(quote.subtotalHtXof)}</span>
               </div>
             </>
           ) : (
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-              <span>Sous-total HT</span>
+              <span>{copy.print.totals.subtotalHt}</span>
               <strong>{formatXof(quote.subtotalHtXof)}</strong>
             </div>
           )}
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-            <span>TVA ({quote.taxRatePct}%)</span>
+            <span>{copy.print.totals.vat(quote.taxRatePct)}</span>
             <strong>{formatXof(quote.taxXof)}</strong>
           </div>
           <div
@@ -237,7 +242,7 @@ export default async function QuotePrintPage({
               fontWeight: 800,
             }}
           >
-            <span>Total TTC</span>
+            <span>{copy.print.totals.totalTtc}</span>
             <strong>{formatXof(quote.totalXof)}</strong>
           </div>
         </div>
@@ -265,7 +270,7 @@ export default async function QuotePrintPage({
               marginBottom: 3,
             }}
           >
-            Mention Légale et Comptable
+            {copy.print.legalHeading}
           </span>
           <strong style={{ color: "#0f172a" }}>
             {formatLegalAmountNotice(quote.totalXof, "proforma")}
@@ -273,7 +278,7 @@ export default async function QuotePrintPage({
         </div>
 
         {cleanNotes ? (
-          <p style={{ marginTop: "1.5rem", fontSize: "0.9rem", opacity: 0.8 }}>Notes : {cleanNotes}</p>
+          <p style={{ marginTop: "1.5rem", fontSize: "0.9rem", opacity: 0.8 }}>{copy.print.notes(cleanNotes)}</p>
         ) : null}
 
         <footer
@@ -285,9 +290,7 @@ export default async function QuotePrintPage({
             paddingTop: "0.75rem",
           }}
         >
-          Document proforma · non fiscal jusqu&apos;à conversion en facture normalisée. Une commande confirmée
-          dans CARZONE ne peut pas être annulée unilatéralement par le client (stock / import / engagements
-          bancaires). Annulation interne réservée DG + Comptabilité avec motif écrit.
+          {copy.print.footer}
         </footer>
       </article>
 
@@ -316,15 +319,20 @@ export default async function QuotePrintPage({
         >
           <div>
             <div style={{ fontSize: "1.1rem", fontWeight: 700, letterSpacing: "0.02em" }}>
-              CONDITIONS GÉNÉRALES DE VENTE &amp; DE GARANTIE
+              {copy.print.cgvPage.title}
             </div>
             <div style={{ fontSize: "0.82rem", opacity: 0.7, marginTop: 2 }}>
-              Adossées à la Facture Proforma N° {quote.number} · {quote.cgvType === "ATELIER" ? "Prestations Atelier SAV &amp; Réparations" : "Vente de Véhicules (Showroom &amp; Import)"}
+              {copy.print.cgvPage.subtitle(
+                quote.number,
+                quote.cgvType === "ATELIER"
+                  ? copy.print.cgvPage.kindWorkshop
+                  : copy.print.cgvPage.kindVehicle
+              )}
             </div>
           </div>
           <div style={{ textAlign: "right", fontSize: "0.82rem", opacity: 0.75 }}>
-            <strong>CARZONE SARL</strong> (SARL Showroom & Mobilité)<br />
-            Zone Maro-Militaire, Quartier Gbèdomidji · Cotonou
+            <strong>{copy.print.cgvPage.company}</strong><br />
+            {copy.print.cgvPage.address}
           </div>
         </header>
 
@@ -352,15 +360,15 @@ export default async function QuotePrintPage({
           }}
         >
           <div>
-            <strong>Pour CARZONE SARL Bénin :</strong>
-            <div style={{ height: 60, marginTop: 6, opacity: 0.6 }}>Direction Commerciale / Signature &amp; Cachet</div>
+            <strong>{copy.print.cgvPage.signCompanyLabel}</strong>
+            <div style={{ height: 60, marginTop: 6, opacity: 0.6 }}>{copy.print.cgvPage.signCompanyRole}</div>
           </div>
           <div style={{ textAlign: "right" }}>
-            <strong>Pour le Client :</strong>
+            <strong>{copy.print.cgvPage.signClientLabel}</strong>
             <div style={{ fontStyle: "italic", fontSize: "0.8rem", opacity: 0.8, marginTop: 2 }}>
-              « Lu et approuvé, bon pour accord »
+              {copy.print.cgvPage.signClientAccepted}
             </div>
-            <div style={{ height: 60, marginTop: 6, opacity: 0.6 }}>Signature &amp; Cachet du Client</div>
+            <div style={{ height: 60, marginTop: 6, opacity: 0.6 }}>{copy.print.cgvPage.signClientStamp}</div>
           </div>
         </div>
       </article>
@@ -391,13 +399,13 @@ export default async function QuotePrintPage({
               fontSize: "0.85rem",
             }}
           >
-            <span>📄 Dossier Annexe : Fiche Technique · {sheet.title}</span>
+            <span>{copy.print.cgvPage.annex(sheet.title)}</span>
             <Link
               href={`/vehicles/${vehicle.id}/fiche-technique`}
               target="_blank"
               style={{ color: "#38bdf8", textDecoration: "underline" }}
             >
-              Ouvrir fiche seule ↗
+              {copy.print.cgvPage.openSheet}
             </Link>
           </div>
 

@@ -4,6 +4,8 @@ import { Badge, DataTable } from "@/components/ui";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { formatXof } from "@/lib/format";
+import { getServerMessages } from "@/lib/i18n/server";
+import { crmCopy, opportunityStageLabel } from "@/lib/i18n/messages/crm";
 
 async function createOpp(formData: FormData) {
   "use server";
@@ -45,6 +47,9 @@ async function setStage(formData: FormData) {
 
 export default async function OpportunitiesPage() {
   const user = await requireUser(["DG", "COMMERCIAL", "COMPTA", "ADMIN"]);
+  const { locale } = await getServerMessages();
+  const copy = crmCopy[locale];
+  const oppsCopy = copy.opportunities;
   const [opps, customers, vehicles] = await Promise.all([
     prisma.opportunity.findMany({
       include: { customer: true, vehicle: true, owner: true },
@@ -59,43 +64,50 @@ export default async function OpportunitiesPage() {
   return (
     <AppShell user={user} titleKey="opportunities">
       <form action={createOpp} style={formRow}>
-        <input name="title" placeholder="Titre opportunité *" required style={{ ...input, minWidth: 220 }} />
+        <input name="title" placeholder={oppsCopy.form.titlePlaceholder} required style={{ ...input, minWidth: 220 }} />
         <select name="customerId" style={input} defaultValue="">
-          <option value="">Client</option>
+          <option value="">{oppsCopy.form.customer}</option>
           {customers.map((c) => (
             <option key={c.id} value={c.id}>{c.contactName}</option>
           ))}
         </select>
         <select name="vehicleId" style={input} defaultValue="">
-          <option value="">Véhicule (matching)</option>
+          <option value="">{oppsCopy.form.vehicle}</option>
           {vehicles.map((v) => (
             <option key={v.id} value={v.id}>{v.brand} {v.model} · {formatXof(v.priceXof)}</option>
           ))}
         </select>
-        <input name="amountXof" type="number" placeholder="Montant XOF" style={input} />
-        <button type="submit" style={btn}>Créer</button>
+        <input name="amountXof" type="number" placeholder={oppsCopy.form.amountPlaceholder} style={input} />
+        <button type="submit" style={btn}>{oppsCopy.form.submit}</button>
       </form>
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
         {stages.map((s) => (
-          <Badge key={s}>{s}: {opps.filter((o) => o.stage === s).length}</Badge>
+          <Badge key={s}>{opportunityStageLabel(copy, s)}: {opps.filter((o) => o.stage === s).length}</Badge>
         ))}
       </div>
 
       <DataTable
-        headers={["Titre", "Client", "Véhicule", "Montant", "Étape", "Avancer"]}
+        headers={[
+          oppsCopy.table.title,
+          oppsCopy.table.customer,
+          oppsCopy.table.vehicle,
+          oppsCopy.table.amount,
+          oppsCopy.table.stage,
+          oppsCopy.table.advance,
+        ]}
         rows={opps.map((o) => [
           o.title,
           o.customer?.contactName || "-",
           o.vehicle ? `${o.vehicle.brand} ${o.vehicle.model}` : "-",
           o.amountXof ? formatXof(o.amountXof) : "-",
-          <Badge key={o.id} tone={o.stage === "LIVRE" ? "ok" : o.stage === "PERDU" ? "bad" : "warn"}>{o.stage}</Badge>,
+          <Badge key={o.id} tone={o.stage === "LIVRE" ? "ok" : o.stage === "PERDU" ? "bad" : "warn"}>{opportunityStageLabel(copy, o.stage)}</Badge>,
           <form key={`f-${o.id}`} action={setStage} style={{ display: "flex", gap: 4 }}>
             <input type="hidden" name="id" value={o.id} />
             <select name="stage" defaultValue={o.stage} style={input}>
-              {stages.map((s) => <option key={s} value={s}>{s}</option>)}
+              {stages.map((s) => <option key={s} value={s}>{opportunityStageLabel(copy, s)}</option>)}
             </select>
-            <button type="submit" style={btnSmall}>OK</button>
+            <button type="submit" style={btnSmall}>{oppsCopy.table.apply}</button>
           </form>,
         ])}
       />

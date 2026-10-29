@@ -4,26 +4,16 @@ import { AppShell } from "@/components/AppShell";
 import { Badge, DataTable } from "@/components/ui";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
-
-const VEHICLE_TYPES = [
-  { value: "SUV", label: "SUV" },
-  { value: "PICKUP", label: "Pick-up" },
-  { value: "BERLINE", label: "Berline" },
-  { value: "VAN", label: "Van / Minibus" },
-] as const;
-
-const SUPPLIER_TYPES = [
-  { value: "IMPORT_PORT", label: "Port d'import" },
-  { value: "DEALER", label: "Dealer" },
-  { value: "OTHER", label: "Autre" },
-] as const;
-
-const TYPE_LABEL: Record<string, string> = Object.fromEntries(
-  VEHICLE_TYPES.map((t) => [t.value, t.label]),
-);
-const SUPPLIER_TYPE_LABEL: Record<string, string> = Object.fromEntries(
-  SUPPLIER_TYPES.map((t) => [t.value, t.label]),
-);
+import { getServerMessages } from "@/lib/i18n/server";
+import {
+  energyCopy,
+  energyKindLabel,
+  ENERGY_KIND_KEYS,
+  ENERGY_VEHICLE_TYPE_KEYS,
+  energyVehicleTypeLabel,
+  SUPPLIER_TYPE_KEYS,
+  supplierTypeLabel,
+} from "@/lib/i18n/messages/energy";
 
 async function createBrand(formData: FormData) {
   "use server";
@@ -115,6 +105,9 @@ async function toggleSupplier(formData: FormData) {
 
 export default async function CatalogPage() {
   const user = await requireUser(["DG", "STOCK"]);
+  const { locale } = await getServerMessages();
+  const copy = energyCopy[locale];
+  const t = copy.catalog;
   const [brands, suppliers] = await Promise.all([
     prisma.vehicleBrand.findMany({
       include: { models: { orderBy: { name: "asc" } }, _count: { select: { models: true } } },
@@ -129,16 +122,16 @@ export default async function CatalogPage() {
       modelRows.push([
         b.name,
         m.name,
-        m.vehicleType ? TYPE_LABEL[m.vehicleType] || m.vehicleType : "-",
-        m.energy || "-",
+        m.vehicleType ? energyVehicleTypeLabel(copy, m.vehicleType) : copy.common.notProvided,
+        m.energy ? energyKindLabel(copy, m.energy) : copy.common.notProvided,
         <Badge key={`ma-${m.id}`} tone={m.active ? "ok" : "neutral"}>
-          {m.active ? "Actif" : "Inactif"}
+          {m.active ? copy.common.active : copy.common.inactive}
         </Badge>,
         <form key={`mt-${m.id}`} action={toggleModel} style={{ display: "inline" }}>
           <input type="hidden" name="id" value={m.id} />
           <input type="hidden" name="active" value={m.active ? "1" : "0"} />
           <button type="submit" className="ox-btn ox-btn-ghost" style={{ padding: "0.25rem 0.55rem", fontSize: "0.8rem" }}>
-            {m.active ? "Désactiver" : "Réactiver"}
+            {m.active ? t.toggle.deactivate : t.toggle.reactivate}
           </button>
         </form>,
       ]);
@@ -147,38 +140,35 @@ export default async function CatalogPage() {
 
   return (
     <AppShell user={user} titleKey="catalog">
-      <p style={{ opacity: 0.75, marginTop: 0 }}>
-        Marques et modèles CARZONE (site officiel + BYD EV), utilisés pour le stock et les imports.
-        Ajoutez une marque, un modèle ou un fournisseur quand CARZONE élargit l&apos;offre.
-      </p>
+      <p style={{ opacity: 0.75, marginTop: 0 }}>{t.intro}</p>
 
       <section className="ox-glass" style={{ padding: "1rem", marginBottom: 20 }}>
-        <h2 style={{ margin: "0 0 0.75rem", fontSize: "1.05rem" }}>Marques</h2>
+        <h2 style={{ margin: "0 0 0.75rem", fontSize: "1.05rem" }}>{t.brand.title}</h2>
         <form action={createBrand} className="ox-form-row" style={{ marginBottom: 12 }}>
           <input
             name="name"
-            placeholder="Nouvelle marque *"
+            placeholder={t.brand.placeholder}
             required
             className="ox-input"
-            title="Nom de marque (ex. BYD, VOYAH)"
+            title={t.brand.titleAttr}
           />
-          <button type="submit" className="ox-btn" title="Ajouter une marque au catalogue">
-            Ajouter marque
+          <button type="submit" className="ox-btn" title={t.brand.addTitle}>
+            {t.brand.add}
           </button>
         </form>
         <DataTable
-          headers={["Marque", "Modèles", "Statut", "Action"]}
+          headers={[t.brand.table.brand, t.brand.table.models, t.brand.table.status, t.brand.table.action]}
           rows={brands.map((b) => [
             b.name,
             b._count.models,
             <Badge key={`ba-${b.id}`} tone={b.active ? "ok" : "neutral"}>
-              {b.active ? "Actif" : "Inactif"}
+              {b.active ? copy.common.active : copy.common.inactive}
             </Badge>,
             <form key={`bt-${b.id}`} action={toggleBrand} style={{ display: "inline" }}>
               <input type="hidden" name="id" value={b.id} />
               <input type="hidden" name="active" value={b.active ? "1" : "0"} />
               <button type="submit" className="ox-btn ox-btn-ghost" style={{ padding: "0.25rem 0.55rem", fontSize: "0.8rem" }}>
-                {b.active ? "Désactiver" : "Réactiver"}
+                {b.active ? t.toggle.deactivate : t.toggle.reactivate}
               </button>
             </form>,
           ])}
@@ -186,11 +176,11 @@ export default async function CatalogPage() {
       </section>
 
       <section className="ox-glass" style={{ padding: "1rem", marginBottom: 20 }}>
-        <h2 style={{ margin: "0 0 0.75rem", fontSize: "1.05rem" }}>Modèles</h2>
+        <h2 style={{ margin: "0 0 0.75rem", fontSize: "1.05rem" }}>{t.model.title}</h2>
         <form action={createModel} className="ox-form-row" style={{ marginBottom: 12 }}>
-          <select name="brandId" required className="ox-select" defaultValue="" title="Marque parente">
+          <select name="brandId" required className="ox-select" defaultValue="" title={t.model.brandTitle}>
             <option value="" disabled>
-              Marque *
+              {t.model.brandPlaceholder}
             </option>
             {brands
               .filter((b) => b.active)
@@ -200,69 +190,69 @@ export default async function CatalogPage() {
                 </option>
               ))}
           </select>
-          <input name="name" placeholder="Modèle *" required className="ox-input" title="Nom du modèle" />
-          <select name="vehicleType" className="ox-select" defaultValue="SUV" title="Type / gamme">
-            {VEHICLE_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.label}
+          <input name="name" placeholder={t.model.modelPlaceholder} required className="ox-input" title={t.model.modelTitle} />
+          <select name="vehicleType" className="ox-select" defaultValue="SUV" title={t.model.typeTitle}>
+            {ENERGY_VEHICLE_TYPE_KEYS.map((value) => (
+              <option key={value} value={value}>
+                {energyVehicleTypeLabel(copy, value)}
               </option>
             ))}
           </select>
-          <select name="energy" className="ox-select" defaultValue="" title="Énergie par défaut">
-            <option value="">Énergie (opt.)</option>
-            <option value="ELECTRIQUE">Électrique</option>
-            <option value="HYBRIDE">Hybride</option>
-            <option value="PHEV">PHEV</option>
-            <option value="ESSENCE">Essence</option>
-            <option value="DIESEL">Diesel</option>
+          <select name="energy" className="ox-select" defaultValue="" title={t.model.energyTitle}>
+            <option value="">{t.model.energyOptional}</option>
+            {ENERGY_KIND_KEYS.map((value) => (
+              <option key={value} value={value}>
+                {energyKindLabel(copy, value)}
+              </option>
+            ))}
           </select>
-          <button type="submit" className="ox-btn" title="Ajouter un modèle">
-            Ajouter modèle
+          <button type="submit" className="ox-btn" title={t.model.addTitle}>
+            {t.model.add}
           </button>
         </form>
         <DataTable
-          headers={["Marque", "Modèle", "Gamme", "Énergie", "Statut", "Action"]}
+          headers={[t.model.table.brand, t.model.table.model, t.model.table.type, t.model.table.energy, t.model.table.status, t.model.table.action]}
           rows={modelRows}
         />
       </section>
 
       <section className="ox-glass" style={{ padding: "1rem", marginBottom: 8 }}>
-        <h2 style={{ margin: "0 0 0.75rem", fontSize: "1.05rem" }}>Fournisseurs</h2>
+        <h2 style={{ margin: "0 0 0.75rem", fontSize: "1.05rem" }}>{t.supplier.title}</h2>
         <form action={createSupplier} className="ox-form-row" style={{ marginBottom: 12 }}>
-          <input name="name" placeholder="Nom fournisseur *" required className="ox-input" title="Nom" />
-          <select name="type" className="ox-select" defaultValue="IMPORT_PORT" title="Type">
-            {SUPPLIER_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.label}
+          <input name="name" placeholder={t.supplier.namePlaceholder} required className="ox-input" title={t.supplier.nameTitle} />
+          <select name="type" className="ox-select" defaultValue="IMPORT_PORT" title={t.supplier.typeTitle}>
+            {SUPPLIER_TYPE_KEYS.map((value) => (
+              <option key={value} value={value}>
+                {supplierTypeLabel(copy, value)}
               </option>
             ))}
           </select>
-          <input name="country" placeholder="Pays" className="ox-input" />
-          <input name="city" placeholder="Ville / port" className="ox-input" />
-          <input name="contact" placeholder="Contact" className="ox-input" />
-          <input name="email" placeholder="Email" className="ox-input" />
-          <input name="phone" placeholder="Téléphone" className="ox-input" />
-          <input name="notes" placeholder="Notes" className="ox-input" style={{ minWidth: 180 }} />
-          <button type="submit" className="ox-btn" title="Ajouter un fournisseur">
-            Ajouter fournisseur
+          <input name="country" placeholder={t.supplier.countryPlaceholder} className="ox-input" />
+          <input name="city" placeholder={t.supplier.cityPlaceholder} className="ox-input" />
+          <input name="contact" placeholder={t.supplier.contactPlaceholder} className="ox-input" />
+          <input name="email" placeholder={t.supplier.emailPlaceholder} className="ox-input" />
+          <input name="phone" placeholder={t.supplier.phonePlaceholder} className="ox-input" />
+          <input name="notes" placeholder={t.supplier.notesPlaceholder} className="ox-input" style={{ minWidth: 180 }} />
+          <button type="submit" className="ox-btn" title={t.supplier.addTitle}>
+            {t.supplier.add}
           </button>
         </form>
         <DataTable
-          headers={["Nom", "Type", "Pays / ville", "Contact", "Tél.", "Statut", "Action"]}
+          headers={[t.supplier.table.name, t.supplier.table.type, t.supplier.table.location, t.supplier.table.contact, t.supplier.table.phone, t.supplier.table.status, t.supplier.table.action]}
           rows={suppliers.map((s) => [
             s.name,
-            SUPPLIER_TYPE_LABEL[s.type] || s.type,
-            [s.country, s.city].filter(Boolean).join(" · ") || "-",
-            s.contact || "-",
-            s.phone || "-",
+            supplierTypeLabel(copy, s.type),
+            [s.country, s.city].filter(Boolean).join(" · ") || copy.common.notProvided,
+            s.contact || copy.common.notProvided,
+            s.phone || copy.common.notProvided,
             <Badge key={`sa-${s.id}`} tone={s.active ? "ok" : "neutral"}>
-              {s.active ? "Actif" : "Inactif"}
+              {s.active ? copy.common.active : copy.common.inactive}
             </Badge>,
             <form key={`st-${s.id}`} action={toggleSupplier} style={{ display: "inline" }}>
               <input type="hidden" name="id" value={s.id} />
               <input type="hidden" name="active" value={s.active ? "1" : "0"} />
               <button type="submit" className="ox-btn ox-btn-ghost" style={{ padding: "0.25rem 0.55rem", fontSize: "0.8rem" }}>
-                {s.active ? "Désactiver" : "Réactiver"}
+                {s.active ? t.toggle.deactivate : t.toggle.reactivate}
               </button>
             </form>,
           ])}

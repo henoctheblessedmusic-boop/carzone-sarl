@@ -59,6 +59,8 @@ export type AdminCopy = {
     loading: string;
     actions: string;
     status: string;
+    /** Séparateur avant une valeur alignée (" :" en FR, ":" en EN, "：" en ZH). */
+    colon: string;
   };
   hr: {
     title: string;
@@ -575,6 +577,7 @@ const fr: AdminCopy = {
     loading: "Patientez...",
     actions: "Actions",
     status: "Statut",
+    colon: " :",
   },
   hr: {
     title: "Ressources humaines (RH)",
@@ -1162,6 +1165,7 @@ const en: AdminCopy = {
     loading: "One moment...",
     actions: "Actions",
     status: "Status",
+    colon: ":",
   },
   hr: {
     title: "Human resources (HR)",
@@ -1740,6 +1744,7 @@ const zh: AdminCopy = {
     loading: "请稍候…",
     actions: "操作",
     status: "状态",
+    colon: "：",
   },
   hr: {
     title: "人力资源（HR）",

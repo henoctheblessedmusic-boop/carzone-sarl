@@ -4,7 +4,9 @@ import { Badge, Card } from "@/components/ui";
 import { BrandModelSelect } from "@/components/BrandModelSelect";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
-import { formatXof, formatDate } from "@/lib/format";
+import { formatXof } from "@/lib/format";
+import { getServerMessages } from "@/lib/i18n/server";
+import { chargeRequestStatusLabel, energyCopy } from "@/lib/i18n/messages/energy";
 import {
   Zap,
   Wrench,
@@ -86,6 +88,9 @@ async function chooseQuote(formData: FormData) {
 
 export default async function ChargeRequestsPage() {
   const user = await requireUser(["DG", "BORNES_OPS", "COMMERCIAL", "INSTALLATEUR"]);
+  const { locale } = await getServerMessages();
+  const copy = energyCopy[locale];
+  const t = copy.chargeRequests;
   const me = await prisma.user.findUnique({ where: { id: user.id } });
 
   const [requests, customers, brands] = await Promise.all([
@@ -150,13 +155,13 @@ export default async function ChargeRequestsPage() {
           style={{ padding: "1.1rem", borderRadius: 12, borderLeft: "4px solid var(--ice)" }}
         >
           <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", textTransform: "uppercase", fontWeight: 600 }}>
-            Total Demandes Bornes
+            {t.kpi.total.label}
           </div>
           <div className="ox-metric-val" style={{ fontSize: "1.6rem", marginTop: 4 }}>
             {totalRequests}
           </div>
           <div style={{ fontSize: "0.75rem", color: "var(--ice-text-muted)", marginTop: 2 }}>
-            Showroom &amp; Clients Particuliers/Pro
+            {t.kpi.total.hint}
           </div>
         </div>
 
@@ -165,13 +170,13 @@ export default async function ChargeRequestsPage() {
           style={{ padding: "1.1rem", borderRadius: 12, borderLeft: "4px solid #f59e0b" }}
         >
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
-            En Appel d&apos;Offres
+            {t.kpi.pending.label}
           </div>
           <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#f59e0b", marginTop: 4 }}>
             {pendingQuotes}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: 2 }}>
-            En attente des chiffrages électriciens
+            {t.kpi.pending.hint}
           </div>
         </div>
 
@@ -180,13 +185,13 @@ export default async function ChargeRequestsPage() {
           style={{ padding: "1.1rem", borderRadius: 12, borderLeft: "4px solid #38bdf8" }}
         >
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
-            Devis Reçus à Arbitrer
+            {t.kpi.received.label}
           </div>
           <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#38bdf8", marginTop: 4 }}>
             {quotesReceived}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: 2 }}>
-            Mise en concurrence disponible
+            {t.kpi.received.hint}
           </div>
         </div>
 
@@ -195,13 +200,13 @@ export default async function ChargeRequestsPage() {
           style={{ padding: "1.1rem", borderRadius: 12, borderLeft: "4px solid #10b981" }}
         >
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
-            Chantiers Attribués
+            {t.kpi.awarded.label}
           </div>
           <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#10b981", marginTop: 4 }}>
             {assignedProjects}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: 2 }}>
-            Installateur retenu &amp; travaux engagés
+            {t.kpi.awarded.hint}
           </div>
         </div>
       </div>
@@ -224,14 +229,14 @@ export default async function ChargeRequestsPage() {
           <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--gold)" }}>
             <Zap size={20} />
             <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700 }}>
-              Lancer un Appel d&apos;Offres Installation Borne (Panel Agréé CARZONE SARL)
+              {t.form.title}
             </h3>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0.75rem" }}>
-            <select name="customerId" required className="ox-select" defaultValue="" title="Client">
+            <select name="customerId" required className="ox-select" defaultValue="" title={t.form.customer}>
               <option value="" disabled>
-                Sélectionner le Client *
+                {t.form.customer}
               </option>
               {customers.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -242,23 +247,23 @@ export default async function ChargeRequestsPage() {
 
             <input
               name="address"
-              placeholder="Adresse d'installation (ex: Cité Houéyiho, Lot 14) *"
+              placeholder={t.form.address}
               required
               className="ox-input"
             />
 
             <input
               name="city"
-              placeholder="Ville"
+              placeholder={t.form.city}
               defaultValue="Cotonou"
               className="ox-input"
             />
 
             <select name="powerKw" className="ox-select" defaultValue="7.4">
-              <option value="7.4">Borne 7.4 kW (Monophasé 32A)</option>
-              <option value="11">Borne 11 kW (Triphasé 16A)</option>
-              <option value="22">Borne 22 kW (Triphasé 32A)</option>
-              <option value="50">Borne Rapide DC 50 kW</option>
+              <option value="7.4">{t.form.powerOptions["7.4"]}</option>
+              <option value="11">{t.form.powerOptions["11"]}</option>
+              <option value="22">{t.form.powerOptions["22"]}</option>
+              <option value="50">{t.form.powerOptions["50"]}</option>
             </select>
           </div>
 
@@ -267,7 +272,7 @@ export default async function ChargeRequestsPage() {
           <div>
             <input
               name="notes"
-              placeholder="Précisions chantier (ex: distance disjoncteur 15m, passage de câble en goulotte extérieure...)"
+              placeholder={t.form.notes}
               className="ox-input"
               style={{ width: "100%", fontSize: "0.85rem" }}
             />
@@ -288,7 +293,7 @@ export default async function ChargeRequestsPage() {
               }}
             >
               <Send size={16} />
-              Diffuser la demande au Panel Installateurs
+              {t.form.submit}
             </button>
           </div>
         </form>
@@ -326,26 +331,22 @@ export default async function ChargeRequestsPage() {
 
                   <div style={{ fontSize: "0.85rem", opacity: 0.8, marginTop: 4, display: "flex", flexWrap: "wrap", gap: 12 }}>
                     <span>📍 {r.address}, {r.city}</span>
-                    <span>⚡ Puissance demandée : <strong>{r.powerKw ? `${r.powerKw} kW` : "7.4 kW"}</strong></span>
+                    <span>⚡ {t.request.power} : <strong>{r.powerKw ? `${r.powerKw} kW` : "7.4 kW"}</strong></span>
                     {r.vehicleBrand && (
-                      <span>🚗 Véhicule : {r.vehicleBrand} {r.vehicleModel || ""}</span>
+                      <span>🚗 {t.request.vehicle} : {r.vehicleBrand} {r.vehicleModel || ""}</span>
                     )}
-                    <span>📅 Créée le : {formatDate(r.createdAt)}</span>
+                    <span>📅 {t.request.created} : {copy.formatDate(r.createdAt)}</span>
                   </div>
 
                   {r.notes && (
                     <div style={{ fontSize: "0.8rem", opacity: 0.7, fontStyle: "italic", marginTop: 4 }}>
-                      Note : {r.notes}
+                      {t.request.note} : {r.notes}
                     </div>
                   )}
                 </div>
 
                 <Badge tone={r.status === "CHOISI" ? "ok" : r.status === "DEVIS_RECUS" ? "ice" : "warn"}>
-                  {r.status === "CHOISI"
-                    ? "Installateur Retenu"
-                    : r.status === "DEVIS_RECUS"
-                      ? "Devis à Comparer"
-                      : "En Attente de Devis"}
+                  {chargeRequestStatusLabel(copy, r.status)}
                 </Badge>
               </div>
 
@@ -353,7 +354,7 @@ export default async function ChargeRequestsPage() {
               <div>
                 <div style={{ fontSize: "0.85rem", fontWeight: 650, color: "var(--ice)", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
                   <Wrench size={16} />
-                  Mise en Concurrence des Installateurs Partenaires ({r.installerQuotes.length} consultés) :
+                  {t.request.quotesTitle(r.installerQuotes.length)}
                 </div>
 
                 <div
@@ -409,7 +410,7 @@ export default async function ChargeRequestsPage() {
                             }}
                           >
                             <Award size={12} />
-                            OFFRE RETENUE
+                            {t.quote.awarded}
                           </div>
                         )}
 
@@ -418,20 +419,20 @@ export default async function ChargeRequestsPage() {
                             {q.installer.companyName}
                           </div>
                           <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: 2 }}>
-                            {q.installer.contactName} · {q.installer.city || "Cotonou"}
+                            {q.installer.contactName} · {q.installer.city || t.quote.defaultCity}
                           </div>
 
                           <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
                             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem" }}>
-                              <span style={{ opacity: 0.7 }}>Montant Chiffré :</span>
+                              <span style={{ opacity: 0.7 }}>{t.quote.amount} :</span>
                               <strong style={{ fontSize: "1.05rem", color: q.amountXof ? "#10b981" : "inherit" }}>
-                                {q.amountXof != null ? formatXof(q.amountXof) : "En attente..."}
+                                {q.amountXof != null ? formatXof(q.amountXof) : t.quote.pendingAmount}
                               </strong>
                             </div>
 
                             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem" }}>
-                              <span style={{ opacity: 0.7 }}>Délai d&apos;exécution :</span>
-                              <span>{q.leadDays != null ? `${q.leadDays} jours ouvrés` : "-"}</span>
+                              <span style={{ opacity: 0.7 }}>{t.quote.leadTime} :</span>
+                              <span>{q.leadDays != null ? t.quote.leadDays(q.leadDays) : copy.common.notProvided}</span>
                             </div>
 
                             {q.notes && (
@@ -452,7 +453,7 @@ export default async function ChargeRequestsPage() {
                                 <input
                                   name="amountXof"
                                   type="number"
-                                  placeholder="Montant XOF *"
+                                  placeholder={t.quote.amountPlaceholder}
                                   required
                                   className="ox-input"
                                   style={{ flex: 1, fontSize: "0.85rem" }}
@@ -460,7 +461,7 @@ export default async function ChargeRequestsPage() {
                                 <input
                                   name="leadDays"
                                   type="number"
-                                  placeholder="Délai (j)"
+                                  placeholder={t.quote.leadPlaceholder}
                                   defaultValue={7}
                                   className="ox-input"
                                   style={{ width: 80, fontSize: "0.85rem" }}
@@ -468,7 +469,7 @@ export default async function ChargeRequestsPage() {
                               </div>
                               <input
                                 name="notes"
-                                placeholder="Matériel inclus / spécificités"
+                                placeholder={t.quote.notesPlaceholder}
                                 className="ox-input"
                                 style={{ width: "100%", fontSize: "0.8rem" }}
                               />
@@ -480,7 +481,7 @@ export default async function ChargeRequestsPage() {
                                   fontWeight: 650,
                                 }}
                               >
-                                Soumettre l&apos;offre chiffrée
+                                {t.quote.submit}
                               </button>
                             </form>
                           ) : isSubmitted && user.role !== "INSTALLATEUR" ? (
@@ -503,17 +504,17 @@ export default async function ChargeRequestsPage() {
                                 }}
                               >
                                 <CheckCircle size={15} />
-                                Retenir cet installateur
+                                {t.quote.choose}
                               </button>
                             </form>
                           ) : (
                             <div style={{ textAlign: "center", fontSize: "0.78rem", opacity: 0.65 }}>
                               {isSelected ? (
-                                <span style={{ color: "#10b981", fontWeight: 700 }}>Chantier confié</span>
+                                <span style={{ color: "#10b981", fontWeight: 700 }}>{t.quote.won}</span>
                               ) : isRejected ? (
-                                <span style={{ color: "#ef4444" }}>Offre non retenue</span>
+                                <span style={{ color: "#ef4444" }}>{t.quote.rejected}</span>
                               ) : (
-                                "Devis en cours de rédaction"
+                                t.quote.drafting
                               )}
                             </div>
                           )}

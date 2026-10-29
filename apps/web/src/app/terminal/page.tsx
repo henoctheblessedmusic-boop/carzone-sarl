@@ -14,6 +14,8 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
+import { usePrefs } from "@/components/PrefsProvider";
+import { energyCopy, type PaymentMethodKey } from "@/lib/i18n/messages/energy";
 
 type Station = {
   id: string;
@@ -34,12 +36,15 @@ type Customer = {
 };
 
 export default function TerminalPage() {
+  const { locale } = usePrefs();
+  const copy = energyCopy[locale];
+  const t = copy.terminal;
   const [stations, setStations] = useState<Station[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [stationId, setStationId] = useState("");
   const [customerId, setCustomerId] = useState("");
   const [kwh, setKwh] = useState<number>(30);
-  const [method, setMethod] = useState<"MTN_MOMO" | "MOOV_MONEY" | "CARTE">("MTN_MOMO");
+  const [method, setMethod] = useState<PaymentMethodKey>("MTN_MOMO");
   const [phone, setPhone] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [ussdStep, setUssdStep] = useState<"IDLE" | "PUSH_SENT" | "PIN_ENTERED" | "SUCCESS">("IDLE");
@@ -60,8 +65,8 @@ export default function TerminalPage() {
         setCustomers(data.customers || []);
         if (data.stations?.[0]) setStationId(data.stations[0].id);
       })
-      .catch(() => setError("Erreur de connexion au réseau des bornes CARZONE"));
-  }, []);
+      .catch(() => setError(t.errors.loadNetwork));
+  }, [t.errors.loadNetwork]);
 
   const selectedStation = stations.find((s) => s.id === stationId);
   const selectedCustomer = customers.find((c) => c.id === customerId);
@@ -81,11 +86,11 @@ export default function TerminalPage() {
 
   async function handleLaunchPayment() {
     if (!stationId) {
-      setError("Veuillez sélectionner une borne active.");
+      setError(t.errors.pickStation);
       return;
     }
     if (kwh <= 0) {
-      setError("Veuillez sélectionner une quantité de kWh positive.");
+      setError(t.errors.pickKwh);
       return;
     }
 
@@ -119,7 +124,7 @@ export default function TerminalPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Échec du paiement.");
+        setError(data.error || t.errors.payment);
         setUssdStep("IDLE");
       } else {
         setResultData({
@@ -132,7 +137,7 @@ export default function TerminalPage() {
         setUssdStep("SUCCESS");
       }
     } catch {
-      setError("Erreur réseau lors de la validation.");
+      setError(t.errors.validation);
       setUssdStep("IDLE");
     } finally {
       setLoading(false);
@@ -183,11 +188,11 @@ export default function TerminalPage() {
           }}
         >
           <ArrowLeft size={16} />
-          Retour plateforme CARZONE
+          {t.backLink}
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.85rem", color: "#10b981" }}>
           <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", display: "inline-block", boxShadow: "0 0 10px #10b981" }} />
-          Terminal Réseau Actif
+          {t.networkOn}
         </div>
       </div>
 
@@ -235,10 +240,10 @@ export default function TerminalPage() {
             </div>
             <div>
               <div style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.08em", color: "#10b981", fontWeight: 700 }}>
-                CARZONE Fast Charging
+                {t.brandKicker}
               </div>
               <h1 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 800, color: "#fff" }}>
-                Borne Publique Haute Puissance
+                {t.title}
               </h1>
             </div>
           </div>
@@ -249,7 +254,7 @@ export default function TerminalPage() {
                 {selectedStation.code}
               </div>
               <div style={{ fontSize: "0.75rem", opacity: 0.65 }}>
-                {selectedStation.powerKw ? `${selectedStation.powerKw} kW DC` : "Rapide"}
+                {selectedStation.powerKw ? `${selectedStation.powerKw} kW DC` : t.powerFallback}
               </div>
             </div>
           )}
@@ -300,10 +305,10 @@ export default function TerminalPage() {
 
             <div>
               <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, color: "#fff" }}>
-                Paiement Validé &amp; Charge Débloquée !
+                {t.successTitle}
               </h2>
               <div style={{ fontSize: "0.85rem", opacity: 0.7, marginTop: 4 }}>
-                Facture de recharge n° <strong>{resultData.invoiceNumber}</strong>
+                {t.successInvoiceLabel} <strong>{resultData.invoiceNumber}</strong>
               </div>
             </div>
 
@@ -322,22 +327,22 @@ export default function TerminalPage() {
               }}
             >
               <div>
-                <span style={{ opacity: 0.65, fontSize: "0.8rem" }}>Énergie injectée :</span>
+                <span style={{ opacity: 0.65, fontSize: "0.8rem" }}>{t.injected} :</span>
                 <div style={{ fontWeight: 700, fontSize: "1.1rem" }}>{resultData.kwh} kWh</div>
               </div>
               <div>
-                <span style={{ opacity: 0.65, fontSize: "0.8rem" }}>Tarif unitaire :</span>
+                <span style={{ opacity: 0.65, fontSize: "0.8rem" }}>{t.unitPrice} :</span>
                 <div style={{ fontWeight: 700, fontSize: "1.1rem" }}>{resultData.pricePerKwh} FCFA/kWh</div>
               </div>
               <div>
-                <span style={{ opacity: 0.65, fontSize: "0.8rem" }}>Montant Réglé :</span>
+                <span style={{ opacity: 0.65, fontSize: "0.8rem" }}>{t.amountPaid} :</span>
                 <div style={{ fontWeight: 800, fontSize: "1.3rem", color: "#10b981" }}>
                   {formatXof(resultData.totalXof)}
                 </div>
               </div>
               {resultData.savingsXof > 0 && (
                 <div>
-                  <span style={{ opacity: 0.65, fontSize: "0.8rem" }}>Économie Abonné :</span>
+                  <span style={{ opacity: 0.65, fontSize: "0.8rem" }}>{t.savings} :</span>
                   <div style={{ fontWeight: 800, fontSize: "1.1rem", color: "var(--gold)" }}>
                     {formatXof(resultData.savingsXof)}
                   </div>
@@ -363,7 +368,7 @@ export default function TerminalPage() {
                 }}
               >
                 <RefreshCw size={16} />
-                Nouvelle Session
+                {t.newSession}
               </button>
             </div>
           </div>
@@ -398,10 +403,10 @@ export default function TerminalPage() {
 
             <div>
               <h2 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 800, color: "#fff" }}>
-                {ussdStep === "PUSH_SENT" ? "Notification Push USSD Envoyée..." : "Validation du Code Secret..."}
+                {ussdStep === "PUSH_SENT" ? t.pushTitle : t.pinTitle}
               </h2>
               <p style={{ margin: "6px 0 0", fontSize: "0.88rem", opacity: 0.8 }}>
-                Veuillez confirmer la transaction de <strong>{formatXof(totalXof)}</strong> sur votre téléphone portable ({phone || "+229 ..."}).
+                {t.pushBody(formatXof(totalXof), phone || "+229 ...")}
               </p>
             </div>
 
@@ -418,7 +423,7 @@ export default function TerminalPage() {
               }}
             >
               <Clock size={14} />
-              En attente de saisie du PIN {method === "MTN_MOMO" ? "MTN (*880#)" : "Moov (*855#)"}
+              {t.waitingPin(t.ussdPin[method])}
             </div>
           </div>
         ) : (
@@ -427,7 +432,7 @@ export default function TerminalPage() {
             {/* Choix de la Borne & Emplacement */}
             <div>
               <label style={{ display: "block", fontSize: "0.82rem", opacity: 0.8, marginBottom: 6 }}>
-                Emplacement de la Borne :
+                {t.stationLabel} :
               </label>
               <select
                 className="ox-select"
@@ -447,7 +452,7 @@ export default function TerminalPage() {
             {/* Identification & Badge Abonné */}
             <div>
               <label style={{ display: "block", fontSize: "0.82rem", opacity: 0.8, marginBottom: 6 }}>
-                Identification Client / Badge d&apos;Abonnement :
+                {t.customerLabel} :
               </label>
               <select
                 className="ox-select"
@@ -456,10 +461,10 @@ export default function TerminalPage() {
                 onChange={(e) => setCustomerId(e.target.value)}
                 disabled={loading}
               >
-                <option value="">👤 Visiteur Standard (Tarif public 125 FCFA / kWh)</option>
+                <option value="">{t.visitorOption}</option>
                 {customers.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.isSubscriber ? "⭐ [ABONNÉ] " : "👤 "}
+                    {c.isSubscriber ? t.subscriberTag : t.visitorTag}
                     {c.contactName} {c.companyName ? `(${c.companyName})` : ""} · {c.kwhPriceXof} FCFA/kWh
                   </option>
                 ))}
@@ -482,9 +487,9 @@ export default function TerminalPage() {
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--gold)", fontWeight: 650 }}>
                     <Sparkles size={15} />
-                    <span>Abonnement Actif : {selectedCustomer.planName}</span>
+                    <span>{t.activePlan(selectedCustomer.planName ?? "")}</span>
                   </div>
-                  <strong style={{ color: "#fff" }}>90 FCFA / kWh (-28%)</strong>
+                  <strong style={{ color: "#fff" }}>{t.memberRate}</strong>
                 </div>
               )}
             </div>
@@ -493,37 +498,32 @@ export default function TerminalPage() {
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                 <label style={{ fontSize: "0.82rem", opacity: 0.8 }}>
-                  Quantité d&apos;énergie à injecter :
+                  {t.energyLabel} :
                 </label>
                 <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "#10b981" }}>
-                  {kwh} kWh <span style={{ opacity: 0.6, fontSize: "0.75rem", fontWeight: 400 }}>(~{Math.round(kwh * 6.5)} km)</span>
+                  {kwh} kWh <span style={{ opacity: 0.6, fontSize: "0.75rem", fontWeight: 400 }}>({t.rangeHint(Math.round(kwh * 6.5))})</span>
                 </span>
               </div>
 
               {/* Presets */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginBottom: 10 }}>
-                {[
-                  { val: 15, label: "15 kWh", desc: "~100 km" },
-                  { val: 30, label: "30 kWh", desc: "~200 km" },
-                  { val: 45, label: "45 kWh", desc: "~300 km" },
-                  { val: 60, label: "60 kWh", desc: "Plein 100%" },
-                ].map((p) => (
+                {t.presets.map((p) => (
                   <button
-                    key={p.val}
+                    key={p.value}
                     type="button"
-                    onClick={() => setKwh(p.val)}
+                    onClick={() => setKwh(p.value)}
                     style={{
                       padding: "0.65rem 0.4rem",
                       borderRadius: 10,
-                      background: kwh === p.val ? "rgba(16, 185, 129, 0.25)" : "rgba(255, 255, 255, 0.05)",
-                      border: kwh === p.val ? "1px solid #10b981" : "1px solid rgba(255, 255, 255, 0.1)",
-                      color: kwh === p.val ? "#fff" : "rgba(255, 255, 255, 0.7)",
+                      background: kwh === p.value ? "rgba(16, 185, 129, 0.25)" : "rgba(255, 255, 255, 0.05)",
+                      border: kwh === p.value ? "1px solid #10b981" : "1px solid rgba(255, 255, 255, 0.1)",
+                      color: kwh === p.value ? "#fff" : "rgba(255, 255, 255, 0.7)",
                       cursor: "pointer",
                       textAlign: "center",
                     }}
                   >
                     <div style={{ fontWeight: 700, fontSize: "0.9rem" }}>{p.label}</div>
-                    <div style={{ fontSize: "0.7rem", opacity: 0.6 }}>{p.desc}</div>
+                    <div style={{ fontSize: "0.7rem", opacity: 0.6 }}>{p.hint}</div>
                   </button>
                 ))}
               </div>
@@ -542,7 +542,7 @@ export default function TerminalPage() {
             {/* Mode de Paiement */}
             <div>
               <label style={{ display: "block", fontSize: "0.82rem", opacity: 0.8, marginBottom: 6 }}>
-                Mode de Paiement Immédiat :
+                {t.paymentLabel} :
               </label>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
                 <button
@@ -563,7 +563,7 @@ export default function TerminalPage() {
                   }}
                 >
                   <Smartphone size={18} />
-                  <span style={{ fontSize: "0.8rem" }}>MTN MoMo</span>
+                  <span style={{ fontSize: "0.8rem" }}>{t.method.MTN_MOMO}</span>
                 </button>
 
                 <button
@@ -584,7 +584,7 @@ export default function TerminalPage() {
                   }}
                 >
                   <Smartphone size={18} />
-                  <span style={{ fontSize: "0.8rem" }}>Moov Money</span>
+                  <span style={{ fontSize: "0.8rem" }}>{t.method.MOOV_MONEY}</span>
                 </button>
 
                 <button
@@ -605,7 +605,7 @@ export default function TerminalPage() {
                   }}
                 >
                   <CreditCard size={18} />
-                  <span style={{ fontSize: "0.8rem" }}>Carte TPE</span>
+                  <span style={{ fontSize: "0.8rem" }}>{t.method.CARTE}</span>
                 </button>
               </div>
 
@@ -613,7 +613,7 @@ export default function TerminalPage() {
                 <div style={{ marginTop: 10 }}>
                   <input
                     type="tel"
-                    placeholder="Numéro Mobile Money (ex: 97 00 00 00)"
+                    placeholder={t.phonePlaceholder}
                     className="ox-input"
                     style={{ width: "100%", fontSize: "0.9rem" }}
                     value={phone}
@@ -636,14 +636,14 @@ export default function TerminalPage() {
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.88rem" }}>
-                <span style={{ opacity: 0.7 }}>Tarif par kWh appliqué :</span>
+                <span style={{ opacity: 0.7 }}>{t.rateApplied} :</span>
                 <span style={{ fontWeight: 650 }}>{pricePerKwh} FCFA</span>
               </div>
 
               {savingsXof > 0 && (
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.88rem", color: "var(--gold)" }}>
-                  <span>Avantage Membre Club :</span>
-                  <span style={{ fontWeight: 700 }}>- {formatXof(savingsXof)} économisés</span>
+                  <span>{t.memberSaving} :</span>
+                  <span style={{ fontWeight: 700 }}>- {t.saved(formatXof(savingsXof))}</span>
                 </div>
               )}
 
@@ -658,7 +658,7 @@ export default function TerminalPage() {
                 }}
               >
                 <span style={{ fontWeight: 700, fontSize: "1.05rem", color: "#fff" }}>
-                  Total à régler :
+                  {t.totalLabel} :
                 </span>
                 <span style={{ fontWeight: 800, fontSize: "1.5rem", color: "#10b981" }}>
                   {formatXof(totalXof)}
@@ -688,7 +688,7 @@ export default function TerminalPage() {
               }}
             >
               <BatteryCharging size={22} />
-              {loading ? "Déclenchement en cours..." : "Payer & Débloquer la Charge"}
+              {loading ? t.paying : t.payButton}
             </button>
           </>
         )}

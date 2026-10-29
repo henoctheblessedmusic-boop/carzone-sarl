@@ -19,6 +19,8 @@ import {
   Clock,
 } from "lucide-react";
 import { ROLE_LABELS, type Role } from "@/lib/roles";
+import { usePrefs } from "@/components/PrefsProvider";
+import { commsCopy } from "@/lib/i18n/messages/comms";
 import { CallHistoryView } from "./components/CallHistoryView";
 import { ConferenceRoomView } from "./components/ConferenceRoomView";
 import { PREDEFINED_ROOMS } from "@/lib/conference-rooms";
@@ -78,6 +80,9 @@ export function ChatView({
   initialMessages: MessageItem[];
 }) {
   const [activeTab, setActiveTab] = useState<"CHANNEL" | "DIRECT" | "BROADCAST" | "CONFERENCE" | "CALL_HISTORY">("CHANNEL");
+  const { locale } = usePrefs();
+  const comms = commsCopy[locale];
+  const copy = comms.chat;
   const [selectedChannel, setSelectedChannel] = useState("GENERAL");
   const [selectedPeer, setSelectedPeer] = useState<ChatUser | null>(null);
   const [selectedConferenceRoom, setSelectedConferenceRoom] = useState<string>("CONF_DIRECTION");
@@ -280,7 +285,7 @@ export function ChatView({
         });
         await refreshMessages();
       } catch (err: unknown) {
-        alert(err instanceof Error ? err.message : "Erreur envoi message");
+        alert(err instanceof Error ? err.message : copy.errors.sendMessage);
       }
     });
   };
@@ -301,7 +306,7 @@ export function ChatView({
     if (!broadcastText.trim()) return;
 
     if (broadcastTarget === "CUSTOM" && selectedBroadcastUsers.length === 0) {
-      alert("Veuillez sélectionner au moins un collaborateur ou choisir l'option 'Tous les utilisateurs'.");
+      alert(copy.errors.noRecipient);
       return;
     }
 
@@ -316,16 +321,16 @@ export function ChatView({
 
         const countTarget =
           broadcastTarget === "ALL"
-            ? "l'ensemble des collaborateurs de l'entreprise"
-            : `${selectedBroadcastUsers.length} collaborateur(s) sélectionné(s)`;
+            ? copy.broadcast.allCompany
+            : copy.broadcast.someCount(selectedBroadcastUsers.length);
 
         setBroadcastText("");
         setShowBroadcastModal(false);
         setActiveTab("BROADCAST");
         await refreshMessages();
-        alert(`Message de diffusion envoyé avec succès à ${countTarget} !`);
+        alert(copy.broadcast.success(countTarget));
       } catch (err: unknown) {
-        alert(err instanceof Error ? err.message : "Erreur envoi diffusion");
+        alert(err instanceof Error ? err.message : copy.errors.sendBroadcast);
       }
     });
   };
@@ -335,7 +340,7 @@ export function ChatView({
     if (typeof window !== "undefined" && window.startVoiceCall) {
       window.startVoiceCall(peer.id, peer.fullName);
     } else {
-      alert("Le module d'appel audio est en cours d'initialisation...");
+      alert(copy.errors.audioInit);
     }
   };
 
@@ -377,7 +382,7 @@ export function ChatView({
                 <MessageSquare size={20} />
               </span>
               <h2 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 700, color: "var(--ice-text)" }}>
-                Messagerie Entreprise
+                {copy.title}
               </h2>
             </div>
 
@@ -386,7 +391,7 @@ export function ChatView({
               <button
                 type="button"
                 onClick={() => setShowBroadcastModal(true)}
-                title="Diffuser une annonce à toute l'équipe (Diffusion DG)"
+                title={copy.broadcast.buttonTitle}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -402,7 +407,7 @@ export function ChatView({
                 }}
               >
                 <Radio size={13} />
-                Diffuser
+                {copy.broadcast.button}
               </button>
             )}
           </div>
@@ -413,7 +418,7 @@ export function ChatView({
           {/* Canaux d'équipe */}
           <div style={{ padding: "12px 14px 6px 14px" }}>
             <div style={{ fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", opacity: 0.55, marginBottom: 8 }}>
-              Canaux d&apos;Équipe
+              {copy.channelsTitle}
             </div>
 
             <button
@@ -446,7 +451,7 @@ export function ChatView({
               }}
             >
               <Users size={16} />
-              <span># général (Tous)</span>
+              <span>{copy.channels.general}</span>
             </button>
 
             <button
@@ -479,7 +484,7 @@ export function ChatView({
               }}
             >
               <Wrench size={16} />
-              <span># atelier-sav</span>
+              <span>{copy.channels.workshop}</span>
             </button>
 
             <button
@@ -512,7 +517,7 @@ export function ChatView({
               }}
             >
               <Car size={16} />
-              <span># ventes-showroom</span>
+              <span>{copy.channels.sales}</span>
             </button>
 
             {/* Canal Diffusion Spéciale */}
@@ -547,7 +552,7 @@ export function ChatView({
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <Radio size={16} />
-                <span>📢 Annonces DG / Diffusions</span>
+                <span>{copy.channels.broadcast}</span>
               </div>
               {broadcastUnread > 0 && (
                 <span
@@ -565,7 +570,7 @@ export function ChatView({
                     padding: "0 5px",
                     boxShadow: "0 0 8px rgba(239, 68, 68, 0.6)",
                   }}
-                  title={`${broadcastUnread} annonce(s) non lue(s)`}
+                  title={comms.notifications.unreadAnnouncements(broadcastUnread)}
                 >
                   {broadcastUnread}
                 </span>
@@ -576,7 +581,7 @@ export function ChatView({
           {/* Section Conférences & Historique Appels */}
           <div style={{ padding: "6px 14px 10px 14px", borderBottom: "1px solid var(--ice-border, rgba(255, 255, 255, 0.08))" }}>
             <div style={{ fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", opacity: 0.55, marginBottom: 8 }}>
-              Appels & Conférences
+              {copy.callsSectionTitle}
             </div>
 
             {/* Historique des Appels */}
@@ -611,7 +616,7 @@ export function ChatView({
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <Clock size={16} />
-                <span>📞 Historique des Appels</span>
+                <span>{copy.callHistory}</span>
               </div>
               {missedCallsCount > 0 && (
                 <span
@@ -629,7 +634,7 @@ export function ChatView({
                     padding: "0 5px",
                     boxShadow: "0 0 8px rgba(239, 68, 68, 0.6)",
                   }}
-                  title={`${missedCallsCount} appel(s) en absence`}
+                  title={comms.notifications.missedCalls(missedCallsCount)}
                 >
                   {missedCallsCount}
                 </span>
@@ -697,7 +702,7 @@ export function ChatView({
           {/* Collègues (Messages Directs & Appels) */}
           <div style={{ padding: "12px 14px", flex: 1 }}>
             <div style={{ fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", opacity: 0.55, marginBottom: 8 }}>
-              Messages Directs & Appels ({colleagues.length})
+              {copy.directsTitle(colleagues.length)}
             </div>
 
             {/* Search colleague */}
@@ -716,7 +721,7 @@ export function ChatView({
               <Search size={13} opacity={0.6} />
               <input
                 type="text"
-                placeholder="Rechercher un collègue..."
+                placeholder={copy.searchColleague}
                 value={searchUser}
                 onChange={(e) => setSearchUser(e.target.value)}
                 style={{
@@ -744,10 +749,10 @@ export function ChatView({
                     : "#ef4444";
                 const statusLabel =
                   colleague.status === "ONLINE"
-                    ? "En ligne"
+                    ? copy.presence.online
                     : colleague.status === "AWAY"
-                    ? "Inactif"
-                    : "Non connecté";
+                    ? copy.presence.away
+                    : copy.presence.offline;
 
                 return (
                   <button
@@ -864,7 +869,7 @@ export function ChatView({
                           boxShadow: "0 0 8px rgba(239, 68, 68, 0.6)",
                           flexShrink: 0,
                         }}
-                        title={`${unreadCount} message(s) non lu(s)`}
+                        title={comms.notifications.unreadMessages(unreadCount)}
                       >
                         {unreadCount}
                       </span>
@@ -922,10 +927,10 @@ export function ChatView({
                 : "rgba(239, 68, 68, 0.15)";
             const peerStatusLabel =
               peerStatus === "ONLINE"
-                ? "En ligne"
+                ? copy.presence.online
                 : peerStatus === "AWAY"
-                ? "Inactif"
-                : "Non connecté";
+                ? copy.presence.away
+                : copy.presence.offline;
 
             return (
               <>
@@ -935,8 +940,8 @@ export function ChatView({
                     type="button"
                     onClick={() => setMobileScreen("LIST")}
                     className="ox-chat-back-btn"
-                    title="Retour à la liste"
-                    aria-label="Retour à la liste"
+                    title={copy.backToList}
+                    aria-label={copy.backToList}
                     style={{
                       alignItems: "center",
                       justifyContent: "center",
@@ -959,7 +964,7 @@ export function ChatView({
                         {activeTab === "CHANNEL"
                           ? `# ${selectedChannel.toLowerCase()}`
                           : activeTab === "BROADCAST"
-                          ? "📢 Annonces DG & Diffusions"
+                          ? copy.broadcast.title
                           : selectedPeer?.fullName}
                       </h3>
                       {activeTab === "DIRECT" && selectedPeer && (
@@ -1007,10 +1012,10 @@ export function ChatView({
 
                     <div style={{ fontSize: "0.76rem", opacity: 0.6, marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                       {activeTab === "CHANNEL"
-                        ? "Canal public d'échange d'équipe"
+                        ? copy.subtitle.channel
                         : activeTab === "BROADCAST"
-                        ? "Communications officielles de la flotte"
-                        : "Discussion privée & appel audio"}
+                        ? copy.subtitle.broadcast
+                        : copy.subtitle.direct}
                     </div>
                   </div>
                 </div>
@@ -1026,7 +1031,7 @@ export function ChatView({
                           window.openMicModal();
                         }
                       }}
-                      title="Tester ou autoriser le microphone"
+                      title={copy.micTitle}
                       style={{
                         display: "inline-flex",
                         alignItems: "center",
@@ -1042,7 +1047,7 @@ export function ChatView({
                       }}
                     >
                       <Mic size={14} color="var(--gold, #d4af37)" />
-                      <span>Micro</span>
+                      <span>{copy.mic}</span>
                     </button>
 
                     {/* Audio Call button */}
@@ -1051,8 +1056,8 @@ export function ChatView({
                       onClick={handleStartCall}
                       title={
                         peerStatus === "OFFLINE"
-                          ? `${selectedPeer.fullName} n'est pas connecté actuellement sur l'application`
-                          : `Lancer un appel audio avec ${selectedPeer.fullName}`
+                          ? copy.call.offlineTitle(selectedPeer.fullName)
+                          : copy.call.callTitle(selectedPeer.fullName)
                       }
                       style={{
                         display: "inline-flex",
@@ -1079,7 +1084,7 @@ export function ChatView({
                       }}
                     >
                       {peerStatus === "OFFLINE" ? <PhoneOff size={14} /> : <Phone size={14} />}
-                      <span>{peerStatus === "OFFLINE" ? "Non connecté" : "Appeler"}</span>
+                      <span>{peerStatus === "OFFLINE" ? copy.call.offline : copy.call.call}</span>
                     </button>
                   </div>
                 )}
@@ -1099,7 +1104,7 @@ export function ChatView({
                 fontSize: "0.875rem",
               }}
             >
-              Aucun message pour l&apos;instant. Envoyez le premier message ou lancez une discussion !
+              {copy.empty}
             </div>
           ) : (
             messages.map((m) => {
@@ -1161,9 +1166,9 @@ export function ChatView({
                         }}
                       >
                         <Radio size={13} />
-                        <span>DIFFUSION DIRECTION GÉNÉRALE</span>
+                        <span>{copy.broadcast.badge}</span>
                         <span style={{ opacity: 0.75, fontWeight: 500, fontSize: "0.68rem" }}>
-                          • {m.recipientIds && m.recipientIds.length > 0 ? `Groupe ciblé (${m.recipientIds.length} pers.)` : "Tous les collaborateurs"}
+                          • {m.recipientIds && m.recipientIds.length > 0 ? copy.broadcast.groupTarget(m.recipientIds.length) : copy.broadcast.allTarget}
                         </span>
                       </div>
                     )}
@@ -1202,7 +1207,7 @@ export function ChatView({
                       }}
                     >
                       <span>
-                        {new Date(m.createdAt).toLocaleTimeString("fr-FR", {
+                        {new Date(m.createdAt).toLocaleTimeString(comms.timeLocale, {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
@@ -1311,7 +1316,7 @@ export function ChatView({
                 }}
               >
                 <span style={{ fontSize: "1.2rem" }}>{st.code}</span>
-                <span style={{ fontSize: "0.75rem" }}>{st.label}</span>
+                <span style={{ fontSize: "0.75rem" }}>{copy.stickers.labels[st.code] ?? st.label}</span>
               </button>
             ))}
           </div>
@@ -1323,7 +1328,7 @@ export function ChatView({
           <button
             type="button"
             onClick={() => setShowStickerPicker(!showStickerPicker)}
-            title="Envoyer un sticker ou réaction"
+            title={copy.stickers.title}
             style={{
               background: "none",
               border: "none",
@@ -1341,10 +1346,10 @@ export function ChatView({
             type="text"
             placeholder={
               activeTab === "CHANNEL"
-                ? `Écrire dans #${selectedChannel.toLowerCase()}... (Entrée pour envoyer)`
+                ? copy.placeholder.channel(selectedChannel.toLowerCase())
                 : activeTab === "BROADCAST"
-                ? "Écrire une annonce générale..."
-                : `Message pour ${selectedPeer?.fullName || ""}...`
+                ? copy.placeholder.broadcast
+                : copy.placeholder.direct(selectedPeer?.fullName || "")
             }
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
@@ -1448,7 +1453,7 @@ export function ChatView({
                   <Radio size={18} />
                 </span>
                 <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 700, color: "var(--ice-text)" }}>
-                  Diffusion Direction Générale
+                  {copy.broadcast.modalTitle}
                 </h3>
               </div>
               <button
@@ -1470,7 +1475,7 @@ export function ChatView({
             <form onSubmit={handleBroadcastSubmit} style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 650, marginBottom: 8, color: "var(--ice-text)" }}>
-                  Destinataires du message
+                  {copy.broadcast.recipientsLabel}
                 </label>
                 <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 10 }}>
                   <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "0.85rem" }}>
@@ -1484,7 +1489,7 @@ export function ChatView({
                       }}
                       style={{ accentColor: "#d4af37" }}
                     />
-                    <span>📢 Tous les utilisateurs en même temps (Entreprise entière)</span>
+                    <span>{copy.broadcast.optionAll}</span>
                   </label>
 
                   <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "0.85rem" }}>
@@ -1495,7 +1500,7 @@ export function ChatView({
                       onChange={() => setBroadcastTarget("CUSTOM")}
                       style={{ accentColor: "#d4af37" }}
                     />
-                    <span>👥 Groupe d&apos;utilisateurs spécifique</span>
+                    <span>{copy.broadcast.optionCustom}</span>
                   </label>
                 </div>
 
@@ -1520,7 +1525,7 @@ export function ChatView({
                         cursor: "pointer",
                       }}
                     >
-                      🔧 Groupe Atelier SAV
+                      {copy.broadcast.groups.workshop}
                     </button>
 
                     <button
@@ -1541,7 +1546,7 @@ export function ChatView({
                         cursor: "pointer",
                       }}
                     >
-                      🚗 Groupe Ventes & Showroom
+                      {copy.broadcast.groups.sales}
                     </button>
 
                     <button
@@ -1562,7 +1567,7 @@ export function ChatView({
                         cursor: "pointer",
                       }}
                     >
-                      💳 Groupe Finance & Compta
+                      {copy.broadcast.groups.finance}
                     </button>
 
                     <button
@@ -1583,7 +1588,7 @@ export function ChatView({
                         cursor: "pointer",
                       }}
                     >
-                      👑 Direction & Administration
+                      {copy.broadcast.groups.direction}
                     </button>
                   </div>
                 )}
@@ -1606,7 +1611,7 @@ export function ChatView({
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                     <span style={{ fontSize: "0.75rem", opacity: 0.7 }}>
-                      {selectedBroadcastUsers.length} collaborateur(s) sélectionné(s) :
+                      {copy.broadcast.selectedCount(selectedBroadcastUsers.length)}
                     </span>
                     <button
                       type="button"
@@ -1626,8 +1631,8 @@ export function ChatView({
                       }}
                     >
                       {selectedBroadcastUsers.length === colleagues.length
-                        ? "Tout décocher"
-                        : "Tout sélectionner"}
+                        ? copy.broadcast.deselectAll
+                        : copy.broadcast.selectAll}
                     </button>
                   </div>
 
@@ -1667,12 +1672,12 @@ export function ChatView({
               {/* Message text */}
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 650, marginBottom: 6, color: "var(--ice-text)" }}>
-                  Message officiel de la Direction
+                  {copy.broadcast.messageLabel}
                 </label>
                 <textarea
                   rows={4}
                   required
-                  placeholder="Tapez le communiqué, la consigne ou l'information à transmettre..."
+                  placeholder={copy.broadcast.messagePlaceholder}
                   value={broadcastText}
                   onChange={(e) => setBroadcastText(e.target.value)}
                   style={{
@@ -1711,7 +1716,7 @@ export function ChatView({
                     cursor: "pointer",
                   }}
                 >
-                  Annuler
+                  {comms.common.cancel}
                 </button>
                 <button
                   type="submit"
@@ -1732,7 +1737,7 @@ export function ChatView({
                   }}
                 >
                   <Send size={15} />
-                  {isPending ? "Diffusion..." : "Diffuser le Message"}
+                  {isPending ? copy.broadcast.sending : copy.broadcast.submit}
                 </button>
               </div>
             </form>
@@ -1785,7 +1790,7 @@ export function ChatView({
               </div>
               <div>
                 <h4 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 700, color: "var(--ice-text)" }}>
-                  Collaborateur non connecté
+                  {copy.offlineModal.title}
                 </h4>
                 <span
                   style={{
@@ -1798,13 +1803,13 @@ export function ChatView({
                   }}
                 >
                   <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#ef4444" }} />
-                  Hors ligne actuellement
+                  {copy.offlineModal.status}
                 </span>
               </div>
             </div>
 
             <p style={{ margin: "0 0 20px 0", fontSize: "0.86rem", opacity: 0.85, lineHeight: 1.5 }}>
-              <strong>{offlineCallPrompt.fullName}</strong> n&apos;est pas connecté(e) sur l&apos;application en ce moment. Votre appel risque de ne pas aboutir immédiatement sur son appareil.
+              <strong>{offlineCallPrompt.fullName}</strong> {copy.offlineModal.body}
             </p>
 
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
@@ -1821,7 +1826,7 @@ export function ChatView({
                   cursor: "pointer",
                 }}
               >
-                Annuler
+                {comms.common.cancel}
               </button>
 
               <button
@@ -1842,7 +1847,7 @@ export function ChatView({
                   cursor: "pointer",
                 }}
               >
-                📞 Lancer l&apos;appel quand même
+                {copy.offlineModal.callAnyway}
               </button>
             </div>
           </div>

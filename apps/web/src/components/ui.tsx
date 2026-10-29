@@ -1,5 +1,11 @@
+"use client";
+
+// PolicyPanel lit la langue active via le contexte client : le module est donc
+// déclaré comme frontière client, les primitives ci-dessous restent inchangées.
 import type { CSSProperties, ReactNode } from "react";
 import Link from "next/link";
+import { usePrefs } from "@/components/PrefsProvider";
+import { sharedCopy } from "@/lib/i18n/messages/shared";
 
 export function Card({ children, style, className = "" }: { children: ReactNode; style?: CSSProperties; className?: string }) {
   return (
@@ -69,30 +75,27 @@ export function Badge({
 }
 
 export function PolicyPanel() {
+  const { locale } = usePrefs();
+  const policy = sharedCopy[locale].policy;
+
   return (
-    <aside className="ox-callout" aria-label="Politique bon de commande">
-      <h3>Politique bon de commande / proforma acceptée</h3>
+    <aside className="ox-callout" aria-label={policy.ariaLabel}>
+      <h3>{policy.title}</h3>
       <p>
-        Une fois un <strong>bon de commande</strong> ou une <strong>proforma acceptée / confirmée</strong> saisie
-        dans CARZONE, le client <strong>ne peut pas l&apos;annuler unilatéralement</strong>.
+        {policy.intro.before}
+        <strong>{policy.intro.order}</strong>
+        {policy.intro.between}
+        <strong>{policy.intro.proforma}</strong>
+        {policy.intro.after}
+        <strong>{policy.intro.cannot}</strong>
+        {policy.intro.end}
       </p>
       <ul>
-        <li>
-          <strong>Pourquoi :</strong> réservation de stock / import, engagements fournisseur et flux bancaires déjà
-          engagés.
-        </li>
-        <li>
-          <strong>Avant confirmation :</strong> délai de réflexion autorisé ; demande d&apos;avenant possible tant
-          que le document n&apos;est pas « envoyé / confirmé ».
-        </li>
-        <li>
-          <strong>Après confirmation :</strong> seule une note de crédit commerciale / avenant avec validation
-          DG + Comptabilité est possible, jamais une suppression silencieuse.
-        </li>
-        <li>
-          <strong>SLA recommandé :</strong> cooling-off uniquement avant « envoyé/confirmé » ; après envoi = engagement
-          ferme.
-        </li>
+        {policy.bullets.map((bullet) => (
+          <li key={bullet.lead}>
+            <strong>{bullet.lead}</strong> {bullet.text}
+          </li>
+        ))}
       </ul>
     </aside>
   );

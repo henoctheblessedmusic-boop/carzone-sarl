@@ -1812,14 +1812,14 @@ export function HRView({
                   {hrCopy.detail.contractCard}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-                  <div>{hrCopy.detail.contractTypeLabel} : <strong>{contractTypeLongLabel(copy, viewingEmployee.contractType)}</strong></div>
-                  <div>{hrCopy.detail.statusLabel} : <strong>{employeeStatusLabel(copy, viewingEmployee.status)}</strong></div>
+                  <div>{hrCopy.detail.contractTypeLabel}{copy.common.colon} <strong>{contractTypeLongLabel(copy, viewingEmployee.contractType)}</strong></div>
+                  <div>{hrCopy.detail.statusLabel}{copy.common.colon} <strong>{employeeStatusLabel(copy, viewingEmployee.status)}</strong></div>
                   <div>
-                    {hrCopy.detail.hireLabel} : <strong>{new Date(viewingEmployee.hireDate).toLocaleDateString(copy.dateLocale)}</strong>
+                    {hrCopy.detail.hireLabel}{copy.common.colon} <strong>{new Date(viewingEmployee.hireDate).toLocaleDateString(copy.dateLocale)}</strong>
                   </div>
                   {viewingEmployee.contractEnd && (
                     <div>
-                      {hrCopy.detail.endLabel} : <strong>{new Date(viewingEmployee.contractEnd).toLocaleDateString(copy.dateLocale)}</strong>
+                      {hrCopy.detail.endLabel}{copy.common.colon} <strong>{new Date(viewingEmployee.contractEnd).toLocaleDateString(copy.dateLocale)}</strong>
                     </div>
                   )}
                   {viewingEmployee.baseSalaryXof && (
@@ -1846,10 +1846,10 @@ export function HRView({
                   {hrCopy.detail.complianceCard}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-                  <div>{hrCopy.detail.cnssLabel} : <strong>{viewingEmployee.cnssNumber || hrCopy.detail.missing}</strong></div>
-                  <div>{hrCopy.detail.ifuLabel} : <strong>{viewingEmployee.ifuNumber || hrCopy.detail.missing}</strong></div>
-                  <div>{hrCopy.detail.bankLabel} : <strong>{viewingEmployee.bankName || hrCopy.detail.missing}</strong></div>
-                  <div>{hrCopy.detail.accountLabel} : <strong>{viewingEmployee.bankAccountNumber || hrCopy.detail.missing}</strong></div>
+                  <div>{hrCopy.detail.cnssLabel}{copy.common.colon} <strong>{viewingEmployee.cnssNumber || hrCopy.detail.missing}</strong></div>
+                  <div>{hrCopy.detail.ifuLabel}{copy.common.colon} <strong>{viewingEmployee.ifuNumber || hrCopy.detail.missing}</strong></div>
+                  <div>{hrCopy.detail.bankLabel}{copy.common.colon} <strong>{viewingEmployee.bankName || hrCopy.detail.missing}</strong></div>
+                  <div>{hrCopy.detail.accountLabel}{copy.common.colon} <strong>{viewingEmployee.bankAccountNumber || hrCopy.detail.missing}</strong></div>
                 </div>
               </div>
 
@@ -1866,10 +1866,10 @@ export function HRView({
                   {hrCopy.detail.contactCard}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-                  <div>{hrCopy.detail.phoneLabel} : <strong>{viewingEmployee.phone || "-"}</strong></div>
-                  <div>{hrCopy.detail.emailLabel} : <strong>{viewingEmployee.email || "-"}</strong></div>
+                  <div>{hrCopy.detail.phoneLabel}{copy.common.colon} <strong>{viewingEmployee.phone || "-"}</strong></div>
+                  <div>{hrCopy.detail.emailLabel}{copy.common.colon} <strong>{viewingEmployee.email || "-"}</strong></div>
                   <div style={{ gridColumn: "1 / -1" }}>
-                    {hrCopy.detail.emergencyLabel} : <strong>{viewingEmployee.emergencyContact || "-"}</strong>
+                    {hrCopy.detail.emergencyLabel}{copy.common.colon} <strong>{viewingEmployee.emergencyContact || "-"}</strong>
                   </div>
                 </div>
               </div>

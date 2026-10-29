@@ -14,6 +14,8 @@ import {
   Search,
 } from "lucide-react";
 import { ROLE_LABELS, type Role } from "@/lib/roles";
+import { usePrefs } from "@/components/PrefsProvider";
+import { commsCopy, type CommsCopy } from "@/lib/i18n/messages/comms";
 import type { ChatUser } from "../ChatView";
 
 export type CallHistoryItem = {
@@ -31,19 +33,19 @@ export type CallHistoryItem = {
   updatedAt: string;
 };
 
-function formatDuration(seconds: number): string {
-  if (!seconds || seconds <= 0) return "00:00 (Manqué)";
+function formatDuration(seconds: number, copy: CommsCopy["calls"]): string {
+  if (!seconds || seconds <= 0) return copy.missedDuration;
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   if (m >= 60) {
     const h = Math.floor(m / 60);
     const remM = m % 60;
-    return `${h}h ${remM < 10 ? "0" : ""}${remM}m ${s < 10 ? "0" : ""}${s}s`;
+    return `${h}${copy.hourUnit} ${remM < 10 ? "0" : ""}${remM}${copy.minuteUnit} ${s < 10 ? "0" : ""}${s}${copy.secondUnit}`;
   }
-  return `${m < 10 ? "0" : ""}${m} min ${s < 10 ? "0" : ""}${s} s`;
+  return `${m < 10 ? "0" : ""}${m}${copy.minuteUnit} ${s < 10 ? "0" : ""}${s}${copy.secondUnit}`;
 }
 
-function formatDate(iso: string): string {
+function formatDate(iso: string, copy: CommsCopy["calls"], dateLocale: string): string {
   const d = new Date(iso);
   const now = new Date();
   const isToday =
@@ -51,10 +53,10 @@ function formatDate(iso: string): string {
     d.getMonth() === now.getMonth() &&
     d.getFullYear() === now.getFullYear();
 
-  const timeStr = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  const timeStr = d.toLocaleTimeString(dateLocale, { hour: "2-digit", minute: "2-digit" });
 
   if (isToday) {
-    return `Aujourd'hui à ${timeStr}`;
+    return copy.todayAt(timeStr);
   }
 
   const yesterday = new Date(now);
@@ -65,10 +67,13 @@ function formatDate(iso: string): string {
     d.getFullYear() === yesterday.getFullYear();
 
   if (isYesterday) {
-    return `Hier à ${timeStr}`;
+    return copy.yesterdayAt(timeStr);
   }
 
-  return `${d.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" })} à ${timeStr}`;
+  return copy.dateAt(
+    d.toLocaleDateString(dateLocale, { day: "2-digit", month: "2-digit" }),
+    timeStr
+  );
 }
 
 export function CallHistoryView({
@@ -83,6 +88,9 @@ export function CallHistoryView({
   onJoinConference: (roomId: string) => void;
 }) {
   const [calls, setCalls] = useState<CallHistoryItem[]>([]);
+  const { locale } = usePrefs();
+  const comms = commsCopy[locale];
+  const copy = comms.calls;
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"ALL" | "MISSED" | "DIRECT" | "CONFERENCE">("ALL");
   const [scope, setScope] = useState<"me" | "all">("me");
@@ -156,11 +164,11 @@ export function CallHistoryView({
               <Clock size={24} />
             </span>
             <h2 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, color: "var(--ice-text)" }}>
-              Journal des Appels & Traçabilité
+              {copy.title}
             </h2>
           </div>
           <p style={{ margin: "4px 0 0 0", fontSize: "0.82rem", opacity: 0.7 }}>
-            Suivi des appels directs, appels en absence et durée des conférences en ligne
+            {copy.subtitle}
           </p>
         </div>
 
@@ -190,7 +198,7 @@ export function CallHistoryView({
                 cursor: "pointer",
               }}
             >
-              Mes Appels
+              {copy.scopeMine}
             </button>
             <button
               type="button"
@@ -208,10 +216,10 @@ export function CallHistoryView({
                 fontWeight: scope === "all" ? 700 : 500,
                 cursor: "pointer",
               }}
-              title="Traçabilité complète de l'ensemble des collaborateurs pour la Direction"
+              title={copy.scopeCompanyTitle}
             >
               <Building2 size={13} />
-              <span>Traçabilité Entreprise</span>
+              <span>{copy.scopeCompany}</span>
             </button>
           </div>
         )}
@@ -229,7 +237,7 @@ export function CallHistoryView({
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", color: "#f87171" }}>
-              Appels en absence
+              {copy.kpi.missed}
             </span>
             <PhoneMissed size={16} color="#ef4444" />
           </div>
@@ -237,7 +245,7 @@ export function CallHistoryView({
             {missedCalls.length}
           </div>
           <div style={{ fontSize: "0.7rem", opacity: 0.75, marginTop: 2 }}>
-            {missedCalls.length > 0 ? "Nécessite un rappel" : "Aucun appel manqué"}
+            {missedCalls.length > 0 ? copy.kpi.missedPending : copy.kpi.missedNone}
           </div>
         </div>
 
@@ -251,7 +259,7 @@ export function CallHistoryView({
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", color: "#4ade80" }}>
-              Appels directs
+              {copy.kpi.direct}
             </span>
             <PhoneIncoming size={16} color="#22c55e" />
           </div>
@@ -259,7 +267,7 @@ export function CallHistoryView({
             {directCalls.length}
           </div>
           <div style={{ fontSize: "0.7rem", opacity: 0.7, marginTop: 2 }}>
-            Entrants & Sortants
+            {copy.kpi.directDetail}
           </div>
         </div>
 
@@ -273,7 +281,7 @@ export function CallHistoryView({
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", color: "#a855f7" }}>
-              Conférences
+              {copy.kpi.conference}
             </span>
             <Users size={16} color="#c084fc" />
           </div>
@@ -281,7 +289,7 @@ export function CallHistoryView({
             {conferenceCalls.length}
           </div>
           <div style={{ fontSize: "0.7rem", opacity: 0.7, marginTop: 2 }}>
-            Salons d&apos;équipe tenus
+            {copy.kpi.conferenceDetail}
           </div>
         </div>
 
@@ -295,15 +303,15 @@ export function CallHistoryView({
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", color: "var(--gold, #d4af37)" }}>
-              Durée Cumulée
+              {copy.kpi.total}
             </span>
             <Clock size={16} color="var(--gold, #d4af37)" />
           </div>
           <div style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--gold, #d4af37)", marginTop: 4 }}>
-            {formatDuration(totalSeconds)}
+            {formatDuration(totalSeconds, copy)}
           </div>
           <div style={{ fontSize: "0.7rem", opacity: 0.7, marginTop: 2 }}>
-            Temps total de communication
+            {copy.kpi.totalDetail}
           </div>
         </div>
       </div>
@@ -325,7 +333,7 @@ export function CallHistoryView({
               cursor: "pointer",
             }}
           >
-            Tous ({calls.length})
+            {copy.filters.all(calls.length)}
           </button>
 
           <button
@@ -342,7 +350,7 @@ export function CallHistoryView({
               cursor: "pointer",
             }}
           >
-            🔴 En absence ({missedCalls.length})
+            {copy.filters.missed(missedCalls.length)}
           </button>
 
           <button
@@ -359,7 +367,7 @@ export function CallHistoryView({
               cursor: "pointer",
             }}
           >
-            📞 Appels Directs ({directCalls.length})
+            {copy.filters.direct(directCalls.length)}
           </button>
 
           <button
@@ -376,7 +384,7 @@ export function CallHistoryView({
               cursor: "pointer",
             }}
           >
-            🎙️ Conférences ({conferenceCalls.length})
+            {copy.filters.conference(conferenceCalls.length)}
           </button>
         </div>
 
@@ -396,7 +404,7 @@ export function CallHistoryView({
           <Search size={13} opacity={0.6} />
           <input
             type="text"
-            placeholder="Rechercher par nom..."
+            placeholder={copy.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -416,7 +424,7 @@ export function CallHistoryView({
         {loading && calls.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px 0", opacity: 0.6 }}>
             <RefreshCw size={24} style={{ animation: "spin 1s linear infinite" }} />
-            <p style={{ marginTop: 8, fontSize: "0.85rem" }}>Chargement de l&apos;historique des appels...</p>
+            <p style={{ marginTop: 8, fontSize: "0.85rem" }}>{copy.loading}</p>
           </div>
         ) : filteredCalls.length === 0 ? (
           <div
@@ -430,7 +438,7 @@ export function CallHistoryView({
               opacity: 0.7,
             }}
           >
-            Aucun appel enregistré dans cette catégorie.
+            {copy.empty}
           </div>
         ) : (
           filteredCalls.map((c) => {
@@ -512,7 +520,7 @@ export function CallHistoryView({
                           color: isMissed ? "#f87171" : "var(--ice-text)",
                         }}
                       >
-                        {isConference ? c.receiverName : isOutgoing ? `Vers : ${c.receiverName}` : `De : ${c.callerName}`}
+                        {isConference ? c.receiverName : isOutgoing ? copy.toName(c.receiverName) : copy.fromName(c.callerName)}
                       </span>
 
                       {/* Rôle */}
@@ -535,13 +543,13 @@ export function CallHistoryView({
                             border: "1px solid rgba(239, 68, 68, 0.4)",
                           }}
                         >
-                          APPEL EN ABSENCE
+                          {copy.missedBadge}
                         </span>
                       )}
                     </div>
 
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 3, fontSize: "0.76rem", opacity: 0.7 }}>
-                      <span>{formatDate(c.createdAt)}</span>
+                      <span>{formatDate(c.createdAt, copy, comms.dateLocale)}</span>
                       <span>•</span>
                       <span
                         style={{
@@ -549,7 +557,7 @@ export function CallHistoryView({
                           color: isMissed ? "#ef4444" : "var(--gold, #d4af37)",
                         }}
                       >
-                        {isMissed ? "Non décroché (0s)" : `Durée : ${formatDuration(c.durationSeconds)}`}
+                        {isMissed ? copy.notAnswered : copy.duration(formatDuration(c.durationSeconds, copy))}
                       </span>
                     </div>
                   </div>
@@ -576,7 +584,7 @@ export function CallHistoryView({
                       }}
                     >
                       <Radio size={14} />
-                      <span>Rejoindre salon</span>
+                      <span>{copy.joinRoom}</span>
                     </button>
                   ) : targetPeer ? (
                     <button
@@ -602,7 +610,7 @@ export function CallHistoryView({
                       }}
                     >
                       <Phone size={13} />
-                      <span>{isMissed ? "Rappeler" : "Appeler"}</span>
+                      <span>{isMissed ? copy.callBack : copy.call}</span>
                     </button>
                   ) : null}
                 </div>

@@ -3,6 +3,8 @@ import { AppShell } from "@/components/AppShell";
 import { Badge, DataTable } from "@/components/ui";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
+import { getServerMessages } from "@/lib/i18n/server";
+import { energyCopy } from "@/lib/i18n/messages/energy";
 
 async function createInstaller(formData: FormData) {
   "use server";
@@ -21,6 +23,9 @@ async function createInstaller(formData: FormData) {
 
 export default async function InstallersPage() {
   const user = await requireUser(["DG", "BORNES_OPS", "COMMERCIAL", "INSTALLATEUR"]);
+  const { locale } = await getServerMessages();
+  const copy = energyCopy[locale];
+  const t = copy.installers;
   const installers = await prisma.installer.findMany({
     orderBy: { companyName: "asc" },
     include: { _count: { select: { quotes: true } } },
@@ -28,28 +33,26 @@ export default async function InstallersPage() {
 
   return (
     <AppShell user={user} titleKey="installers">
-      <p style={{ opacity: 0.75, marginTop: 0 }}>
-        Professionnels partenaires pour l&apos;installation de bornes à domicile, devis via CARZONE.
-      </p>
+      <p style={{ opacity: 0.75, marginTop: 0 }}>{t.intro}</p>
       {user.role !== "INSTALLATEUR" ? (
         <form action={createInstaller} style={formRow}>
-          <input name="companyName" placeholder="Société *" required style={input} />
-          <input name="contactName" placeholder="Contact *" required style={input} />
-          <input name="email" placeholder="Email" style={input} />
-          <input name="phone" placeholder="Téléphone" style={input} />
-          <input name="specialties" placeholder="Spécialités" style={{ ...input, minWidth: 200 }} />
-          <button type="submit" style={btn}>Ajouter au panel</button>
+          <input name="companyName" placeholder={t.form.company} required style={input} />
+          <input name="contactName" placeholder={t.form.contact} required style={input} />
+          <input name="email" placeholder={t.form.email} style={input} />
+          <input name="phone" placeholder={t.form.phone} style={input} />
+          <input name="specialties" placeholder={t.form.specialties} style={{ ...input, minWidth: 200 }} />
+          <button type="submit" style={btn}>{t.form.submit}</button>
         </form>
       ) : null}
       <DataTable
-        headers={["Société", "Contact", "Téléphone", "Spécialités", "Devis", "Actif"]}
+        headers={[t.table.company, t.table.contact, t.table.phone, t.table.specialties, t.table.quotes, t.table.active]}
         rows={installers.map((i) => [
           i.companyName,
           i.contactName,
-          i.phone || "-",
-          i.specialties || "-",
+          i.phone || copy.common.notProvided,
+          i.specialties || copy.common.notProvided,
           i._count.quotes,
-          <Badge key={i.id} tone={i.active ? "ok" : "bad"}>{i.active ? "Actif" : "Inactif"}</Badge>,
+          <Badge key={i.id} tone={i.active ? "ok" : "bad"}>{i.active ? copy.common.active : copy.common.inactive}</Badge>,
         ])}
       />
     </AppShell>

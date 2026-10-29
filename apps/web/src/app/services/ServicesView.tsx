@@ -13,6 +13,13 @@ import {
   X,
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
+import { usePrefs } from "@/components/PrefsProvider";
+import {
+  ARTICLE_CATEGORY_KEYS,
+  articleCategoryLabel,
+  articleCategoryOptionLabel,
+  energyCopy,
+} from "@/lib/i18n/messages/energy";
 import {
   createArticle,
   updateArticle,
@@ -38,6 +45,9 @@ export function ServicesView({
   initialArticles: ArticleItem[];
   canManage: boolean;
 }) {
+  const { locale } = usePrefs();
+  const copy = energyCopy[locale];
+  const t = copy.services;
   const [articles, setArticles] = useState(initialArticles);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("ALL");
@@ -75,7 +85,7 @@ export function ServicesView({
   }
 
   function handleDelete(item: ArticleItem) {
-    if (!window.confirm(`Supprimer l'article "${item.name}" ?`)) return;
+    if (!window.confirm(t.deleteConfirm(item.name))) return;
     startTransition(async () => {
       await deleteArticle(item.id);
       setArticles((prev) => prev.filter((a) => a.id !== item.id));
@@ -95,7 +105,7 @@ export function ServicesView({
         <div className="ox-glass" style={{ padding: "1.1rem 1.25rem", borderRadius: 16 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: "0.85rem", opacity: 0.7, fontWeight: 550 }}>
-              Total Catalogue
+              {t.kpi.total.label}
             </span>
             <Package size={18} style={{ color: "var(--brand)" }} />
           </div>
@@ -103,14 +113,14 @@ export function ServicesView({
             {totalCount}
           </div>
           <div style={{ fontSize: "0.8rem", opacity: 0.65, marginTop: 2 }}>
-            Articles & prestations référencés
+            {t.kpi.total.hint}
           </div>
         </div>
 
         <div className="ox-glass" style={{ padding: "1.1rem 1.25rem", borderRadius: 16 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: "0.85rem", opacity: 0.7, fontWeight: 550 }}>
-              Modèles & Véhicules
+              {t.kpi.vehicles.label}
             </span>
             <Car size={18} style={{ color: "var(--gold)" }} />
           </div>
@@ -118,14 +128,14 @@ export function ServicesView({
             {vehicleCount}
           </div>
           <div style={{ fontSize: "0.8rem", opacity: 0.65, marginTop: 2 }}>
-            Tarifs catalogue véhicules
+            {t.kpi.vehicles.hint}
           </div>
         </div>
 
         <div className="ox-glass" style={{ padding: "1.1rem 1.25rem", borderRadius: 16 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: "0.85rem", opacity: 0.7, fontWeight: 550 }}>
-              Accessoires & Bornes
+              {t.kpi.accessories.label}
             </span>
             <Sparkles size={18} style={{ color: "var(--ok)" }} />
           </div>
@@ -133,14 +143,14 @@ export function ServicesView({
             {accessoryCount}
           </div>
           <div style={{ fontSize: "0.8rem", opacity: 0.65, marginTop: 2 }}>
-            Wallbox, câbles, bâches, additifs
+            {t.kpi.accessories.hint}
           </div>
         </div>
 
         <div className="ox-glass" style={{ padding: "1.1rem 1.25rem", borderRadius: 16 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: "0.85rem", opacity: 0.7, fontWeight: 550 }}>
-              Forfaits Atelier & SAV
+              {t.kpi.workshop.label}
             </span>
             <Wrench size={18} style={{ color: "var(--ice-highlight)" }} />
           </div>
@@ -148,7 +158,7 @@ export function ServicesView({
             {serviceCount}
           </div>
           <div style={{ fontSize: "0.8rem", opacity: 0.65, marginTop: 2 }}>
-            Main-d&apos;œuvre et révisions
+            {t.kpi.workshop.hint}
           </div>
         </div>
       </div>
@@ -180,7 +190,7 @@ export function ServicesView({
             />
             <input
               type="text"
-              placeholder="Rechercher un article, service, véhicule..."
+              placeholder={t.searchPlaceholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="ox-input"
@@ -212,11 +222,11 @@ export function ServicesView({
             className="ox-select"
             style={{ height: 38, fontSize: "0.88rem" }}
           >
-            <option value="ALL">Toutes catégories</option>
-            <option value="VEHICULE">Véhicules</option>
-            <option value="ACCESSOIRE">Accessoires & Bornes</option>
-            <option value="SERVICE">Services & Atelier</option>
-            <option value="PIECE">Pièces détachées</option>
+            <option value="ALL">{t.categories.all}</option>
+            <option value="VEHICULE">{t.categories.VEHICULE}</option>
+            <option value="ACCESSOIRE">{t.categories.ACCESSOIRE}</option>
+            <option value="SERVICE">{t.categories.SERVICE}</option>
+            <option value="PIECE">{t.categories.PIECE}</option>
           </select>
         </div>
 
@@ -228,7 +238,7 @@ export function ServicesView({
             style={{ height: 38, padding: "0 1.1rem", fontSize: "0.88rem" }}
           >
             <Plus size={16} style={{ marginRight: 6 }} />
-            Ajouter un service / article
+            {t.addButton}
           </button>
         )}
       </div>
@@ -238,22 +248,22 @@ export function ServicesView({
         <table className="ox-table">
           <thead>
             <tr>
-              <th style={{ width: 45 }}>N°</th>
-              <th>Description</th>
-              <th>Description longue / Spécifications</th>
-              <th>Taux / Prix unitaire</th>
-              <th>Taxe</th>
-              <th>Unité</th>
-              <th>Catégorie</th>
-              <th>Statut</th>
-              <th style={{ textAlign: "right", paddingRight: "1.2rem" }}>Actions</th>
+              <th style={{ width: 45 }}>{t.table.index}</th>
+              <th>{t.table.name}</th>
+              <th>{t.table.details}</th>
+              <th>{t.table.price}</th>
+              <th>{t.table.tax}</th>
+              <th>{t.table.unit}</th>
+              <th>{t.table.category}</th>
+              <th>{t.table.status}</th>
+              <th style={{ textAlign: "right", paddingRight: "1.2rem" }}>{t.table.actions}</th>
             </tr>
           </thead>
           <tbody>
             {filteredArticles.length === 0 ? (
               <tr>
                 <td colSpan={9} style={{ textAlign: "center", padding: "2.5rem 1rem", opacity: 0.6 }}>
-                  Aucun article trouvé.
+                  {t.empty}
                 </td>
               </tr>
             ) : (
@@ -273,7 +283,7 @@ export function ServicesView({
                   </td>
                   <td>
                     <span style={{ fontSize: "0.85rem", opacity: 0.8 }}>
-                      {art.taxRatePct > 0 ? `${art.taxRatePct}% TVA` : "0% (Exonéré)"}
+                      {art.taxRatePct > 0 ? t.taxRated(art.taxRatePct) : t.taxFree}
                     </span>
                   </td>
                   <td>
@@ -299,7 +309,7 @@ export function ServicesView({
                             : "var(--ice-highlight)",
                       }}
                     >
-                      {art.category}
+                      {art.category ? articleCategoryLabel(copy, art.category) : copy.common.notProvided}
                     </span>
                   </td>
                   <td>
@@ -309,9 +319,9 @@ export function ServicesView({
                       disabled={isPending || !canManage}
                       className={`ox-badge ox-badge--${art.active ? "ok" : "bad"}`}
                       style={{ cursor: canManage ? "pointer" : "default", border: 0 }}
-                      title={canManage ? "Cliquer pour basculer le statut" : undefined}
+                      title={canManage ? t.toggleTitle : undefined}
                     >
-                      {art.active ? "Actif" : "Inactif"}
+                      {art.active ? copy.common.active : copy.common.inactive}
                     </button>
                   </td>
                   <td style={{ textAlign: "right" }}>
@@ -321,7 +331,7 @@ export function ServicesView({
                           type="button"
                           onClick={() => setEditingArticle(art)}
                           className="ox-btn ox-btn-ghost ox-btn-sm"
-                          title="Modifier"
+                          title={t.editTitle}
                           style={{ padding: "0.3rem 0.5rem" }}
                         >
                           <Edit2 size={14} />
@@ -330,7 +340,7 @@ export function ServicesView({
                           type="button"
                           onClick={() => handleDelete(art)}
                           className="ox-btn ox-btn-ghost ox-btn-sm"
-                          title="Supprimer"
+                          title={t.deleteTitle}
                           style={{ padding: "0.3rem 0.5rem", color: "var(--bad)" }}
                         >
                           <Trash2 size={14} />
@@ -376,9 +386,9 @@ export function ServicesView({
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700 }}>Nouvel Article / Service</h3>
+                <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700 }}>{t.create.title}</h3>
                 <p style={{ margin: "4px 0 0", fontSize: "0.85rem", opacity: 0.65 }}>
-                  Ajouter un produit, forfait ou accessoire au catalogue
+                  {t.create.subtitle}
                 </p>
               </div>
               <button
@@ -400,12 +410,12 @@ export function ServicesView({
             >
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  Description / Nom de l&apos;article <span style={{ color: "var(--bad)" }}>*</span>
+                  {t.form.nameLabel} <span style={{ color: "var(--bad)" }}>*</span>
                 </label>
                 <input
                   name="name"
                   required
-                  placeholder="Ex: Câble Type 2, Forfait Révision, Additif lave glace"
+                  placeholder={t.form.namePlaceholder}
                   className="ox-input"
                   style={{ width: "100%" }}
                   autoFocus
@@ -414,12 +424,12 @@ export function ServicesView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  Description longue / Spécifications
+                  {t.form.detailsLabel}
                 </label>
                 <textarea
                   name="description"
                   rows={2}
-                  placeholder="Détails techniques, finitions, compatibilité..."
+                  placeholder={t.form.detailsPlaceholder}
                   className="ox-textarea"
                   style={{ width: "100%", resize: "vertical" }}
                 />
@@ -428,26 +438,25 @@ export function ServicesView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                    Taux / Prix unitaire (XOF) <span style={{ color: "var(--bad)" }}>*</span>
+                    {t.form.priceLabel} <span style={{ color: "var(--bad)" }}>*</span>
                   </label>
                   <input
                     name="unitPriceXof"
                     type="number"
                     required
-                    placeholder="Ex: 45000"
+                    placeholder={t.form.pricePlaceholder}
                     className="ox-input"
                     style={{ width: "100%" }}
                   />
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                    Catégorie
+                    {t.form.categoryLabel}
                   </label>
                   <select name="category" className="ox-select" style={{ width: "100%" }}>
-                    <option value="SERVICE">Service / Forfait Atelier</option>
-                    <option value="ACCESSOIRE">Accessoire & Borne</option>
-                    <option value="VEHICULE">Véhicule catalogue</option>
-                    <option value="PIECE">Pièce détachée</option>
+                    {ARTICLE_CATEGORY_KEYS.map((key) => (
+                      <option key={key} value={key}>{articleCategoryOptionLabel(copy, key)}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -455,21 +464,21 @@ export function ServicesView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                    Taux TVA (%)
+                    {t.form.taxLabel}
                   </label>
                   <select name="taxRatePct" className="ox-select" style={{ width: "100%" }}>
-                    <option value="0">0% (Exonéré / Standard)</option>
-                    <option value="18">18% (TVA Bénin)</option>
+                    <option value="0">{t.form.taxOption.zero}</option>
+                    <option value="18">{t.form.taxOption.eighteen}</option>
                   </select>
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                    Unité
+                    {t.form.unitLabel}
                   </label>
                   <input
                     name="unit"
                     defaultValue="1"
-                    placeholder="1, U, forfait, litre..."
+                    placeholder={t.form.unitPlaceholder}
                     className="ox-input"
                     style={{ width: "100%" }}
                   />
@@ -482,10 +491,10 @@ export function ServicesView({
                   onClick={() => setIsCreateOpen(false)}
                   className="ox-btn ox-btn-ghost"
                 >
-                  Annuler
+                  {t.form.cancel}
                 </button>
                 <button type="submit" className="ox-btn">
-                  Enregistrer l&apos;article
+                  {t.form.createSubmit}
                 </button>
               </div>
             </form>
@@ -524,9 +533,9 @@ export function ServicesView({
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700 }}>Modifier l&apos;article</h3>
+                <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700 }}>{t.edit.title}</h3>
                 <p style={{ margin: "4px 0 0", fontSize: "0.85rem", opacity: 0.65 }}>
-                  Mettre à jour le prix et les caractéristiques
+                  {t.edit.subtitle}
                 </p>
               </div>
               <button
@@ -550,7 +559,7 @@ export function ServicesView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  Description / Nom de l&apos;article <span style={{ color: "var(--bad)" }}>*</span>
+                  {t.form.nameLabel} <span style={{ color: "var(--bad)" }}>*</span>
                 </label>
                 <input
                   name="name"
@@ -563,7 +572,7 @@ export function ServicesView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  Description longue / Spécifications
+                  {t.form.detailsLabel}
                 </label>
                 <textarea
                   name="description"
@@ -577,7 +586,7 @@ export function ServicesView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                    Taux / Prix unitaire (XOF) <span style={{ color: "var(--bad)" }}>*</span>
+                    {t.form.priceLabel} <span style={{ color: "var(--bad)" }}>*</span>
                   </label>
                   <input
                     name="unitPriceXof"
@@ -590,7 +599,7 @@ export function ServicesView({
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                    Catégorie
+                    {t.form.categoryLabel}
                   </label>
                   <select
                     name="category"
@@ -598,10 +607,9 @@ export function ServicesView({
                     className="ox-select"
                     style={{ width: "100%" }}
                   >
-                    <option value="SERVICE">Service / Forfait Atelier</option>
-                    <option value="ACCESSOIRE">Accessoire & Borne</option>
-                    <option value="VEHICULE">Véhicule catalogue</option>
-                    <option value="PIECE">Pièce détachée</option>
+                    {ARTICLE_CATEGORY_KEYS.map((key) => (
+                      <option key={key} value={key}>{articleCategoryOptionLabel(copy, key)}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -609,7 +617,7 @@ export function ServicesView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                    Taux TVA (%)
+                    {t.form.taxLabel}
                   </label>
                   <select
                     name="taxRatePct"
@@ -617,13 +625,13 @@ export function ServicesView({
                     className="ox-select"
                     style={{ width: "100%" }}
                   >
-                    <option value="0">0% (Exonéré / Standard)</option>
-                    <option value="18">18% (TVA Bénin)</option>
+                    <option value="0">{t.form.taxOption.zero}</option>
+                    <option value="18">{t.form.taxOption.eighteen}</option>
                   </select>
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                    Unité
+                    {t.form.unitLabel}
                   </label>
                   <input
                     name="unit"
@@ -644,7 +652,7 @@ export function ServicesView({
                   style={{ width: 16, height: 16, accentColor: "var(--brand)" }}
                 />
                 <label htmlFor="activeArt" style={{ fontSize: "0.85rem", cursor: "pointer" }}>
-                  Article actif et disponible pour les devis et factures
+                  {t.form.activeLabel}
                 </label>
               </div>
 
@@ -654,10 +662,10 @@ export function ServicesView({
                   onClick={() => setEditingArticle(null)}
                   className="ox-btn ox-btn-ghost"
                 >
-                  Annuler
+                  {t.form.cancel}
                 </button>
                 <button type="submit" className="ox-btn">
-                  Enregistrer les modifications
+                  {t.form.editSubmit}
                 </button>
               </div>
             </form>

@@ -4,7 +4,14 @@ import { Badge, DataTable } from "@/components/ui";
 import { BrandModelSelect } from "@/components/BrandModelSelect";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
-import { formatDate, formatXof, nextDocNumber } from "@/lib/format";
+import { formatXof, nextDocNumber } from "@/lib/format";
+import { getServerMessages } from "@/lib/i18n/server";
+import {
+  energyCopy,
+  IMPORT_STATUS_KEYS,
+  importPortLabel,
+  importStatusLabel,
+} from "@/lib/i18n/messages/energy";
 
 async function createImport(formData: FormData) {
   "use server";
@@ -42,6 +49,9 @@ async function updateImportStatus(formData: FormData) {
 
 export default async function ImportsPage() {
   const user = await requireUser(["DG", "STOCK", "COMPTA"]);
+  const { locale } = await getServerMessages();
+  const copy = energyCopy[locale];
+  const t = copy.imports;
   const [orders, suppliers, brands] = await Promise.all([
     prisma.importOrder.findMany({
       include: { vehicles: true, customer: true, supplier: true },
@@ -68,18 +78,16 @@ export default async function ImportsPage() {
 
   return (
     <AppShell user={user} titleKey="imports">
-      <p style={{ opacity: 0.75 }}>
-        Suivi des arrivages Anvers · Dubaï · Livourne · lien stock, fournisseur & catalogue.
-      </p>
+      <p style={{ opacity: 0.75 }}>{t.intro}</p>
       <form action={createImport} className="ox-glass" style={{ padding: "1rem", marginBottom: 16 }}>
         <div className="ox-form-row">
-          <select name="originPort" className="ox-select" defaultValue="Anvers" title="Port d'origine">
-            <option value="Anvers">Anvers</option>
-            <option value="Dubaï">Dubaï</option>
-            <option value="Livourne">Livourne</option>
+          <select name="originPort" className="ox-select" defaultValue="Anvers" title={t.form.portTitle}>
+            <option value="Anvers">{importPortLabel(copy, "Anvers")}</option>
+            <option value="Dubaï">{importPortLabel(copy, "Dubaï")}</option>
+            <option value="Livourne">{importPortLabel(copy, "Livourne")}</option>
           </select>
-          <select name="supplierId" className="ox-select" defaultValue="" title="Fournisseur">
-            <option value="">Fournisseur (opt.)</option>
+          <select name="supplierId" className="ox-select" defaultValue="" title={t.form.supplierTitle}>
+            <option value="">{t.form.supplierOptional}</option>
             {suppliers.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
@@ -87,46 +95,46 @@ export default async function ImportsPage() {
               </option>
             ))}
           </select>
-          <input name="etaDate" type="date" className="ox-input" title="ETA" />
-          <input name="costXof" type="number" placeholder="Coût XOF" className="ox-input" />
-          <input name="notes" placeholder="Notes" className="ox-input" style={{ minWidth: 200 }} />
+          <input name="etaDate" type="date" className="ox-input" title={t.form.etaTitle} />
+          <input name="costXof" type="number" placeholder={t.form.costPlaceholder} className="ox-input" />
+          <input name="notes" placeholder={t.form.notesPlaceholder} className="ox-input" style={{ minWidth: 200 }} />
         </div>
         <div style={{ fontSize: "0.85rem", opacity: 0.75, margin: "10px 0 6px" }}>
-          Marque / modèle attendus (catalogue, optionnel)
+          {t.form.catalogHint}
         </div>
         <BrandModelSelect brands={catalog} required={false} allowFreeText={false} />
         <div className="ox-form-row" style={{ marginTop: 10 }}>
-          <button type="submit" className="ox-btn" title="Créer la commande d'import">
-            Nouvelle commande import
+          <button type="submit" className="ox-btn" title={t.form.submitTitle}>
+            {t.form.submit}
           </button>
         </div>
       </form>
       <DataTable
-        headers={["Réf.", "Port", "Fournisseur", "Attendu", "ETA", "Coût", "Véhicules", "Statut", "Action"]}
+        headers={[t.table.reference, t.table.port, t.table.supplier, t.table.expected, t.table.eta, t.table.cost, t.table.vehicles, t.table.status, t.table.action]}
         rows={orders.map((o) => [
           o.reference,
-          o.originPort,
-          o.supplier?.name || "-",
+          importPortLabel(copy, o.originPort),
+          o.supplier?.name || copy.common.notProvided,
           o.expectedBrand
             ? `${o.expectedBrand}${o.expectedModel ? ` ${o.expectedModel}` : ""}`
-            : "-",
-          formatDate(o.etaDate),
-          o.costXof ? formatXof(o.costXof) : "-",
+            : copy.common.notProvided,
+          copy.formatDate(o.etaDate),
+          o.costXof ? formatXof(o.costXof) : copy.common.notProvided,
           o.vehicles.length,
           <Badge key={o.id} tone={o.status === "ARRIVE" ? "ok" : "warn"}>
-            {o.status}
+            {importStatusLabel(copy, o.status)}
           </Badge>,
           <form key={`f-${o.id}`} action={updateImportStatus} className="ox-form-row" style={{ margin: 0, gap: 4 }}>
             <input type="hidden" name="id" value={o.id} />
             <select name="status" defaultValue={o.status} className="ox-select" style={{ minWidth: 110 }}>
-              {["COMMANDE", "EN_TRANSIT", "DOUANE", "ARRIVE", "ANNULE"].map((s) => (
+              {IMPORT_STATUS_KEYS.map((s) => (
                 <option key={s} value={s}>
-                  {s}
+                  {t.statusOption[s]}
                 </option>
               ))}
             </select>
             <button type="submit" className="ox-btn" style={{ padding: "0.35rem 0.6rem", fontSize: "0.8rem" }}>
-              OK
+              {t.confirm}
             </button>
           </form>,
         ])}

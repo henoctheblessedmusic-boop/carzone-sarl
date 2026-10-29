@@ -14,6 +14,8 @@ import {
   Reply,
 } from "lucide-react";
 import { formatDate } from "@/lib/format";
+import { usePrefs } from "@/components/PrefsProvider";
+import { commsCopy } from "@/lib/i18n/messages/comms";
 import {
   sendEmail,
   markMailRead,
@@ -52,6 +54,9 @@ export function MailboxView({
   currentUserEmail: string;
 }) {
   const [mails, setMails] = useState(initialMails);
+  const { locale } = usePrefs();
+  const comms = commsCopy[locale];
+  const copy = comms.mail;
   const [activeFolder, setActiveFolder] = useState<"INBOX" | "SENT" | "DRAFT" | "STARRED" | "TRASH">("INBOX");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMail, setSelectedMail] = useState<MailItem | null>(null);
@@ -148,7 +153,7 @@ export function MailboxView({
           style={{ width: "100%", padding: "0.75rem 1rem", fontSize: "0.92rem", justifyContent: "flex-start" }}
         >
           <Plus size={18} style={{ marginRight: 8 }} />
-          Composer
+          {copy.composeOpen}
         </button>
 
         {/* Folders Card */}
@@ -173,7 +178,7 @@ export function MailboxView({
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <Inbox size={16} />
-                <span>Boîte de réception</span>
+                <span>{copy.folders.INBOX}</span>
               </div>
               {inboxUnread > 0 && (
                 <span
@@ -210,7 +215,7 @@ export function MailboxView({
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <Send size={16} />
-                <span>Envoyés</span>
+                <span>{copy.folders.SENT}</span>
               </div>
               <span style={{ fontSize: "0.78rem", opacity: 0.6 }}>{sentCount}</span>
             </button>
@@ -234,7 +239,7 @@ export function MailboxView({
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <Star size={16} style={{ color: "var(--gold)" }} />
-                <span>Favoris</span>
+                <span>{copy.folders.STARRED}</span>
               </div>
               <span style={{ fontSize: "0.78rem", opacity: 0.6 }}>{starredCount}</span>
             </button>
@@ -258,7 +263,7 @@ export function MailboxView({
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <FileText size={16} />
-                <span>Brouillons</span>
+                <span>{copy.folders.DRAFT}</span>
               </div>
               <span style={{ fontSize: "0.78rem", opacity: 0.6 }}>{draftCount}</span>
             </button>
@@ -282,7 +287,7 @@ export function MailboxView({
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <Trash2 size={16} />
-                <span>Corbeille</span>
+                <span>{copy.folders.TRASH}</span>
               </div>
               <span style={{ fontSize: "0.78rem", opacity: 0.6 }}>{trashCount}</span>
             </button>
@@ -292,7 +297,7 @@ export function MailboxView({
         {/* Connected Accounts */}
         <div className="ox-glass" style={{ padding: "0.9rem", borderRadius: 16 }}>
           <div style={{ fontSize: "0.75rem", fontWeight: 700, opacity: 0.6, letterSpacing: "0.5px", marginBottom: 10, textTransform: "uppercase" }}>
-            Comptes connectés
+            {copy.accountsTitle}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem" }}>
@@ -335,7 +340,7 @@ export function MailboxView({
               />
               <input
                 type="text"
-                placeholder="Rechercher un message, expéditeur..."
+                placeholder={copy.searchPlaceholder}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="ox-input"
@@ -350,10 +355,10 @@ export function MailboxView({
             disabled={isSyncing}
             className="ox-btn ox-btn-ghost ox-btn-sm"
             style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
-            title="Synchroniser la boîte de réception"
+            title={copy.syncTitle}
           >
             <RefreshCw size={14} className={isSyncing ? "animate-spin" : ""} />
-            <span>Synchroniser</span>
+            <span>{copy.sync}</span>
           </button>
         </div>
 
@@ -367,7 +372,7 @@ export function MailboxView({
                 onClick={() => setSelectedMail(null)}
                 className="ox-btn ox-btn-ghost ox-btn-sm"
               >
-                ← Retour aux messages
+                ← {copy.backToList}
               </button>
               <div style={{ display: "flex", gap: 8 }}>
                 <button
@@ -380,14 +385,14 @@ export function MailboxView({
                   style={{ display: "inline-flex", alignItems: "center", gap: 5 }}
                 >
                   <Reply size={14} />
-                  Répondre
+                  {copy.reply}
                 </button>
                 <button
                   type="button"
                   onClick={(e) => handleDelete(e, selectedMail)}
                   className="ox-btn ox-btn-ghost ox-btn-sm"
                   style={{ color: "var(--bad)" }}
-                  title="Supprimer"
+                  title={copy.delete}
                 >
                   <Trash2 size={14} />
                 </button>
@@ -412,11 +417,11 @@ export function MailboxView({
               }}
             >
               <div>
-                <span style={{ opacity: 0.6 }}>De : </span>
+                <span style={{ opacity: 0.6 }}>{copy.from} </span>
                 <strong>{selectedMail.from}</strong>
               </div>
               <div>
-                <span style={{ opacity: 0.6 }}>À : </span>
+                <span style={{ opacity: 0.6 }}>{copy.to} </span>
                 <strong>{selectedMail.to}</strong>
               </div>
               <div style={{ marginLeft: "auto", opacity: 0.7 }}>
@@ -444,7 +449,7 @@ export function MailboxView({
                 {filteredMails.length === 0 ? (
                   <tr>
                     <td colSpan={5} style={{ textAlign: "center", padding: "3rem 1rem", opacity: 0.6 }}>
-                      Aucun message dans ce dossier.
+                      {copy.emptyFolder}
                     </td>
                   </tr>
                 ) : (
@@ -495,7 +500,7 @@ export function MailboxView({
                             {(activeFolder === "SENT" ? mail.to : mail.from)[0].toUpperCase()}
                           </div>
                           <span style={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 170 }}>
-                            {activeFolder === "SENT" ? `À : ${mail.to}` : mail.from}
+                            {activeFolder === "SENT" ? `${copy.toPrefix}${mail.to}` : mail.from}
                           </span>
                         </div>
                       </td>
@@ -527,7 +532,7 @@ export function MailboxView({
                             opacity: 0.5,
                             color: "var(--bad)",
                           }}
-                          title="Supprimer"
+                          title={copy.delete}
                         >
                           <Trash2 size={14} />
                         </button>
@@ -573,10 +578,10 @@ export function MailboxView({
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700 }}>
-                  {replyTo ? `Répondre à ${replyTo.from}` : "Nouveau Message"}
+                  {replyTo ? copy.replyTitle(replyTo.from) : copy.composeTitle}
                 </h3>
                 <p style={{ margin: "4px 0 0", fontSize: "0.85rem", opacity: 0.65 }}>
-                  Envoi d&apos;email depuis CARZONE SARL
+                  {copy.composeSubtitle}
                 </p>
               </div>
               <button
@@ -600,7 +605,7 @@ export function MailboxView({
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
                   <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>
-                    Destinataire <span style={{ color: "var(--bad)" }}>*</span>
+                    {copy.recipient} <span style={{ color: "var(--bad)" }}>*</span>
                   </label>
                   {customers.length > 0 && (
                     <select
@@ -612,7 +617,7 @@ export function MailboxView({
                       style={{ fontSize: "0.78rem", padding: "0.2rem 0.5rem" }}
                       defaultValue=""
                     >
-                      <option value="" disabled>Choisir un client...</option>
+                      <option value="" disabled>{copy.customerPlaceholder}</option>
                       {customers.filter((c) => c.email).map((c) => (
                         <option key={c.id} value={c.email || ""}>
                           {c.contactName} ({c.email})
@@ -627,7 +632,7 @@ export function MailboxView({
                   type="email"
                   required
                   defaultValue={replyTo ? replyTo.from : ""}
-                  placeholder="client@domaine.bj"
+                  placeholder={copy.recipientPlaceholder}
                   className="ox-input"
                   style={{ width: "100%" }}
                   autoFocus
@@ -636,13 +641,13 @@ export function MailboxView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  Objet <span style={{ color: "var(--bad)" }}>*</span>
+                  {copy.subject} <span style={{ color: "var(--bad)" }}>*</span>
                 </label>
                 <input
                   name="subject"
                   required
                   defaultValue={replyTo ? `Re: ${replyTo.subject}` : ""}
-                  placeholder="Ex: Devis CARZONE SARL / Confirmation de votre commande"
+                  placeholder={copy.subjectPlaceholder}
                   className="ox-input"
                   style={{ width: "100%" }}
                 />
@@ -650,7 +655,7 @@ export function MailboxView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  Message <span style={{ color: "var(--bad)" }}>*</span>
+                  {copy.messageLabel} <span style={{ color: "var(--bad)" }}>*</span>
                 </label>
                 <textarea
                   name="body"
@@ -658,8 +663,8 @@ export function MailboxView({
                   rows={6}
                   defaultValue={
                     replyTo
-                      ? `\n\n--- Message original de ${replyTo.from} ---\n${replyTo.body}`
-                      : "Bonjour,\n\nNous vous remercions de votre confiance.\n\nBien cordialement,\nL'équipe CARZONE SARL"
+                      ? `${copy.quoteHeader(replyTo.from)}${replyTo.body}`
+                      : copy.draftBody
                   }
                   className="ox-textarea"
                   style={{ width: "100%", resize: "vertical" }}
@@ -672,11 +677,11 @@ export function MailboxView({
                   onClick={() => setIsComposeOpen(false)}
                   className="ox-btn ox-btn-ghost"
                 >
-                  Annuler
+                  {comms.common.cancel}
                 </button>
                 <button type="submit" className="ox-btn">
                   <Send size={15} style={{ marginRight: 6 }} />
-                  Envoyer l&apos;email
+                  {copy.send}
                 </button>
               </div>
             </form>

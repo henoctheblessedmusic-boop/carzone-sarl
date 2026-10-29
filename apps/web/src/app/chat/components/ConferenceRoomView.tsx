@@ -12,6 +12,8 @@ import {
   X,
 } from "lucide-react";
 import { ROLE_LABELS, type Role } from "@/lib/roles";
+import { usePrefs } from "@/components/PrefsProvider";
+import { commsCopy } from "@/lib/i18n/messages/comms";
 import { PREDEFINED_ROOMS } from "@/lib/conference-rooms";
 import type { ChatUser } from "../ChatView";
 
@@ -50,6 +52,9 @@ export function ConferenceRoomView({
   onSwitchRoom: (newRoomId: string) => void;
 }) {
   const [isJoined, setIsJoined] = useState(false);
+  const { locale } = usePrefs();
+  const comms = commsCopy[locale];
+  const copy = comms.conference;
   const [isMuted, setIsMuted] = useState(false);
   const [participants, setParticipants] = useState<RoomParticipant[]>([]);
   const [timerSeconds, setTimerSeconds] = useState(0);
@@ -71,11 +76,15 @@ export function ConferenceRoomView({
 
   const roomInfo = PREDEFINED_ROOMS.find((r) => r.id === roomId) || {
     id: roomId,
-    name: "Conférence en ligne",
+    name: copy.fallbackName,
     category: "CUSTOM",
     icon: "🎙️",
-    description: "Session de conférence audio en direct",
+    description: copy.fallbackDescription,
   };
+
+  const roomCopy = copy.rooms[roomInfo.id];
+  const roomName = roomCopy?.name ?? roomInfo.name;
+  const roomDescription = roomCopy?.description ?? roomInfo.description;
 
   // Timer
   useEffect(() => {
@@ -159,7 +168,7 @@ export function ConferenceRoomView({
         setIsJoined(true);
       }
     } catch {
-      alert("Impossible de rejoindre la conférence.");
+      alert(copy.errors.joinFailed);
     }
   };
 
@@ -182,7 +191,7 @@ export function ConferenceRoomView({
 
   // Clôturer la conférence (DG / Admin)
   const handleCloseForEveryone = async () => {
-    if (!confirm("Voulez-vous clôturer cette conférence pour l'ensemble des participants et enregistrer la durée totale dans le rapport de traçabilité ?")) {
+    if (!confirm(copy.closeConfirm)) {
       return;
     }
     stopAudioCapture();
@@ -298,7 +307,7 @@ export function ConferenceRoomView({
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700, color: "var(--ice-text)" }}>
-                {roomInfo.name}
+                {roomName}
               </h3>
               <span
                 style={{
@@ -311,11 +320,11 @@ export function ConferenceRoomView({
                   border: isJoined ? "1px solid rgba(34, 197, 94, 0.3)" : "1px solid rgba(212, 175, 55, 0.3)",
                 }}
               >
-                {isJoined ? "🟢 EN DIRECT" : "SALON OUVERT"}
+                {isJoined ? copy.live : copy.open}
               </span>
             </div>
             <p style={{ margin: "3px 0 0 0", fontSize: "0.78rem", opacity: 0.65 }}>
-              {roomInfo.description}
+              {roomDescription}
             </p>
           </div>
         </div>
@@ -349,7 +358,7 @@ export function ConferenceRoomView({
                 key={r.id}
                 type="button"
                 onClick={() => onSwitchRoom(r.id)}
-                title={r.name}
+                title={copy.rooms[r.id]?.name ?? r.name}
                 style={{
                   padding: "6px 10px",
                   borderRadius: 6,
@@ -361,7 +370,7 @@ export function ConferenceRoomView({
                   fontWeight: r.id === roomId ? 700 : 400,
                 }}
               >
-                <span>{r.icon}</span> <span className="ox-hide-mobile">{r.category}</span>
+                <span>{r.icon}</span> <span className="ox-hide-mobile">{copy.categories[r.category] ?? r.category}</span>
               </button>
             ))}
           </div>
@@ -387,10 +396,10 @@ export function ConferenceRoomView({
           >
             <div style={{ fontSize: "3rem", marginBottom: 10 }}>{roomInfo.icon}</div>
             <h3 style={{ margin: "0 0 8px 0", fontSize: "1.3rem", fontWeight: 700, color: "var(--ice-text)" }}>
-              {roomInfo.name}
+              {roomName}
             </h3>
             <p style={{ margin: "0 0 20px 0", fontSize: "0.86rem", opacity: 0.75, lineHeight: 1.5 }}>
-              Connectez-vous pour échanger en direct avec la Direction et les équipes via l&apos;appel conférence.
+              {copy.lobbyText}
             </p>
 
             {/* Participants déjà en ligne */}
@@ -404,11 +413,11 @@ export function ConferenceRoomView({
               }}
             >
               <div style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", opacity: 0.7, marginBottom: 8 }}>
-                Participants actuellement dans ce salon ({participants.length})
+                {copy.participantsInRoom(participants.length)}
               </div>
               {participants.length === 0 ? (
                 <div style={{ fontSize: "0.8rem", opacity: 0.5, fontStyle: "italic" }}>
-                  Personne n&apos;est encore dans ce salon. Soyez le premier à entrer !
+                  {copy.emptyRoom}
                 </div>
               ) : (
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" }}>
@@ -453,7 +462,7 @@ export function ConferenceRoomView({
               }}
             >
               <Radio size={18} />
-              <span>Entrer dans la Conférence</span>
+              <span>{copy.join}</span>
             </button>
           </div>
         ) : (
@@ -511,7 +520,7 @@ export function ConferenceRoomView({
                 </div>
 
                 <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--ice-text)" }}>
-                  {currentUser.fullName} (Moi)
+                  {copy.me(currentUser.fullName)}
                 </div>
                 <div style={{ fontSize: "0.72rem", opacity: 0.7, marginTop: 2 }}>
                   {ROLE_LABELS[currentUser.role as Role] || currentUser.role}
@@ -532,7 +541,7 @@ export function ConferenceRoomView({
                     }}
                   >
                     {isMuted ? <MicOff size={12} /> : <Mic size={12} />}
-                    {isMuted ? "Micro coupé" : "Micro actif"}
+                    {isMuted ? copy.micOff : copy.micOn}
                   </span>
                 </div>
               </div>
@@ -597,7 +606,7 @@ export function ConferenceRoomView({
                         }}
                       >
                         {p.isMuted ? <MicOff size={12} /> : <Mic size={12} />}
-                        {p.isMuted ? "Micro coupé" : "En écoute / Parle"}
+                        {p.isMuted ? copy.micOff : copy.listening}
                       </span>
                     </div>
                   </div>
@@ -638,7 +647,7 @@ export function ConferenceRoomView({
                 }}
               >
                 {isMuted ? <MicOff size={17} /> : <Mic size={17} />}
-                <span>{isMuted ? "Réactiver mon micro" : "Couper mon micro"}</span>
+                <span>{isMuted ? copy.unmute : copy.mute}</span>
               </button>
 
               {/* Inviter un collaborateur */}
@@ -660,7 +669,7 @@ export function ConferenceRoomView({
                 }}
               >
                 <UserPlus size={16} />
-                <span>Inviter un collègue</span>
+                <span>{copy.invite}</span>
               </button>
 
               {/* Quitter */}
@@ -682,7 +691,7 @@ export function ConferenceRoomView({
                 }}
               >
                 <PhoneOff size={16} />
-                <span>Quitter la salle</span>
+                <span>{copy.leave}</span>
               </button>
 
               {/* Clôturer pour tous (Direction / Admin) */}
@@ -703,10 +712,10 @@ export function ConferenceRoomView({
                     fontWeight: 700,
                     cursor: "pointer",
                   }}
-                  title="Met fin à la conférence pour tous les participants et consigne la durée"
+                  title={copy.closeForAllTitle}
                 >
                   <Shield size={14} />
-                  <span>Clôturer pour tous (DG)</span>
+                  <span>{copy.closeForAll}</span>
                 </button>
               )}
             </div>
@@ -742,7 +751,7 @@ export function ConferenceRoomView({
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
               <h4 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 700, color: "var(--ice-text)" }}>
-                Inviter un collaborateur
+                {copy.inviteTitle}
               </h4>
               <button
                 type="button"
@@ -754,7 +763,7 @@ export function ConferenceRoomView({
             </div>
 
             <p style={{ margin: "0 0 14px 0", fontSize: "0.78rem", opacity: 0.75 }}>
-              Sélectionnez un membre de l&apos;équipe pour lui envoyer une alerte directe pour rejoindre « {roomInfo.name} ».
+              {copy.inviteText(roomName)}
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: 300, overflowY: "auto" }}>
@@ -799,7 +808,7 @@ export function ConferenceRoomView({
                           cursor: isInvited ? "default" : "pointer",
                         }}
                       >
-                        {isInvited ? "Invité ✓" : "Inviter"}
+                        {isInvited ? copy.invited : copy.inviteOne}
                       </button>
                     </div>
                   );
@@ -820,7 +829,7 @@ export function ConferenceRoomView({
                   cursor: "pointer",
                 }}
               >
-                Fermer
+                {comms.common.close}
               </button>
             </div>
           </div>

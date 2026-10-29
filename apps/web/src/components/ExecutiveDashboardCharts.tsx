@@ -18,6 +18,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
+import { usePrefs } from "@/components/PrefsProvider";
+import { sharedCopy } from "@/lib/i18n/messages/shared";
 import type {
   AnalyticsDataset,
   PeriodKey,
@@ -27,11 +29,16 @@ import type {
 
 type ChartMode = "sales" | "expenses" | "activity" | "profit" | "all";
 
+/** Ordre d'affichage des onglets de graphes. */
+const CHART_TAB_KEYS: ChartMode[] = ["profit", "sales", "expenses", "activity", "all"];
+
 export function ExecutiveDashboardCharts({
   analytics,
 }: {
   analytics: AnalyticsDataset;
 }) {
+  const { locale } = usePrefs();
+  const exec = sharedCopy[locale].exec;
   const [period, setPeriod] = useState<PeriodKey>("1Y");
   const [activeTab, setActiveTab] = useState<ChartMode>("profit");
   const [hoveredMonthKey, setHoveredMonthKey] = useState<string | null>(null);
@@ -86,7 +93,7 @@ export function ExecutiveDashboardCharts({
                 letterSpacing: "-0.02em",
               }}
             >
-              Tableau de Bord Financier &amp; Performance
+              {exec.header.title}
             </h2>
             <p
               style={{
@@ -95,7 +102,7 @@ export function ExecutiveDashboardCharts({
                 color: "#94a3b8",
               }}
             >
-              Suivi consolidé de la rentabilité, des flux de trésorerie et de l&apos;activité CARZONE SARL.
+              {exec.header.subtitle}
             </p>
           </div>
 
@@ -122,17 +129,10 @@ export function ExecutiveDashboardCharts({
                 gap: 4,
               }}
             >
-              <Calendar size={13} /> Période :
+              <Calendar size={13} /> {exec.period.label}
             </span>
 
             {(["1M", "6M", "1Y", "2Y", "3Y"] as PeriodKey[]).map((pKey) => {
-              const labelMap: Record<PeriodKey, string> = {
-                "1M": "1 Mois",
-                "6M": "6 Mois",
-                "1Y": "1 An",
-                "2Y": "2 Ans",
-                "3Y": "3 Ans",
-              };
               const isActive = period === pKey;
               return (
                 <button
@@ -152,7 +152,7 @@ export function ExecutiveDashboardCharts({
                     transition: "all 0.15s ease",
                   }}
                 >
-                  {labelMap[pKey]}
+                  {exec.period.options[pKey]}
                 </button>
               );
             })}
@@ -169,19 +169,14 @@ export function ExecutiveDashboardCharts({
             paddingTop: "0.85rem",
           }}
         >
-          {[
-            { key: "profit", label: "💎 1. Bénéfice Général Réel", desc: "Après dépenses et salaires" },
-            { key: "sales", label: "💰 2. Évolution des Ventes", desc: "Facturé vs Encaissé" },
-            { key: "expenses", label: "💸 3. Dépenses d'Entreprise", desc: "Charges & Fournisseurs" },
-            { key: "activity", label: "⚡ 4. Activités & Opérations", desc: "Stocks, Devis, Atelier" },
-            { key: "all", label: "📊 Vue Consolidée (4 Graphes)", desc: "Vision panoramique DG" },
-          ].map((tab) => {
-            const isTabActive = activeTab === tab.key;
+          {CHART_TAB_KEYS.map((tabKey) => {
+            const tab = exec.tabs[tabKey];
+            const isTabActive = activeTab === tabKey;
             return (
               <button
-                key={tab.key}
+                key={tabKey}
                 type="button"
-                onClick={() => setActiveTab(tab.key as ChartMode)}
+                onClick={() => setActiveTab(tabKey)}
                 style={{
                   flex: "1 1 auto",
                   minWidth: "150px",
@@ -231,7 +226,7 @@ export function ExecutiveDashboardCharts({
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase" }}>
-              Ventes de la période
+              {exec.summary.salesLabel}
             </span>
             <DollarSign size={16} color="#38bdf8" />
           </div>
@@ -239,7 +234,7 @@ export function ExecutiveDashboardCharts({
             {formatXof(summary.totalSalesInvoiced)}
           </div>
           <div style={{ fontSize: "0.76rem", color: "#94a3b8", marginTop: 4, display: "flex", gap: 6 }}>
-            <span>Encaissé réel : <strong style={{ color: "#34d399" }}>{formatXof(summary.totalSalesCollected)}</strong></span>
+            <span>{exec.summary.collectedInline} <strong style={{ color: "#34d399" }}>{formatXof(summary.totalSalesCollected)}</strong></span>
           </div>
         </div>
 
@@ -255,7 +250,7 @@ export function ExecutiveDashboardCharts({
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#f59e0b", textTransform: "uppercase" }}>
-              Dépenses Exploitation
+              {exec.summary.expensesLabel}
             </span>
             <Receipt size={16} color="#f59e0b" />
           </div>
@@ -263,7 +258,7 @@ export function ExecutiveDashboardCharts({
             {formatXof(summary.totalExpenses)}
           </div>
           <div style={{ fontSize: "0.76rem", color: "#94a3b8", marginTop: 4 }}>
-            Charges &amp; Fournisseurs enregistrés en BDD
+            {exec.summary.expensesHint}
           </div>
         </div>
 
@@ -279,7 +274,7 @@ export function ExecutiveDashboardCharts({
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#a78bfa", textTransform: "uppercase" }}>
-              Masse Salariale
+              {exec.summary.salariesLabel}
             </span>
             <PieChart size={16} color="#a78bfa" />
           </div>
@@ -287,7 +282,7 @@ export function ExecutiveDashboardCharts({
             {formatXof(summary.totalSalaries)}
           </div>
           <div style={{ fontSize: "0.76rem", color: "#94a3b8", marginTop: 4 }}>
-            Total salaires et rémunérations payés
+            {exec.summary.salariesHint}
           </div>
         </div>
 
@@ -316,7 +311,7 @@ export function ExecutiveDashboardCharts({
                 textTransform: "uppercase",
               }}
             >
-              Bénéfice Net Réel
+              {exec.summary.netLabel}
             </span>
             {summary.netProfit >= 0 ? (
               <ArrowUpRight size={18} color="#34d399" />
@@ -335,8 +330,8 @@ export function ExecutiveDashboardCharts({
             {formatXof(summary.netProfit)}
           </div>
           <div style={{ fontSize: "0.76rem", color: "#cbd5e1", marginTop: 4, display: "flex", gap: 6 }}>
-            <span>Marge nette : <strong>{formatPct(summary.netMarginPct)}</strong></span>
-            <span>· Coûts totaux : {formatXof(summary.totalCosts)}</span>
+            <span>{exec.summary.marginInline} <strong>{formatPct(summary.netMarginPct)}</strong></span>
+            <span>· {exec.summary.costsInline} {formatXof(summary.totalCosts)}</span>
           </div>
         </div>
       </div>
@@ -384,28 +379,28 @@ export function ExecutiveDashboardCharts({
         >
           <div>
             <div style={{ color: "#94a3b8", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 700 }}>
-              Détail BDD pour le mois de :
+              {exec.hover.heading}
             </div>
             <div style={{ color: "#ffffff", fontSize: "1.1rem", fontWeight: 800 }}>
-              {hoveredPoint.label}
+              {exec.months.long(hoveredPoint.year, hoveredPoint.monthIndex)}
             </div>
           </div>
 
           <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap", alignItems: "center" }}>
             <div>
-              <div style={{ color: "#38bdf8", fontSize: "0.74rem", fontWeight: 700 }}>Facturé</div>
+              <div style={{ color: "#38bdf8", fontSize: "0.74rem", fontWeight: 700 }}>{exec.hover.invoiced}</div>
               <div style={{ color: "#ffffff", fontWeight: 700 }}>{formatXof(hoveredPoint.salesInvoicedXof)}</div>
             </div>
             <div>
-              <div style={{ color: "#34d399", fontSize: "0.74rem", fontWeight: 700 }}>Encaissé</div>
+              <div style={{ color: "#34d399", fontSize: "0.74rem", fontWeight: 700 }}>{exec.hover.collected}</div>
               <div style={{ color: "#ffffff", fontWeight: 700 }}>{formatXof(hoveredPoint.salesCollectedXof)}</div>
             </div>
             <div>
-              <div style={{ color: "#f59e0b", fontSize: "0.74rem", fontWeight: 700 }}>Dépenses</div>
+              <div style={{ color: "#f59e0b", fontSize: "0.74rem", fontWeight: 700 }}>{exec.hover.expenses}</div>
               <div style={{ color: "#ffffff", fontWeight: 700 }}>{formatXof(hoveredPoint.expensesTotalXof)}</div>
             </div>
             <div>
-              <div style={{ color: "#a78bfa", fontSize: "0.74rem", fontWeight: 700 }}>Salaires</div>
+              <div style={{ color: "#a78bfa", fontSize: "0.74rem", fontWeight: 700 }}>{exec.hover.salaries}</div>
               <div style={{ color: "#ffffff", fontWeight: 700 }}>{formatXof(hoveredPoint.salariesTotalXof)}</div>
             </div>
             <div
@@ -422,7 +417,7 @@ export function ExecutiveDashboardCharts({
                   textTransform: "uppercase",
                 }}
               >
-                Bénéfice Net
+                {exec.hover.net}
               </div>
               <div
                 style={{
@@ -455,6 +450,8 @@ function ProfitChartCard({
   hoveredKey: string | null;
   isMainView?: boolean;
 }) {
+  const { locale } = usePrefs();
+  const copy = sharedCopy[locale].exec;
   const width = 800;
   const height = isMainView ? 280 : 210;
   const paddingX = 50;
@@ -500,19 +497,19 @@ function ProfitChartCard({
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ fontSize: "1.1rem" }}>💎</span>
             <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800, color: "#ffffff" }}>
-              Évolution du Bénéfice Général Réel
+              {copy.charts.profit.title}
             </h3>
           </div>
           <p style={{ margin: "3px 0 0", fontSize: "0.78rem", color: "#94a3b8" }}>
-            Bénéfice net mensuel calculé après déduction de toutes les dépenses et de tous les salaires.
+            {copy.charts.profit.desc}
           </p>
         </div>
         <div style={{ display: "flex", gap: "10px", fontSize: "0.75rem", fontWeight: 700 }}>
           <span style={{ color: "#34d399", display: "inline-flex", alignItems: "center", gap: 4 }}>
-            <span style={{ width: 10, height: 10, borderRadius: 2, background: "#10b981" }} /> Bénéfice
+            <span style={{ width: 10, height: 10, borderRadius: 2, background: "#10b981" }} /> {copy.charts.profit.legendProfit}
           </span>
           <span style={{ color: "#f87171", display: "inline-flex", alignItems: "center", gap: 4 }}>
-            <span style={{ width: 10, height: 10, borderRadius: 2, background: "#ef4444" }} /> Perte / Charges
+            <span style={{ width: 10, height: 10, borderRadius: 2, background: "#ef4444" }} /> {copy.charts.profit.legendLoss}
           </span>
         </div>
       </div>
@@ -541,7 +538,7 @@ function ProfitChartCard({
             fontWeight={700}
             textAnchor="end"
           >
-            0 FCFA
+            {copy.charts.profit.zeroAxis}
           </text>
 
           {/* Barres et colonnes par mois */}
@@ -595,7 +592,7 @@ function ProfitChartCard({
                   fontWeight={isHovered ? 800 : 600}
                   textAnchor="middle"
                 >
-                  {p.shortLabel}
+                  {copy.months.short(p.year, p.monthIndex)}
                 </text>
               </g>
             );
@@ -620,6 +617,8 @@ function SalesChartCard({
   hoveredKey: string | null;
   isMainView?: boolean;
 }) {
+  const { locale } = usePrefs();
+  const copy = sharedCopy[locale].exec;
   const width = 800;
   const height = isMainView ? 280 : 210;
   const paddingX = 50;
@@ -661,19 +660,19 @@ function SalesChartCard({
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ fontSize: "1.1rem" }}>💰</span>
             <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800, color: "#ffffff" }}>
-              Évolution des Ventes &amp; Chiffre d&apos;Affaires
+              {copy.charts.sales.title}
             </h3>
           </div>
           <p style={{ margin: "3px 0 0", fontSize: "0.78rem", color: "#94a3b8" }}>
-            Comparatif facturation commerciale émise vs paiements réellement encaissés.
+            {copy.charts.sales.desc}
           </p>
         </div>
         <div style={{ display: "flex", gap: "10px", fontSize: "0.75rem", fontWeight: 700 }}>
           <span style={{ color: "#e11d48", display: "inline-flex", alignItems: "center", gap: 4 }}>
-            <span style={{ width: 10, height: 3, background: "#e11d48" }} /> Facturé
+            <span style={{ width: 10, height: 3, background: "#e11d48" }} /> {copy.charts.sales.legendInvoiced}
           </span>
           <span style={{ color: "#34d399", display: "inline-flex", alignItems: "center", gap: 4 }}>
-            <span style={{ width: 10, height: 3, background: "#34d399" }} /> Encaissé Réel
+            <span style={{ width: 10, height: 3, background: "#34d399" }} /> {copy.charts.sales.legendCollected}
           </span>
         </div>
       </div>
@@ -710,7 +709,7 @@ function SalesChartCard({
                 <circle cx={x} cy={yInv} r={isHovered ? 5 : 3.5} fill="#e11d48" stroke="#ffffff" strokeWidth={1.5} />
                 <circle cx={x} cy={yCol} r={isHovered ? 5 : 3.5} fill="#10b981" stroke="#ffffff" strokeWidth={1.5} />
                 <text x={x} y={height - paddingY + 16} fill={isHovered ? "#ffffff" : "#94a3b8"} fontSize={10} fontWeight={isHovered ? 800 : 600} textAnchor="middle">
-                  {p.shortLabel}
+                  {copy.months.short(p.year, p.monthIndex)}
                 </text>
               </g>
             );
@@ -735,6 +734,8 @@ function ExpensesChartCard({
   hoveredKey: string | null;
   isMainView?: boolean;
 }) {
+  const { locale } = usePrefs();
+  const copy = sharedCopy[locale].exec;
   const width = 800;
   const height = isMainView ? 280 : 210;
   const paddingX = 50;
@@ -774,15 +775,15 @@ function ExpensesChartCard({
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ fontSize: "1.1rem" }}>💸</span>
             <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800, color: "#ffffff" }}>
-              Évolution des Dépenses d&apos;Exploitation
+              {copy.charts.expenses.title}
             </h3>
           </div>
           <p style={{ margin: "3px 0 0", fontSize: "0.78rem", color: "#94a3b8" }}>
-            Charges directes, loyers, électricité SBEE, prestataires et fonctionnement.
+            {copy.charts.expenses.desc}
           </p>
         </div>
         <div style={{ color: "#f59e0b", fontSize: "0.75rem", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 4 }}>
-          <span style={{ width: 10, height: 3, background: "#f59e0b" }} /> Dépenses Totales
+          <span style={{ width: 10, height: 3, background: "#f59e0b" }} /> {copy.charts.expenses.legendTotal}
         </div>
       </div>
 
@@ -818,7 +819,7 @@ function ExpensesChartCard({
                 {isHovered && <line x1={x} y1={paddingY} x2={x} y2={height - paddingY} stroke="rgba(255, 255, 255, 0.2)" strokeWidth={1} />}
                 <circle cx={x} cy={y} r={isHovered ? 5 : 3.5} fill="#f59e0b" stroke="#ffffff" strokeWidth={1.5} />
                 <text x={x} y={height - paddingY + 16} fill={isHovered ? "#ffffff" : "#94a3b8"} fontSize={10} fontWeight={isHovered ? 800 : 600} textAnchor="middle">
-                  {p.shortLabel}
+                  {copy.months.short(p.year, p.monthIndex)}
                 </text>
               </g>
             );
@@ -843,6 +844,8 @@ function ActivityChartCard({
   hoveredKey: string | null;
   isMainView?: boolean;
 }) {
+  const { locale } = usePrefs();
+  const copy = sharedCopy[locale].exec;
   const width = 800;
   const height = isMainView ? 280 : 210;
   const paddingX = 50;
@@ -881,15 +884,15 @@ function ActivityChartCard({
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ fontSize: "1.1rem" }}>⚡</span>
             <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800, color: "#ffffff" }}>
-              Performance &amp; Activités Opérationnelles
+              {copy.charts.activity.title}
             </h3>
           </div>
           <p style={{ margin: "3px 0 0", fontSize: "0.78rem", color: "#94a3b8" }}>
-            Indicateur composite des opérations réelles (entrées stock, devis émis, passages atelier, nouveaux clients).
+            {copy.charts.activity.desc}
           </p>
         </div>
         <div style={{ color: "#a78bfa", fontSize: "0.75rem", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 4 }}>
-          <span style={{ width: 10, height: 3, background: "#a78bfa" }} /> Score Opérations
+          <span style={{ width: 10, height: 3, background: "#a78bfa" }} /> {copy.charts.activity.legendScore}
         </div>
       </div>
 
@@ -901,7 +904,7 @@ function ActivityChartCard({
               <g key={idx}>
                 <line x1={paddingX} y1={y} x2={width - paddingX} y2={y} stroke="rgba(255, 255, 255, 0.08)" strokeDasharray="3 3" />
                 <text x={paddingX - 10} y={y + 3} fill="#64748b" fontSize={9} textAnchor="end">
-                  {Math.round(maxAct * pct)} ops
+                  {`${Math.round(maxAct * pct)}${copy.charts.activity.axisSuffix}`}
                 </text>
               </g>
             );
@@ -918,7 +921,7 @@ function ActivityChartCard({
                 {isHovered && <line x1={x} y1={paddingY} x2={x} y2={height - paddingY} stroke="rgba(255, 255, 255, 0.2)" strokeWidth={1} />}
                 <circle cx={x} cy={y} r={isHovered ? 5 : 3.5} fill="#a78bfa" stroke="#ffffff" strokeWidth={1.5} />
                 <text x={x} y={height - paddingY + 16} fill={isHovered ? "#ffffff" : "#94a3b8"} fontSize={10} fontWeight={isHovered ? 800 : 600} textAnchor="middle">
-                  {p.shortLabel}
+                  {copy.months.short(p.year, p.monthIndex)}
                 </text>
               </g>
             );

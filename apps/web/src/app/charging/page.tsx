@@ -3,7 +3,9 @@ import { AppShell } from "@/components/AppShell";
 import { Badge, DataTable, PrimaryLink, Stat } from "@/components/ui";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
-import { formatXof, formatDate } from "@/lib/format";
+import { formatXof } from "@/lib/format";
+import { getServerMessages } from "@/lib/i18n/server";
+import { chargingInvoiceStatusLabel, energyCopy } from "@/lib/i18n/messages/energy";
 
 async function subscribe(formData: FormData) {
   "use server";
@@ -22,6 +24,9 @@ async function subscribe(formData: FormData) {
 
 export default async function ChargingPage() {
   const user = await requireUser(["DG", "BORNES_OPS", "COMPTA"]);
+  const { locale } = await getServerMessages();
+  const copy = energyCopy[locale];
+  const t = copy.charging;
   const [plans, subs, stations, invoices, customers] = await Promise.all([
     prisma.chargingPlan.findMany({ orderBy: { kwhPriceXof: "asc" } }),
     prisma.chargingSubscription.findMany({
@@ -40,15 +45,15 @@ export default async function ChargingPage() {
   return (
     <AppShell user={user} titleKey="charging">
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 12, marginBottom: 16 }}>
-        <Stat label="Plans" value={plans.length} />
-        <Stat label="Abonnés actifs" value={subs.length} />
-        <Stat label="Bornes" value={stations.length} />
-        <Stat label="Factures recharge" value={invoices.length} />
+        <Stat label={t.kpi.plans} value={plans.length} />
+        <Stat label={t.kpi.subscribers} value={subs.length} />
+        <Stat label={t.kpi.stations} value={stations.length} />
+        <Stat label={t.kpi.invoices} value={invoices.length} />
       </div>
 
-      <h2 style={{ fontSize: "1.05rem" }}>Plans tarifaires (kWh)</h2>
+      <h2 style={{ fontSize: "1.05rem" }}>{t.plansTitle}</h2>
       <DataTable
-        headers={["Plan", "Mensualité", "Prix kWh", "Public", "Actif"]}
+        headers={t.planHeaders}
         rows={plans.map((p) => [
           <div key={p.id}>
             <strong>{p.name}</strong>
@@ -57,64 +62,64 @@ export default async function ChargingPage() {
           formatXof(p.monthlyFeeXof),
           formatXof(p.kwhPriceXof),
           formatXof(p.publicKwhPriceXof),
-          <Badge key={`b-${p.id}`} tone={p.active ? "ok" : "bad"}>{p.active ? "Oui" : "Non"}</Badge>,
+          <Badge key={`b-${p.id}`} tone={p.active ? "ok" : "bad"}>{p.active ? copy.common.yes : copy.common.no}</Badge>,
         ])}
       />
 
-      <h2 style={{ fontSize: "1.05rem", marginTop: 24 }}>Souscrire un client</h2>
+      <h2 style={{ fontSize: "1.05rem", marginTop: 24 }}>{t.subscribeTitle}</h2>
       <form action={subscribe} style={formRow}>
         <select name="customerId" required style={input} defaultValue="">
-          <option value="" disabled>Client</option>
+          <option value="" disabled>{t.customerSelect}</option>
           {customers.map((c) => <option key={c.id} value={c.id}>{c.contactName}</option>)}
         </select>
         <select name="planId" required style={input} defaultValue="">
-          <option value="" disabled>Plan</option>
+          <option value="" disabled>{t.planSelect}</option>
           {plans.filter((p) => p.active).map((p) => (
             <option key={p.id} value={p.id}>{p.name} · {formatXof(p.kwhPriceXof)}/kWh</option>
           ))}
         </select>
-        <button type="submit" style={btn}>Activer abonnement</button>
+        <button type="submit" style={btn}>{t.subscribeSubmit}</button>
       </form>
 
-      <h2 style={{ fontSize: "1.05rem", marginTop: 8 }}>Abonnés</h2>
+      <h2 style={{ fontSize: "1.05rem", marginTop: 8 }}>{t.subscribersTitle}</h2>
       <DataTable
-        headers={["Client", "Plan", "kWh", "Depuis"]}
+        headers={t.subscriberHeaders}
         rows={subs.map((s) => [
           s.customer.contactName,
           s.plan.name,
           formatXof(s.plan.kwhPriceXof),
-          formatDate(s.startedAt),
+          copy.formatDate(s.startedAt),
         ])}
       />
 
-      <h2 style={{ fontSize: "1.05rem", marginTop: 24 }}>Stations</h2>
+      <h2 style={{ fontSize: "1.05rem", marginTop: 24 }}>{t.stationsTitle}</h2>
       <DataTable
-        headers={["Code", "Nom", "Site", "Puissance", "Terminal"]}
+        headers={t.stationHeaders}
         rows={stations.map((s) => [
           s.code,
           s.name,
-          s.site?.name || "-",
-          s.powerKw ? `${s.powerKw} kW` : "-",
-          s.terminalId || "-",
+          s.site?.name || copy.common.notProvided,
+          s.powerKw ? `${s.powerKw} kW` : copy.common.notProvided,
+          s.terminalId || copy.common.notProvided,
         ])}
       />
 
-      <h2 style={{ fontSize: "1.05rem", marginTop: 24 }}>Factures de recharge</h2>
+      <h2 style={{ fontSize: "1.05rem", marginTop: 24 }}>{t.invoicesTitle}</h2>
       <DataTable
-        headers={["N°", "Client", "kWh", "Tarif", "Total", "Statut", "Date"]}
+        headers={t.invoiceHeaders}
         rows={invoices.map((inv) => [
           inv.number,
-          inv.customer?.contactName || "Anonyme",
+          inv.customer?.contactName || t.anonymous,
           `${inv.session.kwhDelivered} kWh`,
           formatXof(inv.session.pricePerKwh),
           formatXof(inv.totalXof),
-          <Badge key={inv.id} tone={inv.status === "PAYEE" ? "ok" : "warn"}>{inv.status}</Badge>,
-          formatDate(inv.createdAt),
+          <Badge key={inv.id} tone={inv.status === "PAYEE" ? "ok" : "warn"}>{chargingInvoiceStatusLabel(copy, inv.status)}</Badge>,
+          copy.formatDate(inv.createdAt),
         ])}
       />
 
       <div style={{ marginTop: 16 }}>
-        <PrimaryLink href="/terminal">Ouvrir le terminal de borne →</PrimaryLink>
+        <PrimaryLink href="/terminal">{t.openTerminal}</PrimaryLink>
       </div>
     </AppShell>
   );

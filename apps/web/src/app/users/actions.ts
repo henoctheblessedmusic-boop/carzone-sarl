@@ -6,6 +6,8 @@ import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import type { Role } from "@/lib/roles";
 import { DEFAULT_ROLE_CAPABILITIES } from "@/lib/permissions-config";
+import { getLocale } from "@/lib/i18n/server";
+import { adminCopy } from "@/lib/i18n/messages/admin";
 
 const CAN_MANAGE_USERS_ROLES = ["DEVELOPER", "PDG", "SG", "DG", "ADV", "RTA", "DC", "ADMIN", "RH"] as const;
 const PRIVILEGED_PASSWORD_ROLES = ["DEVELOPER", "PDG", "SG", "DG", "ADMIN"] as const;
@@ -18,19 +20,20 @@ export async function createUser(formData: FormData) {
   const role = String(formData.get("role") || "COMMERCIAL").trim() as Role;
   const password = String(formData.get("password") || "").trim() || "Carzone2026!";
   const rawPermissions = String(formData.get("permissions") || "").trim();
+  const t = adminCopy[await getLocale()].server.users;
 
   // Confidentialité : Seul le Développeur peut créer ou assigner le rôle Développeur
   if (role === "DEVELOPER" && currentUser.role !== "DEVELOPER") {
-    throw new Error("Seul le Développeur peut attribuer ce rôle.");
+    throw new Error(t.onlyDeveloperCanAssignRole);
   }
 
   if (!email || !fullName) {
-    throw new Error("L'email et le nom complet sont obligatoires.");
+    throw new Error(t.requiredCreateFields);
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    throw new Error("Un utilisateur avec cette adresse email existe déjà.");
+    throw new Error(t.emailAlreadyUsed);
   }
 
   let customPermissions: string[] = [];
@@ -70,16 +73,18 @@ export async function updateUser(formData: FormData) {
   const role = String(formData.get("role") || "").trim() as Role;
   const rawPermissions = String(formData.get("permissions") || "").trim();
 
+  const t = adminCopy[await getLocale()].server.users;
+
   if (!id || !role || !fullName) {
-    throw new Error("ID, rôle et nom complet sont obligatoires.");
+    throw new Error(t.requiredUpdateFields);
   }
 
   const targetUser = await prisma.user.findUnique({ where: { id } });
-  if (!targetUser) throw new Error("Utilisateur introuvable.");
+  if (!targetUser) throw new Error(t.userNotFound);
 
   // Confidentialité : Seul le Développeur peut modifier un compte Développeur ou attribuer le rôle Développeur
   if ((targetUser.role === "DEVELOPER" || role === "DEVELOPER") && currentUser.role !== "DEVELOPER") {
-    throw new Error("Action non autorisée.");
+    throw new Error(t.actionNotAllowed);
   }
 
   let customPermissions: string[] | undefined = undefined;
@@ -109,21 +114,22 @@ export async function updateUserPassword(userId: string, newPassword: string) {
   const isPrivileged = (PRIVILEGED_PASSWORD_ROLES as readonly string[]).includes(currentUser.role);
 
   const isSelf = currentUser.id === userId;
+  const t = adminCopy[await getLocale()].server.users;
 
   if (!isSelf && !isPrivileged) {
-    throw new Error("Vous n'êtes pas autorisé à modifier le mot de passe de cet utilisateur.");
+    throw new Error(t.notAllowedChangePassword);
   }
 
   if (!newPassword || newPassword.trim().length < 4) {
-    throw new Error("Le mot de passe doit comporter au moins 4 caractères.");
+    throw new Error(t.passwordTooShort);
   }
 
   const targetUser = await prisma.user.findUnique({ where: { id: userId } });
-  if (!targetUser) throw new Error("Utilisateur introuvable.");
+  if (!targetUser) throw new Error(t.userNotFound);
 
   // Confidentialité : Seul le Développeur lui-même peut modifier son mot de passe
   if (targetUser.role === "DEVELOPER" && currentUser.role !== "DEVELOPER") {
-    throw new Error("Action non autorisée.");
+    throw new Error(t.actionNotAllowed);
   }
 
   const cleanPassword = newPassword.trim();
@@ -163,7 +169,7 @@ export async function updateUserPermissions(id: string, permissions: string[]) {
   await requireUser([...CAN_MANAGE_USERS_ROLES]);
 
   if (!id) {
-    throw new Error("ID utilisateur obligatoire.");
+    throw new Error(adminCopy[await getLocale()].server.users.userIdRequired);
   }
 
   await prisma.user.update({
@@ -181,7 +187,7 @@ export async function resetUserPermissions(id: string) {
   await requireUser([...CAN_MANAGE_USERS_ROLES]);
 
   const user = await prisma.user.findUnique({ where: { id } });
-  if (!user) throw new Error("Utilisateur introuvable.");
+  if (!user) throw new Error(adminCopy[await getLocale()].server.users.userNotFound);
 
   const defaultPerms = DEFAULT_ROLE_CAPABILITIES[user.role as Role] || [];
 
@@ -203,7 +209,7 @@ export async function updateUserRole(formData: FormData) {
   const role = String(formData.get("role") || "").trim() as Role;
 
   if (!id || !role) {
-    throw new Error("ID et nouveau rôle obligatoires.");
+    throw new Error(adminCopy[await getLocale()].server.users.idAndRoleRequired);
   }
 
   // Mettre à jour le rôle et synchroniser les capacités par défaut
@@ -224,10 +230,11 @@ export async function toggleUserActive(id: string, active: boolean) {
   const currentUser = await requireUser([...CAN_MANAGE_USERS_ROLES]);
 
   const targetUser = await prisma.user.findUnique({ where: { id } });
-  if (!targetUser) throw new Error("Utilisateur introuvable.");
+  const t = adminCopy[await getLocale()].server.users;
+  if (!targetUser) throw new Error(t.userNotFound);
 
   if (targetUser.role === "DEVELOPER" && currentUser.role !== "DEVELOPER") {
-    throw new Error("Action non autorisée.");
+    throw new Error(t.actionNotAllowed);
   }
 
   await prisma.user.update({
@@ -241,15 +248,16 @@ export async function toggleUserActive(id: string, active: boolean) {
 export async function deleteUser(id: string) {
   const currentUser = await requireUser([...CAN_MANAGE_USERS_ROLES]);
 
+  const t = adminCopy[await getLocale()].server.users;
   if (currentUser.id === id) {
-    throw new Error("Vous ne pouvez pas supprimer votre propre compte.");
+    throw new Error(t.cannotDeleteOwnAccount);
   }
 
   const targetUser = await prisma.user.findUnique({ where: { id } });
-  if (!targetUser) throw new Error("Utilisateur introuvable.");
+  if (!targetUser) throw new Error(t.userNotFound);
 
   if (targetUser.role === "DEVELOPER" && currentUser.role !== "DEVELOPER") {
-    throw new Error("Action non autorisée.");
+    throw new Error(t.actionNotAllowed);
   }
 
   await prisma.user.delete({

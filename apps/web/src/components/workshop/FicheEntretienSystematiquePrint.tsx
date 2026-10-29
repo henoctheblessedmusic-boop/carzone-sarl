@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Printer, ArrowLeft, ShieldCheck } from "lucide-react";
 import { WORKSHOP_CHECKLIST_TEMPLATE } from "@/lib/workshop-checklist-data";
 import { usePrefs } from "@/components/PrefsProvider";
-import { workshopCopy } from "@/lib/i18n/messages/workshop";
+import { workshopCopy, checklistCategoryLabel, checklistTaskLabel } from "@/lib/i18n/messages/workshop";
 
 export type ChecklistTaskExecution = {
   taskLabel: string;
@@ -46,7 +46,8 @@ export type SystematicMaintenanceData = {
 export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMaintenanceData }) {
   const printAreaRef = useRef<HTMLDivElement>(null);
   const { locale } = usePrefs();
-  const copy = workshopCopy[locale].print.maintenance;
+  const dict = workshopCopy[locale];
+  const copy = dict.print.maintenance;
 
   const handlePrint = () => {
     window.print();
@@ -379,10 +380,10 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
                         color: "#0f172a",
                       }}
                     >
-                      <span>{item.template.taskLabel}</span>
+                      <span>{checklistTaskLabel(dict, item.template.taskLabel)}</span>
                       {item.template.category && (
                         <span style={{ fontSize: "7px", color: "#64748b", marginLeft: "6px", textTransform: "uppercase" }}>
-                          [{item.template.category}]
+                          [{checklistCategoryLabel(dict, item.template.category)}]
                         </span>
                       )}
                     </td>

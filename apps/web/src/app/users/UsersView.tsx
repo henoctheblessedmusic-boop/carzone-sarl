@@ -1930,7 +1930,7 @@ function CapabilitiesTable({
                     {group.name}
                   </div>
                   <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: 2 }}>
-                    {group.nameFr}
+                    {copy.team.capabilities.groups[group.id] ?? group.nameFr}
                   </div>
 
                   <button
@@ -1995,7 +1995,7 @@ function CapabilitiesTable({
                           <span style={{ fontWeight: isChecked ? 650 : 400 }}>
                             {cap.label}
                           </span>
-                          {cap.description && (
+                          {(copy.team.capabilities.items[cap.id] ?? cap.description) && (
                             <span
                               style={{
                                 fontSize: "0.75rem",
@@ -2003,7 +2003,7 @@ function CapabilitiesTable({
                                 fontStyle: "italic",
                               }}
                             >
-                              · {cap.description}
+                              · {copy.team.capabilities.items[cap.id] ?? cap.description}
                             </span>
                           )}
                         </label>

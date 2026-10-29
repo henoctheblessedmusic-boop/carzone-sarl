@@ -35,12 +35,54 @@ export type PartMovementTypeKey =
   | "RETOUR_STOCK"
   | "AJUSTEMENT_INVENTAIRE";
 
+/** Catégories de tâches de la checklist d'entretien systématique (fiche 2, 22 points). */
+export type ChecklistCategoryKey =
+  | "MOTEUR"
+  | "FILTRATION"
+  | "ELECTRICITE"
+  | "FLUIDES"
+  | "FREINAGE"
+  | "SUSPENSION"
+  | "ECLAIRAGE"
+  | "SCANNER";
+
+/**
+ * Libellés FR exacts des 22 tâches de `WORKSHOP_CHECKLIST_TEMPLATE` (lib/workshop-checklist-data.ts).
+ * Ces chaînes sont persistées en base comme `taskLabel` : ne jamais les modifier,
+ * seule leur traduction affichée passe par `checklistTasks`.
+ */
+export type ChecklistTaskLabelKey =
+  | "Vidange huile moteur"
+  | "Remplacer filtre à huile"
+  | "Nettoyer et contrôler le filtre à air"
+  | "Nettoyage et contrôler les batteries"
+  | "Contrôle du niveau de liquide refroidissement"
+  | "Contrôle du niveau d'huile à frein/embrayage"
+  | "Contrôle du niveau d'huile boîte et pont"
+  | "Contrôle/remplacer les garnitures de frein"
+  | "Contrôle état des courroies"
+  | "Contrôle de suspension et pneus"
+  | "Contrôle éclairage et signalisation"
+  | "Graissage générale"
+  | "Pose du scanner"
+  | "Ajout de nettoyant injecteur"
+  | "Remplacer filtre à gasoil"
+  | "Échange de filtre à air"
+  | "Échange de filtre habitacle"
+  | "Échange des bougies d'allumage"
+  | "Entretien du système de freinage"
+  | "Vidange de liquide de frein"
+  | "Vidange de liquide de refroidissement"
+  | "Échange de filtre carburant essence";
+
 export type WorkshopCopy = {
   /** Format de date local utilisé dans les listes (fr-BJ, en-GB, zh-CN). */
   dateLocale: string;
   status: Record<WorkshopStatusCode, string>;
   paymentMode: Record<PaymentModeKey, string>;
   clientType: { client: string; internal: string };
+  checklistCategories: Record<ChecklistCategoryKey, string>;
+  checklistTasks: Record<ChecklistTaskLabelKey, string>;
   list: {
     title: string;
     subtitle: string;
@@ -607,6 +649,33 @@ export function movementTypeLabel(copy: PartCopy, value: string): string {
     : value;
 }
 
+const CHECKLIST_CATEGORY_KEYS: ChecklistCategoryKey[] = [
+  "MOTEUR",
+  "FILTRATION",
+  "ELECTRICITE",
+  "FLUIDES",
+  "FREINAGE",
+  "SUSPENSION",
+  "ECLAIRAGE",
+  "SCANNER",
+];
+
+/** Catégorie de tâche de checklist traduite, sinon le code brut venu de la base. */
+export function checklistCategoryLabel(
+  copy: WorkshopCopy,
+  value?: string | null
+): string {
+  if (!value) return "";
+  return CHECKLIST_CATEGORY_KEYS.some((key) => key === value)
+    ? copy.checklistCategories[value as ChecklistCategoryKey]
+    : value;
+}
+
+/** Libellé de tâche de checklist traduit, sinon le `taskLabel` brut persisté en base. */
+export function checklistTaskLabel(copy: WorkshopCopy, value: string): string {
+  return copy.checklistTasks[value as ChecklistTaskLabelKey] ?? value;
+}
+
 const fr: WorkshopCopy = {
   dateLocale: "fr-BJ",
   status: {
@@ -629,6 +698,43 @@ const fr: WorkshopCopy = {
     INTERNAL: "Interne",
   },
   clientType: { client: "Client", internal: "Interne" },
+  checklistCategories: {
+    MOTEUR: "Moteur",
+    FILTRATION: "Filtration",
+    ELECTRICITE: "Électricité",
+    FLUIDES: "Fluides",
+    FREINAGE: "Freinage",
+    SUSPENSION: "Suspension",
+    ECLAIRAGE: "Éclairage",
+    SCANNER: "Scanner",
+  },
+  checklistTasks: {
+    "Vidange huile moteur": "Vidange huile moteur",
+    "Remplacer filtre à huile": "Remplacer filtre à huile",
+    "Nettoyer et contrôler le filtre à air": "Nettoyer et contrôler le filtre à air",
+    "Nettoyage et contrôler les batteries": "Nettoyage et contrôler les batteries",
+    "Contrôle du niveau de liquide refroidissement":
+      "Contrôle du niveau de liquide refroidissement",
+    "Contrôle du niveau d'huile à frein/embrayage":
+      "Contrôle du niveau d'huile à frein/embrayage",
+    "Contrôle du niveau d'huile boîte et pont": "Contrôle du niveau d'huile boîte et pont",
+    "Contrôle/remplacer les garnitures de frein":
+      "Contrôle/remplacer les garnitures de frein",
+    "Contrôle état des courroies": "Contrôle état des courroies",
+    "Contrôle de suspension et pneus": "Contrôle de suspension et pneus",
+    "Contrôle éclairage et signalisation": "Contrôle éclairage et signalisation",
+    "Graissage générale": "Graissage générale",
+    "Pose du scanner": "Pose du scanner",
+    "Ajout de nettoyant injecteur": "Ajout de nettoyant injecteur",
+    "Remplacer filtre à gasoil": "Remplacer filtre à gasoil",
+    "Échange de filtre à air": "Échange de filtre à air",
+    "Échange de filtre habitacle": "Échange de filtre habitacle",
+    "Échange des bougies d'allumage": "Échange des bougies d'allumage",
+    "Entretien du système de freinage": "Entretien du système de freinage",
+    "Vidange de liquide de frein": "Vidange de liquide de frein",
+    "Vidange de liquide de refroidissement": "Vidange de liquide de refroidissement",
+    "Échange de filtre carburant essence": "Échange de filtre carburant essence",
+  },
   list: {
     title: "Historique des passages à l'atelier SAV",
     subtitle:
@@ -1176,6 +1282,40 @@ const en: WorkshopCopy = {
     INTERNAL: "Internal",
   },
   clientType: { client: "Client", internal: "Internal" },
+  checklistCategories: {
+    MOTEUR: "Engine",
+    FILTRATION: "Filtration",
+    ELECTRICITE: "Electrical",
+    FLUIDES: "Fluids",
+    FREINAGE: "Braking",
+    SUSPENSION: "Suspension",
+    ECLAIRAGE: "Lighting",
+    SCANNER: "Diagnostics",
+  },
+  checklistTasks: {
+    "Vidange huile moteur": "Engine oil change",
+    "Remplacer filtre à huile": "Replace oil filter",
+    "Nettoyer et contrôler le filtre à air": "Clean and check the air filter",
+    "Nettoyage et contrôler les batteries": "Clean and check the batteries",
+    "Contrôle du niveau de liquide refroidissement": "Check the coolant level",
+    "Contrôle du niveau d'huile à frein/embrayage": "Check the brake/clutch fluid level",
+    "Contrôle du niveau d'huile boîte et pont": "Check the gearbox and axle oil level",
+    "Contrôle/remplacer les garnitures de frein": "Check/replace the brake pads",
+    "Contrôle état des courroies": "Check belt condition",
+    "Contrôle de suspension et pneus": "Check suspension and tyres",
+    "Contrôle éclairage et signalisation": "Check lights and signals",
+    "Graissage générale": "General lubrication",
+    "Pose du scanner": "Diagnostic scan",
+    "Ajout de nettoyant injecteur": "Add injector cleaner",
+    "Remplacer filtre à gasoil": "Replace the diesel filter",
+    "Échange de filtre à air": "Replace the air filter",
+    "Échange de filtre habitacle": "Replace the cabin filter",
+    "Échange des bougies d'allumage": "Replace the spark plugs",
+    "Entretien du système de freinage": "Service the braking system",
+    "Vidange de liquide de frein": "Brake fluid flush",
+    "Vidange de liquide de refroidissement": "Coolant flush",
+    "Échange de filtre carburant essence": "Replace the petrol fuel filter",
+  },
   list: {
     title: "Workshop visit history",
     subtitle:
@@ -1722,6 +1862,40 @@ const zh: WorkshopCopy = {
     INTERNAL: "内部",
   },
   clientType: { client: "客户", internal: "内部" },
+  checklistCategories: {
+    MOTEUR: "发动机",
+    FILTRATION: "滤清",
+    ELECTRICITE: "电气",
+    FLUIDES: "油液",
+    FREINAGE: "制动",
+    SUSPENSION: "悬挂",
+    ECLAIRAGE: "灯光",
+    SCANNER: "诊断",
+  },
+  checklistTasks: {
+    "Vidange huile moteur": "更换机油",
+    "Remplacer filtre à huile": "更换机油滤清器",
+    "Nettoyer et contrôler le filtre à air": "清洁并检查空气滤清器",
+    "Nettoyage et contrôler les batteries": "清洁并检查电瓶",
+    "Contrôle du niveau de liquide refroidissement": "检查冷却液液位",
+    "Contrôle du niveau d'huile à frein/embrayage": "检查制动/离合器油液位",
+    "Contrôle du niveau d'huile boîte et pont": "检查变速箱和差速器油液位",
+    "Contrôle/remplacer les garnitures de frein": "检查/更换制动片",
+    "Contrôle état des courroies": "检查传动带状态",
+    "Contrôle de suspension et pneus": "检查悬挂与轮胎",
+    "Contrôle éclairage et signalisation": "检查灯光与信号",
+    "Graissage générale": "整车加注润滑油",
+    "Pose du scanner": "接诊断仪检测",
+    "Ajout de nettoyant injecteur": "添加喷油嘴清洁剂",
+    "Remplacer filtre à gasoil": "更换柴油滤清器",
+    "Échange de filtre à air": "更换空气滤清器",
+    "Échange de filtre habitacle": "更换空调滤芯",
+    "Échange des bougies d'allumage": "更换火花塞",
+    "Entretien du système de freinage": "保养制动系统",
+    "Vidange de liquide de frein": "更换制动液",
+    "Vidange de liquide de refroidissement": "更换冷却液",
+    "Échange de filtre carburant essence": "更换汽油滤清器",
+  },
   list: {
     title: "售后车间进厂记录",
     subtitle: "车间事务都在这一个页面。旧 Excel 台账原样上传,直接写入公司数据库。",

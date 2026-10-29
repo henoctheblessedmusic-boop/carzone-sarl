@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/require-user";
+import { getLocale } from "@/lib/i18n/server";
+import { adminCopy } from "@/lib/i18n/messages/admin";
 
 const CAN_MANAGE_HR = [
   "PDG",
@@ -54,9 +56,10 @@ export async function createEmployee(data: {
   userId?: string;
 }) {
   await requireUser([...CAN_MANAGE_HR]);
+  const t = adminCopy[await getLocale()].server.hr;
 
   if (!data.firstName.trim() || !data.lastName.trim() || !data.jobTitle.trim()) {
-    throw new Error("Le prénom, le nom et le poste sont obligatoires.");
+    throw new Error(t.requiredEmployeeFields);
   }
 
   const employeeNumber = data.employeeNumber?.trim() || (await generateEmployeeNumber());
@@ -64,7 +67,7 @@ export async function createEmployee(data: {
   // Check if employeeNumber already exists
   const existingNumber = await prisma.employee.findUnique({ where: { employeeNumber } });
   if (existingNumber) {
-    throw new Error(`Le matricule ${employeeNumber} est déjà utilisé.`);
+    throw new Error(t.employeeNumberTaken(employeeNumber));
   }
 
   const employee = await prisma.employee.create({
@@ -157,9 +160,10 @@ export async function updateEmployee(
   }
 ) {
   await requireUser([...CAN_MANAGE_HR]);
+  const t = adminCopy[await getLocale()].server.hr;
 
   if (!data.firstName.trim() || !data.lastName.trim() || !data.jobTitle.trim()) {
-    throw new Error("Le prénom, le nom et le poste sont obligatoires.");
+    throw new Error(t.requiredEmployeeFields);
   }
 
   const updated = await prisma.employee.update({
@@ -245,16 +249,17 @@ export async function createLeaveRequest(data: {
   attachmentUrl?: string;
 }) {
   await requireUser([...CAN_MANAGE_HR]);
+  const t = adminCopy[await getLocale()].server.hr;
 
   if (!data.employeeId || !data.leaveTypeId || !data.startDate || !data.endDate) {
-    throw new Error("Veuillez renseigner toutes les informations obligatoires de la demande.");
+    throw new Error(t.requiredLeaveFields);
   }
 
   const start = new Date(data.startDate);
   const end = new Date(data.endDate);
 
   if (end < start) {
-    throw new Error("La date de fin ne peut pas être antérieure à la date de début.");
+    throw new Error(t.leaveEndBeforeStart);
   }
 
   const req = await prisma.leaveRequest.create({
@@ -283,7 +288,7 @@ export async function approveLeaveRequest(requestId: string) {
   });
 
   if (!request) {
-    throw new Error("Demande de congé introuvable.");
+    throw new Error(adminCopy[await getLocale()].server.hr.leaveRequestNotFound);
   }
 
   if (request.status === "APPROUVE") {
@@ -347,9 +352,10 @@ export async function approveLeaveRequest(requestId: string) {
 
 export async function rejectLeaveRequest(requestId: string, rejectionReason: string) {
   await requireUser([...CAN_MANAGE_HR]);
+  const t = adminCopy[await getLocale()].server.hr;
 
   if (!rejectionReason.trim()) {
-    throw new Error("Un motif de refus est requis.");
+    throw new Error(t.rejectionReasonRequired);
   }
 
   const request = await prisma.leaveRequest.findUnique({
@@ -357,7 +363,7 @@ export async function rejectLeaveRequest(requestId: string, rejectionReason: str
     include: { leaveType: true },
   });
   if (!request) {
-    throw new Error("Demande de congé introuvable.");
+    throw new Error(t.leaveRequestNotFound);
   }
 
   // If already approved previously, refund balance
@@ -404,7 +410,7 @@ export async function cancelLeaveRequest(requestId: string) {
     where: { id: requestId },
     include: { leaveType: true },
   });
-  if (!request) throw new Error("Demande de congé introuvable.");
+  if (!request) throw new Error(adminCopy[await getLocale()].server.hr.leaveRequestNotFound);
 
   if (request.status === "APPROUVE") {
     const requestYear = request.startDate.getFullYear();
@@ -454,7 +460,7 @@ export async function createDepartment(data: {
   await requireUser([...CAN_MANAGE_HR]);
 
   if (!data.name.trim() || !data.code.trim()) {
-    throw new Error("Le nom et le code du département sont obligatoires.");
+    throw new Error(adminCopy[await getLocale()].server.hr.requiredDepartmentFields);
   }
 
   const dept = await prisma.department.create({
@@ -481,7 +487,7 @@ export async function updateDepartment(
 ) {
   await requireUser([...CAN_MANAGE_HR]);
 
-  if (!data.name.trim()) throw new Error("Le nom du département est requis.");
+  if (!data.name.trim()) throw new Error(adminCopy[await getLocale()].server.hr.departmentNameRequired);
 
   const dept = await prisma.department.update({
     where: { id },
@@ -502,7 +508,7 @@ export async function deleteDepartment(id: string) {
 
   const employeesCount = await prisma.employee.count({ where: { departmentId: id } });
   if (employeesCount > 0) {
-    throw new Error(`Ce département contient encore ${employeesCount} employé(s). Réassignez-les avant de supprimer.`);
+    throw new Error(adminCopy[await getLocale()].server.hr.departmentHasEmployees(employeesCount));
   }
 
   await prisma.department.delete({ where: { id } });
@@ -520,7 +526,7 @@ export async function createLeaveType(data: {
   await requireUser([...CAN_MANAGE_HR]);
 
   if (!data.name.trim() || !data.code.trim()) {
-    throw new Error("Le nom et le code du type de congé sont obligatoires.");
+    throw new Error(adminCopy[await getLocale()].server.hr.requiredLeaveTypeFields);
   }
 
   const lt = await prisma.leaveType.create({
@@ -569,7 +575,7 @@ export async function deleteLeaveType(id: string) {
 
   const requestsCount = await prisma.leaveRequest.count({ where: { leaveTypeId: id } });
   if (requestsCount > 0) {
-    throw new Error(`Ce type de congé est utilisé par ${requestsCount} demande(s). Impossible de le supprimer.`);
+    throw new Error(adminCopy[await getLocale()].server.hr.leaveTypeInUse(requestsCount));
   }
 
   const lt = await prisma.leaveType.findUnique({ where: { id } });
@@ -696,7 +702,7 @@ export async function recordSalaryPayment(data: {
   const user = await requireUser([...CAN_MANAGE_HR]);
 
   if (!data.employeeId || !data.month || !data.year || data.amountXof <= 0) {
-    throw new Error("Informations de paiement invalides.");
+    throw new Error(adminCopy[await getLocale()].server.hr.invalidPaymentInfo);
   }
 
   const payment = await prisma.salaryPayment.upsert({

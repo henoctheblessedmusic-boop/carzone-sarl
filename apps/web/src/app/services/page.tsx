@@ -27,7 +27,7 @@ export default async function ServicesPage() {
   });
 
   return (
-    <AppShell user={user} title="Articles & Services (Catalogue)">
+    <AppShell user={user} titleKey="services">
       <ServicesView initialArticles={articles} canManage={canManage} />
     </AppShell>
   );

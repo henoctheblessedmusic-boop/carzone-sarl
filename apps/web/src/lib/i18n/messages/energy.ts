@@ -89,6 +89,7 @@ export type EnergyCopy = {
       pickKwh: string;
       payment: string;
       validation: string;
+      stationNotFound: string;
     };
   };
   charging: {
@@ -512,6 +513,7 @@ const fr: EnergyCopy = {
       pickKwh: "Indiquez une quantité de kWh supérieure à zéro.",
       payment: "Le paiement n'est pas passé. Réessayez.",
       validation: "Le réseau a coupé pendant la validation. Réessayez.",
+      stationNotFound: "Borne introuvable ou inactive.",
     },
   },
   charging: {
@@ -892,6 +894,7 @@ const en: EnergyCopy = {
       pickKwh: "Enter a kWh amount above zero.",
       payment: "The payment didn't go through. Please try again.",
       validation: "The network dropped during validation. Please try again.",
+      stationNotFound: "Station not found or inactive.",
     },
   },
   charging: {
@@ -1283,6 +1286,7 @@ const zh: EnergyCopy = {
       pickKwh: "充电量要大于零。",
       payment: "这笔付款没成功,请重试。",
       validation: "确认时网络断了,请重试。",
+      stationNotFound: "充电桩不存在或已停用。",
     },
   },
   charging: {

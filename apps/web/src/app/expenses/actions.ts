@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/require-user";
+import { getLocale } from "@/lib/i18n/server";
+import { adminCopy } from "@/lib/i18n/messages/admin";
 
 const CAN_MANAGE_EXPENSES = [
   "PDG",
@@ -55,7 +57,7 @@ export async function createExpense(data: {
   const user = await requireUser([...CAN_MANAGE_EXPENSES]);
 
   if (!data.title.trim() || !data.supplierName.trim() || data.amountTtcXof <= 0) {
-    throw new Error("Veuillez renseigner la désignation, le prestataire et le montant valide.");
+    throw new Error(adminCopy[await getLocale()].server.expenses.requiredExpenseFields);
   }
 
   const expenseNumber = await generateExpenseNumber();

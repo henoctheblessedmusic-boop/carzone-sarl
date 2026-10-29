@@ -14,7 +14,12 @@ import {
 } from "lucide-react";
 import { WORKSHOP_CHECKLIST_TEMPLATE } from "@/lib/workshop-checklist-data";
 import { usePrefs } from "@/components/PrefsProvider";
-import { workshopCopy, type WorkshopCopy } from "@/lib/i18n/messages/workshop";
+import {
+  workshopCopy,
+  checklistCategoryLabel,
+  checklistTaskLabel,
+  type WorkshopCopy,
+} from "@/lib/i18n/messages/workshop";
 import type { WorkshopSignaturePayload, WorkshopTabletPayload } from "@/lib/workshop-types";
 
 export type WorkshopTabletProps = {
@@ -269,7 +274,8 @@ function SignaturePad({
 
 export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: WorkshopTabletProps) {
   const { locale } = usePrefs();
-  const copy = workshopCopy[locale].tablet;
+  const dict = workshopCopy[locale];
+  const copy = dict.tablet;
   const [activeTab, setActiveTab] = useState<"CHECKLIST" | "INTERVENTION" | "SIGNATURES">("CHECKLIST");
   const [selectedTier, setSelectedTier] = useState<number>(entry.maintenanceTier || 5000);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -795,12 +801,12 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                             </span>
                             {task.category && (
                               <span style={{ fontSize: "0.72rem", opacity: 0.65, textTransform: "uppercase" }}>
-                                [{task.category}]
+                                [{checklistCategoryLabel(dict, task.category)}]
                               </span>
                             )}
                           </div>
                           <div style={{ fontSize: "0.9rem", fontWeight: 650, color: "#ffffff" }}>
-                            {task.taskLabel}
+                            {checklistTaskLabel(dict, task.taskLabel)}
                           </div>
                           <input
                             type="text"

@@ -62,6 +62,39 @@ export type AdminCopy = {
     /** Séparateur avant une valeur alignée (" :" en FR, ":" en EN, "：" en ZH). */
     colon: string;
   };
+  /** Messages d'erreur des Server Actions (hr/actions.ts, users/actions.ts, expenses/actions.ts). */
+  server: {
+    hr: {
+      requiredEmployeeFields: string;
+      employeeNumberTaken: (employeeNumber: string) => string;
+      requiredLeaveFields: string;
+      leaveEndBeforeStart: string;
+      leaveRequestNotFound: string;
+      rejectionReasonRequired: string;
+      requiredDepartmentFields: string;
+      departmentNameRequired: string;
+      departmentHasEmployees: (count: number) => string;
+      requiredLeaveTypeFields: string;
+      leaveTypeInUse: (count: number) => string;
+      invalidPaymentInfo: string;
+    };
+    users: {
+      onlyDeveloperCanAssignRole: string;
+      requiredCreateFields: string;
+      emailAlreadyUsed: string;
+      requiredUpdateFields: string;
+      userNotFound: string;
+      actionNotAllowed: string;
+      notAllowedChangePassword: string;
+      passwordTooShort: string;
+      userIdRequired: string;
+      idAndRoleRequired: string;
+      cannotDeleteOwnAccount: string;
+    };
+    expenses: {
+      requiredExpenseFields: string;
+    };
+  };
   hr: {
     title: string;
     subtitle: string;
@@ -441,6 +474,11 @@ export type AdminCopy = {
       checkAll: string;
       uncheckAll: string;
     };
+    /** Libellés localisés de la grille de permissions (lib/permissions-config.ts), repli sur group.nameFr / capability.description. */
+    capabilities: {
+      groups: Record<string, string>;
+      items: Record<string, string>;
+    };
     alerts: {
       missingFields: string;
       errCreate: string;
@@ -578,6 +616,40 @@ const fr: AdminCopy = {
     actions: "Actions",
     status: "Statut",
     colon: " :",
+  },
+  server: {
+    hr: {
+      requiredEmployeeFields: "Le prénom, le nom et le poste sont obligatoires.",
+      employeeNumberTaken: (employeeNumber) => `Le matricule ${employeeNumber} est déjà utilisé.`,
+      requiredLeaveFields: "Veuillez renseigner toutes les informations obligatoires de la demande.",
+      leaveEndBeforeStart: "La date de fin ne peut pas être antérieure à la date de début.",
+      leaveRequestNotFound: "Demande de congé introuvable.",
+      rejectionReasonRequired: "Un motif de refus est requis.",
+      requiredDepartmentFields: "Le nom et le code du département sont obligatoires.",
+      departmentNameRequired: "Le nom du département est requis.",
+      departmentHasEmployees: (count) =>
+        `Ce département contient encore ${count} employé(s). Réassignez-les avant de supprimer.`,
+      requiredLeaveTypeFields: "Le nom et le code du type de congé sont obligatoires.",
+      leaveTypeInUse: (count) =>
+        `Ce type de congé est utilisé par ${count} demande(s). Impossible de le supprimer.`,
+      invalidPaymentInfo: "Informations de paiement invalides.",
+    },
+    users: {
+      onlyDeveloperCanAssignRole: "Seul le Développeur peut attribuer ce rôle.",
+      requiredCreateFields: "L'email et le nom complet sont obligatoires.",
+      emailAlreadyUsed: "Un utilisateur avec cette adresse email existe déjà.",
+      requiredUpdateFields: "ID, rôle et nom complet sont obligatoires.",
+      userNotFound: "Utilisateur introuvable.",
+      actionNotAllowed: "Action non autorisée.",
+      notAllowedChangePassword: "Vous n'êtes pas autorisé à modifier le mot de passe de cet utilisateur.",
+      passwordTooShort: "Le mot de passe doit comporter au moins 4 caractères.",
+      userIdRequired: "ID utilisateur obligatoire.",
+      idAndRoleRequired: "ID et nouveau rôle obligatoires.",
+      cannotDeleteOwnAccount: "Vous ne pouvez pas supprimer votre propre compte.",
+    },
+    expenses: {
+      requiredExpenseFields: "Veuillez renseigner la désignation, le prestataire et le montant valide.",
+    },
   },
   hr: {
     title: "Ressources humaines (RH)",
@@ -1014,6 +1086,66 @@ const fr: AdminCopy = {
       checkAll: "Tout cocher",
       uncheckAll: "Tout décocher",
     },
+    capabilities: {
+      groups: {
+        customers: "Clients & Répertoire",
+        invoices: "Factures & Bilan Financier",
+        estimates: "Devis & Proformas",
+        purchase_orders: "Bons de Commande (BDC)",
+        workshop: "Atelier Garage & SAV",
+        stock: "Stock Véhicules & Parc",
+        services: "Prestations & Forfaits Atelier",
+        users_management: "Flotte des Utilisateurs & Rôles",
+        hr: "Ressources Humaines (RH)",
+      },
+      items: {
+        "customers:view_own": "Consulter uniquement ses clients assignés",
+        "customers:view_global": "Consulter l'ensemble des clients de l'entreprise",
+        "customers:create": "Créer et enregistrer de nouveaux clients",
+        "customers:edit": "Modifier les coordonnées, IFU et contacts",
+        "customers:delete": "Supprimer ou archiver un client",
+        "customers:documents": "Téléverser et consulter les documents (CIP, IFU, etc.)",
+        "invoices:view_own": "Consulter uniquement ses factures",
+        "invoices:view_global": "Consulter toutes les factures de l'entreprise",
+        "invoices:create": "Générer et émettre des factures",
+        "invoices:edit": "Modifier les factures non clôturées",
+        "invoices:delete": "Annuler des factures (motif obligatoire)",
+        "invoices:financial_export": "Télécharger l'état financier et grand livre au format Excel",
+        "estimates:view_own": "Consulter ses propres devis",
+        "estimates:view_global": "Consulter l'ensemble des devis",
+        "estimates:create": "Créer un devis ou une facture proforma",
+        "estimates:edit": "Modifier les devis existants",
+        "estimates:delete": "Supprimer ou annuler des devis",
+        "orders:view_own": "Consulter ses bons de commande",
+        "orders:view_global": "Consulter tous les bons de commande",
+        "orders:create": "Établir un bon de commande",
+        "orders:edit": "Valider ou modifier les bons de commande",
+        "orders:delete": "Supprimer / Annuler un bon de commande",
+        "workshop:view_own": "Consulter ses véhicules assignés",
+        "workshop:view_global": "Consulter tout l'historique SAV et mouvements d'atelier",
+        "workshop:create": "Enregistrer une entrée de véhicule au garage (OR)",
+        "workshop:edit": "Modifier l'état, travaux effectués, date de sortie",
+        "workshop:delete": "Supprimer un enregistrement de passage SAV",
+        "workshop:excel": "Importer des classeurs Excel programmés et exporter en .xlsx",
+        "stock:view": "Consulter l'état du stock de véhicules",
+        "stock:create": "Ajouter un véhicule au stock",
+        "stock:edit": "Modifier les prix, options et caractéristiques",
+        "stock:delete": "Retirer ou supprimer un véhicule du stock",
+        "services:view": "Consulter la grille tarifaire des prestations",
+        "services:create": "Ajouter de nouveaux services et forfaits",
+        "services:edit": "Modifier les tarifs et descriptions",
+        "services:delete": "Supprimer un service ou un forfait",
+        "users:view": "Consulter la liste de tous les utilisateurs de l'entreprise",
+        "users:create": "Créer un nouveau compte utilisateur",
+        "users:assign_role": "Modifier et assigner les rôles de l'équipe",
+        "users:custom_permissions": "Cocher et personnaliser les capacités individuelles",
+        "users:delete": "Désactiver ou supprimer un compte utilisateur",
+        "hr:view": "Consulter la liste des salariés et les demandes de congés",
+        "hr:manage_employees": "Créer, modifier et archiver les fiches du personnel",
+        "hr:manage_leaves": "Valider, refuser et administrer les congés et soldes",
+        "hr:setup": "Gérer les départements, types de congés et référentiels RH",
+      },
+    },
     alerts: {
       missingFields: "Il manque le nom complet ou l'adresse email.",
       errCreate: "La création du compte a échoué.",
@@ -1166,6 +1298,40 @@ const en: AdminCopy = {
     actions: "Actions",
     status: "Status",
     colon: ":",
+  },
+  server: {
+    hr: {
+      requiredEmployeeFields: "First name, last name and job title are required.",
+      employeeNumberTaken: (employeeNumber) => `Staff ID ${employeeNumber} is already in use.`,
+      requiredLeaveFields: "Please fill in all the required fields of the request.",
+      leaveEndBeforeStart: "The end date can't be earlier than the start date.",
+      leaveRequestNotFound: "Leave request not found.",
+      rejectionReasonRequired: "A rejection reason is required.",
+      requiredDepartmentFields: "The department name and code are required.",
+      departmentNameRequired: "The department name is required.",
+      departmentHasEmployees: (count) =>
+        `This department still has ${count} employee(s). Reassign them before deleting it.`,
+      requiredLeaveTypeFields: "The leave type name and code are required.",
+      leaveTypeInUse: (count) =>
+        `This leave type is used by ${count} request(s). It can't be deleted.`,
+      invalidPaymentInfo: "Invalid payment information.",
+    },
+    users: {
+      onlyDeveloperCanAssignRole: "Only the Developer can assign this role.",
+      requiredCreateFields: "Email and full name are required.",
+      emailAlreadyUsed: "A user with this email address already exists.",
+      requiredUpdateFields: "ID, role and full name are required.",
+      userNotFound: "User not found.",
+      actionNotAllowed: "Action not allowed.",
+      notAllowedChangePassword: "You're not allowed to change this user's password.",
+      passwordTooShort: "The password must be at least 4 characters long.",
+      userIdRequired: "User ID is required.",
+      idAndRoleRequired: "ID and new role are required.",
+      cannotDeleteOwnAccount: "You can't delete your own account.",
+    },
+    expenses: {
+      requiredExpenseFields: "Please fill in the description, the supplier and a valid amount.",
+    },
   },
   hr: {
     title: "Human resources (HR)",
@@ -1594,6 +1760,66 @@ const en: AdminCopy = {
       checkAll: "Tick all",
       uncheckAll: "Clear all",
     },
+    capabilities: {
+      groups: {
+        customers: "Customer Records & Directory",
+        invoices: "Invoices & Financial Statement",
+        estimates: "Quotes & Proformas",
+        purchase_orders: "Purchase Orders (BDC)",
+        workshop: "Workshop & After-Sales",
+        stock: "Stock & Fleet",
+        services: "Services & Workshop Packages",
+        users_management: "User Accounts & Roles",
+        hr: "Human Resources (HR)",
+      },
+      items: {
+        "customers:view_own": "View only their assigned customers",
+        "customers:view_global": "View all of the company's customers",
+        "customers:create": "Create and register new customers",
+        "customers:edit": "Edit contact details, tax ID and contacts",
+        "customers:delete": "Delete or archive a customer",
+        "customers:documents": "Upload and view documents (ID, tax ID, etc.)",
+        "invoices:view_own": "View only their own invoices",
+        "invoices:view_global": "View all of the company's invoices",
+        "invoices:create": "Generate and issue invoices",
+        "invoices:edit": "Edit invoices that aren't closed",
+        "invoices:delete": "Void invoices (reason required)",
+        "invoices:financial_export": "Download the financial statement and ledger as Excel",
+        "estimates:view_own": "View their own quotes",
+        "estimates:view_global": "View all quotes",
+        "estimates:create": "Create a quote or proforma invoice",
+        "estimates:edit": "Edit existing quotes",
+        "estimates:delete": "Delete or cancel quotes",
+        "orders:view_own": "View their own purchase orders",
+        "orders:view_global": "View all purchase orders",
+        "orders:create": "Issue a purchase order",
+        "orders:edit": "Approve or edit purchase orders",
+        "orders:delete": "Delete / cancel a purchase order",
+        "workshop:view_own": "View their assigned vehicles",
+        "workshop:view_global": "View the full after-sales history and workshop activity",
+        "workshop:create": "Log a vehicle entry at the garage (repair order)",
+        "workshop:edit": "Edit status, work done and exit date",
+        "workshop:delete": "Delete an after-sales visit record",
+        "workshop:excel": "Upload scheduled Excel workbooks and export to .xlsx",
+        "stock:view": "View the vehicle stock status",
+        "stock:create": "Add a vehicle to stock",
+        "stock:edit": "Edit prices, options and specs",
+        "stock:delete": "Remove or delete a vehicle from stock",
+        "services:view": "View the service price list",
+        "services:create": "Add new services and packages",
+        "services:edit": "Edit prices and descriptions",
+        "services:delete": "Delete a service or package",
+        "users:view": "View the list of all company users",
+        "users:create": "Create a new user account",
+        "users:assign_role": "Edit and assign team roles",
+        "users:custom_permissions": "Tick and customise individual capabilities",
+        "users:delete": "Deactivate or delete a user account",
+        "hr:view": "View the staff list and leave requests",
+        "hr:manage_employees": "Create, edit and archive staff records",
+        "hr:manage_leaves": "Approve, reject and manage leave and balances",
+        "hr:setup": "Manage departments, leave types and HR reference data",
+      },
+    },
     alerts: {
       missingFields: "The full name or the email address is missing.",
       errCreate: "The account couldn't be created.",
@@ -1745,6 +1971,38 @@ const zh: AdminCopy = {
     actions: "操作",
     status: "状态",
     colon: "：",
+  },
+  server: {
+    hr: {
+      requiredEmployeeFields: "名字、姓氏和职位为必填项。",
+      employeeNumberTaken: (employeeNumber) => `工号 ${employeeNumber} 已被使用。`,
+      requiredLeaveFields: "请填写申请的所有必填信息。",
+      leaveEndBeforeStart: "结束日期不能早于开始日期。",
+      leaveRequestNotFound: "找不到该请假申请。",
+      rejectionReasonRequired: "必须填写拒绝理由。",
+      requiredDepartmentFields: "部门名称和代码为必填项。",
+      departmentNameRequired: "部门名称为必填项。",
+      departmentHasEmployees: (count) => `该部门仍有 ${count} 名员工,请先重新分配后再删除。`,
+      requiredLeaveTypeFields: "假种名称和代码为必填项。",
+      leaveTypeInUse: (count) => `该假种已被 ${count} 条申请使用,无法删除。`,
+      invalidPaymentInfo: "付款信息无效。",
+    },
+    users: {
+      onlyDeveloperCanAssignRole: "只有开发者可以分配此角色。",
+      requiredCreateFields: "邮箱和姓名为必填项。",
+      emailAlreadyUsed: "该邮箱地址已被其他用户使用。",
+      requiredUpdateFields: "ID、角色和姓名为必填项。",
+      userNotFound: "找不到该用户。",
+      actionNotAllowed: "操作未被授权。",
+      notAllowedChangePassword: "您无权修改此用户的密码。",
+      passwordTooShort: "密码至少需要 4 个字符。",
+      userIdRequired: "用户 ID 为必填项。",
+      idAndRoleRequired: "ID 和新角色为必填项。",
+      cannotDeleteOwnAccount: "您不能删除自己的账户。",
+    },
+    expenses: {
+      requiredExpenseFields: "请填写名称、供应商和有效金额。",
+    },
   },
   hr: {
     title: "人力资源（HR）",
@@ -2162,6 +2420,66 @@ const zh: AdminCopy = {
       capabilities: "权限",
       checkAll: "全选",
       uncheckAll: "全不选",
+    },
+    capabilities: {
+      groups: {
+        customers: "客户档案与名录",
+        invoices: "发票与财务报表",
+        estimates: "报价与形式发票",
+        purchase_orders: "采购订单(BDC)",
+        workshop: "车间与售后",
+        stock: "库存与车队",
+        services: "服务与车间套餐",
+        users_management: "用户账号与角色",
+        hr: "人力资源(HR)",
+      },
+      items: {
+        "customers:view_own": "仅查看自己负责的客户",
+        "customers:view_global": "查看公司全部客户",
+        "customers:create": "创建并登记新客户",
+        "customers:edit": "修改联系方式、税号和联系人",
+        "customers:delete": "删除或归档客户",
+        "customers:documents": "上传并查看证件资料(身份证、税号等)",
+        "invoices:view_own": "仅查看自己的发票",
+        "invoices:view_global": "查看公司全部发票",
+        "invoices:create": "生成并开具发票",
+        "invoices:edit": "修改未结清的发票",
+        "invoices:delete": "作废发票(须填写原因)",
+        "invoices:financial_export": "下载财务报表和总账(Excel)",
+        "estimates:view_own": "查看自己的报价单",
+        "estimates:view_global": "查看全部报价单",
+        "estimates:create": "创建报价单或形式发票",
+        "estimates:edit": "修改现有报价单",
+        "estimates:delete": "删除或取消报价单",
+        "orders:view_own": "查看自己的采购订单",
+        "orders:view_global": "查看全部采购订单",
+        "orders:create": "开具采购订单",
+        "orders:edit": "审批或修改采购订单",
+        "orders:delete": "删除/取消采购订单",
+        "workshop:view_own": "查看自己负责的车辆",
+        "workshop:view_global": "查看全部售后历史和车间动态",
+        "workshop:create": "登记车辆入厂(工单)",
+        "workshop:edit": "修改状态、已完成工作和出厂日期",
+        "workshop:delete": "删除一条售后记录",
+        "workshop:excel": "上传排程 Excel 表并导出 .xlsx",
+        "stock:view": "查看车辆库存状态",
+        "stock:create": "新增库存车辆",
+        "stock:edit": "修改价格、选装和配置",
+        "stock:delete": "移除或删除库存车辆",
+        "services:view": "查看服务价目表",
+        "services:create": "新增服务和套餐",
+        "services:edit": "修改价格和说明",
+        "services:delete": "删除服务或套餐",
+        "users:view": "查看公司全部用户列表",
+        "users:create": "创建新用户账号",
+        "users:assign_role": "修改并分配团队角色",
+        "users:custom_permissions": "勾选并自定义个人权限",
+        "users:delete": "停用或删除用户账号",
+        "hr:view": "查看员工列表和请假申请",
+        "hr:manage_employees": "创建、修改和归档员工档案",
+        "hr:manage_leaves": "审批、拒绝并管理假期与余额",
+        "hr:setup": "管理部门、假种和人力资源基础数据",
+      },
     },
     alerts: {
       missingFields: "姓名或邮箱还没填。",

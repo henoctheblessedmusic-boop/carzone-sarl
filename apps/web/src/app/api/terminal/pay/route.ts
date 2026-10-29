@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { nextDocNumber } from "@/lib/format";
+import { getLocale } from "@/lib/i18n/server";
+import { energyCopy } from "@/lib/i18n/messages/energy";
 
 /** Simulate charging terminal payment (Mobile Money / card) */
 export async function POST(req: NextRequest) {
@@ -20,7 +22,11 @@ export async function POST(req: NextRequest) {
 
   const station = await prisma.chargingStation.findUnique({ where: { id: stationId } });
   if (!station || !station.active) {
-    return NextResponse.json({ error: "Station introuvable" }, { status: 404 });
+    const locale = await getLocale();
+    return NextResponse.json(
+      { error: energyCopy[locale].terminal.errors.stationNotFound },
+      { status: 404 }
+    );
   }
 
   let pricePerKwh = 125;

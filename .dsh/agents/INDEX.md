@@ -73,3 +73,5 @@
 | [type-design-analyzer](type-design-analyzer.md) | Analyze type design for encapsulation, invariant expression, usefulness, and enforcement. |
 | [typescript-reviewer](typescript-reviewer.md) | Expert TypeScript/JavaScript code reviewer specializing in type safety, async correctness, Node/web security, and idiomatic patter… |
 | [vue-reviewer](vue-reviewer.md) | Expert Vue.js code reviewer specializing in Composition API correctness, reactivity pitfalls, component architecture, template sec… |
+| [copy-humanizer](copy-humanizer.md) | Rôle humaniseur de copy FR/EN/ZH — réécrit les textes UI générés par IA en style humain, irrégulier, sans toucher au code fonctionnel. |
+

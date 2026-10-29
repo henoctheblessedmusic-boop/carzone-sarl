@@ -34,6 +34,9 @@ import {
 } from "lucide-react";
 import { OFFICIAL_VEHICLE_CATALOG, ModelCatalogEntry } from "@/lib/vehicle-catalog-specs";
 import { CarzoneLogo } from "@/components/CarzoneLogo";
+import { usePrefs } from "@/components/PrefsProvider";
+import { publicShowcaseCopy, type PublicShowcaseCopy } from "@/lib/i18n/messages/public-showcase";
+import type { Locale } from "@/lib/prefs";
 
 export interface ShowcaseVehicle extends ModelCatalogEntry {
   dbId?: string;
@@ -55,32 +58,37 @@ interface PublicShowcaseProps {
   liveDbVehicles?: any[];
 }
 
-const CATEGORIES = [
-  { id: "ALL", label: "Tous les Véhicules" },
-  { id: "VEDETTES", label: "🔥 Nouveautés 2026 & Flashy" },
-  { id: "SUV", label: "SUV & Crossovers" },
-  { id: "PICKUP", label: "Pick-up 4x4" },
-  { id: "BERLINE", label: "Berlines de Luxe" },
-  { id: "ELECTRIQUE", label: "Électrique & Hybride (VE)" },
-];
+function getCategories(copy: PublicShowcaseCopy) {
+  return [
+    { id: "ALL", label: copy.categories.all },
+    { id: "VEDETTES", label: copy.categories.vedettes },
+    { id: "SUV", label: copy.categories.suv },
+    { id: "PICKUP", label: copy.categories.pickup },
+    { id: "BERLINE", label: copy.categories.berline },
+    { id: "ELECTRIQUE", label: copy.categories.electrique },
+  ];
+}
 
-const AVAILABILITY_FILTERS = [
-  { id: "ALL", label: "Toutes Disponibilités" },
-  { id: "SHOWROOM", label: "🟢 En Stock Showroom" },
-  { id: "TRANSIT", label: "🚢 En Arrivage / Au Port" },
-  { id: "COMMANDE", label: "🏭 Commandes d'Usine" },
-];
+function getAvailabilityFilters(copy: PublicShowcaseCopy) {
+  return [
+    { id: "ALL", label: copy.availability.all },
+    { id: "SHOWROOM", label: copy.availability.showroom },
+    { id: "TRANSIT", label: copy.availability.transit },
+    { id: "COMMANDE", label: copy.availability.commande },
+  ];
+}
 
-function formatPriceXof(price?: number | null): string {
-  if (!price || price <= 0) return "Sur cotation usine";
+function formatPriceXof(price: number | null | undefined, fallbackLabel: string): string {
+  if (!price || price <= 0) return fallbackLabel;
   return `${price.toLocaleString("fr-FR")} FCFA`;
 }
 
-function formatEtaDate(dateStr?: string | null): string | null {
+function formatEtaDate(dateStr: string | null | undefined, locale: Locale): string | null {
   if (!dateStr) return null;
   try {
     const d = new Date(dateStr);
-    return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+    const dateLocale = locale === "en" ? "en-US" : locale === "zh" ? "zh-CN" : "fr-FR";
+    return d.toLocaleDateString(dateLocale, { day: "numeric", month: "long", year: "numeric" });
   } catch {
     return dateStr;
   }
@@ -146,11 +154,16 @@ export function getVehicleAttractivenessScore(v: ShowcaseVehicle): number {
 
 
 export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseProps) {
+  const { locale } = usePrefs();
+  const copy = publicShowcaseCopy[locale];
+  const CATEGORIES = getCategories(copy);
+  const AVAILABILITY_FILTERS = getAvailabilityFilters(copy);
+
   const [selectedCategory, setSelectedCategory] = useState("ALL");
   const [selectedBrand, setSelectedBrand] = useState("ALL");
   const [selectedAvailability, setSelectedAvailability] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   // Modals state
   const [detailVehicle, setDetailVehicle] = useState<ShowcaseVehicle | null>(null);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
@@ -343,7 +356,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
   const handleQuoteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.contactName || (!formData.phone && !formData.email)) {
-      setFormError("Veuillez renseigner votre nom et au moins un contact (téléphone ou email).");
+      setFormError(copy.errors.missingContact);
       return;
     }
 
@@ -359,7 +372,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
           phone: formData.phone,
           email: formData.email,
           vehicleInterest: quoteVehicle
-            ? `${quoteVehicle.title} [Statut: ${quoteVehicle.stockStatus}${quoteVehicle.etaDate ? ` - Arrivage: ${formatEtaDate(quoteVehicle.etaDate)}` : ""}]`
+            ? `${quoteVehicle.title} [Statut: ${quoteVehicle.stockStatus}${quoteVehicle.etaDate ? ` - Arrivage: ${formatEtaDate(quoteVehicle.etaDate, "fr")}` : ""}]`
             : "Catalogue Général CARZONE",
           energyPref: quoteVehicle ? quoteVehicle.energy : undefined,
           notes: `Statut stock: ${quoteVehicle?.stockStatus || "Général"} · Mode paiement: ${formData.paymentType} · Ville: ${formData.city} · Notes: ${formData.notes || "Aucune"}`,
@@ -374,12 +387,12 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Une erreur est survenue.");
+        throw new Error(data.error || copy.errors.genericSubmit);
       }
 
       setFormSuccess(true);
     } catch (err: any) {
-      setFormError(err.message || "Erreur de connexion. Veuillez réessayer.");
+      setFormError(err.message || copy.errors.connection);
     } finally {
       setFormSubmitting(false);
     }
@@ -389,17 +402,18 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
     const phone = "2290192616161";
     let text = "";
     if (vehicle) {
+      const eta = formatEtaDate(vehicle.etaDate, locale);
       if (vehicle.stockStatus === "EN_TRANSIT") {
-        text = `Bonjour CARZONE Bénin, je souhaite réserver le modèle ${vehicle.title} actuellement en transit vers Cotonou${vehicle.etaDate ? ` (Arrivage prévu le ${formatEtaDate(vehicle.etaDate)})` : ""}. Pouvez-vous me transmettre la facture proforma officielle ?`;
+        text = copy.whatsapp.transit(vehicle.title, eta);
       } else if (vehicle.stockStatus === "AU_PORT") {
-        text = `Bonjour CARZONE Bénin, je suis intéressé par le modèle ${vehicle.title} actuellement au Port de Cotonou en dédouanement. Quand sera-t-il prêt au Showroom ?`;
+        text = copy.whatsapp.port(vehicle.title);
       } else if (vehicle.stockStatus === "SHOWROOM") {
-        text = `Bonjour CARZONE Bénin, je souhaite acheter le modèle ${vehicle.title} disponible au showroom de Cotonou. Pouvez-vous me confirmer le prix (${formatPriceXof(vehicle.priceXof)}) et la disponibilité d'essai ?`;
+        text = copy.whatsapp.showroom(vehicle.title, formatPriceXof(vehicle.priceXof, copy.card.priceOnQuote));
       } else {
-        text = `Bonjour CARZONE Bénin, je souhaite configurer et commander d'usine le modèle ${vehicle.title}. Pouvez-vous me transmettre la fiche technique et le devis usine ?`;
+        text = copy.whatsapp.factoryOrder(vehicle.title);
       }
     } else {
-      text = "Bonjour CARZONE Bénin, je souhaite échanger avec un conseiller commercial concernant vos véhicules neufs disponibles au showroom de Cotonou.";
+      text = copy.whatsapp.general;
     }
     return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
   };
@@ -423,10 +437,10 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
         <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem", color: "#94a3b8" }}>
             <span style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}>
-              <MapPin size={13} color="#e11d48" /> Showroom Maro-Militaire, Gbèdomidji, Cotonou
+              <MapPin size={13} color="#e11d48" /> {copy.topBar.address}
             </span>
             <span style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}>
-              <Clock size={13} color="#f59e0b" /> Lun - Ven : 8h00 - 18h30 | Sam : 8h30 - 15h00
+              <Clock size={13} color="#f59e0b" /> {copy.topBar.hours}
             </span>
           </div>
 
@@ -450,7 +464,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                   gap: "0.3rem",
                 }}
               >
-                <Lock size={12} /> Dashboard ({session.fullName})
+                <Lock size={12} /> {copy.topBar.dashboardLabel(session.fullName)}
               </Link>
             ) : (
               <Link
@@ -464,7 +478,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                   fontWeight: 600,
                 }}
               >
-                <Lock size={12} /> Espace Collaborateur
+                <Lock size={12} /> {copy.topBar.loginLabel}
               </Link>
             )}
           </div>
@@ -480,19 +494,19 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
 
           <nav style={{ display: "flex", alignItems: "center", gap: "1.8rem" }}>
             <a href="#showroom" style={{ color: "#e2e8f0", textDecoration: "none", fontWeight: 600, fontSize: "0.92rem", transition: "color 0.2s" }}>
-              Stock & Arrivages
+              {copy.nav.stock}
             </a>
             <a href="#sur-mesure" style={{ color: "#e2e8f0", textDecoration: "none", fontWeight: 600, fontSize: "0.92rem", transition: "color 0.2s" }}>
-              Commande Usine
+              {copy.nav.factoryOrder}
             </a>
             <a href="#services" style={{ color: "#e2e8f0", textDecoration: "none", fontWeight: 600, fontSize: "0.92rem", transition: "color 0.2s" }}>
-              Atelier SAV & Pièces
+              {copy.nav.workshop}
             </a>
             <a href="#recharge" style={{ color: "#e2e8f0", textDecoration: "none", fontWeight: 600, fontSize: "0.92rem", transition: "color 0.2s" }}>
-              Bornes & VE
+              {copy.nav.charging}
             </a>
             <a href="#contact" style={{ color: "#e2e8f0", textDecoration: "none", fontWeight: 600, fontSize: "0.92rem", transition: "color 0.2s" }}>
-              Showroom & Accès
+              {copy.nav.contact}
             </a>
           </nav>
 
@@ -506,7 +520,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
               className="cz-btn-outline"
               style={{ padding: "0.6rem 1.1rem", fontSize: "0.85rem" }}
             >
-              <FileText size={15} color="#f59e0b" /> Devis Express
+              <FileText size={15} color="#f59e0b" /> {copy.header.quoteExpress}
             </button>
             <a
               href={getWhatsAppLink()}
@@ -515,7 +529,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
               className="cz-btn-whatsapp"
               style={{ padding: "0.6rem 1.1rem", fontSize: "0.85rem" }}
             >
-              <MessageSquare size={15} /> WhatsApp
+              <MessageSquare size={15} /> {copy.header.whatsapp}
             </a>
           </div>
         </div>
@@ -544,7 +558,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                   textTransform: "uppercase",
                 }}
               >
-                <Sparkles size={12} color="#f59e0b" /> Concessionnaire Officiel Multimarques · Stock Live & Arrivages Cotonou
+                <Sparkles size={12} color="#f59e0b" /> {copy.hero.badge}
               </div>
 
               <h1
@@ -557,9 +571,9 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                   margin: 0,
                 }}
               >
-                L&apos;Excellence Automobile{" "}
+                {copy.hero.titleStart}{" "}
                 <span style={{ background: "linear-gradient(135deg, #e11d48 0%, #f59e0b 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                  au Cœur de Cotonou
+                  {copy.hero.titleHighlight}
                 </span>
               </h1>
             </div>
@@ -570,7 +584,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                 <Search size={15} color="#94a3b8" style={{ position: "absolute", left: "0.9rem", top: "50%", transform: "translateY(-50%)" }} />
                 <input
                   type="text"
-                  placeholder="Rechercher par modèle, marque..."
+                  placeholder={copy.hero.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="cz-input"
@@ -587,7 +601,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                 className="cz-btn-primary"
                 style={{ padding: "0.6rem 1.2rem", fontSize: "0.85rem", height: "40px" }}
               >
-                <FileText size={15} color="#fff" /> Devis Express en 1 Clic
+                <FileText size={15} color="#fff" /> {copy.hero.quoteCta}
               </button>
             </div>
           </div>
@@ -595,7 +609,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
           {/* FILTRE DISPONIBILITÉ STOCK (SHOWROOM / TRANSIT / COMMANDE) */}
           <div style={{ display: "flex", gap: "0.5rem", overflowX: "auto", paddingBottom: "0.5rem", marginBottom: "0.65rem", alignItems: "center" }}>
             <span style={{ fontSize: "0.76rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", marginRight: "0.3rem" }}>
-              Disponibilité :
+              {copy.hero.availabilityLabel}
             </span>
             {AVAILABILITY_FILTERS.map((f) => (
               <button
@@ -626,7 +640,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
           {/* SÉLECTEUR DE MARQUES */}
           <div style={{ display: "flex", gap: "0.35rem", overflowX: "auto", alignItems: "center" }}>
             <span style={{ fontSize: "0.75rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", marginRight: "0.3rem" }}>
-              Marque :
+              {copy.hero.brandLabel}
             </span>
             {brands.map((b) => (
               <button
@@ -635,7 +649,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                 className={`cz-pill ${selectedBrand === b ? "active" : ""}`}
                 style={{ padding: "0.26rem 0.65rem", fontSize: "0.73rem" }}
               >
-                {b === "ALL" ? "Toutes" : b}
+                {b === "ALL" ? copy.hero.allBrands : b}
               </button>
             ))}
           </div>
@@ -647,20 +661,20 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "1rem", marginBottom: "1.8rem" }}>
           <div>
             <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", background: "rgba(225,29,72,0.15)", border: "1px solid rgba(225,29,72,0.35)", borderRadius: "20px", padding: "0.25rem 0.75rem", fontSize: "0.75rem", fontWeight: 800, color: "#f43f5e", marginBottom: "0.5rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-              <Sparkles size={13} color="#f43f5e" /> Ordonnancement Automatique Intelligent
+              <Sparkles size={13} color="#f43f5e" /> {copy.showroom.badge}
             </div>
             <h2 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#fff", margin: 0, letterSpacing: "-0.02em" }}>
-              Collection Véhicules Neufs & Arrivages Prioritaires
+              {copy.showroom.title}
             </h2>
             <p style={{ color: "#94a3b8", fontSize: "0.88rem", margin: "0.35rem 0 0" }}>
-              Les modèles 2026 les plus récents, technologiques et prestigieux sont automatiquement propulsés en avant.
+              {copy.showroom.subtitle}
             </p>
           </div>
 
           <div style={{ background: "rgba(14,26,38,0.7)", border: "1px solid rgba(160,210,230,0.18)", borderRadius: "10px", padding: "0.5rem 1rem", display: "flex", alignItems: "center", gap: "0.6rem" }}>
             <Car size={16} color="#f59e0b" />
             <span style={{ fontSize: "0.85rem", color: "#cbd5e1", fontWeight: 600 }}>
-              <strong style={{ color: "#fff", fontSize: "1rem", fontWeight: 800 }}>{filteredVehicles.length}</strong> modèles disponibles
+              <strong style={{ color: "#fff", fontSize: "1rem", fontWeight: 800 }}>{filteredVehicles.length}</strong> {copy.showroom.modelsAvailable}
             </span>
           </div>
         </div>
@@ -668,8 +682,8 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
         {filteredVehicles.length === 0 ? (
           <div className="cz-card-glass" style={{ padding: "4rem 2rem", textAlign: "center" }}>
             <Car size={48} color="#64748b" style={{ margin: "0 auto 1rem" }} />
-            <h3 style={{ fontSize: "1.3rem", fontWeight: 700, color: "#fff" }}>Aucun véhicule ne correspond à ces critères</h3>
-            <p style={{ color: "#94a3b8", marginTop: "0.5rem" }}>Modifiez vos filtres ou effectuez une commande spéciale d&apos;usine.</p>
+            <h3 style={{ fontSize: "1.3rem", fontWeight: 700, color: "#fff" }}>{copy.showroom.emptyTitle}</h3>
+            <p style={{ color: "#94a3b8", marginTop: "0.5rem" }}>{copy.showroom.emptyText}</p>
             <button
               onClick={() => {
                 setSelectedCategory("ALL");
@@ -680,7 +694,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
               className="cz-btn-outline"
               style={{ marginTop: "1.5rem" }}
             >
-              Réinitialiser les filtres
+              {copy.showroom.resetFilters}
             </button>
           </div>
         ) : (
@@ -692,8 +706,8 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
             }}
           >
             {filteredVehicles.map((vehicle, idx) => {
-              const formattedPrice = formatPriceXof(vehicle.priceXof);
-              const eta = formatEtaDate(vehicle.etaDate);
+              const formattedPrice = formatPriceXof(vehicle.priceXof, copy.card.priceOnQuote);
+              const eta = formatEtaDate(vehicle.etaDate, locale);
 
               return (
                 <div
@@ -734,40 +748,40 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                       <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", alignItems: "center" }}>
                         {vehicle.year && vehicle.year >= 2026 ? (
                           <span className="cz-badge-flagship">
-                            <Sparkles size={11} /> NOUVEAUTÉ 2026
+                            <Sparkles size={11} /> {copy.card.newBadge}
                           </span>
                         ) : getVehicleAttractivenessScore(vehicle) >= 8000 ? (
                           <span
                             className="cz-badge-flagship"
                             style={{ background: "linear-gradient(135deg, #f59e0b 0%, #b45309 100%)" }}
                           >
-                            <Sparkles size={11} /> MODÈLE PHARE
+                            <Sparkles size={11} /> {copy.card.flagshipBadge}
                           </span>
                         ) : null}
 
                         {vehicle.stockStatus === "SHOWROOM" && (
                           <span className="cz-badge-status stock">
-                            <CheckCircle2 size={12} /> EN STOCK SHOWROOM
+                            <CheckCircle2 size={12} /> {copy.card.inStockBadge}
                           </span>
                         )}
                         {vehicle.stockStatus === "EN_TRANSIT" && (
                           <span className="cz-badge-status transit">
-                            <Ship size={12} /> {eta ? `ARRIVAGE : ${eta}` : "EN TRANSIT"}
+                            <Ship size={12} /> {copy.card.transitBadge(eta)}
                           </span>
                         )}
                         {vehicle.stockStatus === "AU_PORT" && (
                           <span className="cz-badge-status port">
-                            <Anchor size={12} /> AU PORT (DÉDOUANEMENT)
+                            <Anchor size={12} /> {copy.card.portBadge}
                           </span>
                         )}
                         {vehicle.stockStatus === "COMMANDE" && (
                           <span className="cz-badge-status commande">
-                            <Clock size={12} /> COMMANDÉ USINE
+                            <Clock size={12} /> {copy.card.orderedBadge}
                           </span>
                         )}
                         {vehicle.stockStatus === "SUR_COMMANDE_USINE" && (
                           <span className="cz-badge-status usine">
-                            <Sparkles size={12} /> SUR COMMANDE USINE
+                            <Sparkles size={12} /> {copy.card.factoryOrderBadge}
                           </span>
                         )}
                       </div>
@@ -807,7 +821,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                         gap: "0.3rem",
                       }}
                     >
-                      <Sparkles size={12} color="#f59e0b" /> Galerie 360° & Fiche
+                      <Sparkles size={12} color="#f59e0b" /> {copy.card.galleryHint}
                     </div>
                   </div>
 
@@ -858,7 +872,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                     >
                       <div>
                         <div style={{ fontSize: "0.72rem", color: "#94a3b8", textTransform: "uppercase", fontWeight: 700 }}>
-                          {vehicle.priceXof ? "Tarif Officiel" : "Disponibilité"}
+                          {vehicle.priceXof ? copy.card.officialPrice : copy.card.availability}
                         </div>
                         <div style={{ fontSize: "1.15rem", fontWeight: 900, color: vehicle.priceXof ? "#f59e0b" : "#cbd5e1" }}>
                           {formattedPrice}
@@ -867,14 +881,14 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
 
                       {vehicle.stockStatus === "EN_TRANSIT" && eta && (
                         <div style={{ textAlign: "right" }}>
-                          <div style={{ fontSize: "0.7rem", color: "#38bdf8", fontWeight: 700 }}>ARRIVAGE PRÉVU</div>
+                          <div style={{ fontSize: "0.7rem", color: "#38bdf8", fontWeight: 700 }}>{copy.card.etaUpcoming}</div>
                           <div style={{ fontSize: "0.82rem", color: "#fff", fontWeight: 800 }}>{eta}</div>
                         </div>
                       )}
                       {vehicle.stockStatus === "SHOWROOM" && (
                         <div style={{ textAlign: "right" }}>
-                          <div style={{ fontSize: "0.7rem", color: "#34d399", fontWeight: 700 }}>LIVRAISON</div>
-                          <div style={{ fontSize: "0.82rem", color: "#fff", fontWeight: 800 }}>Immédiate 24/48h</div>
+                          <div style={{ fontSize: "0.7rem", color: "#34d399", fontWeight: 700 }}>{copy.card.deliveryLabel}</div>
+                          <div style={{ fontSize: "0.82rem", color: "#fff", fontWeight: 800 }}>{copy.card.deliveryImmediate}</div>
                         </div>
                       )}
                     </div>
@@ -902,7 +916,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                       <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
                         <SlidersHorizontal size={14} color="#38bdf8" />
                         <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                          {vehicle.motorisation.transmission.includes("Auto") ? "Automatique" : "Manuelle"}
+                          {vehicle.motorisation.transmission.includes("Auto") ? copy.card.automatic : copy.card.manual}
                         </span>
                       </div>
                     </div>
@@ -918,7 +932,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                           className="cz-btn-outline"
                           style={{ padding: "0.65rem 0.8rem", fontSize: "0.82rem" }}
                         >
-                          Fiche & Photos
+                          {copy.card.sheetAndPhotos}
                         </button>
                         <button
                           onClick={() => {
@@ -930,10 +944,10 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                           style={{ padding: "0.65rem 0.8rem", fontSize: "0.82rem" }}
                         >
                           {vehicle.stockStatus === "EN_TRANSIT"
-                            ? "Réserver avant arrivage"
+                            ? copy.card.reserveBeforeArrival
                             : vehicle.stockStatus === "AU_PORT"
-                            ? "Bloquer réservation"
-                            : "Cotation 1 Clic"}
+                            ? copy.card.blockReservation
+                            : copy.card.quoteOneClick}
                         </button>
                       </div>
 
@@ -944,7 +958,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                         className="cz-btn-whatsapp"
                         style={{ padding: "0.65rem 1rem", fontSize: "0.82rem", width: "100%" }}
                       >
-                        <MessageSquare size={14} /> Échanger sur WhatsApp
+                        <MessageSquare size={14} /> {copy.card.chatWhatsapp}
                       </a>
                     </div>
                   </div>
@@ -960,38 +974,38 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
         <div style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "3rem", alignItems: "center" }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#f59e0b", fontWeight: 700, fontSize: "0.88rem", textTransform: "uppercase" }}>
-              <Sparkles size={16} /> Exclusivité CARZONE Bénin
+              <Sparkles size={16} /> {copy.customOrder.badge}
             </div>
             <h2 style={{ fontSize: "2.4rem", fontWeight: 900, color: "#fff", marginTop: "0.4rem", lineHeight: 1.15 }}>
-              Commande Personnalisée <br />
-              <span style={{ color: "#e11d48" }}>Directe d&apos;Usine</span>
+              {copy.customOrder.titleStart} <br />
+              <span style={{ color: "#e11d48" }}>{copy.customOrder.titleHighlight}</span>
             </h2>
             <p style={{ color: "#94a3b8", fontSize: "1rem", lineHeight: 1.6, marginTop: "1rem" }}>
-              Vous avez une configuration précise en tête ? CARZONE assure l&apos;importation directe depuis les usines constructeurs (Chine, Dubaï, Europe, Japon).
+              {copy.customOrder.paragraph}
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginTop: "2rem" }}>
               <div style={{ display: "flex", gap: "0.85rem", alignItems: "flex-start" }}>
                 <CheckCircle2 size={20} color="#10b981" style={{ flexShrink: 0, marginTop: "0.2rem" }} />
                 <div>
-                  <strong style={{ color: "#fff" }}>Choix intégral des finitions :</strong>
-                  <div style={{ color: "#94a3b8", fontSize: "0.9rem" }}>Teintes de carrosserie exclusives, intérieurs cuir Nappa bicolore, toits panoramiques, jantes sur-mesure.</div>
+                  <strong style={{ color: "#fff" }}>{copy.customOrder.feature1Title}</strong>
+                  <div style={{ color: "#94a3b8", fontSize: "0.9rem" }}>{copy.customOrder.feature1Text}</div>
                 </div>
               </div>
 
               <div style={{ display: "flex", gap: "0.85rem", alignItems: "flex-start" }}>
                 <CheckCircle2 size={20} color="#10b981" style={{ flexShrink: 0, marginTop: "0.2rem" }} />
                 <div>
-                  <strong style={{ color: "#fff" }}>Logistique & Transit maritime sécurisé :</strong>
-                  <div style={{ color: "#94a3b8", fontSize: "0.9rem" }}>Suivi en temps réel de votre conteneur avec traçabilité complète de l&apos;usine jusqu&apos;au Port Autonome de Cotonou.</div>
+                  <strong style={{ color: "#fff" }}>{copy.customOrder.feature2Title}</strong>
+                  <div style={{ color: "#94a3b8", fontSize: "0.9rem" }}>{copy.customOrder.feature2Text}</div>
                 </div>
               </div>
 
               <div style={{ display: "flex", gap: "0.85rem", alignItems: "flex-start" }}>
                 <CheckCircle2 size={20} color="#10b981" style={{ flexShrink: 0, marginTop: "0.2rem" }} />
                 <div>
-                  <strong style={{ color: "#fff" }}>Livraison Clé en Main :</strong>
-                  <div style={{ color: "#94a3b8", fontSize: "0.9rem" }}>Dédouanement, formalités administratives, immatriculation Bénin et préparation esthétique showroom inclus.</div>
+                  <strong style={{ color: "#fff" }}>{copy.customOrder.feature3Title}</strong>
+                  <div style={{ color: "#94a3b8", fontSize: "0.9rem" }}>{copy.customOrder.feature3Text}</div>
                 </div>
               </div>
             </div>
@@ -1000,24 +1014,24 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
               <button
                 onClick={() => {
                   setQuoteVehicle(null);
-                  setFormData((prev) => ({ ...prev, notes: "Demande de commande personnalisée sur-mesure d'usine" }));
+                  setFormData((prev) => ({ ...prev, notes: copy.customOrder.defaultNote }));
                   setFormSuccess(false);
                   setCatalogModalOpen(true);
                 }}
                 className="cz-btn-primary"
                 style={{ padding: "0.9rem 1.8rem" }}
               >
-                Configurer une Commande Usine <ArrowRight size={16} />
+                {copy.customOrder.cta} <ArrowRight size={16} />
               </button>
             </div>
           </div>
 
           <div className="cz-card-glass" style={{ padding: "2.5rem", position: "relative" }}>
             <div style={{ fontSize: "1.25rem", fontWeight: 800, color: "#fff", marginBottom: "1rem" }}>
-              Demande Rapide de Personnalisation
+              {copy.customOrder.cardTitle}
             </div>
             <p style={{ color: "#94a3b8", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
-              Indiquez le véhicule et vos options souhaitées. Un spécialiste import CARZONE vous contacte sous 2 heures avec le devis usine détaillé.
+              {copy.customOrder.cardText}
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -1028,9 +1042,9 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                 className="cz-btn-whatsapp"
                 style={{ width: "100%", padding: "0.9rem" }}
               >
-                <MessageSquare size={18} /> Discuter de votre projet sur WhatsApp
+                <MessageSquare size={18} /> {copy.customOrder.whatsappCta}
               </a>
-              <div style={{ textAlign: "center", color: "#64748b", fontSize: "0.85rem" }}>ou appelez notre direction des ventes :</div>
+              <div style={{ textAlign: "center", color: "#64748b", fontSize: "0.85rem" }}>{copy.customOrder.orCallSales}</div>
               <a
                 href="tel:+2290192616161"
                 className="cz-btn-outline"
@@ -1047,13 +1061,13 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
       <section id="services" style={{ maxWidth: 1280, margin: "0 auto", padding: "5rem 1.25rem" }}>
         <div style={{ textAlign: "center", maxWidth: 750, margin: "0 auto 3.5rem" }}>
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "0.5rem", color: "#e11d48", fontWeight: 700, fontSize: "0.88rem", textTransform: "uppercase" }}>
-            <Wrench size={16} /> Excellence Technique
+            <Wrench size={16} /> {copy.services.badge}
           </div>
           <h2 style={{ fontSize: "2.3rem", fontWeight: 900, color: "#fff", marginTop: "0.3rem" }}>
-            Atelier SAV Certifié & Pièces d&apos;Origine
+            {copy.services.title}
           </h2>
           <p style={{ color: "#94a3b8", fontSize: "1rem", marginTop: "0.8rem" }}>
-            Notre engagement ne s&apos;arrête pas à la vente. CARZONE dispose d&apos;un atelier ultra-moderne équipé des dernières valises de diagnostic constructeur.
+            {copy.services.paragraph}
           </p>
         </div>
 
@@ -1063,10 +1077,10 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
               <Gauge size={26} color="#e11d48" />
             </div>
             <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#fff", marginBottom: "0.6rem" }}>
-              Diagnostic Électronique Haute Précision
+              {copy.services.card1Title}
             </h3>
             <p style={{ color: "#94a3b8", fontSize: "0.9rem", lineHeight: 1.6 }}>
-              Bancs de test électroniques certifiés multimarques pour la détection et la mise à jour des calculateurs, systèmes hybrides et batteries.
+              {copy.services.card1Text}
             </p>
           </div>
 
@@ -1075,10 +1089,10 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
               <Award size={26} color="#f59e0b" />
             </div>
             <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#fff", marginBottom: "0.6rem" }}>
-              Magasin Pièces de Rechange d&apos;Origine
+              {copy.services.card2Title}
             </h3>
             <p style={{ color: "#94a3b8", fontSize: "0.9rem", lineHeight: 1.6 }}>
-              Stock permanent de pièces d&apos;origine garanties constructeur : filtres, plaquettes de frein, suspensions, optiques et accessoires officiels.
+              {copy.services.card2Text}
             </p>
           </div>
 
@@ -1087,10 +1101,10 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
               <ShieldCheck size={26} color="#10b981" />
             </div>
             <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#fff", marginBottom: "0.6rem" }}>
-              Contrats d&apos;Entretien & Suivi Flotte
+              {copy.services.card3Title}
             </h3>
             <p style={{ color: "#94a3b8", fontSize: "0.9rem", lineHeight: 1.6 }}>
-              Formules sur-mesure pour les entreprises et particuliers : vidange rapide, révision périodique garantie et assistance routière 24/7 au Bénin.
+              {copy.services.card3Text}
             </p>
           </div>
         </div>
@@ -1101,25 +1115,25 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
         <div style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "3rem", alignItems: "center" }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#34d399", fontWeight: 700, fontSize: "0.88rem", textTransform: "uppercase" }}>
-              <Zap size={16} /> Transition Énergétique & Mobilité Verte
+              <Zap size={16} /> {copy.charging.badge}
             </div>
             <h2 style={{ fontSize: "2.3rem", fontWeight: 900, color: "#fff", marginTop: "0.4rem", lineHeight: 1.2 }}>
-              Solutions de Recharge <br />
-              <span style={{ color: "#34d399" }}>Véhicules Électriques (VE)</span>
+              {copy.charging.titleStart} <br />
+              <span style={{ color: "#34d399" }}>{copy.charging.titleHighlight}</span>
             </h2>
             <p style={{ color: "#94a3b8", fontSize: "1rem", lineHeight: 1.6, marginTop: "1rem" }}>
-              Pionnier de la mobilité électrique à Cotonou, CARZONE propose une gamme complète de bornes intelligentes AC/DC (7kW à 120kW ultra-rapides) pour résidences, hôtels et entreprises.
+              {copy.charging.paragraph}
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem", marginTop: "1.75rem" }}>
               <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", color: "#e2e8f0" }}>
-                <CheckCircle2 size={18} color="#34d399" /> Bornes de recharge à domicile (Wallbox 7kW à 22kW)
+                <CheckCircle2 size={18} color="#34d399" /> {copy.charging.item1}
               </div>
               <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", color: "#e2e8f0" }}>
-                <CheckCircle2 size={18} color="#34d399" /> Superchargeurs DC rapides pour flottes et parkings publics
+                <CheckCircle2 size={18} color="#34d399" /> {copy.charging.item2}
               </div>
               <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", color: "#e2e8f0" }}>
-                <CheckCircle2 size={18} color="#34d399" /> Installation électrique certifiée par des techniciens habilités
+                <CheckCircle2 size={18} color="#34d399" /> {copy.charging.item3}
               </div>
             </div>
 
@@ -1131,25 +1145,25 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                 className="cz-btn-whatsapp"
                 style={{ padding: "0.85rem 1.8rem" }}
               >
-                <Zap size={16} /> Demander une Étude d&apos;Installation Borne
+                <Zap size={16} /> {copy.charging.cta}
               </a>
             </div>
           </div>
 
           <div className="cz-card-glass" style={{ padding: "2.5rem", border: "1px solid rgba(52,211,153,0.3)" }}>
             <div style={{ fontSize: "1.3rem", fontWeight: 800, color: "#fff", marginBottom: "0.5rem" }}>
-              Le Réseau de Recharge CARZONE à Cotonou
+              {copy.charging.cardTitle}
             </div>
             <p style={{ color: "#94a3b8", fontSize: "0.9rem", lineHeight: 1.5, marginBottom: "1.5rem" }}>
-              Rechargez votre véhicule 100% électrique ou hybride rechargeable (BYD, Geely Galaxy, etc.) directement au Showroom Carzone en moins de 35 minutes.
+              {copy.charging.cardText}
             </p>
 
             <div style={{ background: "rgba(6,15,24,0.7)", borderRadius: "12px", padding: "1.25rem", border: "1px solid rgba(160,210,230,0.12)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-                <span style={{ color: "#fff", fontWeight: 700 }}>Station Carzone Maro-Militaire</span>
-                <span style={{ color: "#34d399", fontSize: "0.78rem", fontWeight: 800, background: "rgba(52,211,153,0.15)", padding: "0.2rem 0.5rem", borderRadius: "4px" }}>EN LIGNE</span>
+                <span style={{ color: "#fff", fontWeight: 700 }}>{copy.charging.stationName}</span>
+                <span style={{ color: "#34d399", fontSize: "0.78rem", fontWeight: 800, background: "rgba(52,211,153,0.15)", padding: "0.2rem 0.5rem", borderRadius: "4px" }}>{copy.charging.statusOnline}</span>
               </div>
-              <div style={{ fontSize: "0.85rem", color: "#94a3b8" }}>Connecteurs Combo CCS2 & Type 2 compatibles avec toutes les marques.</div>
+              <div style={{ fontSize: "0.85rem", color: "#94a3b8" }}>{copy.charging.connectorNote}</div>
             </div>
           </div>
         </div>
@@ -1160,13 +1174,13 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "3rem" }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#e11d48", fontWeight: 700, fontSize: "0.88rem", textTransform: "uppercase" }}>
-              <MapPin size={16} /> Nous Rendre Visite
+              <MapPin size={16} /> {copy.contact.badge}
             </div>
             <h2 style={{ fontSize: "2.3rem", fontWeight: 900, color: "#fff", marginTop: "0.4rem" }}>
-              Showroom & Direction Générale
+              {copy.contact.title}
             </h2>
             <p style={{ color: "#94a3b8", fontSize: "1rem", lineHeight: 1.6, marginTop: "0.8rem" }}>
-              Venez découvrir nos véhicules en conditions réelles et réaliser un essai sur route dans notre showroom de prestige à Cotonou.
+              {copy.contact.paragraph}
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem", marginTop: "2rem" }}>
@@ -1175,9 +1189,9 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                   <MapPin size={20} color="#e11d48" />
                 </div>
                 <div>
-                  <strong style={{ color: "#fff" }}>Adresse du Showroom :</strong>
+                  <strong style={{ color: "#fff" }}>{copy.contact.addressLabel}</strong>
                   <div style={{ color: "#94a3b8", fontSize: "0.92rem", marginTop: "0.2rem" }}>
-                    Zone Maro-Militaire, Quartier Gbèdomidji, Cotonou, République du Bénin
+                    {copy.contact.addressText}
                   </div>
                   <a
                     href="https://maps.app.goo.gl/ie79JAW6ri2km8Qx8?g_st=ac"
@@ -1185,7 +1199,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                     rel="noopener noreferrer"
                     style={{ color: "#38bdf8", fontSize: "0.85rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.3rem", marginTop: "0.35rem" }}
                   >
-                    Ouvrir dans Google Maps <ExternalLink size={12} />
+                    {copy.contact.openMaps} <ExternalLink size={12} />
                   </a>
                 </div>
               </div>
@@ -1195,7 +1209,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                   <Phone size={20} color="#10b981" />
                 </div>
                 <div>
-                  <strong style={{ color: "#fff" }}>Lignes Téléphoniques Officielles :</strong>
+                  <strong style={{ color: "#fff" }}>{copy.contact.phoneLabel}</strong>
                   <div style={{ color: "#94a3b8", fontSize: "0.92rem", marginTop: "0.2rem" }}>
                     +229 01 92 61 61 61 / +229 01 63 70 00 00 / +229 01 92 62 62 62
                   </div>
@@ -1207,7 +1221,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                   <Mail size={20} color="#f59e0b" />
                 </div>
                 <div>
-                  <strong style={{ color: "#fff" }}>Courriers Électroniques :</strong>
+                  <strong style={{ color: "#fff" }}>{copy.contact.emailLabel}</strong>
                   <div style={{ color: "#94a3b8", fontSize: "0.92rem", marginTop: "0.2rem" }}>
                     contact@topcarzone.com / direction@topcarzone.com
                   </div>
@@ -1219,19 +1233,19 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
           {/* CONTACT DIRECT FORM */}
           <div className="cz-card-glass" style={{ padding: "2.5rem" }}>
             <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "#fff", marginBottom: "0.4rem" }}>
-              Écrivez-nous Directement
+              {copy.contact.formTitle}
             </h3>
             <p style={{ color: "#94a3b8", fontSize: "0.88rem", marginBottom: "1.5rem" }}>
-              Notre équipe commerciale vous répond sous quelques minutes.
+              {copy.contact.formSubtitle}
             </p>
 
             <form onSubmit={handleQuoteSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
-                <label className="cz-label">Votre Nom et Prénoms *</label>
+                <label className="cz-label">{copy.contact.nameLabel}</label>
                 <input
                   type="text"
                   required
-                  placeholder="Ex : M. KOUASSI Jean"
+                  placeholder={copy.contact.namePlaceholder}
                   value={formData.contactName}
                   onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
                   className="cz-input"
@@ -1240,7 +1254,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <div>
-                  <label className="cz-label">Téléphone / WhatsApp *</label>
+                  <label className="cz-label">{copy.contact.phoneFieldLabel}</label>
                   <input
                     type="tel"
                     required
@@ -1251,10 +1265,10 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                   />
                 </div>
                 <div>
-                  <label className="cz-label">Email Professionnel</label>
+                  <label className="cz-label">{copy.contact.emailFieldLabel}</label>
                   <input
                     type="email"
-                    placeholder="jean@domaine.com"
+                    placeholder={copy.contact.emailPlaceholder}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="cz-input"
@@ -1263,10 +1277,10 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
               </div>
 
               <div>
-                <label className="cz-label">Votre Message ou Véhicule recherché</label>
+                <label className="cz-label">{copy.contact.messageLabel}</label>
                 <textarea
                   rows={3}
-                  placeholder="Précisez le véhicule ou votre besoin..."
+                  placeholder={copy.contact.messagePlaceholder}
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   className="cz-input"
@@ -1283,8 +1297,8 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
               {formSuccess ? (
                 <div style={{ background: "rgba(16,185,129,0.2)", border: "1px solid rgba(16,185,129,0.4)", color: "#6ee7b7", padding: "1rem", borderRadius: "8px", textAlign: "center" }}>
                   <CheckCircle2 size={24} color="#10b981" style={{ margin: "0 auto 0.4rem" }} />
-                  <strong>Message bien transmis !</strong>
-                  <div style={{ fontSize: "0.85rem", marginTop: "0.2rem" }}>L&apos;équipe commerciale CARZONE vous contacte dans les plus brefs délais.</div>
+                  <strong>{copy.contact.successTitle}</strong>
+                  <div style={{ fontSize: "0.85rem", marginTop: "0.2rem" }}>{copy.contact.successText}</div>
                 </div>
               ) : (
                 <button
@@ -1293,7 +1307,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                   className="cz-btn-primary"
                   style={{ width: "100%", padding: "0.85rem" }}
                 >
-                  {formSubmitting ? "Envoi en cours..." : "Envoyer ma Demande"} <Send size={16} />
+                  {formSubmitting ? copy.contact.sending : copy.contact.submit} <Send size={16} />
                 </button>
               )}
             </form>
@@ -1307,7 +1321,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
           <div>
             <CarzoneLogo size="md" />
             <p style={{ marginTop: "1rem", lineHeight: 1.6, color: "#94a3b8" }}>
-              CARZONE SARL — Concessionnaire automobile multimarques de premier plan en République du Bénin. Vente, atelier SAV, pièces d&apos;origine et recharge électrique.
+              {copy.footer.description}
             </p>
             <div style={{ marginTop: "1rem", fontSize: "0.78rem" }}>
               RCCM : RB/COT/23 B 34567 · IFU : 0202314589201
@@ -1316,7 +1330,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
 
           <div>
             <strong style={{ color: "#fff", display: "block", marginBottom: "1rem", textTransform: "uppercase", fontSize: "0.82rem", letterSpacing: "0.05em" }}>
-              Nos Marques Partenaires
+              {copy.footer.brandsTitle}
             </strong>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
               <span>Changan Automobile</span>
@@ -1331,40 +1345,40 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
 
           <div>
             <strong style={{ color: "#fff", display: "block", marginBottom: "1rem", textTransform: "uppercase", fontSize: "0.82rem", letterSpacing: "0.05em" }}>
-              Navigation Rapide
+              {copy.footer.quickNavTitle}
             </strong>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <a href="#showroom" style={{ color: "#94a3b8", textDecoration: "none" }}>Stock Showroom & Arrivages</a>
-              <a href="#sur-mesure" style={{ color: "#94a3b8", textDecoration: "none" }}>Commande Spéciale d&apos;Usine</a>
-              <a href="#services" style={{ color: "#94a3b8", textDecoration: "none" }}>Atelier SAV & Diagnostics</a>
-              <a href="#recharge" style={{ color: "#94a3b8", textDecoration: "none" }}>Solutions de Recharge VE</a>
-              <Link href="/login" style={{ color: "#e11d48", textDecoration: "none", fontWeight: 700 }}>Espace Collaborateur (Connexion)</Link>
+              <a href="#showroom" style={{ color: "#94a3b8", textDecoration: "none" }}>{copy.footer.navStock}</a>
+              <a href="#sur-mesure" style={{ color: "#94a3b8", textDecoration: "none" }}>{copy.footer.navFactoryOrder}</a>
+              <a href="#services" style={{ color: "#94a3b8", textDecoration: "none" }}>{copy.footer.navWorkshop}</a>
+              <a href="#recharge" style={{ color: "#94a3b8", textDecoration: "none" }}>{copy.footer.navCharging}</a>
+              <Link href="/login" style={{ color: "#e11d48", textDecoration: "none", fontWeight: 700 }}>{copy.footer.navLogin}</Link>
             </div>
           </div>
 
           <div>
             <strong style={{ color: "#fff", display: "block", marginBottom: "1rem", textTransform: "uppercase", fontSize: "0.82rem", letterSpacing: "0.05em" }}>
-              Contact Immédiat
+              {copy.footer.contactTitle}
             </strong>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-              <span>Showroom : Gbèdomidji, Cotonou</span>
-              <span>Tél : +229 01 92 61 61 61</span>
-              <span>Email : contact@topcarzone.com</span>
+              <span>{copy.footer.showroomLine}</span>
+              <span>{copy.footer.phoneLine}</span>
+              <span>{copy.footer.emailLine}</span>
               <a
                 href={getWhatsAppLink()}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: "#34d399", textDecoration: "none", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "0.3rem", marginTop: "0.5rem" }}
               >
-                <MessageSquare size={14} /> WhatsApp Assistance 24/7
+                <MessageSquare size={14} /> {copy.footer.whatsappLine}
               </a>
             </div>
           </div>
         </div>
 
         <div style={{ maxWidth: 1280, margin: "0 auto", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "1.5rem", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem", alignItems: "center" }}>
-          <div>© {new Date().getFullYear()} CARZONE SARL. Tous droits réservés. Cotonou, Bénin.</div>
-          <div>Plateforme Officielle reliée au Système d&apos;Information & Stock Central CARZONE.</div>
+          <div>{copy.footer.copyright(new Date().getFullYear())}</div>
+          <div>{copy.footer.platformLine}</div>
         </div>
       </footer>
 
@@ -1374,11 +1388,11 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
         target="_blank"
         rel="noopener noreferrer"
         className="cz-floating-whatsapp"
-        title="Discuter directement avec un conseiller commercial"
+        title={copy.floatingWhatsapp.title}
       >
         <span className="cz-online-dot" />
         <MessageSquare size={18} />
-        <span>Conseiller en ligne</span>
+        <span>{copy.floatingWhatsapp.text}</span>
       </a>
 
       {/* 11. MODAL : DETAIL & 360° INSPECTION DU VÉHICULE */}
@@ -1397,16 +1411,16 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                     {detailVehicle.brand} · {detailVehicle.category}
                   </span>
                   {detailVehicle.stockStatus === "SHOWROOM" && (
-                    <span className="cz-badge-status stock"><CheckCircle2 size={11} /> EN STOCK SHOWROOM</span>
+                    <span className="cz-badge-status stock"><CheckCircle2 size={11} /> {copy.detailModal.inStock}</span>
                   )}
                   {detailVehicle.stockStatus === "EN_TRANSIT" && (
-                    <span className="cz-badge-status transit"><Ship size={11} /> EN TRANSIT</span>
+                    <span className="cz-badge-status transit"><Ship size={11} /> {copy.detailModal.inTransit}</span>
                   )}
                   {detailVehicle.stockStatus === "AU_PORT" && (
-                    <span className="cz-badge-status port"><Anchor size={11} /> AU PORT</span>
+                    <span className="cz-badge-status port"><Anchor size={11} /> {copy.detailModal.atPort}</span>
                   )}
                   {detailVehicle.stockStatus === "COMMANDE" && (
-                    <span className="cz-badge-status commande"><Clock size={11} /> COMMANDÉ</span>
+                    <span className="cz-badge-status commande"><Clock size={11} /> {copy.detailModal.ordered}</span>
                   )}
                 </div>
 
@@ -1449,21 +1463,22 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
               >
                 <div>
                   <div style={{ fontSize: "0.75rem", fontWeight: 800, color: "#cbd5e1", textTransform: "uppercase" }}>
-                    Situation du Véhicule
+                    {copy.detailModal.situationLabel}
                   </div>
                   <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginTop: "0.2rem" }}>
-                    {detailVehicle.stockStatus === "SHOWROOM" && "🟢 Disponible immédiatement au Showroom de Gbèdomidji (Cotonou)"}
-                    {detailVehicle.stockStatus === "EN_TRANSIT" && `🚢 En transit maritime vers Cotonou${detailVehicle.etaDate ? ` · Arrivage prévu le ${formatEtaDate(detailVehicle.etaDate)}` : ""}`}
-                    {detailVehicle.stockStatus === "AU_PORT" && "⚓ Arrivé au Port Autonome de Cotonou · Dédouanement en cours"}
-                    {detailVehicle.stockStatus === "COMMANDE" && "🏭 Commandé d'usine · En cours d'assemblage constructeur"}
-                    {detailVehicle.stockStatus === "SUR_COMMANDE_USINE" && "✨ Disponible sur commande directe usine (Délai : 4 à 6 semaines)"}
+                    {detailVehicle.stockStatus === "SHOWROOM" && copy.detailModal.statusShowroom}
+                    {detailVehicle.stockStatus === "EN_TRANSIT" &&
+                      copy.detailModal.statusTransit(formatEtaDate(detailVehicle.etaDate, locale))}
+                    {detailVehicle.stockStatus === "AU_PORT" && copy.detailModal.statusPort}
+                    {detailVehicle.stockStatus === "COMMANDE" && copy.detailModal.statusOrdered}
+                    {detailVehicle.stockStatus === "SUR_COMMANDE_USINE" && copy.detailModal.statusFactoryOrder}
                   </div>
                 </div>
 
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: "0.75rem", color: "#94a3b8", textTransform: "uppercase", fontWeight: 700 }}>Tarif Officiel</div>
+                  <div style={{ fontSize: "0.75rem", color: "#94a3b8", textTransform: "uppercase", fontWeight: 700 }}>{copy.detailModal.officialPrice}</div>
                   <div style={{ fontSize: "1.35rem", fontWeight: 900, color: "#f59e0b" }}>
-                    {formatPriceXof(detailVehicle.priceXof)}
+                    {formatPriceXof(detailVehicle.priceXof, copy.card.priceOnQuote)}
                   </div>
                 </div>
               </div>
@@ -1498,7 +1513,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                         flexShrink: 0,
                       }}
                     >
-                      <Image src={photoUrl} alt="Vignette" fill unoptimized style={{ objectFit: "cover" }} />
+                      <Image src={photoUrl} alt={copy.detailModal.thumbnailAlt} fill unoptimized style={{ objectFit: "cover" }} />
                     </button>
                   ))}
                 </div>
@@ -1508,27 +1523,27 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1.5rem", marginBottom: "2rem" }}>
                 <div className="cz-card-glass" style={{ padding: "1.25rem" }}>
                   <strong style={{ color: "#e11d48", display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.75rem", fontSize: "0.95rem" }}>
-                    <Gauge size={16} /> Motorisation & Performance
+                    <Gauge size={16} /> {copy.detailModal.engineTitle}
                   </strong>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem", fontSize: "0.85rem" }}>
-                    <div><span style={{ color: "#64748b" }}>Moteur :</span> <strong style={{ color: "#fff" }}>{detailVehicle.motorisation.displacementOrMotor}</strong></div>
-                    <div><span style={{ color: "#64748b" }}>Puissance :</span> <strong style={{ color: "#fff" }}>{detailVehicle.motorisation.maxPower}</strong></div>
-                    <div><span style={{ color: "#64748b" }}>Couple max :</span> <strong style={{ color: "#fff" }}>{detailVehicle.motorisation.maxTorque}</strong></div>
-                    <div><span style={{ color: "#64748b" }}>Transmission :</span> <strong style={{ color: "#fff" }}>{detailVehicle.motorisation.transmission}</strong></div>
-                    <div><span style={{ color: "#64748b" }}>Énergie :</span> <strong style={{ color: "#fff" }}>{detailVehicle.motorisation.fuelType}</strong></div>
+                    <div><span style={{ color: "#64748b" }}>{copy.detailModal.engineLabel}</span> <strong style={{ color: "#fff" }}>{detailVehicle.motorisation.displacementOrMotor}</strong></div>
+                    <div><span style={{ color: "#64748b" }}>{copy.detailModal.powerLabel}</span> <strong style={{ color: "#fff" }}>{detailVehicle.motorisation.maxPower}</strong></div>
+                    <div><span style={{ color: "#64748b" }}>{copy.detailModal.torqueLabel}</span> <strong style={{ color: "#fff" }}>{detailVehicle.motorisation.maxTorque}</strong></div>
+                    <div><span style={{ color: "#64748b" }}>{copy.detailModal.transmissionLabel}</span> <strong style={{ color: "#fff" }}>{detailVehicle.motorisation.transmission}</strong></div>
+                    <div><span style={{ color: "#64748b" }}>{copy.detailModal.energyLabel}</span> <strong style={{ color: "#fff" }}>{detailVehicle.motorisation.fuelType}</strong></div>
                   </div>
                 </div>
 
                 <div className="cz-card-glass" style={{ padding: "1.25rem" }}>
                   <strong style={{ color: "#f59e0b", display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.75rem", fontSize: "0.95rem" }}>
-                    <SlidersHorizontal size={16} /> Dimensions & Habitabilité
+                    <SlidersHorizontal size={16} /> {copy.detailModal.dimensionsTitle}
                   </strong>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem", fontSize: "0.85rem" }}>
-                    <div><span style={{ color: "#64748b" }}>L x l x h (mm) :</span> <strong style={{ color: "#fff" }}>{detailVehicle.dimensions.lengthWidthHeight}</strong></div>
-                    <div><span style={{ color: "#64748b" }}>Empattement :</span> <strong style={{ color: "#fff" }}>{detailVehicle.dimensions.wheelbase} mm</strong></div>
-                    <div><span style={{ color: "#64748b" }}>Places assises :</span> <strong style={{ color: "#fff" }}>{detailVehicle.dimensions.seats} places</strong></div>
-                    <div><span style={{ color: "#64748b" }}>Portes :</span> <strong style={{ color: "#fff" }}>{detailVehicle.dimensions.doors} portes</strong></div>
-                    <div><span style={{ color: "#64748b" }}>Réservoir/Batterie :</span> <strong style={{ color: "#fff" }}>{detailVehicle.dimensions.tankOrBattery}</strong></div>
+                    <div><span style={{ color: "#64748b" }}>{copy.detailModal.dimensionsLabel}</span> <strong style={{ color: "#fff" }}>{detailVehicle.dimensions.lengthWidthHeight}</strong></div>
+                    <div><span style={{ color: "#64748b" }}>{copy.detailModal.wheelbaseLabel}</span> <strong style={{ color: "#fff" }}>{detailVehicle.dimensions.wheelbase} mm</strong></div>
+                    <div><span style={{ color: "#64748b" }}>{copy.detailModal.seatsLabel}</span> <strong style={{ color: "#fff" }}>{detailVehicle.dimensions.seats} {copy.detailModal.seatsSuffix}</strong></div>
+                    <div><span style={{ color: "#64748b" }}>{copy.detailModal.doorsLabel}</span> <strong style={{ color: "#fff" }}>{detailVehicle.dimensions.doors} {copy.detailModal.doorsSuffix}</strong></div>
+                    <div><span style={{ color: "#64748b" }}>{copy.detailModal.tankLabel}</span> <strong style={{ color: "#fff" }}>{detailVehicle.dimensions.tankOrBattery}</strong></div>
                   </div>
                 </div>
               </div>
@@ -1537,7 +1552,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.5rem" }}>
                 <div>
                   <h4 style={{ color: "#fff", fontWeight: 700, marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                    <Sparkles size={16} color="#f59e0b" /> Équipements de Confort & Technologie
+                    <Sparkles size={16} color="#f59e0b" /> {copy.detailModal.comfortTitle}
                   </h4>
                   <ul style={{ paddingLeft: "1.2rem", margin: 0, color: "#94a3b8", fontSize: "0.85rem", lineHeight: 1.6 }}>
                     {detailVehicle.equipementConfort.map((item, iIdx) => (
@@ -1548,7 +1563,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
 
                 <div>
                   <h4 style={{ color: "#fff", fontWeight: 700, marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                    <ShieldCheck size={16} color="#10b981" /> Sécurité & Aides à la Conduite (ADAS)
+                    <ShieldCheck size={16} color="#10b981" /> {copy.detailModal.safetyTitle}
                   </h4>
                   <ul style={{ paddingLeft: "1.2rem", margin: 0, color: "#94a3b8", fontSize: "0.85rem", lineHeight: 1.6 }}>
                     {detailVehicle.securite.map((item, sIdx) => (
@@ -1562,7 +1577,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
             {/* MODAL FOOTER WITH INSTANT ACTION BAR */}
             <div style={{ padding: "1.25rem 1.75rem", borderTop: "1px solid rgba(160,210,230,0.12)", background: "#07111b", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
               <div style={{ color: "#94a3b8", fontSize: "0.88rem" }}>
-                Garantie constructeur officielle incluse · Véhicule neuf 0 km
+                {copy.detailModal.warrantyNote}
               </div>
 
               <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
@@ -1571,9 +1586,9 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                   onClick={() => window.print()}
                   className="cz-btn-outline"
                   style={{ padding: "0.75rem 1.1rem", fontSize: "0.88rem" }}
-                  title="Imprimer ou enregistrer en PDF la fiche technique officielle"
+                  title={copy.detailModal.pdfSheetTitle}
                 >
-                  <FileText size={16} color="#f59e0b" /> Fiche Technique (PDF)
+                  <FileText size={16} color="#f59e0b" /> {copy.detailModal.pdfSheet}
                 </button>
                 <a
                   href={getWhatsAppLink(detailVehicle)}
@@ -1582,7 +1597,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                   className="cz-btn-whatsapp"
                   style={{ padding: "0.75rem 1.25rem", fontSize: "0.88rem" }}
                 >
-                  <MessageSquare size={16} /> WhatsApp Direct
+                  <MessageSquare size={16} /> {copy.detailModal.whatsappDirect}
                 </a>
                 <button
                   onClick={() => {
@@ -1595,10 +1610,10 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                   style={{ padding: "0.75rem 1.4rem", fontSize: "0.88rem" }}
                 >
                   {detailVehicle.stockStatus === "EN_TRANSIT"
-                    ? "Réserver avant arrivage"
+                    ? copy.detailModal.reserveBeforeArrival
                     : detailVehicle.stockStatus === "AU_PORT"
-                    ? "Bloquer réservation"
-                    : "Demander une Cotation Immédiate"} <ArrowRight size={16} />
+                    ? copy.detailModal.blockReservation
+                    : copy.detailModal.requestQuote} <ArrowRight size={16} />
                 </button>
               </div>
             </div>
@@ -1619,13 +1634,13 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
               <div>
                 <span style={{ fontSize: "0.75rem", fontWeight: 800, color: "#e11d48", textTransform: "uppercase", letterSpacing: "0.06em" }}>
                   {quoteVehicle?.stockStatus === "EN_TRANSIT"
-                    ? "Réservation Anticipée en Transit"
+                    ? copy.quoteModal.headerTransit
                     : quoteVehicle?.stockStatus === "SHOWROOM"
-                    ? "Devis Proforma Showroom"
-                    : "Cotation & Commande Véhicule"}
+                    ? copy.quoteModal.headerShowroom
+                    : copy.quoteModal.headerDefault}
                 </span>
                 <h3 style={{ fontSize: "1.25rem", fontWeight: 900, color: "#fff", margin: "0.2rem 0 0" }}>
-                  {quoteVehicle ? quoteVehicle.title : "Demande de Devis & Catalogue CARZONE"}
+                  {quoteVehicle ? quoteVehicle.title : copy.quoteModal.defaultTitle}
                 </h3>
               </div>
               <button
@@ -1645,11 +1660,11 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                   </div>
                   <h3 style={{ fontSize: "1.4rem", fontWeight: 800, color: "#fff" }}>
                     {quoteVehicle?.stockStatus === "EN_TRANSIT"
-                      ? "Votre demande de réservation a été enregistrée !"
-                      : "Votre demande de cotation a été transmise !"}
+                      ? copy.quoteModal.successTitleReservation
+                      : copy.quoteModal.successTitleQuote}
                   </h3>
                   <p style={{ color: "#94a3b8", fontSize: "0.95rem", lineHeight: 1.6, marginTop: "0.5rem" }}>
-                    Notre équipe commerciale prépare votre cotation chiffrée avec les délais de livraison showroom. Un conseiller va vous joindre très rapidement.
+                    {copy.quoteModal.successText}
                   </p>
 
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "2rem" }}>
@@ -1660,14 +1675,14 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                       className="cz-btn-whatsapp"
                       style={{ width: "100%", padding: "0.85rem" }}
                     >
-                      <MessageSquare size={16} /> Accélérer mon dossier sur WhatsApp
+                      <MessageSquare size={16} /> {copy.quoteModal.whatsappCta}
                     </a>
                     <button
                       onClick={() => setCatalogModalOpen(false)}
                       className="cz-btn-outline"
                       style={{ width: "100%", padding: "0.75rem" }}
                     >
-                      Fermer
+                      {copy.quoteModal.close}
                     </button>
                   </div>
                 </div>
@@ -1682,7 +1697,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                         <div style={{ flexGrow: 1 }}>
                           <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#fff" }}>{quoteVehicle.title}</div>
                           <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "#f59e0b" }}>
-                            {formatPriceXof(quoteVehicle.priceXof)}
+                            {formatPriceXof(quoteVehicle.priceXof, copy.card.priceOnQuote)}
                           </div>
                         </div>
                       </div>
@@ -1690,23 +1705,23 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                       {/* NOTICE PROFESSIONNELLE SUR LA SITUATION DU VÉHICULE */}
                       {quoteVehicle.stockStatus === "EN_TRANSIT" && (
                         <div style={{ marginTop: "0.65rem", padding: "0.55rem 0.75rem", background: "rgba(14,165,233,0.15)", borderRadius: "6px", border: "1px solid rgba(14,165,233,0.3)", fontSize: "0.78rem", color: "#38bdf8", lineHeight: 1.4 }}>
-                          🚢 <strong>Véhicule en cours d&apos;acheminement maritime :</strong> Arrivage estimé au Port de Cotonou le <strong>{formatEtaDate(quoteVehicle.etaDate)}</strong>. En remplissant ce formulaire, vous recevez la proforma pour bloquer votre réservation prioritaire.
+                          🚢 <strong>{copy.quoteModal.transitNoticeLead}</strong> {copy.quoteModal.transitNoticeMid} <strong>{formatEtaDate(quoteVehicle.etaDate, locale)}</strong>{copy.quoteModal.transitNoticeTail}
                         </div>
                       )}
                       {quoteVehicle.stockStatus === "SHOWROOM" && (
                         <div style={{ marginTop: "0.65rem", padding: "0.55rem 0.75rem", background: "rgba(16,185,129,0.15)", borderRadius: "6px", border: "1px solid rgba(16,185,129,0.3)", fontSize: "0.78rem", color: "#34d399", lineHeight: 1.4 }}>
-                          🟢 <strong>Disponible immédiatement :</strong> Ce véhicule est présent au Showroom de Gbèdomidji (Cotonou). Livraison rapide sous 24h à 48h.
+                          🟢 <strong>{copy.quoteModal.showroomNoticeLead}</strong>{copy.quoteModal.showroomNoticeTail}
                         </div>
                       )}
                     </div>
                   )}
 
                   <div>
-                    <label className="cz-label">Nom et Prénoms / Société *</label>
+                    <label className="cz-label">{copy.quoteModal.nameLabel}</label>
                     <input
                       type="text"
                       required
-                      placeholder="Ex : M. ADEOTI Paul"
+                      placeholder={copy.quoteModal.namePlaceholder}
                       value={formData.contactName}
                       onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
                       className="cz-input"
@@ -1715,7 +1730,7 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
 
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
                     <div>
-                      <label className="cz-label">Téléphone / WhatsApp *</label>
+                      <label className="cz-label">{copy.quoteModal.phoneLabel}</label>
                       <input
                         type="tel"
                         required
@@ -1726,10 +1741,10 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                       />
                     </div>
                     <div>
-                      <label className="cz-label">Email</label>
+                      <label className="cz-label">{copy.quoteModal.emailLabel}</label>
                       <input
                         type="email"
-                        placeholder="paul@email.com"
+                        placeholder={copy.quoteModal.emailPlaceholder}
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         className="cz-input"
@@ -1739,19 +1754,19 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
 
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
                     <div>
-                      <label className="cz-label">Type d&apos;Acquisition</label>
+                      <label className="cz-label">{copy.quoteModal.paymentTypeLabel}</label>
                       <select
                         value={formData.paymentType}
                         onChange={(e) => setFormData({ ...formData, paymentType: e.target.value })}
                         className="cz-input"
                       >
-                        <option value="Comptant">Paiement Comptant</option>
-                        <option value="Crédit Bancaire">Crédit Bancaire / Leasing</option>
-                        <option value="Flotte Entreprise">Flotte Société / Appel d&apos;offres</option>
+                        <option value="Comptant">{copy.quoteModal.paymentCash}</option>
+                        <option value="Crédit Bancaire">{copy.quoteModal.paymentCredit}</option>
+                        <option value="Flotte Entreprise">{copy.quoteModal.paymentFleet}</option>
                       </select>
                     </div>
                     <div>
-                      <label className="cz-label">Ville de Livraison</label>
+                      <label className="cz-label">{copy.quoteModal.cityLabel}</label>
                       <input
                         type="text"
                         value={formData.city}
@@ -1762,10 +1777,10 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                   </div>
 
                   <div>
-                    <label className="cz-label">Précisions ou Options Souhaitées (Optionnel)</label>
+                    <label className="cz-label">{copy.quoteModal.notesLabel}</label>
                     <textarea
                       rows={2}
-                      placeholder="Ex : Couleur préférée, acompte de réservation..."
+                      placeholder={copy.quoteModal.notesPlaceholder}
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       className="cz-input"
@@ -1786,10 +1801,10 @@ export function PublicShowcase({ session, liveDbVehicles = [] }: PublicShowcaseP
                     style={{ width: "100%", padding: "0.9rem", marginTop: "0.5rem" }}
                   >
                     {formSubmitting
-                      ? "Traitement en cours..."
+                      ? copy.quoteModal.processing
                       : quoteVehicle?.stockStatus === "EN_TRANSIT"
-                      ? "Recevoir la Proforma & Réserver"
-                      : "Recevoir ma Cotation Immédiate"} <Send size={16} />
+                      ? copy.quoteModal.receiveProforma
+                      : copy.quoteModal.receiveQuote} <Send size={16} />
                   </button>
                 </form>
               )}

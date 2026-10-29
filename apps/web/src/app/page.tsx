@@ -1,13 +1,19 @@
+import type { Metadata } from "next";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PublicShowcase } from "@/components/PublicShowcase";
+import { getServerMessages } from "@/lib/i18n/server";
+import { publicShowcaseCopy } from "@/lib/i18n/messages/public-showcase";
 import "./public-showcase.css";
 
-export const metadata = {
-  title: "CARZONE SARL Bénin — Concessionnaire Automobile Officiel & Mobilité Électrique Cotonou",
-  description:
-    "Showroom de véhicules neufs multimarques (Changan, Jetour, BYD, Geely, BAIC, Toyota, Dongfeng), cotations immédiates, commandes d'usine sur-mesure, atelier SAV certifié et solutions de recharge VE à Cotonou, Bénin.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale } = await getServerMessages();
+  const copy = publicShowcaseCopy[locale];
+  return {
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+  };
+}
 
 export default async function HomePage() {
   const session = await getSession();

@@ -1,11 +1,16 @@
 import { Metadata } from "next";
 import { PresentationClient } from "./PresentationClient";
+import { getServerMessages } from "@/lib/i18n/server";
+import { presentationCopy } from "@/lib/i18n/messages/presentation";
 
-export const metadata: Metadata = {
-  title: "Présentation Motion Design 16:9 & Mobile — CARZONE SARL Ops",
-  description:
-    "Présentation dynamique et motion design du progiciel de concession automobile CARZONE SARL : finances réelles, fiches techniques IA immuables, atelier SAV, VoIP et mobile checking en temps réel.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale } = await getServerMessages();
+  const copy = presentationCopy[locale];
+  return {
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+  };
+}
 
 export default function PresentationPage() {
   return <PresentationClient />;

@@ -28,219 +28,98 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
+import { usePrefs } from "@/components/PrefsProvider";
+import { presentationCopy } from "@/lib/i18n/messages/presentation";
 
 interface Scene {
   id: string;
   number: string;
-  title: string;
-  subtitle: string;
-  badge: string;
   badgeColor: string;
   desktopImage: string;
   mobileImage?: string;
   zoomTarget: "center" | "bottom" | "top-right" | "middle-left" | "charts" | "header";
   zoomScale: number;
-  description: string;
-  keyPoints: string[];
-  stats: { label: string; value: string }[];
 }
 
 const SCENES: Scene[] = [
   {
     id: "intro",
     number: "01",
-    title: "CARZONE Ops — Système d'Exploitation Concessionnaire",
-    subtitle: "Architecture d'Entreprise Unifiée & Mobilité Haute Performance",
-    badge: "100% Production · BDD Neon",
     badgeColor: "#3b82f6",
     desktopImage: "/presentation/dashboard_16_9.png",
     mobileImage: "/presentation/dashboard_mobile.png",
     zoomTarget: "center",
     zoomScale: 1.08,
-    description:
-      "Plateforme centralisée tout-en-un pour le pilotage complet de la concession Carzone SARL à Cotonou : stocks véhicules, atelier SAV, comptabilité, CRM, VoIP interne et bornes électriques.",
-    keyPoints: [
-      "Authentification sécurisée par hachage Bcrypt & sessions inviolables",
-      "Matrice de permissions granulaires sur 18 rôles opérationnels",
-      "Expérience unifiée sur ordinateur grand écran et smartphone",
-    ],
-    stats: [
-      { label: "Rôles Métiers", value: "18 Rôles" },
-      { label: "Intégrité BDD", value: "100% Réelle" },
-      { label: "Temps Réel", value: "< 250ms" },
-    ],
   },
   {
     id: "finance",
     number: "02",
-    title: "Tableau de Bord Financier & Graphes Réels",
-    subtitle: "Visibilité Totale sur les Ventes, Dépenses et Bénéfices Réels",
-    badge: "Zéro Donnée Fictive",
     badgeColor: "#10b981",
     desktopImage: "/presentation/charts_16_9.png",
     mobileImage: "/presentation/dashboard_mobile.png",
     zoomTarget: "charts",
     zoomScale: 1.25,
-    description:
-      "4 graphes dynamiques reliés directement aux écritures comptables réelles : Évolution des ventes, Évolution des dépenses, Performance des activités et Bénéfice général net calculé après salaires et charges.",
-    keyPoints: [
-      "Calcul automatique du bénéfice net après salaires et charges réelles",
-      "Filtre temporel instantané : 1 mois, 6 mois, 1 an, 2 ans, 3 ans",
-      "Corrélation stricte avec les factures réglées et les bons de caisse",
-    ],
-    stats: [
-      { label: "Graphes Clés", value: "4 Piliers" },
-      { label: "Horizons", value: "1M à 3 Ans" },
-      { label: "Précision", value: "Comptable" },
-    ],
   },
   {
     id: "tech-sheet",
     number: "03",
-    title: "Fiches Techniques IA & Stock Véhicules",
-    subtitle: "Génération OpenAI GPT-4o & Enregistrement Définitif en BDD",
-    badge: "Immuabilité Base de Données",
     badgeColor: "#8b5cf6",
     desktopImage: "/presentation/tech_sheet_16_9.png",
     mobileImage: "/presentation/vehicles_16_9.png",
     zoomTarget: "center",
     zoomScale: 1.22,
-    description:
-      "Génération assistée par IA avec bouton de confirmation : une fois la fiche technique validée, elle reste définitivement stockée en BDD sans aucune régénération redondante. Navigation fluide sans ouverture d'autre onglet.",
-    keyPoints: [
-      "Spécifications complètes : Motorisation, Puissance, Autonomie, Dimensions",
-      "Bouton 'Confirmer la fiche technique' pour gel immuable en BDD",
-      "Consultation directe in-app avec retour facile au catalogue",
-    ],
-    stats: [
-      { label: "Modèle IA", value: "GPT-4o" },
-      { label: "Persistance", value: "Définitive" },
-      { label: "Économie Tokens", value: "> 95%" },
-    ],
   },
   {
     id: "workshop",
     number: "04",
-    title: "Atelier SAV & Matrice Excel Bidirectionnelle",
-    subtitle: "Suivi des Réparations, Ordres de Travail & Import/Export XLSX",
-    badge: "Compatibilité Excel Native",
     badgeColor: "#f59e0b",
     desktopImage: "/presentation/workshop_16_9.png",
     mobileImage: "/presentation/dashboard_mobile.png",
     zoomTarget: "center",
     zoomScale: 1.18,
-    description:
-      "Pilotage des ordres de réparation, pièces détachées et devis techniques. Export et import instantanés avec modèle Excel structuré pour les équipes terrain et le chef d'atelier.",
-    keyPoints: [
-      "Téléchargement du modèle de matrice Excel préformaté en 1 clic",
-      "Synchronisation bidirectionnelle fluide entre l'atelier et la facturation",
-      "Suivi des délais, kilométrages et statuts d'intervention en direct",
-    ],
-    stats: [
-      { label: "Format Fichier", value: ".XLSX" },
-      { label: "Temps Synchro", value: "Instantané" },
-      { label: "Suivi Pièces", value: "Intégré" },
-    ],
   },
   {
     id: "voip",
     number: "05",
-    title: "Téléphonie VoIP & Salons de Conférence Audio",
-    subtitle: "Communications d'Équipe Chiffrées & Salons Virtuels Dédiés",
-    badge: "WebRTC Audio HD",
     badgeColor: "#06b6d4",
     desktopImage: "/presentation/conference_voip_16_9.png",
     mobileImage: "/presentation/chat_mobile.png",
     zoomTarget: "center",
     zoomScale: 1.2,
-    description:
-      "Messagerie interne instantanée, appels vocaux poste-à-poste et 4 salons de conférence audio virtuels permanents : Direction Générale, Atelier SAV, Commercial et Entreprise.",
-    keyPoints: [
-      "Communication audio chiffrée de bout en bout sans standard téléphonique externe",
-      "Visualiseur audio animé et gestion des micros en temps réel",
-      "Canaux d'annonces officielles et diffusion de consignes urgentes",
-    ],
-    stats: [
-      { label: "Salons Permanents", value: "4 Espaces" },
-      { label: "Latence Audio", value: "< 50ms" },
-      { label: "Confidentialité", value: "Chiffré" },
-    ],
   },
   {
     id: "mobile",
     number: "06",
-    title: "Mobile Checking & Notifications en Temps Réel",
-    subtitle: "Supervision Nomade pour la Direction et les Équipes Terrain",
-    badge: "Ultra-Responsive Mobile",
     badgeColor: "#ec4899",
     desktopImage: "/presentation/dashboard_mobile.png",
     mobileImage: "/presentation/menu_mobile.png",
     zoomTarget: "top-right",
     zoomScale: 1.15,
-    description:
-      "Interface mobile conçue pour le contrôle à la volée : consultation des notifications d'urgence, validation de devis, vérification des entrées/sorties de véhicules et navigation au pouce optimisée.",
-    keyPoints: [
-      "Cloche de notifications temps réel avec alertes sonores et visuelles",
-      "Tiroir de navigation rapide adapté aux manipulations à une main",
-      "Vitesse de chargement fulgurante optimisée pour les réseaux 4G/5G",
-    ],
-    stats: [
-      { label: "Viewport", value: "390 × 844" },
-      { label: "Touch UX", value: "100% Fluide" },
-      { label: "Alertes", value: "Push Réel" },
-    ],
   },
   {
     id: "help",
     number: "07",
-    title: "Centre d'Aide & Documentation Stylée",
-    subtitle: "Guides Intégrés, Recherche Instantanée & Premiers Pas Mémorisés",
-    badge: "Design Glassmorphism",
     badgeColor: "#6366f1",
     desktopImage: "/presentation/help_center_16_9.png",
     mobileImage: "/presentation/menu_mobile.png",
     zoomTarget: "center",
     zoomScale: 1.18,
-    description:
-      "Modal d'aide moderne accessible depuis le header et le menu mobile. Mémorisation du guide 'Premiers pas' par utilisateur pour ne plus encombrer l'écran une fois fermé, avec possibilité de relance à la demande.",
-    keyPoints: [
-      "Recherche instantanée filtrant tous les modules et procédures",
-      "Guides thématiques complets pour chaque corps de métier",
-      "Nettoyage complet de l'interface : aucun bouton flottant persistant",
-    ],
-    stats: [
-      { label: "Guides Métiers", value: "8 Modules" },
-      { label: "Filtre Recherche", value: "Instant" },
-      { label: "UX Clutter", value: "0% Déchet" },
-    ],
   },
   {
     id: "security",
     number: "08",
-    title: "Sécurité d'Entreprise, Rôles & Scalabilité",
-    subtitle: "Une Infrastructure Pérenne Prête pour l'Expansion Nationale",
-    badge: "Conforme Normes Bancaires",
     badgeColor: "#14b8a6",
     desktopImage: "/presentation/login_16_9.png",
     mobileImage: "/presentation/dashboard_mobile.png",
     zoomTarget: "center",
     zoomScale: 1.12,
-    description:
-      "Base de données relationnelle Neon PostgreSQL avec pool de connexions haute disponibilité, mots de passe chiffrés Bcrypt avec temporisation anti-bruteforce progressive, et isolation stricte du rôle DEVELOPER.",
-    keyPoints: [
-      "Protection multi-niveaux contre les attaques par force brute (verrou progressif)",
-      "Journalisation d'audit des actions critiques et des transactions",
-      "Hébergement cloud Vercel avec bascule instantanée et sauvegardes continues",
-    ],
-    stats: [
-      { label: "Chiffrement", value: "Bcrypt Cost 10" },
-      { label: "Uptime Cloud", value: "99.98%" },
-      { label: "Audit Log", value: "100% Traçable" },
-    ],
   },
 ];
 
 export function PresentationClient() {
+  const { locale } = usePrefs();
+  const copy = presentationCopy[locale];
+
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [viewMode, setViewMode] = useState<"landscape" | "mobile" | "split">("landscape");
@@ -254,6 +133,7 @@ export function PresentationClient() {
   const recordedChunksRef = useRef<Blob[]>([]);
 
   const currentScene = SCENES[currentIdx];
+  const currentSceneCopy = copy.scenes[currentScene.id];
 
   // Alternance périodique des zooms toutes les 3.5 secondes pour rendre la scène vivante
   useEffect(() => {
@@ -335,7 +215,7 @@ export function PresentationClient() {
       setIsRecording(true);
       setIsPlaying(true);
     } catch {
-      alert("Enregistrement annulé ou non supporté par ce navigateur.");
+      alert(copy.recording.unsupported);
       setIsRecording(false);
     }
   };
@@ -417,7 +297,7 @@ export function PresentationClient() {
               transition: "all 0.2s ease",
             }}
           >
-            ← Retour à l&apos;App
+            {copy.backToApp}
           </Link>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span
@@ -432,10 +312,10 @@ export function PresentationClient() {
                 boxShadow: "0 0 15px rgba(239, 68, 68, 0.5)",
               }}
             >
-              STUDIO MOTION
+              {copy.studioBadge}
             </span>
             <span style={{ fontSize: "1.1rem", fontWeight: 800, letterSpacing: "-0.02em" }}>
-              CARZONE SARL <span style={{ color: "#38bdf8", fontWeight: 400 }}>· Présentation Officielle</span>
+              CARZONE SARL <span style={{ color: "#38bdf8", fontWeight: 400 }}>{copy.officialPresentationSuffix}</span>
             </span>
           </div>
         </div>
@@ -454,7 +334,7 @@ export function PresentationClient() {
         >
           <button
             onClick={() => setViewMode("landscape")}
-            title="Format Ordinateur 16:9 Landscape"
+            title={copy.viewModes.landscapeTitle}
             style={{
               display: "flex",
               alignItems: "center",
@@ -470,11 +350,11 @@ export function PresentationClient() {
               transition: "all 0.2s ease",
             }}
           >
-            <Monitor size={15} /> 16:9 Ordinateur
+            <Monitor size={15} /> {copy.viewModes.landscapeLabel}
           </button>
           <button
             onClick={() => setViewMode("mobile")}
-            title="Format Mobile 9:16 (06:19 Checking Nomade)"
+            title={copy.viewModes.mobileTitle}
             style={{
               display: "flex",
               alignItems: "center",
@@ -490,11 +370,11 @@ export function PresentationClient() {
               transition: "all 0.2s ease",
             }}
           >
-            <Smartphone size={15} /> Mobile Checking
+            <Smartphone size={15} /> {copy.viewModes.mobileLabel}
           </button>
           <button
             onClick={() => setViewMode("split")}
-            title="Vue Duo Synchronisée Ordinateur + Mobile"
+            title={copy.viewModes.splitTitle}
             style={{
               display: "flex",
               alignItems: "center",
@@ -510,7 +390,7 @@ export function PresentationClient() {
               transition: "all 0.2s ease",
             }}
           >
-            <Columns size={15} /> Vue Duo Miroir
+            <Columns size={15} /> {copy.viewModes.splitLabel}
           </button>
         </div>
 
@@ -535,7 +415,7 @@ export function PresentationClient() {
                 transition: "all 0.2s ease",
               }}
             >
-              <Download size={15} /> Enregistrer Vidéo Motion
+              <Download size={15} /> {copy.recording.start}
             </button>
           ) : (
             <button
@@ -564,7 +444,7 @@ export function PresentationClient() {
                   display: "inline-block",
                 }}
               />
-              Arrêter & Télécharger ({recordingSeconds}s)
+              {copy.recording.stop(recordingSeconds)}
             </button>
           )}
 
@@ -581,7 +461,7 @@ export function PresentationClient() {
               alignItems: "center",
               justifyContent: "center",
             }}
-            title="Plein Écran (Touche F)"
+            title={copy.recording.fullscreenTitle}
           >
             {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
           </button>
@@ -624,7 +504,7 @@ export function PresentationClient() {
                 letterSpacing: "0.05em",
               }}
             >
-              SCÈNE {currentScene.number} / {SCENES.length.toString().padStart(2, "0")}
+              {copy.hud.scene(currentScene.number, SCENES.length.toString().padStart(2, "0"))}
             </span>
             <span
               style={{
@@ -639,7 +519,7 @@ export function PresentationClient() {
                 letterSpacing: "0.05em",
               }}
             >
-              {currentScene.badge}
+              {currentSceneCopy.badge}
             </span>
           </div>
 
@@ -654,10 +534,10 @@ export function PresentationClient() {
                   boxShadow: isPlaying ? "0 0 10px #10b981" : "none",
                 }}
               />
-              {isPlaying ? "LECTURE CINÉMATIQUE AUTOMATIQUE" : "PAUSE"}
+              {isPlaying ? copy.hud.playing : copy.hud.paused}
             </span>
             <span style={{ opacity: 0.6 }}>|</span>
-            <span style={{ fontFamily: "monospace" }}>ZOOM ACTIF : ×{currentScale.toFixed(2)}</span>
+            <span style={{ fontFamily: "monospace" }}>{copy.hud.zoomActive(currentScale.toFixed(2))}</span>
           </div>
         </div>
 
@@ -737,7 +617,7 @@ export function PresentationClient() {
                   <ShieldCheck size={12} color="#10b981" />
                   https://carzone-sarl.vercel.app/
                 </div>
-                <div style={{ fontSize: "0.75rem", opacity: 0.6 }}>16:9 UHD · 60 FPS</div>
+                <div style={{ fontSize: "0.75rem", opacity: 0.6 }}>{copy.hud.urlBarLabel}</div>
               </div>
 
               {/* Viewport with Animated Periodic Zoom */}
@@ -761,7 +641,7 @@ export function PresentationClient() {
                 >
                   <Image
                     src={currentScene.desktopImage}
-                    alt={currentScene.title}
+                    alt={currentSceneCopy.title}
                     fill
                     priority
                     sizes="(max-width: 1280px) 100vw, 1280px"
@@ -795,12 +675,12 @@ export function PresentationClient() {
                       }}
                     />
                     <span style={{ fontSize: "0.75rem", fontWeight: 700, color: currentScene.badgeColor }}>
-                      {currentScene.badge}
+                      {currentSceneCopy.badge}
                     </span>
                   </div>
-                  <h3 style={{ margin: "0 0 6px 0", fontSize: "1.1rem", fontWeight: 800 }}>{currentScene.title}</h3>
+                  <h3 style={{ margin: "0 0 6px 0", fontSize: "1.1rem", fontWeight: 800 }}>{currentSceneCopy.title}</h3>
                   <p style={{ margin: 0, fontSize: "0.82rem", color: "#cbd5e1", lineHeight: 1.45 }}>
-                    {currentScene.description}
+                    {currentSceneCopy.description}
                   </p>
                 </div>
               </div>
@@ -858,7 +738,7 @@ export function PresentationClient() {
               >
                 <Image
                   src={currentScene.mobileImage || currentScene.desktopImage}
-                  alt={currentScene.title}
+                  alt={currentSceneCopy.title}
                   fill
                   priority
                   sizes="380px"
@@ -924,7 +804,7 @@ export function PresentationClient() {
                   <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#ef4444" }} />
                   <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#f59e0b" }} />
                   <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#10b981" }} />
-                  <span style={{ fontSize: "0.72rem", color: "#94a3b8", marginLeft: 8 }}>Bureau 16:9</span>
+                  <span style={{ fontSize: "0.72rem", color: "#94a3b8", marginLeft: 8 }}>{copy.desktopWindowLabel}</span>
                 </div>
                 <div
                   style={{
@@ -938,7 +818,7 @@ export function PresentationClient() {
                 >
                   <Image
                     src={currentScene.desktopImage}
-                    alt={currentScene.title}
+                    alt={currentSceneCopy.title}
                     fill
                     sizes="700px"
                     style={{ objectFit: "cover", objectPosition: "top center" }}
@@ -983,7 +863,7 @@ export function PresentationClient() {
                 >
                   <Image
                     src={currentScene.mobileImage || currentScene.desktopImage}
-                    alt={currentScene.title}
+                    alt={currentSceneCopy.title}
                     fill
                     sizes="290px"
                     style={{ objectFit: "cover", objectPosition: "top center" }}
@@ -1018,11 +898,11 @@ export function PresentationClient() {
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
               <Sparkles size={17} color="#38bdf8" />
               <h4 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "#f8fafc" }}>
-                Fonctionnalités Clés en Production
+                {copy.storyboard.keyFeaturesTitle}
               </h4>
             </div>
             <ul style={{ margin: 0, paddingLeft: "1.2rem", color: "#cbd5e1", fontSize: "0.85rem", lineHeight: 1.6 }}>
-              {currentScene.keyPoints.map((pt, i) => (
+              {currentSceneCopy.keyPoints.map((pt, i) => (
                 <li key={i}>{pt}</li>
               ))}
             </ul>
@@ -1044,11 +924,11 @@ export function PresentationClient() {
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
               <TrendingUp size={17} color="#10b981" />
               <h4 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "#f8fafc" }}>
-                Métriques Opérationnelles
+                {copy.storyboard.metricsTitle}
               </h4>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.8rem", textAlign: "center" }}>
-              {currentScene.stats.map((st, i) => (
+              {currentSceneCopy.stats.map((st, i) => (
                 <div
                   key={i}
                   style={{
@@ -1100,7 +980,7 @@ export function PresentationClient() {
                   setCurrentIdx(idx);
                   setZoomPhase(0);
                 }}
-                title={`${sc.number} - ${sc.title}`}
+                title={copy.timeline.sceneTitleAttr(sc.number, copy.scenes[sc.id].title)}
                 style={{
                   flex: 1,
                   height: 6,
@@ -1142,7 +1022,7 @@ export function PresentationClient() {
                   padding: "0.45rem",
                   cursor: "pointer",
                 }}
-                title="Scène précédente"
+                title={copy.timeline.prevScene}
               >
                 <ChevronLeft size={18} />
               </button>
@@ -1165,7 +1045,7 @@ export function PresentationClient() {
                 }}
               >
                 {isPlaying ? <Pause size={16} /> : <Play size={16} />}
-                {isPlaying ? "Pause" : "Lecture"}
+                {isPlaying ? copy.timeline.pause : copy.timeline.play}
               </button>
 
               <button
@@ -1178,7 +1058,7 @@ export function PresentationClient() {
                   padding: "0.45rem",
                   cursor: "pointer",
                 }}
-                title="Scène suivante"
+                title={copy.timeline.nextScene}
               >
                 <ChevronRight size={18} />
               </button>
@@ -1196,7 +1076,7 @@ export function PresentationClient() {
                   padding: "0.45rem",
                   cursor: "pointer",
                 }}
-                title="Recommencer depuis le début"
+                title={copy.timeline.restart}
               >
                 <RotateCcw size={16} />
               </button>
@@ -1233,7 +1113,7 @@ export function PresentationClient() {
                     transition: "all 0.2s ease",
                   }}
                 >
-                  {sc.number}. {sc.title.split("—")[0].split("&")[0].trim()}
+                  {sc.number}. {copy.scenes[sc.id].title.split("—")[0].split("&")[0].trim()}
                 </button>
               ))}
             </div>

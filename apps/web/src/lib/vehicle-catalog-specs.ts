@@ -248,7 +248,7 @@ export const OFFICIAL_VEHICLE_CATALOG: ModelCatalogEntry[] = [
     photos: {
       mainPhotoUrl: "/images/vehicles/rich7-main.jpg",
       interiorPhotoUrl: "/images/vehicles/rich7-interior.jpg",
-      interiorSeatsPhotoUrl: "/images/vehicles/rich7-interior.jpg",
+      interiorSeatsPhotoUrl: "/images/vehicles/rich7-seats.jpg",
       exteriorPhotoUrl: "/images/vehicles/rich7-exterior.jpg",
       rearPhotoUrl: "/images/vehicles/rich7-rear.jpg",
     },

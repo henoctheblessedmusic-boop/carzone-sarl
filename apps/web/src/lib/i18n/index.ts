@@ -11,6 +11,7 @@ import { DEFAULT_LOCALE, type Locale } from "@/lib/prefs";
 import type { Messages, StepCopy } from "./types";
 import { fr } from "./messages/fr";
 import { en } from "./messages/en";
+import { zh } from "./messages/zh";
 import { ONBOARDING_STEPS, type OnboardingStep } from "@/lib/onboarding";
 
 export type { Messages, StepCopy };
@@ -18,6 +19,7 @@ export type { Messages, StepCopy };
 const dictionaries: Record<Locale, Messages> = {
   fr,
   en,
+  zh,
 };
 
 export function getMessages(locale: Locale): Messages {

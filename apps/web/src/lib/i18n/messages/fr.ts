@@ -4,7 +4,12 @@ export const fr: Messages = {
   brand: {
     name: "CARZONE",
     tagline: "DRIVE YOUR DREAM",
-    subtitle: "Concession de Véhicules Multi Marques · +229 01 92 61 61 61",
+    subtitle: "Concession de véhicules multi marques · +229 01 92 61 61 61",
+  },
+  meta: {
+    title: "CARZONE SARL — Concessionnaire automobile multimarques à Cotonou",
+    description:
+      "Showroom de véhicules neufs, atelier SAV, pièces d'origine et bornes de recharge à Cotonou. Vente, import et entretien. CARZONE SARL, Bénin.",
   },
   nav: {
     dashboard: "Tableau de bord",
@@ -44,17 +49,17 @@ export const fr: Messages = {
     rentals: "Location (LCD / LLD / LOA)",
     fleet: "Gestion de flotte",
     workshop: "Atelier SAV",
-    parts: "Gestion des Pièces & Références Croisées",
+    parts: "Gestion des pièces & références croisées",
     imports: "Import / logistique",
     installers: "Panel installateurs bornes",
     chargeRequests: "Devis installation borne",
     charging: "Bornes & abonnements",
-    services: "Articles & services (Catalogue)",
+    services: "Articles & services (catalogue)",
     mailbox: "Boîte de réception & messagerie",
-    chat: "Messagerie d'Entreprise & Appels",
+    chat: "Messagerie d'entreprise & appels",
     users: "Gestion de l'équipe & des rôles",
-    hr: "Gestion des Ressources Humaines (RH)",
-    expenses: "Charges, Dépenses & Bons de Commande",
+    hr: "Gestion des ressources humaines (RH)",
+    expenses: "Charges, dépenses & bons de commande",
   },
   common: {
     logout: "Déconnexion",
@@ -92,6 +97,7 @@ export const fr: Messages = {
     label: "Langue",
     fr: "Français",
     en: "English",
+    zh: "中文",
     menuAria: "Choisir la langue",
   },
   roles: {
@@ -116,9 +122,9 @@ export const fr: Messages = {
     INSTALLATEUR: "Installateur",
   },
   dashboard: {
-    firstStepsTitle: "Premiers pas — {role}",
+    firstStepsTitle: "Premiers pas : {role}",
     firstStepsHint:
-      "Guide rapide selon votre rôle. Utilisez aussi le bouton flottant « Premiers pas » en bas à droite (mémorisé dans le navigateur).",
+      "Un guide rapide selon votre rôle. Le bouton « Premiers pas » en bas à droite rouvre cette liste (mémorisé dans ce navigateur).",
     clients: "Clients",
     leads: "Prospects",
     vehiclesInStock: "Véhicules en stock",
@@ -144,20 +150,20 @@ export const fr: Messages = {
     fabTitle: "Rouvrir le guide Premiers pas",
     hide: "Masquer",
     hideTitle: "Masquer (mémorisé)",
-    intro: "Checklist guidée pour découvrir CARZONE selon votre rôle.",
+    intro: "Une petite checklist pour découvrir CARZONE, adaptée à votre rôle.",
     dialogAria: "Premiers pas",
     steps: {
       DG: {
-        dash: { label: "Parcourir le tableau de bord", hint: "Vue d’ensemble KPI" },
+        dash: { label: "Parcourir le tableau de bord", hint: "Vue d'ensemble des KPI" },
         stock: { label: "Contrôler le stock véhicules", hint: "Disponibilités & matching" },
         catalog: { label: "Catalogue & fournisseurs", hint: "Marques CARZONE & Showroom" },
         pipeline: { label: "Suivre le pipeline commercial", hint: "Opportunités en cours" },
-        proforma: { label: "Valider une proforma / BDC", hint: "Politique d’annulation" },
-        invoices: { label: "Surveiller encaissements", hint: "Factures & retards" },
+        proforma: { label: "Valider une proforma / BDC", hint: "Politique d'annulation" },
+        invoices: { label: "Surveiller les encaissements", hint: "Factures & retards" },
         bornes: { label: "Bornes & abonnements", hint: "Énergie & plans" },
       },
       ADMIN: {
-        stock: { label: "Référencer entrées / sorties véhicules", hint: "Gestion du stock & mouvements" },
+        stock: { label: "Référencer entrées / sorties véhicules", hint: "Stock & mouvements" },
         mailbox: { label: "Consulter les messages clients", hint: "Boîte de réception & réponses" },
         clients: { label: "Répertoire clients", hint: "Coordonnées & contacts" },
         fleet: { label: "Suivi de la flotte & parc", hint: "Véhicules en circulation" },
@@ -170,10 +176,10 @@ export const fr: Messages = {
         invoice: { label: "Suivre la facture normalisée", hint: "Après acceptation client" },
       },
       COMPTA: {
-        quotes: { label: "Contrôler proformas envoyées", hint: "Statuts & TVA" },
+        quotes: { label: "Contrôler les proformas envoyées", hint: "Statuts & TVA" },
         normalize: { label: "Factures normalisées", hint: "Encaissements" },
         void: { label: "Annulation interne (motif obligatoire)", hint: "Jamais silencieuse" },
-        workshop: { label: "OR atelier facturables", hint: "Main-d’œuvre / pièces" },
+        workshop: { label: "OR atelier facturables", hint: "Main-d'œuvre / pièces" },
       },
       STOCK: {
         catalog: { label: "Gérer catalogue & fournisseurs", hint: "Marques, modèles, ports" },
@@ -183,10 +189,10 @@ export const fr: Messages = {
       },
       ATELIER: {
         wo: { label: "Ouvrir / suivre un OR", hint: "Diagnostic & coûts" },
-        stock: { label: "Vérifier véhicule concerné", hint: "Fiche stock" },
+        stock: { label: "Vérifier le véhicule concerné", hint: "Fiche stock" },
       },
       BORNES_OPS: {
-        req: { label: "Demande installation borne", hint: "Panel installateurs" },
+        req: { label: "Demande d'installation borne", hint: "Panel installateurs" },
         plans: { label: "Plans & abonnements", hint: "Tarifs kWh" },
         term: { label: "Terminal de paiement", hint: "Simulation paiement" },
       },

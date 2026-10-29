@@ -4,10 +4,10 @@ export const THEME_COOKIE = "carzone-theme";
 export const LOCALE_COOKIE = "carzone-locale";
 
 export type ThemePref = "dark" | "light" | "auto";
-export type Locale = "fr" | "en";
+export type Locale = "fr" | "en" | "zh";
 
 export const THEME_PREFS: ThemePref[] = ["dark", "light", "auto"];
-export const LOCALES: Locale[] = ["fr", "en"];
+export const LOCALES: Locale[] = ["fr", "en", "zh"];
 export const DEFAULT_LOCALE: Locale = "fr";
 export const DEFAULT_THEME: ThemePref = "dark";
 
@@ -18,7 +18,7 @@ export function isThemePref(value: string | undefined | null): value is ThemePre
 }
 
 export function isLocale(value: string | undefined | null): value is Locale {
-  return value === "fr" || value === "en";
+  return value === "fr" || value === "en" || value === "zh";
 }
 
 export function parseAcceptLanguage(header: string | null | undefined): Locale {
@@ -36,6 +36,7 @@ export function parseAcceptLanguage(header: string | null | undefined): Locale {
   for (const { tag } of parts) {
     if (tag.startsWith("fr")) return "fr";
     if (tag.startsWith("en")) return "en";
+    if (tag.startsWith("zh")) return "zh";
   }
   return DEFAULT_LOCALE;
 }

@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AppPrefs, resolvePrefs, THEME_BOOT_SCRIPT } from "@/components/RootPrefs";
+import { getServerMessages } from "@/lib/i18n/server";
 
-export const metadata: Metadata = {
-  title: "CARZONE SARL — Concessionnaire Automobile & Mobilité Cotonou",
-  description: "ERP / DMS de gestion de concession automobile, showroom véhicules neufs multimarques, atelier SAV & bornes — CARZONE SARL (Cotonou, Bénin)",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { messages } = await getServerMessages();
+  return {
+    title: messages.meta.title,
+    description: messages.meta.description,
+  };
+}
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { locale, theme, localeFromCookie } = await resolvePrefs();

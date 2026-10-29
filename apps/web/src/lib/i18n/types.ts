@@ -94,7 +94,12 @@ export type Messages = {
     label: string;
     fr: string;
     en: string;
+    zh: string;
     menuAria: string;
+  };
+  meta: {
+    title: string;
+    description: string;
   };
   roles: Record<Role, string>;
   dashboard: {

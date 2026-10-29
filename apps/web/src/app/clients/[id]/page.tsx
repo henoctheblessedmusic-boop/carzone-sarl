@@ -87,7 +87,7 @@ export default async function CustomerDetailPage({
     .toUpperCase();
 
   return (
-    <AppShell user={user} title={`Fiche Client — ${customer.contactName}`}>
+    <AppShell user={user} title={`Fiche Client : ${customer.contactName}`}>
       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
         {/* Top Navigation */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -552,7 +552,7 @@ export default async function CustomerDetailPage({
                         <Badge tone={req.status === "TERMINEE" ? "ok" : "warn"}>{req.status}</Badge>
                       </div>
                       <div style={{ fontSize: "0.82rem", opacity: 0.7, marginTop: 4 }}>
-                        Puissance : {req.powerKw ? `${req.powerKw} kW` : "N/A"} — Véhicule :{" "}
+                        Puissance : {req.powerKw ? `${req.powerKw} kW` : "N/A"} · Véhicule :{" "}
                         {req.vehicleBrand} {req.vehicleModel}
                       </div>
                       <div style={{ fontSize: "0.8rem", color: "var(--ice-highlight)", marginTop: 6 }}>
@@ -630,7 +630,7 @@ export default async function CustomerDetailPage({
                     {r.vehicle.brand} {r.vehicle.model} ({r.vehicle.vin || "Sans VIN"})
                   </div>
                   <div style={{ fontSize: "0.82rem", opacity: 0.7, marginTop: 4 }}>
-                    Loyer : {r.monthlyXof ? `${formatXof(r.monthlyXof)}/mois` : "N/A"} — Du {formatDate(r.startDate)} au {formatDate(r.endDate)}
+                    Loyer : {r.monthlyXof ? `${formatXof(r.monthlyXof)}/mois` : "N/A"} · Du {formatDate(r.startDate)} au {formatDate(r.endDate)}
                   </div>
                 </div>
               ))}
@@ -653,7 +653,7 @@ export default async function CustomerDetailPage({
                     {fv.vehicle ? `${fv.vehicle.brand} ${fv.vehicle.model}` : "Véhicule Flotte"}
                   </div>
                   <div style={{ fontSize: "0.82rem", opacity: 0.7, marginTop: 4 }}>
-                    Immatriculation : {fv.plateNumber || "N/A"} — Chauffeur : {fv.driverName || "N/A"}
+                    Immatriculation : {fv.plateNumber || "N/A"} · Chauffeur : {fv.driverName || "N/A"}
                   </div>
                 </div>
               ))}

@@ -129,8 +129,8 @@ export default async function CatalogPage() {
       modelRows.push([
         b.name,
         m.name,
-        m.vehicleType ? TYPE_LABEL[m.vehicleType] || m.vehicleType : "—",
-        m.energy || "—",
+        m.vehicleType ? TYPE_LABEL[m.vehicleType] || m.vehicleType : "-",
+        m.energy || "-",
         <Badge key={`ma-${m.id}`} tone={m.active ? "ok" : "neutral"}>
           {m.active ? "Actif" : "Inactif"}
         </Badge>,
@@ -148,7 +148,7 @@ export default async function CatalogPage() {
   return (
     <AppShell user={user} titleKey="catalog">
       <p style={{ opacity: 0.75, marginTop: 0 }}>
-        Marques et modèles CARZONE (site officiel + BYD EV) — utilisés pour le stock et les imports.
+        Marques et modèles CARZONE (site officiel + BYD EV), utilisés pour le stock et les imports.
         Ajoutez une marque, un modèle ou un fournisseur quand CARZONE élargit l&apos;offre.
       </p>
 
@@ -252,9 +252,9 @@ export default async function CatalogPage() {
           rows={suppliers.map((s) => [
             s.name,
             SUPPLIER_TYPE_LABEL[s.type] || s.type,
-            [s.country, s.city].filter(Boolean).join(" · ") || "—",
-            s.contact || "—",
-            s.phone || "—",
+            [s.country, s.city].filter(Boolean).join(" · ") || "-",
+            s.contact || "-",
+            s.phone || "-",
             <Badge key={`sa-${s.id}`} tone={s.active ? "ok" : "neutral"}>
               {s.active ? "Actif" : "Inactif"}
             </Badge>,

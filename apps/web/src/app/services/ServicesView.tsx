@@ -264,7 +264,7 @@ export function ServicesView({
                     <strong style={{ fontSize: "0.95rem" }}>{art.name}</strong>
                   </td>
                   <td style={{ opacity: 0.75, fontSize: "0.85rem", maxWidth: 280 }}>
-                    {art.description || "—"}
+                    {art.description || "-"}
                   </td>
                   <td>
                     <strong style={{ color: "var(--gold)", fontSize: "0.95rem" }}>

@@ -191,7 +191,7 @@ export function PaymentModal({
           >
             {invoices.map((inv) => (
               <option key={inv.id} value={inv.id}>
-                {inv.number} — {inv.customer.contactName} ({formatXof(inv.totalXof)}) · Reste: {formatXof(inv.totalXof - inv.paidXof)}
+                {inv.number} · {inv.customer.contactName} ({formatXof(inv.totalXof)}) · Reste: {formatXof(inv.totalXof - inv.paidXof)}
               </option>
             ))}
           </select>

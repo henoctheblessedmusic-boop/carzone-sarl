@@ -87,7 +87,7 @@ export function PolicyPanel() {
         </li>
         <li>
           <strong>Après confirmation :</strong> seule une note de crédit commerciale / avenant avec validation
-          DG + Comptabilité est possible — jamais une suppression silencieuse.
+          DG + Comptabilité est possible, jamais une suppression silencieuse.
         </li>
         <li>
           <strong>SLA recommandé :</strong> cooling-off uniquement avant « envoyé/confirmé » ; après envoi = engagement

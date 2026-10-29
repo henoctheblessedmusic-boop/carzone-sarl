@@ -505,7 +505,7 @@ export function MailboxView({
                         <div style={{ display: "flex", alignItems: "baseline", gap: 6, overflow: "hidden" }}>
                           <span style={{ color: "var(--ice-text)" }}>{mail.subject}</span>
                           <span style={{ opacity: 0.5, fontSize: "0.82rem", fontWeight: 400, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                            — {mail.snippet || mail.body.slice(0, 80)}
+                            · {mail.snippet || mail.body.slice(0, 80)}
                           </span>
                         </div>
                       </td>

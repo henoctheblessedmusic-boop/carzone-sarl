@@ -195,7 +195,7 @@ async function main() {
       city: "Anvers",
       type: "IMPORT_PORT",
       contact: "Showroom Logistique CARZONE SARL (+229 01 92 61 61 61)",
-      notes: "Port d'embarquement Europe — conteneurs véhicules",
+      notes: "Port d'embarquement Europe · conteneurs véhicules",
     },
   });
   const supplierDubai = await prisma.supplier.create({
@@ -205,7 +205,7 @@ async function main() {
       city: "Dubaï",
       type: "IMPORT_PORT",
       contact: "Desk Moyen-Orient",
-      notes: "Hub GCC — SUV & pick-up",
+      notes: "Hub GCC · SUV & pick-up",
     },
   });
   await prisma.supplier.create({
@@ -215,7 +215,7 @@ async function main() {
       city: "Livourne",
       type: "IMPORT_PORT",
       contact: "Desk Méditerranée",
-      notes: "Port italien — véhicules Europe / Méditerranée",
+      notes: "Port italien · véhicules Europe / Méditerranée",
     },
   });
   await prisma.supplier.create({
@@ -225,7 +225,7 @@ async function main() {
       city: "Cotonou",
       type: "OTHER",
       contact: "Direction des Achats CARZONE SARL",
-      notes: "Placeholder — remplacer par un dealer réel",
+      notes: "Placeholder · remplacer par un dealer réel",
     },
   });
   await prisma.supplier.create({
@@ -364,7 +364,7 @@ async function main() {
 
   const opp = await prisma.opportunity.create({
     data: {
-      title: "Vente BYD Song Plus — Augustin JOHNSON",
+      title: "Vente BYD Song Plus · Augustin JOHNSON",
       stage: "DEVIS",
       customerId: customer.id,
       leadId: lead.id,

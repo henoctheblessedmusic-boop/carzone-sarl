@@ -11,3 +11,7 @@ dist
 coverage
 .env*
 *.tsbuildinfo
+
+# Staging temporaire photos constructeurs (non versionne)
+.dsh/photos-staging/
+.dsh/tmp/

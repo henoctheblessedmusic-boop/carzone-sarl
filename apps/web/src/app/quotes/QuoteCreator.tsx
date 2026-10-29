@@ -306,7 +306,7 @@ export function QuoteCreator({
     if (!articleId) return;
     const art = articles.find((a) => a.id === articleId);
     if (!art) return;
-    const desc = art.name + (art.description ? ` — ${art.description}` : "");
+    const desc = art.name + (art.description ? ` · ${art.description}` : "");
     const existing = lines.find((l) => l.description.trim().toLowerCase() === desc.trim().toLowerCase());
     setStagedItem({
       type: "ARTICLE",
@@ -757,7 +757,7 @@ export function QuoteCreator({
                   <option value="">⚡ + Article / Borne / Service...</option>
                   {articles.map((art) => (
                     <option key={art.id} value={art.id}>
-                      [{art.category}] {art.name} — {formatXof(art.unitPriceXof)}
+                      [{art.category}] {art.name} · {formatXof(art.unitPriceXof)}
                     </option>
                   ))}
                 </select>
@@ -791,7 +791,7 @@ export function QuoteCreator({
                     const colorText = v.color ? ` (${v.color})` : "";
                     return (
                       <option key={v.id} value={v.id}>
-                        {v.brand} {v.model}{variantText}{colorText}{badgeText} — {formatXof(v.priceXof)}
+                        {v.brand} {v.model}{variantText}{colorText}{badgeText} · {formatXof(v.priceXof)}
                       </option>
                     );
                   })}
@@ -1091,7 +1091,7 @@ export function QuoteCreator({
                               type="text"
                               className="ox-input"
                               style={{ width: "100%", fontSize: "0.85rem" }}
-                              placeholder={`Ligne ${idx + 1} — ex: TOYOTA COROLLA CROSS, Borne Wallbox...`}
+                              placeholder={`Ligne ${idx + 1} · ex: TOYOTA COROLLA CROSS, Borne Wallbox...`}
                               value={line.description}
                               onChange={(e) => updateLine(line.id, "description", e.target.value)}
                               disabled={isPending}

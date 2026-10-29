@@ -101,6 +101,11 @@ export type Messages = {
     title: string;
     description: string;
   };
+  help: {
+    button: string;
+    title: string;
+    aria: string;
+  };
   roles: Record<Role, string>;
   dashboard: {
     firstStepsTitle: string;

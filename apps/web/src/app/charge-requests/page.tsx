@@ -318,7 +318,7 @@ export default async function ChargeRequestsPage() {
                       {r.customer.contactName}
                       {r.customer.companyName && (
                         <span style={{ fontSize: "0.9rem", opacity: 0.7, fontWeight: 400 }}>
-                          {" "}— {r.customer.companyName}
+                          {" "}· {r.customer.companyName}
                         </span>
                       )}
                     </div>
@@ -431,7 +431,7 @@ export default async function ChargeRequestsPage() {
 
                             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem" }}>
                               <span style={{ opacity: 0.7 }}>Délai d&apos;exécution :</span>
-                              <span>{q.leadDays != null ? `${q.leadDays} jours ouvrés` : "—"}</span>
+                              <span>{q.leadDays != null ? `${q.leadDays} jours ouvrés` : "-"}</span>
                             </div>
 
                             {q.notes && (

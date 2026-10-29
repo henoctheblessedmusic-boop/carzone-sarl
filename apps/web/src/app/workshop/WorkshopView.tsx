@@ -199,7 +199,7 @@ function toInputTime(t?: string | null): string {
 }
 
 function formatDisplayDate(d?: string | null): string {
-  if (!d) return "—";
+  if (!d) return "-";
   if (d.includes("-")) {
     const parts = d.split("-");
     if (parts.length === 3) {
@@ -808,7 +808,7 @@ export function WorkshopView({
                       </span>
                     </div>
                     <div style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: 4 }}>
-                      Client : <strong style={{ color: "var(--ice-text)" }}>{entry.clientName}</strong> {entry.phone ? `(${entry.phone})` : ""} · Compteur : {entry.mileage ? `${entry.mileage.toLocaleString()} KM` : "—"}
+                      Client : <strong style={{ color: "var(--ice-text)" }}>{entry.clientName}</strong> {entry.phone ? `(${entry.phone})` : ""} · Compteur : {entry.mileage ? `${entry.mileage.toLocaleString()} KM` : "-"}
                     </div>
                   </div>
 
@@ -824,7 +824,7 @@ export function WorkshopView({
                       whiteSpace: "nowrap",
                     }}
                   >
-                    OR #{entry.orNumber || "—"} · En Cours
+                    OR #{entry.orNumber || "-"} · En Cours
                   </span>
                 </div>
 
@@ -997,7 +997,7 @@ export function WorkshopView({
             <option value="ALL" style={optionStyle}>Tous les statuts</option>
             {Object.entries(STATUS_CONFIG).map(([k, v]) => (
               <option key={k} value={k} style={optionStyle}>
-                {v.label} — {v.full}
+                {v.label} · {v.full}
               </option>
             ))}
           </select>
@@ -1093,7 +1093,7 @@ export function WorkshopView({
                           #{row.orNumber}
                         </span>
                       ) : (
-                        <span style={{ opacity: 0.4 }}>—</span>
+                        <span style={{ opacity: 0.4 }}>-</span>
                       )}
                     </td>
                     <td style={tdStyle}>
@@ -1108,7 +1108,7 @@ export function WorkshopView({
                       </span>
                     </td>
                     <td style={tdStyle}>
-                      <div style={{ fontWeight: 600 }}>{row.brand || "—"}</div>
+                      <div style={{ fontWeight: 600 }}>{row.brand || "-"}</div>
                       <div style={{ fontSize: "0.75rem", opacity: 0.7 }}>{row.model || ""}</div>
                     </td>
                     <td style={{ ...tdStyle, whiteSpace: "nowrap" }}>
@@ -1180,14 +1180,14 @@ export function WorkshopView({
                     </td>
                     <td style={tdStyle}>
                       <span style={{ fontFamily: "monospace", fontSize: "0.75rem", opacity: 0.8 }}>
-                        {row.chassis || "—"}
+                        {row.chassis || "-"}
                       </span>
                     </td>
                     <td style={tdStyle}>
                       {row.mileage !== null && row.mileage !== undefined ? (
                         <span>{row.mileage.toLocaleString()} km</span>
                       ) : (
-                        <span style={{ opacity: 0.4 }}>—</span>
+                        <span style={{ opacity: 0.4 }}>-</span>
                       )}
                     </td>
                     <td style={tdStyle}>
@@ -1222,10 +1222,10 @@ export function WorkshopView({
                           {row.phone}
                         </a>
                       ) : (
-                        <span style={{ opacity: 0.4 }}>—</span>
+                        <span style={{ opacity: 0.4 }}>-</span>
                       )}
                     </td>
-                    <td style={tdStyle}>{row.receptionist || "—"}</td>
+                    <td style={tdStyle}>{row.receptionist || "-"}</td>
                     <td style={tdStyle}>
                       <span
                         style={{
@@ -1252,15 +1252,15 @@ export function WorkshopView({
                         }}
                         title={row.worksDone || ""}
                       >
-                        {row.worksDone || "—"}
+                        {row.worksDone || "-"}
                       </div>
                     </td>
-                    <td style={tdStyle}>{row.endWorksAt || "—"}</td>
+                    <td style={tdStyle}>{row.endWorksAt || "-"}</td>
                     <td style={tdStyle}>
-                      <div>{row.exitDate || "—"}</div>
+                      <div>{row.exitDate || "-"}</div>
                       {row.exitTime && <div style={{ fontSize: "0.72rem", opacity: 0.6 }}>{row.exitTime}</div>}
                     </td>
-                    <td style={tdStyle}>{row.deliverer || "—"}</td>
+                    <td style={tdStyle}>{row.deliverer || "-"}</td>
                     <td style={tdStyle}>
                       {row.paymentMode ? (
                         <span
@@ -1286,7 +1286,7 @@ export function WorkshopView({
                           {row.paymentMode}
                         </span>
                       ) : (
-                        <span style={{ opacity: 0.4 }}>—</span>
+                        <span style={{ opacity: 0.4 }}>-</span>
                       )}
                     </td>
                     <td style={{ ...tdStyle, textAlign: "right", whiteSpace: "nowrap" }}>
@@ -1584,7 +1584,7 @@ export function WorkshopView({
                   </option>
                   {customers.map((c) => (
                     <option key={c.id} value={c.id} style={optionStyle}>
-                      {c.name} {c.phone ? `— Tél: ${c.phone}` : ""} {c.brand ? `[${c.brand} ${c.model || ""}]` : ""}
+                      {c.name} {c.phone ? `· Tél: ${c.phone}` : ""} {c.brand ? `[${c.brand} ${c.model || ""}]` : ""}
                     </option>
                   ))}
                 </select>
@@ -1599,7 +1599,7 @@ export function WorkshopView({
                       borderRadius: 6,
                     }}
                   >
-                    ⚡ Téléphone ({createPhone || "—"}) et véhicule ({createBrand || "—"} {createModel || ""}) renseignés automatiquement.
+                    ⚡ Téléphone ({createPhone || "-"}) et véhicule ({createBrand || "-"} {createModel || ""}) renseignés automatiquement.
                   </div>
                 )}
               </div>
@@ -1782,7 +1782,7 @@ export function WorkshopView({
                   >
                     {Object.entries(STATUS_CONFIG).map(([k, v]) => (
                       <option key={k} value={k} style={optionStyle}>
-                        {v.label} — {v.full}
+                        {v.label} · {v.full}
                       </option>
                     ))}
                   </select>
@@ -1881,7 +1881,7 @@ export function WorkshopView({
                   Modifier le passage : {editingItem.immatriculation}
                 </h3>
                 <span style={{ fontSize: "0.78rem", color: "var(--gold)", fontWeight: 600 }}>
-                  N° d&apos;Ordre #{editingItem.orNumber || "—"} (Clé primaire)
+                  N° d&apos;Ordre #{editingItem.orNumber || "-"} (Clé primaire)
                 </span>
               </div>
               <button
@@ -1967,7 +1967,7 @@ export function WorkshopView({
                     }}
                   >
                     <span style={{ fontWeight: 800, color: "var(--gold)" }}>
-                      #{editingItem.orNumber || "—"}
+                      #{editingItem.orNumber || "-"}
                     </span>
                     <span style={{ fontSize: "0.68rem", opacity: 0.6 }}>Non modifiable</span>
                   </div>
@@ -2027,7 +2027,7 @@ export function WorkshopView({
                   <select name="statusCode" defaultValue={editingItem.statusCode} style={selectStyle}>
                     {Object.entries(STATUS_CONFIG).map(([k, v]) => (
                       <option key={k} value={k} style={optionStyle}>
-                        {v.label} — {v.full}
+                        {v.label} · {v.full}
                       </option>
                     ))}
                   </select>

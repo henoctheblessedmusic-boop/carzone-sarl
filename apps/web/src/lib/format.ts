@@ -11,7 +11,7 @@ export function formatXof(amount: number) {
 }
 
 export function formatDate(date: Date | string | null | undefined) {
-  if (!date) return "—";
+  if (!date) return "-";
   return new Intl.DateTimeFormat("fr-BJ", {
     day: "2-digit",
     month: "short",

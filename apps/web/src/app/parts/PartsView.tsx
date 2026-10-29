@@ -1150,7 +1150,7 @@ export function PartsView({
                         {p.partNumber}
                       </td>
                       <td style={{ color: "#38bdf8", fontFamily: "monospace" }}>
-                        {p.oemNumber || "—"}
+                        {p.oemNumber || "-"}
                       </td>
                       <td>
                         <div style={{ fontWeight: 600 }}>{p.name}</div>
@@ -1171,7 +1171,7 @@ export function PartsView({
                       <td>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.3rem" }}>
                           {p.crossReferences.length === 0 ? (
-                            <span style={{ color: "var(--ice-text-muted)", fontSize: "0.8rem" }}>—</span>
+                            <span style={{ color: "var(--ice-text-muted)", fontSize: "0.8rem" }}>-</span>
                           ) : (
                             p.crossReferences.map((cr) => (
                               <span
@@ -1194,7 +1194,7 @@ export function PartsView({
                       <td>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.3rem" }}>
                           {p.compatibilities.length === 0 ? (
-                            <span style={{ color: "var(--ice-text-muted)", fontSize: "0.8rem" }}>—</span>
+                            <span style={{ color: "var(--ice-text-muted)", fontSize: "0.8rem" }}>-</span>
                           ) : (
                             p.compatibilities.map((c) => (
                               <span
@@ -1396,10 +1396,10 @@ export function PartsView({
                           {formatXof(m.totalPriceXof)}
                         </td>
                         <td style={{ color: "#38bdf8", fontWeight: 600 }}>
-                          {m.referenceDoc || "—"}
+                          {m.referenceDoc || "-"}
                         </td>
                         <td style={{ fontSize: "0.82rem", color: "#cbd5e1" }}>
-                          {m.reason || "—"}
+                          {m.reason || "-"}
                         </td>
                         <td style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)" }}>
                           {m.performedBy || "Système"}
@@ -1722,7 +1722,7 @@ export function PartsView({
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
               <div>
                 <h3 style={{ fontSize: "1.25rem", fontWeight: 700, margin: 0 }}>
-                  Gestion des Croisements — {selectedPartForDetails.partNumber}
+                  Gestion des Croisements · {selectedPartForDetails.partNumber}
                 </h3>
                 <div style={{ fontSize: "0.85rem", color: "var(--ice-text-muted)" }}>
                   {selectedPartForDetails.name} (Stock: {selectedPartForDetails.stockQuantity} {selectedPartForDetails.unit})
@@ -1943,7 +1943,7 @@ export function PartsView({
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
               <h3 style={{ fontSize: "1.2rem", fontWeight: 700, margin: 0 }}>
-                Mouvement de Stock — {movementPart.partNumber}
+                Mouvement de Stock · {movementPart.partNumber}
               </h3>
               <button
                 type="button"
@@ -2110,7 +2110,7 @@ export function PartsView({
                   <option value="">-- Choisir un dossier en cours à l&apos;atelier --</option>
                   {workshopEntries.map((w) => (
                     <option key={w.id} value={w.id}>
-                      {w.immatriculation} {w.brand ? `(${w.brand} ${w.model || ""})` : ""} — {w.clientName} {w.orNumber ? `[OR: ${w.orNumber}]` : ""}
+                      {w.immatriculation} {w.brand ? `(${w.brand} ${w.model || ""})` : ""} · {w.clientName} {w.orNumber ? `[OR: ${w.orNumber}]` : ""}
                     </option>
                   ))}
                 </select>

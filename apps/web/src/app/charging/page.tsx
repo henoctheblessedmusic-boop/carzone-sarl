@@ -70,7 +70,7 @@ export default async function ChargingPage() {
         <select name="planId" required style={input} defaultValue="">
           <option value="" disabled>Plan</option>
           {plans.filter((p) => p.active).map((p) => (
-            <option key={p.id} value={p.id}>{p.name} — {formatXof(p.kwhPriceXof)}/kWh</option>
+            <option key={p.id} value={p.id}>{p.name} · {formatXof(p.kwhPriceXof)}/kWh</option>
           ))}
         </select>
         <button type="submit" style={btn}>Activer abonnement</button>
@@ -93,9 +93,9 @@ export default async function ChargingPage() {
         rows={stations.map((s) => [
           s.code,
           s.name,
-          s.site?.name || "—",
-          s.powerKw ? `${s.powerKw} kW` : "—",
-          s.terminalId || "—",
+          s.site?.name || "-",
+          s.powerKw ? `${s.powerKw} kW` : "-",
+          s.terminalId || "-",
         ])}
       />
 

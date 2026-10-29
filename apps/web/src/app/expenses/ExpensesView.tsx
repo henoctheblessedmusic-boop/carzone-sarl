@@ -987,7 +987,7 @@ export function ExpensesView({
               Enregistrer le Règlement de la Dépense
             </h2>
             <div style={{ fontSize: "0.85rem", opacity: 0.8, marginBottom: "1rem" }}>
-              Dépense : <strong>{payingExpense.expenseNumber}</strong> — {payingExpense.title}
+              Dépense : <strong>{payingExpense.expenseNumber}</strong> · {payingExpense.title}
               <div style={{ color: "#10b981", fontWeight: 700, fontSize: "1.1rem", marginTop: 4 }}>
                 Montant : {formatXof(payingExpense.amountTtcXof)}
               </div>

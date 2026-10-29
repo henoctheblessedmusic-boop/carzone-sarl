@@ -63,7 +63,7 @@ export async function GET() {
     inv.paidXof,
     Math.max(0, inv.totalXof - inv.paidXof),
   ]);
-  const wsInvoices = XLSX.utils.aoa_to_sheet([["BILAN FINANCIER — FACTURES EMISES"], [], invoiceHeaders, ...invoiceRows]);
+  const wsInvoices = XLSX.utils.aoa_to_sheet([["BILAN FINANCIER · FACTURES EMISES"], [], invoiceHeaders, ...invoiceRows]);
   XLSX.utils.book_append_sheet(wb, wsInvoices, "Factures");
 
   // 2. Feuille Règlements & Encaissements
@@ -73,7 +73,7 @@ export async function GET() {
     p.paidAt.toISOString().slice(0, 10),
     p.invoice.customer.companyName || p.invoice.customer.contactName,
     p.method,
-    p.reference || "—",
+    p.reference || "-",
     p.amountXof,
   ]);
   const wsPayments = XLSX.utils.aoa_to_sheet([["JOURNAL DES ENCAISSEMENTS"], [], paymentHeaders, ...paymentRows]);

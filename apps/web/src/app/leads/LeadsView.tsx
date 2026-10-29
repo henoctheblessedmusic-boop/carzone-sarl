@@ -115,7 +115,7 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
         rows={filteredLeads.map((l) => [
           <div key={l.id}>
             <div style={{ fontWeight: 650 }}>{l.contactName}</div>
-            <div style={{ opacity: 0.65, fontSize: "0.8rem" }}>{l.email || l.phone || "—"}</div>
+            <div style={{ opacity: 0.65, fontSize: "0.8rem" }}>{l.email || l.phone || "-"}</div>
           </div>,
           <span
             key={`src-${l.id}`}
@@ -131,9 +131,9 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
           >
             {SOURCE_LABELS[l.source] || l.source}
           </span>,
-          l.interest || "—",
-          l.energyPref || "—",
-          l.assignee?.fullName || "—",
+          l.interest || "-",
+          l.energyPref || "-",
+          l.assignee?.fullName || "-",
           <Badge key={`s-${l.id}`}>{l.status}</Badge>,
           <div key={`act-${l.id}`} style={{ display: "flex", alignItems: "center", gap: 6 }}>
             {/* Bouton Modifier */}

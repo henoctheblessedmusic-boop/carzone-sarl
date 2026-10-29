@@ -80,6 +80,9 @@ export async function AppShell({
       logoutLabel={messages.common.logout}
       logoutTitle={messages.common.logoutTitle}
       navAria={messages.nav.aria}
+      helpButton={messages.help.button}
+      helpTitle={messages.help.title}
+      helpAria={messages.help.aria}
     >
       {children}
     </AppShellClient>

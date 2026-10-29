@@ -30,6 +30,9 @@ export function AppShellClient({
   logoutLabel,
   logoutTitle,
   navAria,
+  helpButton,
+  helpTitle,
+  helpAria,
   children,
 }: {
   user: SessionUser;
@@ -40,6 +43,9 @@ export function AppShellClient({
   logoutLabel: string;
   logoutTitle: string;
   navAria: string;
+  helpButton: string;
+  helpTitle: string;
+  helpAria: string;
   children: ReactNode;
 }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -137,10 +143,10 @@ export function AppShellClient({
               color: "var(--ice-text)",
               border: "1px solid var(--ice-border)",
             }}
-            title="Ouvrir le Centre d'Aide & Documentation"
+            title={helpAria}
           >
             <HelpCircle size={16} style={{ color: "#f43f5e" }} />
-            <span>Centre d&apos;Aide &amp; Guides</span>
+            <span>{helpButton}</span>
           </button>
 
           <form action="/api/auth/logout" method="post">
@@ -239,7 +245,7 @@ export function AppShellClient({
               type="button"
               onClick={() => setIsHelpOpen(true)}
               className="ox-header-desktop-only"
-              title="Centre d'Aide & Documentation CARZONE Ops"
+              title={helpTitle}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -256,7 +262,7 @@ export function AppShellClient({
               }}
             >
               <HelpCircle size={15} style={{ color: "#f43f5e" }} />
-              <span>Aide</span>
+              <span>{helpButton}</span>
             </button>
 
             <PrefsControls />

@@ -57,7 +57,7 @@ export async function addPayment(formData: FormData) {
     newStatus = "PAYEE_PARTIEL";
   }
 
-  const auditEntry = `${new Date().toISOString()} — Encaissement de ${amountXof.toLocaleString("fr-BJ")} FCFA (${method}${reference ? ` / ${reference}` : ""}) par ${user.fullName}`;
+  const auditEntry = `${new Date().toISOString()} · Encaissement de ${amountXof.toLocaleString("fr-BJ")} FCFA (${method}${reference ? ` / ${reference}` : ""}) par ${user.fullName}`;
 
   await prisma.invoice.update({
     where: { id: invoiceId },
@@ -94,7 +94,7 @@ export async function voidInvoice(formData: FormData) {
       cancelReason: reason,
       cancelledAt: now,
       cancelledByName: user.fullName,
-      notes: [inv.notes, `${now.toISOString()} — Annulation interne par ${user.fullName}: ${reason}`]
+      notes: [inv.notes, `${now.toISOString()} · Annulation interne par ${user.fullName}: ${reason}`]
         .filter(Boolean)
         .join("\n"),
     },

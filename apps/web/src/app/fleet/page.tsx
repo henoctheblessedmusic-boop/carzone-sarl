@@ -71,15 +71,15 @@ export default async function FleetPage() {
       {fleets.map((f) => (
         <div key={f.id} style={{ marginBottom: 20 }}>
           <h2 style={{ fontSize: "1.05rem" }}>
-            {f.name} {f.company ? <span style={{ opacity: 0.65 }}>— {f.company}</span> : null}
+            {f.name} {f.company ? <span style={{ opacity: 0.65 }}>· {f.company}</span> : null}
           </h2>
           <DataTable
             headers={["Immat.", "Véhicule", "Conducteur", "Client", "Actif"]}
             rows={f.vehicles.map((fv) => [
-              fv.plateNumber || "—",
-              fv.vehicle ? `${fv.vehicle.brand} ${fv.vehicle.model}` : "—",
-              fv.driverName || "—",
-              fv.customer?.contactName || "—",
+              fv.plateNumber || "-",
+              fv.vehicle ? `${fv.vehicle.brand} ${fv.vehicle.model}` : "-",
+              fv.driverName || "-",
+              fv.customer?.contactName || "-",
               <Badge key={fv.id} tone={fv.active ? "ok" : "bad"}>{fv.active ? "Oui" : "Non"}</Badge>,
             ])}
           />

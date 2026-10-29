@@ -140,7 +140,7 @@ export function QuotesView({
   function openEmailModal(quote: QuoteItem) {
     setEmailModalQuote(quote);
     setEmailTo(quote.customer.email || "");
-    setEmailSubject(`Facture Proforma ${quote.number} — CARZONE SARL`);
+    setEmailSubject(`Facture Proforma ${quote.number} · CARZONE SARL`);
     const linesSummary = quote.lines
       .map((l) => `• ${l.quantity}x ${l.description.replace(/\s*\(\s*\)/g, "").trim()} : ${formatXof(l.unitPriceXof * l.quantity)}`)
       .join("\n");

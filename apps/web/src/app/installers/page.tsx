@@ -29,7 +29,7 @@ export default async function InstallersPage() {
   return (
     <AppShell user={user} titleKey="installers">
       <p style={{ opacity: 0.75, marginTop: 0 }}>
-        Professionnels partenaires pour l&apos;installation de bornes à domicile — devis via CARZONE.
+        Professionnels partenaires pour l&apos;installation de bornes à domicile, devis via CARZONE.
       </p>
       {user.role !== "INSTALLATEUR" ? (
         <form action={createInstaller} style={formRow}>
@@ -46,8 +46,8 @@ export default async function InstallersPage() {
         rows={installers.map((i) => [
           i.companyName,
           i.contactName,
-          i.phone || "—",
-          i.specialties || "—",
+          i.phone || "-",
+          i.specialties || "-",
           i._count.quotes,
           <Badge key={i.id} tone={i.active ? "ok" : "bad"}>{i.active ? "Actif" : "Inactif"}</Badge>,
         ])}

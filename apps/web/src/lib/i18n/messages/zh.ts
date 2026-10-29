@@ -7,9 +7,14 @@ export const zh: Messages = {
     subtitle: "多品牌汽车经销商 · +229 01 92 61 61 61",
   },
   meta: {
-    title: "CARZONE SARL — 科托努多品牌汽车经销商",
+    title: "CARZONE SARL 科托努多品牌汽车经销商",
     description:
       "科托努新车展厅、售后维修车间、原厂配件与电动车充电服务。CARZONE SARL，贝宁。销售、进口与保养。",
+  },
+  help: {
+    button: "帮助",
+    title: "CARZONE Ops 帮助与文档中心",
+    aria: "打开帮助中心",
   },
   nav: {
     dashboard: "仪表盘",

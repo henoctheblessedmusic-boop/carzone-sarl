@@ -174,7 +174,7 @@ export function QuoteEditorModal({
   const handleSelectArticle = (articleId: string) => {
     const art = articles.find((a) => a.id === articleId);
     if (!art) return;
-    const desc = art.name + (art.description ? ` — ${art.description}` : "");
+    const desc = art.name + (art.description ? ` · ${art.description}` : "");
     const existing = lines.find((l) => l.description.trim().toLowerCase() === desc.trim().toLowerCase());
     setStagedItem({
       type: "ARTICLE",

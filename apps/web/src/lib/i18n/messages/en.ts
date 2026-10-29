@@ -7,9 +7,14 @@ export const en: Messages = {
     subtitle: "Multi-brand vehicle dealership · +229 01 92 61 61 61",
   },
   meta: {
-    title: "CARZONE SARL — Multi-brand car dealership in Cotonou",
+    title: "CARZONE SARL, multi-brand car dealership in Cotonou",
     description:
       "New vehicle showroom, after-sales workshop, genuine parts and EV charging in Cotonou, Benin. Sales, imports and servicing.",
+  },
+  help: {
+    button: "Help",
+    title: "CARZONE Ops help and documentation center",
+    aria: "Open the help center",
   },
   nav: {
     dashboard: "Dashboard",

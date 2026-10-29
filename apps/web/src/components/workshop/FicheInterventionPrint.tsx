@@ -270,9 +270,9 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
           <tbody>
             <tr>
               <td style={{ ...tdHeader, width: "12%" }}>Marque :</td>
-              <td style={{ ...tdData, width: "21%" }}><strong>{data.brand || "—"}</strong></td>
+              <td style={{ ...tdData, width: "21%" }}><strong>{data.brand || "-"}</strong></td>
               <td style={{ ...tdHeader, width: "12%" }}>Modèle :</td>
-              <td style={{ ...tdData, width: "21%" }}><strong>{data.model || "—"}</strong></td>
+              <td style={{ ...tdData, width: "21%" }}><strong>{data.model || "-"}</strong></td>
               <td style={{ ...tdHeader, width: "16%" }}>Immatriculation :</td>
               <td style={{ ...tdData, width: "18%" }}>
                 <span style={{ fontSize: "11px", fontWeight: 900, color: "#0f172a" }}>
@@ -284,19 +284,19 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
               <td style={{ ...tdHeader }}>Date :</td>
               <td style={{ ...tdData }}>{data.entryDate}</td>
               <td style={{ ...tdHeader }}>S/N (Châssis) :</td>
-              <td style={{ ...tdData, fontFamily: "monospace", fontSize: "9.5px" }}>{data.chassis || "—"}</td>
+              <td style={{ ...tdData, fontFamily: "monospace", fontSize: "9.5px" }}>{data.chassis || "-"}</td>
               <td style={{ ...tdHeader }}>N° Fiche / OR :</td>
               <td style={{ ...tdData }}><strong>#{data.orNumber}</strong></td>
             </tr>
             <tr>
               <td style={{ ...tdHeader }}>Client &amp; Tél :</td>
               <td colSpan={3} style={{ ...tdData }}>
-                <strong>{data.clientName}</strong> {data.phone ? `— Tél : ${data.phone}` : ""}
+                <strong>{data.clientName}</strong> {data.phone ? `· Tél : ${data.phone}` : ""}
               </td>
               <td style={{ ...tdHeader }}>Compteur (KM) :</td>
               <td style={{ ...tdData }}>
                 <strong style={{ fontSize: "11px" }}>
-                  {data.mileage ? `${data.mileage.toLocaleString()} KM` : "—"}
+                  {data.mileage ? `${data.mileage.toLocaleString()} KM` : "-"}
                 </strong>
               </td>
             </tr>
@@ -449,10 +449,10 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
           }}
         >
           <div>
-            Heure de début : <strong>{data.startTime || "—"}</strong>
+            Heure de début : <strong>{data.startTime || "-"}</strong>
           </div>
           <div>
-            Heure de fin : <strong>{data.endTime || "—"}</strong>
+            Heure de fin : <strong>{data.endTime || "-"}</strong>
           </div>
           <div>
             Technicien assigné : <strong>{data.technicianName || "Équipe SAV Carzone"}</strong>

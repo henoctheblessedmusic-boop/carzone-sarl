@@ -379,7 +379,7 @@ export default async function InvoicePrintPage({
           >
             <div>
               <div style={{ fontWeight: 800, fontSize: "0.95rem", color: "#166534", display: "flex", alignItems: "center", gap: 6 }}>
-                RÉPUBLIQUE DU BÉNIN — DIRECTION GÉNÉRALE DES IMPÔTS (DGI)
+                RÉPUBLIQUE DU BÉNIN · DIRECTION GÉNÉRALE DES IMPÔTS (DGI)
               </div>
               <div style={{ fontSize: "0.85rem", marginTop: 6, color: "#1e293b", lineHeight: 1.6 }}>
                 <div><strong>Code Sécurité MECeF / DGI :</strong> <span style={{ fontFamily: "monospace", fontSize: "0.98rem", fontWeight: 700, letterSpacing: "0.04em", color: "#0078d4" }}>{invoice.mecefCode}</span></div>

@@ -132,7 +132,7 @@ export async function sendProforma(formData: FormData) {
   const customBody = String(formData.get("body") || "").trim();
   const now = new Date();
 
-  const finalSubject = customSubject || `Facture Proforma ${quote.number} — CARZONE SARL`;
+  const finalSubject = customSubject || `Facture Proforma ${quote.number} · CARZONE SARL`;
   const defaultBody = `Bonjour ${quote.customer.contactName},\n\nVeuillez trouver le récapitulatif de votre facture proforma ${quote.number} pour un montant total de ${formatXof(quote.totalXof)} (${quote.taxMode}).\n\nPrestations et articles inclus :\n${quote.lines.map((l) => `- ${l.quantity}x ${l.description} : ${formatXof(l.unitPriceXof * l.quantity)}`).join("\n")}\n\nCe devis proforma est valable jusqu'au ${formatDate(quote.validUntil)}.\n\nLes Conditions Générales de Vente sont adossées au document officiel en page 2.\n\nRestant à votre entière disposition pour validation,\nL'équipe commerciale Carzone SARL\nShowroom Zone Maro-Militaire, Gbèdomidji · Cotonou, Bénin`;
   const finalBody = customBody || defaultBody;
 
@@ -162,7 +162,7 @@ export async function sendProforma(formData: FormData) {
       emailTo,
       auditNotes: [
         quote.auditNotes,
-        `${now.toISOString()} — Envoi proforma par e-mail vers ${emailTo || "(pas d'e-mail)"}`,
+        `${now.toISOString()} · Envoi proforma par e-mail vers ${emailTo || "(pas d'e-mail)"}`,
       ]
         .filter(Boolean)
         .join("\n"),
@@ -199,7 +199,7 @@ export async function confirmOrder(formData: FormData) {
       status: "COMMANDE_CONFIRMEE",
       approvedAt: now,
       orderConfirmedAt: now,
-      auditNotes: [quote.auditNotes, `${now.toISOString()} — Commande confirmée (engagement ferme)`]
+      auditNotes: [quote.auditNotes, `${now.toISOString()} · Commande confirmée (engagement ferme)`]
         .filter(Boolean)
         .join("\n"),
     },
@@ -251,7 +251,7 @@ export async function normalizeInvoice(formData: FormData) {
       status: "FACTURE_NORMALISEE",
       auditNotes: [
         quote.auditNotes,
-        `${new Date().toISOString()} — Conversion en facture normalisée`,
+        `${new Date().toISOString()} · Conversion en facture normalisée`,
       ]
         .filter(Boolean)
         .join("\n"),
@@ -288,7 +288,7 @@ export async function voidInternally(formData: FormData) {
       cancelledByName: user.fullName,
       auditNotes: [
         quote.auditNotes,
-        `${now.toISOString()} — ANNULEE_INTERNE par ${user.fullName} : ${reason}`,
+        `${now.toISOString()} · ANNULEE_INTERNE par ${user.fullName} : ${reason}`,
       ]
         .filter(Boolean)
         .join("\n"),

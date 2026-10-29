@@ -69,7 +69,7 @@ export default async function ImportsPage() {
   return (
     <AppShell user={user} titleKey="imports">
       <p style={{ opacity: 0.75 }}>
-        Suivi des arrivages Anvers · Dubaï · Livourne — lien stock, fournisseur & catalogue.
+        Suivi des arrivages Anvers · Dubaï · Livourne · lien stock, fournisseur & catalogue.
       </p>
       <form action={createImport} className="ox-glass" style={{ padding: "1rem", marginBottom: 16 }}>
         <div className="ox-form-row">
@@ -83,7 +83,7 @@ export default async function ImportsPage() {
             {suppliers.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
-                {s.city ? ` — ${s.city}` : ""}
+                {s.city ? ` · ${s.city}` : ""}
               </option>
             ))}
           </select>
@@ -106,12 +106,12 @@ export default async function ImportsPage() {
         rows={orders.map((o) => [
           o.reference,
           o.originPort,
-          o.supplier?.name || "—",
+          o.supplier?.name || "-",
           o.expectedBrand
             ? `${o.expectedBrand}${o.expectedModel ? ` ${o.expectedModel}` : ""}`
-            : "—",
+            : "-",
           formatDate(o.etaDate),
-          o.costXof ? formatXof(o.costXof) : "—",
+          o.costXof ? formatXof(o.costXof) : "-",
           o.vehicles.length,
           <Badge key={o.id} tone={o.status === "ARRIVE" ? "ok" : "warn"}>
             {o.status}

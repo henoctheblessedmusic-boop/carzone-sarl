@@ -44,7 +44,7 @@ export default async function QuotePrintPage({
 
   const to = quote.emailTo || quote.customer.email;
   const mailto = to
-    ? `mailto:${to}?subject=${encodeURIComponent(`Proforma ${quote.number} — CARZONE`)}&body=${encodeURIComponent(
+    ? `mailto:${to}?subject=${encodeURIComponent(`Proforma ${quote.number} · CARZONE`)}&body=${encodeURIComponent(
         `Bonjour,\n\nVeuillez trouver la facture proforma ${quote.number} d'un montant de ${formatXof(quote.totalXof)}.\n\nCordialement,\nCARZONE`,
       )}`
     : null;
@@ -96,7 +96,7 @@ export default async function QuotePrintPage({
           </a>
         ) : null}
         <span style={{ fontSize: "0.8rem", opacity: 0.7 }}>
-          E-mail serveur : stub (journal console) — SMTP non branché
+          E-mail serveur : stub (journal console), SMTP non branché
         </span>
       </div>
 
@@ -285,7 +285,7 @@ export default async function QuotePrintPage({
             paddingTop: "0.75rem",
           }}
         >
-          Document proforma — non fiscal jusqu&apos;à conversion en facture normalisée. Une commande confirmée
+          Document proforma · non fiscal jusqu&apos;à conversion en facture normalisée. Une commande confirmée
           dans CARZONE ne peut pas être annulée unilatéralement par le client (stock / import / engagements
           bancaires). Annulation interne réservée DG + Comptabilité avec motif écrit.
         </footer>
@@ -391,7 +391,7 @@ export default async function QuotePrintPage({
               fontSize: "0.85rem",
             }}
           >
-            <span>📄 Dossier Annexe : Fiche Technique — {sheet.title}</span>
+            <span>📄 Dossier Annexe : Fiche Technique · {sheet.title}</span>
             <Link
               href={`/vehicles/${vehicle.id}/fiche-technique`}
               target="_blank"

@@ -476,7 +476,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <h2 style={{ fontSize: "1.15rem", fontWeight: 800, margin: 0, color: "#ffffff" }}>
-                  Fiche Technique Atelier · OR #{entry.orNumber || "—"}
+                  Fiche Technique Atelier · OR #{entry.orNumber || "-"}
                 </h2>
                 <span
                   style={{
@@ -494,7 +494,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 </span>
               </div>
               <p style={{ margin: "2px 0 0", fontSize: "0.82rem", opacity: 0.75 }}>
-                {entry.brand} {entry.model} · Client : <strong style={{ color: "#ffffff" }}>{entry.clientName}</strong> · Compteur : <strong style={{ color: "#ffffff" }}>{entry.mileage ? `${entry.mileage.toLocaleString()} KM` : "—"}</strong>
+                {entry.brand} {entry.model} · Client : <strong style={{ color: "#ffffff" }}>{entry.clientName}</strong> · Compteur : <strong style={{ color: "#ffffff" }}>{entry.mileage ? `${entry.mileage.toLocaleString()} KM` : "-"}</strong>
               </p>
             </div>
           </div>

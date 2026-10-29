@@ -171,7 +171,7 @@ export async function POST(req: NextRequest) {
 
           const opp = await prisma.opportunity.create({
             data: {
-              title: `Essai Routier — ${vehicleModel} (${contactName})`,
+              title: `Essai Routier · ${vehicleModel} (${contactName})`,
               customerId: customer.id,
               stage: "ESSAI",
               amountXof: 0,

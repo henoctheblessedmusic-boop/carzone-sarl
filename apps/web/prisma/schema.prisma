@@ -161,7 +161,7 @@ model Vehicle {
   variant       String?
   year          Int?
   energy        String
-  /// SUV | PICKUP | BERLINE | VAN — copie catalogue à l'entrée stock
+  /// SUV | PICKUP | BERLINE | VAN · copie catalogue à l'entrée stock
   vehicleType   String?
   transmission  String?
   color         String?

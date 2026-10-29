@@ -960,7 +960,7 @@ export function InvoicesView({
                         {/* Réf Transaction */}
                         <td style={{ padding: "0.85rem 1rem" }}>
                           <div style={{ fontSize: "0.82rem", fontFamily: "monospace" }}>
-                            {p.reference || "—"}
+                            {p.reference || "-"}
                           </div>
                         </td>
 

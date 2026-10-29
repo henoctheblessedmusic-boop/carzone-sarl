@@ -3,8 +3,10 @@ import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/ui";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
-import { formatXof, formatDate } from "@/lib/format";
-import { ROLE_LABELS, type Role } from "@/lib/roles";
+import { formatXof } from "@/lib/format";
+import type { Role } from "@/lib/roles";
+import { getServerMessages } from "@/lib/i18n/server";
+import { dashboardPageCopy } from "@/lib/i18n/messages/dashboard-page";
 import {
   CreditCard,
   Zap,
@@ -28,6 +30,8 @@ import { buildRealDashboardAnalytics } from "@/lib/dashboard-analytics";
 
 export default async function DashboardPage() {
   const user = await requireUser();
+  const { locale, messages } = await getServerMessages();
+  const copy = dashboardPageCopy[locale];
 
   const [
     customersCount,
@@ -191,7 +195,7 @@ export default async function DashboardPage() {
   const STOCK_PIPELINE_STAGES = [
     {
       key: "COMMANDE",
-      label: "Commandes",
+      label: copy.stock.stageOrders,
       color: "#f59e0b",
       bg: "rgba(245, 158, 11, 0.12)",
       border: "rgba(245, 158, 11, 0.35)",
@@ -199,7 +203,7 @@ export default async function DashboardPage() {
     },
     {
       key: "EN_PRODUCTION",
-      label: "En Production",
+      label: copy.stock.stageProduction,
       color: "#06b6d4",
       bg: "rgba(6, 182, 212, 0.12)",
       border: "rgba(6, 182, 212, 0.35)",
@@ -207,7 +211,7 @@ export default async function DashboardPage() {
     },
     {
       key: "EN_TRANSIT",
-      label: "En Transit",
+      label: copy.stock.stageTransit,
       color: "#8b5cf6",
       bg: "rgba(139, 92, 246, 0.12)",
       border: "rgba(139, 92, 246, 0.35)",
@@ -215,7 +219,7 @@ export default async function DashboardPage() {
     },
     {
       key: "AU_PORT",
-      label: "Au Port",
+      label: copy.stock.stagePort,
       color: "#ec4899",
       bg: "rgba(236, 72, 153, 0.12)",
       border: "rgba(236, 72, 153, 0.35)",
@@ -223,7 +227,7 @@ export default async function DashboardPage() {
     },
     {
       key: "EN_MAGASIN",
-      label: "En Stock au Showroom",
+      label: copy.stock.stageShowroom,
       color: "#10b981",
       bg: "rgba(16, 185, 129, 0.12)",
       border: "rgba(16, 185, 129, 0.35)",
@@ -250,10 +254,13 @@ export default async function DashboardPage() {
         <div className="ox-hero-card">
           <div>
             <div className="ox-hero-card-title">
-              Bienvenue sur CARZONE Ops, {user.fullName}
+              {copy.welcome(user.fullName)}
             </div>
             <div className="ox-hero-card-sub">
-              Poste : <strong style={{ color: "var(--gold)" }}>{ROLE_LABELS[user.role as Role] || user.role}</strong> · Siège &amp; Showroom Zone Maro-Militaire, Gbèdomidji · Cotonou, Bénin
+              {copy.rolePrefix}{" "}
+              <strong style={{ color: "var(--gold)" }}>{messages.roles[user.role as Role] || user.role}</strong>
+              {" · "}
+              {copy.hqLine}
             </div>
           </div>
 
@@ -277,7 +284,7 @@ export default async function DashboardPage() {
                   }}
                 >
                   <Car size={16} />
-                  Entrées &amp; Sorties Véhicules
+                  {copy.shortcuts.adminVehiclesInOut}
                 </Link>
 
                 <Link
@@ -293,7 +300,7 @@ export default async function DashboardPage() {
                   }}
                 >
                   <Mail size={16} color="var(--brand)" />
-                  Messages Clients
+                  {copy.shortcuts.adminClientMessages}
                 </Link>
 
                 <Link
@@ -309,7 +316,7 @@ export default async function DashboardPage() {
                   }}
                 >
                   <Users size={16} color="#10b981" />
-                  Répertoire Clients
+                  {copy.shortcuts.adminClientDirectory}
                 </Link>
 
                 <Link
@@ -325,7 +332,7 @@ export default async function DashboardPage() {
                   }}
                 >
                   <Car size={16} color="#38bdf8" />
-                  Parc &amp; Flotte
+                  {copy.shortcuts.adminFleet}
                 </Link>
               </>
             ) : user.role === "DEVELOPER" ? (
@@ -346,7 +353,7 @@ export default async function DashboardPage() {
                   }}
                 >
                   <Car size={16} />
-                  Stock Véhicules
+                  {copy.shortcuts.devVehicleStock}
                 </Link>
 
                 <Link
@@ -362,7 +369,7 @@ export default async function DashboardPage() {
                   }}
                 >
                   <Users size={16} color="var(--brand)" />
-                  Utilisateurs &amp; Rôles
+                  {copy.shortcuts.devUsersRoles}
                 </Link>
 
                 <Link
@@ -378,7 +385,7 @@ export default async function DashboardPage() {
                   }}
                 >
                   <CreditCard size={16} color="#10b981" />
-                  Facturation &amp; Finance
+                  {copy.shortcuts.devBillingFinance}
                 </Link>
 
                 <Link
@@ -394,7 +401,7 @@ export default async function DashboardPage() {
                   }}
                 >
                   <Wrench size={16} color="#f59e0b" />
-                  Atelier SAV
+                  {copy.shortcuts.devWorkshop}
                 </Link>
 
                 <Link
@@ -410,7 +417,7 @@ export default async function DashboardPage() {
                   }}
                 >
                   <Mail size={16} color="var(--brand)" />
-                  Boîte Mail
+                  {copy.shortcuts.devMailbox}
                 </Link>
               </>
             ) : (
@@ -431,7 +438,7 @@ export default async function DashboardPage() {
                   }}
                 >
                   <Plus size={16} />
-                  Nouveau Devis Proforma
+                  {copy.shortcuts.salesNewQuote}
                 </Link>
 
                 <Link
@@ -447,7 +454,7 @@ export default async function DashboardPage() {
                   }}
                 >
                   <CreditCard size={16} color="#10b981" />
-                  Règlements &amp; Factures
+                  {copy.shortcuts.salesPaymentsInvoices}
                 </Link>
 
                 <Link
@@ -463,7 +470,7 @@ export default async function DashboardPage() {
                   }}
                 >
                   <Zap size={16} color="#38bdf8" />
-                  Borne Tactile
+                  {copy.shortcuts.salesTerminal}
                 </Link>
 
                 <Link
@@ -479,7 +486,7 @@ export default async function DashboardPage() {
                   }}
                 >
                   <Mail size={16} color="var(--brand)" />
-                  Boîte Mail
+                  {copy.shortcuts.salesMailbox}
                 </Link>
               </>
             )}
@@ -506,13 +513,13 @@ export default async function DashboardPage() {
             }}
           >
             <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", textTransform: "uppercase", fontWeight: 600 }}>
-              Total Facturé TTC
+              {copy.kpi.totalInvoiced}
             </div>
             <div className="ox-metric-val" style={{ fontSize: "1.7rem" }}>
               {formatXof(totalInvoicedTtc)}
             </div>
             <div style={{ fontSize: "0.75rem", color: "var(--ice-text-muted)" }}>
-              {activeInvoices.length} factures commerciales émises
+              {copy.kpi.invoicedHint(activeInvoices.length)}
             </div>
           </div>
 
@@ -528,13 +535,13 @@ export default async function DashboardPage() {
             }}
           >
             <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", textTransform: "uppercase", fontWeight: 600 }}>
-              Total Encaissé
+              {copy.kpi.totalCollected}
             </div>
             <div style={{ fontSize: "1.7rem", fontWeight: 800, color: "#10b981" }}>
               {formatXof(totalCollected)}
             </div>
             <div style={{ fontSize: "0.75rem", color: "#10b981", fontWeight: 600 }}>
-              Caisse Showroom &amp; Banques (Ecobank / BOA / MoMo)
+              {copy.kpi.collectedHint}
             </div>
           </div>
 
@@ -550,13 +557,13 @@ export default async function DashboardPage() {
             }}
           >
             <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", textTransform: "uppercase", fontWeight: 600 }}>
-              Solde Restant Dû (Créances)
+              {copy.kpi.outstanding}
             </div>
             <div style={{ fontSize: "1.7rem", fontWeight: 800, color: totalOutstanding > 0 ? "var(--gold)" : "#10b981" }}>
               {formatXof(totalOutstanding)}
             </div>
             <div style={{ fontSize: "0.75rem", color: "var(--ice-text-muted)" }}>
-              {overdueCount > 0 ? `${overdueCount} facture(s) en retard` : "Créances courantes"}
+              {copy.kpi.outstandingHint(overdueCount)}
             </div>
           </div>
 
@@ -572,13 +579,13 @@ export default async function DashboardPage() {
             }}
           >
             <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", textTransform: "uppercase", fontWeight: 600 }}>
-              Pipeline Devis Proformas
+              {copy.kpi.quotesPipeline}
             </div>
             <div style={{ fontSize: "1.7rem", fontWeight: 800, color: "#a855f7" }}>
               {formatXof(potentialRevenue)}
             </div>
             <div style={{ fontSize: "0.75rem", color: "var(--gold)", fontWeight: 600 }}>
-              + {formatXof(confirmedRevenue)} en commandes fermes
+              {copy.kpi.confirmedRevenue(formatXof(confirmedRevenue))}
             </div>
           </div>
         </div>
@@ -614,10 +621,14 @@ export default async function DashboardPage() {
               </span>
               <div>
                 <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 750, color: "var(--ice-text-strong)" }}>
-                  Stock Général CARZONE — Pipeline Logistique &amp; Showroom
+                  {copy.stock.title}
                 </h3>
                 <div style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", marginTop: 2 }}>
-                  Inventaire total : <strong style={{ color: "#fff" }}>{totalStockCount} véhicules</strong> · Valeur marchande : <strong style={{ color: "var(--gold)" }}>{formatXof(totalStockValue)}</strong>
+                  {copy.stock.inventoryLabel}{" "}
+                  <strong style={{ color: "#fff" }}>{copy.stock.vehicleCount(totalStockCount)}</strong>
+                  {" · "}
+                  {copy.stock.marketValueLabel}{" "}
+                  <strong style={{ color: "var(--gold)" }}>{formatXof(totalStockValue)}</strong>
                 </div>
               </div>
             </div>
@@ -635,7 +646,7 @@ export default async function DashboardPage() {
                 color: "var(--brand)",
               }}
             >
-              Consulter l'Inventaire Stock
+              {copy.stock.viewInventory}
               <ArrowRight size={14} />
             </Link>
           </div>
@@ -694,7 +705,7 @@ export default async function DashboardPage() {
                       {stats.count}
                     </div>
                     <span style={{ fontSize: "0.75rem", color: "var(--ice-text-muted)" }}>
-                      {stats.count > 1 ? "véhicules" : "véhicule"}
+                      {copy.stock.vehicleUnit(stats.count)}
                     </span>
                   </div>
 
@@ -721,12 +732,12 @@ export default async function DashboardPage() {
           <div className="ox-glass" style={{ padding: "0.9rem 1.1rem", borderRadius: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 550 }}>
               <Car size={16} color="var(--brand)" />
-              <span>VE en Stock Showroom</span>
+              <span>{copy.ops.evInStock}</span>
             </div>
             <div className="ox-metric-val" style={{ fontSize: "1.35rem", marginTop: 4 }}>
               {vehiclesInStock}{" "}
               <span style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", fontWeight: 400 }}>
-                ({vehiclesInTransit} en mer)
+                {copy.ops.atSea(vehiclesInTransit)}
               </span>
             </div>
           </div>
@@ -734,12 +745,12 @@ export default async function DashboardPage() {
           <div className="ox-glass" style={{ padding: "0.9rem 1.1rem", borderRadius: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 550 }}>
               <Users size={16} color="var(--gold)" />
-              <span>Portefeuille Clients &amp; Leads</span>
+              <span>{copy.ops.clientsLeads}</span>
             </div>
             <div className="ox-metric-val" style={{ fontSize: "1.35rem", marginTop: 4 }}>
               {customersCount}{" "}
               <span style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", fontWeight: 400 }}>
-                ({leadsCount} prospects)
+                {copy.ops.leadsHint(leadsCount)}
               </span>
             </div>
           </div>
@@ -747,7 +758,7 @@ export default async function DashboardPage() {
           <div className="ox-glass" style={{ padding: "0.9rem 1.1rem", borderRadius: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 550 }}>
               <Zap size={16} color="#10b981" />
-              <span>Recharges Publiques</span>
+              <span>{copy.ops.publicCharging}</span>
             </div>
             <div className="ox-metric-val" style={{ fontSize: "1.35rem", marginTop: 4 }}>
               {chargingStats._count.id}{" "}
@@ -760,12 +771,12 @@ export default async function DashboardPage() {
           <div className="ox-glass" style={{ padding: "0.9rem 1.1rem", borderRadius: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 550 }}>
               <ShieldCheck size={16} color="#38bdf8" />
-              <span>Chantiers Bornes Ouverts</span>
+              <span>{copy.ops.chargerSites}</span>
             </div>
             <div className="ox-metric-val" style={{ fontSize: "1.35rem", marginTop: 4 }}>
               {chargeRequestsCount}{" "}
               <span style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", fontWeight: 400 }}>
-                en cours
+                {copy.ops.inProgress}
               </span>
             </div>
           </div>
@@ -773,12 +784,12 @@ export default async function DashboardPage() {
           <div className="ox-glass" style={{ padding: "0.9rem 1.1rem", borderRadius: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 550 }}>
               <Wrench size={16} color="#f59e0b" />
-              <span>Atelier SAV &amp; Entretien</span>
+              <span>{copy.ops.workshop}</span>
             </div>
             <div className="ox-metric-val" style={{ fontSize: "1.35rem", marginTop: 4 }}>
               {openTasksCount}{" "}
               <span style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", fontWeight: 400 }}>
-                ordres ouverts
+                {copy.ops.openOrders}
               </span>
             </div>
           </div>
@@ -801,17 +812,17 @@ export default async function DashboardPage() {
               <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
                 <CreditCard size={16} color="#10b981" />
                 <h3 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "var(--ice-text-strong)" }}>
-                  Derniers Règlements Encaissés
+                  {copy.payments.title}
                 </h3>
               </div>
               <Link href="/invoices" style={{ fontSize: "0.78rem", color: "var(--brand)", textDecoration: "none", fontWeight: 600 }}>
-                Voir tous →
+                {copy.payments.viewAll} →
               </Link>
             </div>
 
             {recentPayments.length === 0 ? (
               <div style={{ padding: "0.85rem 0.5rem", textAlign: "center", color: "var(--ice-text-muted)", fontSize: "0.8rem" }}>
-                Aucun règlement récent enregistré.
+                {copy.payments.empty}
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -822,7 +833,7 @@ export default async function DashboardPage() {
                         {p.invoice.customer.contactName}
                       </div>
                       <div style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)", marginTop: 1 }}>
-                        {formatDate(p.paidAt)} · Facture {p.invoice.number} · {p.method}
+                        {copy.formatDate(p.paidAt)} · {copy.invoices.invoiceWord} {p.invoice.number} · {p.method}
                       </div>
                     </div>
                     <div style={{ textAlign: "right" }}>
@@ -834,7 +845,7 @@ export default async function DashboardPage() {
                         target="_blank"
                         style={{ fontSize: "0.7rem", color: "var(--gold)", textDecoration: "underline" }}
                       >
-                        Quittance
+                        {copy.payments.receipt}
                       </Link>
                     </div>
                   </div>
@@ -858,17 +869,17 @@ export default async function DashboardPage() {
               <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
                 <FileCheck size={16} color="var(--brand)" />
                 <h3 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "var(--ice-text-strong)" }}>
-                  Dernières Factures Normalisées
+                  {copy.invoices.title}
                 </h3>
               </div>
               <Link href="/invoices" style={{ fontSize: "0.78rem", color: "var(--brand)", textDecoration: "none", fontWeight: 600 }}>
-                Gérer →
+                {copy.invoices.manage} →
               </Link>
             </div>
 
             {recentInvoices.length === 0 ? (
               <div style={{ padding: "0.85rem 0.5rem", textAlign: "center", color: "var(--ice-text-muted)", fontSize: "0.8rem" }}>
-                Aucune facture enregistrée pour le moment.
+                {copy.invoices.empty}
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -894,11 +905,11 @@ export default async function DashboardPage() {
                                 : "warn"
                             }
                           >
-                            {inv.status}
+                            {copy.invoiceStatus(inv.status)}
                           </Badge>
                         </div>
                         <div style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)", marginTop: 1 }}>
-                          {formatDate(inv.createdAt)} · Échéance {formatDate(inv.dueDate)}
+                          {copy.formatDate(inv.createdAt)} · {copy.invoices.dueLabel} {copy.formatDate(inv.dueDate)}
                         </div>
                       </div>
                       <div style={{ textAlign: "right" }}>
@@ -912,7 +923,7 @@ export default async function DashboardPage() {
                             color: balanceDue === 0 ? "#10b981" : "var(--gold)",
                           }}
                         >
-                          {balanceDue === 0 ? "Soldée" : `Solde: ${formatXof(balanceDue)}`}
+                          {balanceDue === 0 ? copy.invoices.settled : copy.invoices.balanceDue(formatXof(balanceDue))}
                         </div>
                       </div>
                     </div>

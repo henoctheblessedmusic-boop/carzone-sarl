@@ -26,6 +26,12 @@ import {
   ChevronRight,
 } from "lucide-react";
 import type { Role } from "@/lib/roles";
+import { usePrefs } from "@/components/PrefsProvider";
+import {
+  helpCenterCopy,
+  type HelpCenterCopy,
+  type HelpCenterTopicCopy,
+} from "@/lib/i18n/messages/help-center";
 
 type HelpTopic = {
   id: string;
@@ -42,205 +48,41 @@ type HelpTopic = {
   }[];
 };
 
-export const HELP_TOPICS: HelpTopic[] = [
-  {
-    id: "getting-started",
-    title: "1. Premiers Pas & Prise en Main",
-    icon: Compass,
-    badge: "Démarrage",
-    summary: "Découverte générale de l'interface CARZONE Ops, navigation par rôle et principes clés.",
-    sections: [
-      {
-        heading: "Architecture de la plateforme",
-        content:
-          "CARZONE Ops est l'ERP de gestion intégrée conçu spécialement pour CARZONE SARL Bénin. Il centralise le showroom automobile de véhicules neufs, l'Atelier SAV haute tension, la facturation normalisée, les flux de trésorerie réels et la communication d'équipe.",
-        tips: [
-          "Chaque collaborateur dispose d'une vue personnalisée selon son rôle métier.",
-          "Les données affichées dans l'application sont 100% synchronisées avec la base de données PostgreSQL.",
-        ],
-      },
-      {
-        heading: "Navigation et Raccourcis",
-        content:
-          "Utilisez la barre latérale gauche pour naviguer entre les différents modules. Sur mobile, le menu s'ouvre d'un clic sur l'icône de navigation. La barre supérieure contient l'accès direct aux messages/appels, aux alertes de sécurité pour la Direction, aux préférences de thème et au présent Centre d'Aide.",
-      },
-    ],
-  },
-  {
-    id: "dashboard",
-    title: "2. Tableau de Bord Financier & Performance",
-    icon: TrendingUp,
-    badge: "Finance & DG",
-    summary: "Analyse de la rentabilité réelle, flux de trésorerie consolidés et filtres temporels au goût du DG.",
-    linkText: "Ouvrir le Tableau de Bord",
-    linkHref: "/dashboard",
-    sections: [
-      {
-        heading: "Les 4 Graphes de Performance Réelle",
-        content:
-          "Le tableau de bord ne comporte aucune donnée fictive. Toutes les courbes sont calculées mensuellement sur la base des écritures réelles :",
-        tips: [
-          "💎 1. Bénéfice Général Réel : Marge brute sur ventes encaissées MOINS l'intégralité des dépenses d'entreprise (charges, prestataires, loyers) et MOINS les salaires du personnel versés chaque mois.",
-          "💰 2. Évolution des Ventes : Comparaison directe entre le montant total facturé (proformas / ventes) et le montant effectivement encaissé en trésorerie.",
-          "💸 3. Dépenses d'Entreprise : Consolidation de tous les décaissements réels (Bons de commande BC, charges d'exploitation, fournisseurs et paie).",
-          "⚡ 4. Activités & Opérations : Suivi volumétrique réel des entrées/sorties Atelier SAV, des devis émis et des fiches véhicules actives.",
-        ],
-      },
-      {
-        heading: "Sélecteur de Période Temporelle",
-        content:
-          "En haut à droite du tableau de bord, vous pouvez ajuster l'horizon temporel en un clic : 1 Mois, 6 Mois, 1 An, 2 Ans ou 3 Ans. Tous les totaux, pourcentages et moyennes mensuelles s'adaptent instantanément.",
-      },
-    ],
-  },
-  {
-    id: "vehicles",
-    title: "3. Véhicules, Fiches Techniques IA & Stock",
-    icon: Car,
-    badge: "Showroom",
-    summary: "Parc automobile de luxe, fiches techniques homologuées, génération IA unitaire et impression officielle.",
-    linkText: "Gérer le Stock Véhicules",
-    linkHref: "/vehicles",
-    sections: [
-      {
-        heading: "Fiches Techniques Homologuées & Confirmation BDD",
-        content:
-          "Chaque véhicule dispose d'une fiche technique ultra-complète (motorisation, batterie, autonomie CLTC/WLTP, dimensions, sécurité, équipements de luxe).",
-        tips: [
-          "Génération OpenAI unitaire : L'IA ne s'exécute que sur demande explicite pour un véhicule spécifique, sans jamais consommer de crédits sur les autres véhicules.",
-          "Confirmation définitive : Dès que vous cliquez sur le bouton vert « Confirmer la fiche technique », elle est scellée en base de données PostgreSQL. Le système priorise toujours les données de la base.",
-          "Consultation sur place : Lorsque vous cliquez sur « Fiche technique », celle-ci s'ouvre dans la même fenêtre pour vous permettre de naviguer et revenir en arrière facilement.",
-        ],
-      },
-      {
-        heading: "Impression & Devis Clients",
-        content:
-          "Le bouton « Imprimer la Fiche Technique » produit un document officiel de prestige, sans coupure de texte ni débordement, prêt à être remis aux acheteurs ou annexé aux factures proformas.",
-      },
-    ],
-  },
-  {
-    id: "workshop",
-    title: "4. Atelier SAV, Réparations & Matrice Excel",
-    icon: Wrench,
-    badge: "Atelier Garage",
-    summary: "Gestion des Ordres de Réparation (OR), diagnostics haute tension et fichier Excel officiel Carzone.",
-    linkText: "Consulter l'Atelier SAV",
-    linkHref: "/workshop",
-    sections: [
-      {
-        heading: "Workflow d'un Ordre de Réparation (OR)",
-        content:
-          "À l'arrivée d'un véhicule à l'Atelier Carzone : 1) Créez l'OR avec immatriculation, kilométrage et motif. 2) Attribuez un technicien. 3) Établissez le diagnostic technique et le devis de pièces. 4) Validez l'exécution des travaux et enregistrez la sortie.",
-      },
-      {
-        heading: "Matrice Excel SAV Carzone",
-        content:
-          "L'Atelier SAV dispose d'une compatibilité Excel complète :",
-        tips: [
-          "Télécharger le modèle : Cliquez sur « Télécharger Modèle Excel » pour obtenir la grille officielle avec les colonnes homologuées.",
-          "Exporter l'historique : Cliquez sur « Exporter l'historique en Excel » pour extraire l'intégralité des passages d'atelier vers un fichier .XLSX prêt pour la comptabilité ou la Direction.",
-        ],
-      },
-    ],
-  },
-  {
-    id: "invoices-expenses",
-    title: "5. Ventes, Facturation, Dépenses & Salaires",
-    icon: Receipt,
-    badge: "Comptabilité",
-    summary: "Devis, factures normalisées, enregistrement des encaissements et gestion des charges de fonctionnement.",
-    linkText: "Gérer la Facturation",
-    linkHref: "/invoices",
-    sections: [
-      {
-        heading: "Facturation & Règlements Clients",
-        content:
-          "Émettez des factures proformas et convertissez-les en factures de vente. Lors de la réception d'un paiement, utilisez le bouton « Encaisser » en renseignant le mode (Virement, Chèque, Espèces, Mobile Money) et la référence.",
-        tips: [
-          "Le système suit automatiquement les statuts : BROUILLON, EN_ATTENTE, PAYEE_PARTIEL, PAYEE.",
-          "Un grand livre financier complet est téléchargeable via « Extraction Bilan Financier ».",
-        ],
-      },
-      {
-        heading: "Dépenses d'Entreprise & Bons de Commande (BC)",
-        content:
-          "Dans la section Dépenses (/expenses), enregistrez les achats auprès des prestataires, fournisseurs et loyers avec leur bon de commande automatique (ex: BC-2026-001). Les salaires du personnel versés dans le module RH (/hr) sont également consolidés.",
-      },
-    ],
-  },
-  {
-    id: "voip-chat",
-    title: "6. Téléphonie VoIP, Conférences & Chat",
-    icon: PhoneCall,
-    badge: "Communication",
-    summary: "Appels vocaux directs entre collaborateurs, salons de conférence audio virtuels et messagerie d'équipe.",
-    linkText: "Accéder à la Messagerie & Appels",
-    linkHref: "/chat",
-    sections: [
-      {
-        heading: "Passer un Appel Direct Interne",
-        content:
-          "Depuis le module Chat (/chat) ou l'annuaire d'équipe, cliquez sur le bouton téléphone vert à côté du nom d'un collègue. Votre navigateur utilise une liaison audio WebRTC sécurisée et chiffrée.",
-      },
-      {
-        heading: "Salons de Conférence Audio",
-        content:
-          "Rejoignez les salons virtuels permanents (Comité de Direction, Atelier SAV, Réunion Commerciale). Vous pouvez couper votre micro, observer les indicateurs de parole en direct et inviter des collaborateurs d'un clic.",
-        tips: [
-          "Assurez-vous d'avoir accordé l'autorisation d'accès au microphone dans votre navigateur.",
-          "La clôture d'un salon de conférence est protégée et réservée à son organisateur ou aux membres de la Direction.",
-        ],
-      },
-    ],
-  },
-  {
-    id: "charging",
-    title: "7. Bornes de Recharge & Terminal Express",
-    icon: Zap,
-    badge: "Énergie",
-    summary: "Réseau de bornes de recharge rapide à Cotonou, abonnements Club VIP et terminal d'encaissement.",
-    linkText: "Voir les Bornes de Recharge",
-    linkHref: "/charging",
-    sections: [
-      {
-        heading: "Tarifs & Abonnements Électriques",
-        content:
-          "CARZONE SARL exploite un réseau de bornes de recharge ultra-rapides. Le tarif d'accès public est fixé à 125 FCFA / kWh, tandis que les abonnés au Club CARZONE VIP bénéficient d'un tarif préférentiel de 90 FCFA / kWh.",
-      },
-      {
-        heading: "Terminal Express au Comptoir (/terminal)",
-        content:
-          "Permet à l'hôtesse ou au caissier d'enregistrer une session de recharge manuelle pour un client, de calculer automatiquement le montant en FCFA et de générer la facture de recharge correspondante.",
-      },
-    ],
-  },
-  {
-    id: "security",
-    title: "8. Sécurité, Profils Utilisateurs & Bcrypt",
-    icon: ShieldCheck,
-    badge: "Sécurité & Audit",
-    summary: "Chiffrement irréversible des mots de passe, gestion des rôles et contrôle strict des accès.",
-    linkText: "Gérer les Utilisateurs",
-    linkHref: "/users",
-    sections: [
-      {
-        heading: "Protection Maximale des Identifiants",
-        content:
-          "La plateforme applique les standards de sécurité les plus stricts. Aucun mot de passe n'est stocké en texte clair. Tous les mots de passe sont hachés de manière irréversible avec l'algorithme Bcrypt.",
-        tips: [
-          "Le DG et l'Administrateur peuvent définir ou réinitialiser le mot de passe d'un collaborateur à tout moment depuis la vue Utilisateurs (/users).",
-          "Les sessions inactives ou expirées sont automatiquement invalidées et les accès des collaborateurs désactivés sont coupés en temps réel.",
-        ],
-      },
-      {
-        heading: "Gouvernance des Rôles & Permissions",
-        content:
-          "Chaque compte dispose de permissions ciblées (DG, ADV, RF, Commercial, Chef d'Atelier, RH, etc.) garantissant l'étanchéité des données confidentielles de l'entreprise.",
-      },
-    ],
-  },
+/** Partie technique des rubriques : identifiant stable, icône, route cible. */
+const HELP_TOPIC_META: {
+  id: string;
+  key: keyof HelpCenterCopy["topics"];
+  icon: typeof BookOpen;
+  linkHref?: string;
+}[] = [
+  { id: "getting-started", key: "gettingStarted", icon: Compass },
+  { id: "dashboard", key: "dashboard", icon: TrendingUp, linkHref: "/dashboard" },
+  { id: "vehicles", key: "vehicles", icon: Car, linkHref: "/vehicles" },
+  { id: "workshop", key: "workshop", icon: Wrench, linkHref: "/workshop" },
+  { id: "invoices-expenses", key: "invoicesExpenses", icon: Receipt, linkHref: "/invoices" },
+  { id: "voip-chat", key: "voipChat", icon: PhoneCall, linkHref: "/chat" },
+  { id: "charging", key: "charging", icon: Zap, linkHref: "/charging" },
+  { id: "security", key: "security", icon: ShieldCheck, linkHref: "/users" },
 ];
+
+function buildHelpTopics(copy: HelpCenterCopy): HelpTopic[] {
+  return HELP_TOPIC_META.map((meta) => {
+    const topic: HelpCenterTopicCopy = copy.topics[meta.key];
+    return {
+      id: meta.id,
+      title: topic.title,
+      icon: meta.icon,
+      badge: topic.badge,
+      summary: topic.summary,
+      linkText: topic.linkText,
+      linkHref: meta.linkHref,
+      sections: topic.sections,
+    };
+  });
+}
+
+/** Repli français, conservé pour les consommateurs historiques de cet export. */
+export const HELP_TOPICS: HelpTopic[] = buildHelpTopics(helpCenterCopy.fr);
 
 export function HelpCenterModal({
   isOpen,
@@ -255,6 +97,10 @@ export function HelpCenterModal({
 }) {
   const [activeTopicId, setActiveTopicId] = useState<string>("getting-started");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const { locale } = usePrefs();
+  const copy = helpCenterCopy[locale];
+  const helpTopics = useMemo(() => buildHelpTopics(copy), [copy]);
 
   // Permet d'ouvrir le Centre d'Aide via l'événement custom carzone:open_help
   useEffect(() => {
@@ -281,8 +127,8 @@ export function HelpCenterModal({
   // Filtrer les sujets selon la recherche
   const filteredTopics = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return HELP_TOPICS;
-    return HELP_TOPICS.filter((t) => {
+    if (!q) return helpTopics;
+    return helpTopics.filter((t) => {
       const inTitle = t.title.toLowerCase().includes(q);
       const inSummary = t.summary.toLowerCase().includes(q);
       const inSections = t.sections.some(
@@ -293,15 +139,15 @@ export function HelpCenterModal({
       );
       return inTitle || inSummary || inSections;
     });
-  }, [searchQuery]);
+  }, [searchQuery, helpTopics]);
 
   const activeTopic = useMemo(() => {
     return (
       filteredTopics.find((t) => t.id === activeTopicId) ||
       filteredTopics[0] ||
-      HELP_TOPICS[0]
+      helpTopics[0]
     );
-  }, [filteredTopics, activeTopicId]);
+  }, [filteredTopics, activeTopicId, helpTopics]);
 
   function relaunchOnboarding() {
     onClose();
@@ -373,7 +219,7 @@ export function HelpCenterModal({
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <h2 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 800, letterSpacing: "-0.02em" }}>
-                  Centre d&apos;Aide &amp; Documentation CARZONE Ops
+                  {copy.header.title}
                 </h2>
                 <span
                   style={{
@@ -386,11 +232,11 @@ export function HelpCenterModal({
                     border: "1px solid rgba(225, 29, 72, 0.4)",
                   }}
                 >
-                  Version Officielle 2026
+                  {copy.header.versionBadge}
                 </span>
               </div>
               <p style={{ margin: "2px 0 0", fontSize: "0.82rem", color: "#94a3b8" }}>
-                Guides détaillés, règles de gestion et procédures d&apos;exploitation pour l&apos;équipe CARZONE SARL.
+                {copy.header.subtitle}
               </p>
             </div>
           </div>
@@ -414,10 +260,10 @@ export function HelpCenterModal({
                 cursor: "pointer",
                 transition: "all 0.15s ease",
               }}
-              title="Ré-ouvrir la checklist guidée de prise en main adaptée à votre rôle"
+              title={copy.header.relaunchTitle}
             >
               <Compass size={14} style={{ color: "#f43f5e" }} />
-              <span>Relancer Premiers Pas</span>
+              <span>{copy.header.relaunchCta}</span>
             </button>
 
             <button
@@ -435,7 +281,7 @@ export function HelpCenterModal({
                 justifyContent: "center",
                 cursor: "pointer",
               }}
-              title="Fermer (Échap)"
+              title={copy.header.closeTitle}
             >
               <X size={18} />
             </button>
@@ -458,7 +304,7 @@ export function HelpCenterModal({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Rechercher une procédure, un module (Dashboard, Fiches IA, Atelier Excel, Facturation, VoIP...)"
+            placeholder={copy.search.placeholder}
             style={{
               flex: 1,
               background: "transparent",
@@ -481,7 +327,7 @@ export function HelpCenterModal({
                 padding: "2px 6px",
               }}
             >
-              Effacer
+              {copy.search.clear}
             </button>
           )}
         </div>
@@ -511,7 +357,7 @@ export function HelpCenterModal({
                 padding: "6px 10px 4px",
               }}
             >
-              Rubriques &amp; Modules
+              {copy.sidebar.heading}
             </div>
 
             {filteredTopics.map((topic) => {
@@ -654,7 +500,7 @@ export function HelpCenterModal({
                         boxShadow: "0 4px 14px rgba(225, 29, 72, 0.35)",
                       }}
                     >
-                      <span>{activeTopic.linkText || "Accéder au module"}</span>
+                      <span>{activeTopic.linkText || copy.reader.fallbackLinkText}</span>
                       <ArrowRight size={14} />
                     </Link>
                   </div>
@@ -723,7 +569,7 @@ export function HelpCenterModal({
               </div>
             ) : (
               <div style={{ textAlign: "center", padding: "3rem", color: "#94a3b8" }}>
-                Aucun résultat ne correspond à votre recherche.
+                {copy.reader.noResults}
               </div>
             )}
           </div>

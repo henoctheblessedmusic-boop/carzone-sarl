@@ -265,9 +265,9 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
           <tbody>
             <tr>
               <td style={{ ...tdHeader, width: "13%" }}>Marque :</td>
-              <td style={{ ...tdData, width: "20%" }}><strong>{data.brand || "—"}</strong></td>
+              <td style={{ ...tdData, width: "20%" }}><strong>{data.brand || "-"}</strong></td>
               <td style={{ ...tdHeader, width: "12%" }}>Modèle :</td>
-              <td style={{ ...tdData, width: "20%" }}><strong>{data.model || "—"}</strong></td>
+              <td style={{ ...tdData, width: "20%" }}><strong>{data.model || "-"}</strong></td>
               <td style={{ ...tdHeader, width: "16%" }}>Immatriculation :</td>
               <td style={{ ...tdData, width: "19%" }}>
                 <span style={{ fontSize: "10.5px", fontWeight: 900, color: "#0f172a" }}>
@@ -279,7 +279,7 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
               <td style={{ ...tdHeader }}>Date :</td>
               <td style={{ ...tdData }}>{data.entryDate}</td>
               <td style={{ ...tdHeader }}>S/N (Châssis) :</td>
-              <td style={{ ...tdData, fontFamily: "monospace", fontSize: "9px" }}>{data.chassis || "—"}</td>
+              <td style={{ ...tdData, fontFamily: "monospace", fontSize: "9px" }}>{data.chassis || "-"}</td>
               <td style={{ ...tdHeader }}>Type de vidange :</td>
               <td style={{ ...tdData, fontSize: "9px" }}>
                 <strong>{data.oilType || "Huile Synthèse 5W-30 Norme Constructeur"}</strong>
@@ -293,14 +293,14 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
               <td style={{ ...tdHeader }}>Compteur :</td>
               <td style={{ ...tdData }}>
                 <strong style={{ fontSize: "10.5px" }}>
-                  {data.mileage ? `${data.mileage.toLocaleString()} KM` : "—"}
+                  {data.mileage ? `${data.mileage.toLocaleString()} KM` : "-"}
                 </strong>
               </td>
             </tr>
             <tr>
               <td style={{ ...tdHeader }}>Heures travaux :</td>
               <td colSpan={3} style={{ ...tdData, fontSize: "9px" }}>
-                Début : <strong>{data.startTime || "—"}</strong> · Fin : <strong>{data.endTime || "—"}</strong>
+                Début : <strong>{data.startTime || "-"}</strong> · Fin : <strong>{data.endTime || "-"}</strong>
               </td>
               <td style={{ ...tdHeader }}>PV Contrôle :</td>
               <td style={{ ...tdData, fontWeight: 750, color: "#166534" }}>
@@ -419,7 +419,7 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
                         color: "#334155",
                       }}
                     >
-                      {item.observation || "—"}
+                      {item.observation || "-"}
                     </td>
                   </tr>
                 );

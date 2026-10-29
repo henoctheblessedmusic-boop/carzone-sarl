@@ -41,9 +41,9 @@ export default async function RentalsPage() {
     <AppShell user={user} titleKey="rentals">
       <form action={createRental} style={formRow}>
         <select name="type" style={input} defaultValue="LCD">
-          <option value="LCD">LCD — courte durée</option>
-          <option value="LLD">LLD — longue durée</option>
-          <option value="LOA">LOA — option d&apos;achat</option>
+          <option value="LCD">LCD · courte durée</option>
+          <option value="LLD">LLD · longue durée</option>
+          <option value="LOA">LOA · option d&apos;achat</option>
         </select>
         <select name="customerId" required style={input} defaultValue="">
           <option value="" disabled>Client *</option>
@@ -69,7 +69,7 @@ export default async function RentalsPage() {
           `${r.vehicle.brand} ${r.vehicle.model}`,
           formatDate(r.startDate),
           formatDate(r.endDate),
-          r.monthlyXof ? formatXof(r.monthlyXof) : "—",
+          r.monthlyXof ? formatXof(r.monthlyXof) : "-",
           <Badge key={r.id} tone={r.status === "ACTIF" ? "ok" : "neutral"}>{r.status}</Badge>,
         ])}
       />

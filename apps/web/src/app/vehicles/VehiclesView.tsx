@@ -26,14 +26,14 @@ import {
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
 import { BrandLogoSvg } from "@/lib/brand-logos";
+import { usePrefs } from "@/components/PrefsProvider";
+import {
+  energyLabel,
+  statusLabel,
+  stockCopy,
+  vehicleTypeLabel,
+} from "@/lib/i18n/messages/stock";
 import { createVehicle, updateVehicle, deleteVehicle, quickChangeVehicleStatus } from "./actions";
-
-const TYPE_LABEL: Record<string, string> = {
-  SUV: "SUV",
-  PICKUP: "Pick-up",
-  BERLINE: "Berline",
-  VAN: "Van / Minibus",
-};
 
 export type VehicleItem = {
   id: string;
@@ -64,56 +64,42 @@ export type VehicleItem = {
 };
 
 // 5 STATUTS OFFICIELS DEMANDÉS PAR LE DIRECTEUR DE CARZONE
+// Les libellés traduits vivent dans stockCopy (lib/i18n/messages/stock.ts).
 export const STOCK_STAGES = [
   {
     key: "COMMANDE",
-    label: "Commandes",
-    short: "Commandes",
     color: "#f59e0b",
     bg: "rgba(245, 158, 11, 0.12)",
     border: "rgba(245, 158, 11, 0.35)",
     icon: ShoppingCart,
-    desc: "Commandes passées aux constructeurs / usines",
   },
   {
     key: "EN_PRODUCTION",
-    label: "En Production",
-    short: "Production",
     color: "#06b6d4",
     bg: "rgba(6, 182, 212, 0.12)",
     border: "rgba(6, 182, 212, 0.35)",
     icon: Factory,
-    desc: "Véhicules en assemblage usine en Chine / fournisseur",
   },
   {
     key: "EN_TRANSIT",
-    label: "En Transit",
-    short: "Transit Maritime",
     color: "#8b5cf6",
     bg: "rgba(139, 92, 246, 0.12)",
     border: "rgba(139, 92, 246, 0.35)",
     icon: Ship,
-    desc: "En mer / navire vers le Port de Cotonou",
   },
   {
     key: "AU_PORT",
-    label: "Au Port",
-    short: "Port de Cotonou",
     color: "#ec4899",
     bg: "rgba(236, 72, 153, 0.12)",
     border: "rgba(236, 72, 153, 0.35)",
     icon: Anchor,
-    desc: "Arrivé au PAC Cotonou / Douane & inspection",
   },
   {
     key: "EN_MAGASIN",
-    label: "En Stock au Showroom",
-    short: "Showroom Cotonou",
     color: "#10b981",
     bg: "rgba(16, 185, 129, 0.12)",
     border: "rgba(16, 185, 129, 0.35)",
     icon: Store,
-    desc: "Disponible immédiatement au Showroom CARZONE",
   },
 ] as const;
 
@@ -134,6 +120,8 @@ export function VehiclesView({
   canDelete?: boolean;
   initialParams: { energy?: string; q?: string; vehicleType?: string; siteId?: string };
 }) {
+  const { locale } = usePrefs();
+  const copy = stockCopy[locale];
   const [viewMode, setViewMode] = useState<"pipeline" | "table">("pipeline");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<VehicleItem | null>(null);
@@ -231,11 +219,11 @@ export function VehiclesView({
                 <Layers size={18} />
               </span>
               <h2 style={{ fontSize: "1.35rem", fontWeight: 700, margin: 0, color: "#f8fafc" }}>
-                Stock Général CARZONE — Pipeline Logistique &amp; Showroom
+                {copy.pipeline.title}
               </h2>
             </div>
             <p style={{ margin: "0.4rem 0 0", fontSize: "0.85rem", color: "var(--ice-text-muted)" }}>
-              Suivi officiel en 5 étapes : Commandes · Stocks en Production · En Transit · Au Port · Stock Showroom (Disponible)
+              {copy.pipeline.subtitle}
             </p>
           </div>
 
@@ -259,10 +247,10 @@ export function VehiclesView({
                   boxShadow: "0 4px 14px rgba(16, 185, 129, 0.35)",
                   cursor: "pointer",
                 }}
-                title="Ouvrir le formulaire d'entrée de stock pour enregistrer un nouveau véhicule"
+                title={copy.pipeline.entryTitle}
               >
                 <PlusCircle size={17} />
-                <span>+ Entrée Stock (Nouveau Véhicule)</span>
+                <span>{copy.pipeline.entryButton}</span>
               </button>
             )}
 
@@ -289,7 +277,7 @@ export function VehiclesView({
                   cursor: "pointer",
                 }}
               >
-                Pipeline (5 Étapes)
+                {copy.pipeline.viewPipeline}
               </button>
               <button
                 type="button"
@@ -305,7 +293,7 @@ export function VehiclesView({
                   cursor: "pointer",
                 }}
               >
-                Vue Tableau ({totalStockCount})
+                {copy.pipeline.viewTable(totalStockCount)}
               </button>
             </div>
           </div>
@@ -339,12 +327,12 @@ export function VehiclesView({
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span style={{ fontSize: "0.78rem", fontWeight: 700, color: stg.color }}>
-                    {stg.label}
+                    {copy.stages[stg.key].label}
                   </span>
                   <Icon size={15} color={stg.color} />
                 </div>
                 <div style={{ fontSize: "1.4rem", fontWeight: 800, color: "#f8fafc" }}>
-                  {data.count} <span style={{ fontSize: "0.8rem", fontWeight: 500, color: "var(--ice-text-muted)" }}>véh.</span>
+                  {data.count} <span style={{ fontSize: "0.8rem", fontWeight: 500, color: "var(--ice-text-muted)" }}>{copy.pipeline.unitShort}</span>
                 </div>
                 <div style={{ fontSize: "0.75rem", color: "var(--ice-text-muted)" }}>
                   {formatXof(data.totalXof)}
@@ -420,11 +408,11 @@ export function VehiclesView({
                     <PlusCircle size={22} />
                   </span>
                   <h3 style={{ fontSize: "1.25rem", fontWeight: 800, margin: 0, color: "#f8fafc" }}>
-                    Nouvelle Entrée en Stock — Véhicule Neuf
+                    {copy.createModal.title}
                   </h3>
                 </div>
                 <p style={{ margin: "0.35rem 0 0", fontSize: "0.82rem", color: "var(--ice-text-muted)" }}>
-                  Affectez les caractéristiques officielles, l&apos;étape logistique initiale (parmi les 5) et le showroom de destination.
+                  {copy.createModal.subtitle}
                 </p>
               </div>
 
@@ -443,7 +431,7 @@ export function VehiclesView({
                   justifyContent: "center",
                   cursor: "pointer",
                 }}
-                title="Fermer"
+                title={copy.createModal.close}
               >
                 <X size={18} />
               </button>
@@ -467,24 +455,24 @@ export function VehiclesView({
                 }}
               >
                 <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.6rem" }}>
-                  1. Marque, Modèle &amp; Finition Constructeur
+                  {copy.createModal.section1}
                 </div>
                 <BrandModelSelect brands={catalog} energyFieldId="modal-vehicle-energy" />
                 <div className="ox-form-row" style={{ marginTop: "0.75rem" }}>
-                  <input name="variant" placeholder="Finition / Pack (ex: 1.5T DCT Premium)" className="ox-input" title="Finition / variante" />
-                  <input name="year" type="number" placeholder="Année" defaultValue={2026} className="ox-input" />
+                  <input name="variant" placeholder={copy.createModal.variantPlaceholder} className="ox-input" title={copy.createModal.variantTitle} />
+                  <input name="year" type="number" placeholder={copy.createModal.yearPlaceholder} defaultValue={2026} className="ox-input" />
                   <select
                     id="modal-vehicle-energy"
                     name="energy"
                     className="ox-select"
                     defaultValue="HYBRIDE"
-                    title="Énergie"
+                    title={copy.createModal.energyTitle}
                   >
-                    <option value="ELECTRIQUE">Électrique (EV)</option>
-                    <option value="HYBRIDE">Hybride (HEV)</option>
-                    <option value="PHEV">Hybride Rechargeable (PHEV)</option>
-                    <option value="ESSENCE">Essence</option>
-                    <option value="DIESEL">Diesel</option>
+                    <option value="ELECTRIQUE">{copy.energyOption.ELECTRIQUE}</option>
+                    <option value="HYBRIDE">{copy.energyOption.HYBRIDE}</option>
+                    <option value="PHEV">{copy.energyOption.PHEV}</option>
+                    <option value="ESSENCE">{copy.energyOption.ESSENCE}</option>
+                    <option value="DIESEL">{copy.energyOption.DIESEL}</option>
                   </select>
                 </div>
               </div>
@@ -499,24 +487,24 @@ export function VehiclesView({
                 }}
               >
                 <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#f59e0b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.6rem" }}>
-                  2. Affectation Logistique (5 Étapes) &amp; Emplacement
+                  {copy.createModal.section2}
                 </div>
                 <div className="ox-form-row">
                   <select
                     name="status"
                     defaultValue="EN_MAGASIN"
                     className="ox-select"
-                    title="Statut logistique initial"
+                    title={copy.createModal.statusTitle}
                     style={{ fontWeight: 700, color: "#34d399", background: "rgba(15,23,42,0.8)" }}
                   >
-                    <option value="COMMANDE">1. COMMANDE (Usine / BDC)</option>
-                    <option value="EN_PRODUCTION">2. EN PRODUCTION (Chine)</option>
-                    <option value="EN_TRANSIT">3. EN TRANSIT (Maritime)</option>
-                    <option value="AU_PORT">4. AU PORT (Port de Cotonou)</option>
-                    <option value="EN_MAGASIN">5. STOCK SHOWROOM (Disponible Cotonou)</option>
+                    <option value="COMMANDE">{copy.statusOption.COMMANDE}</option>
+                    <option value="EN_PRODUCTION">{copy.statusOption.EN_PRODUCTION}</option>
+                    <option value="EN_TRANSIT">{copy.statusOption.EN_TRANSIT}</option>
+                    <option value="AU_PORT">{copy.statusOption.AU_PORT}</option>
+                    <option value="EN_MAGASIN">{copy.statusOption.EN_MAGASIN}</option>
                   </select>
 
-                  <select name="siteId" className="ox-select" defaultValue={sites[0]?.id || ""} title="Showroom d'affectation">
+                  <select name="siteId" className="ox-select" defaultValue={sites[0]?.id || ""} title={copy.createModal.siteTitle}>
                     {sites.map((s) => (
                       <option key={s.id} value={s.id}>
                         📍 {s.name}
@@ -524,8 +512,8 @@ export function VehiclesView({
                     ))}
                   </select>
 
-                  <select name="supplierId" className="ox-select" defaultValue="" title="Fournisseur">
-                    <option value="">Fournisseur (opt.)</option>
+                  <select name="supplierId" className="ox-select" defaultValue="" title={copy.createModal.supplierTitle}>
+                    <option value="">{copy.createModal.supplierOptional}</option>
                     {suppliers.map((s) => (
                       <option key={s.id} value={s.id}>
                         {s.name}
@@ -545,30 +533,30 @@ export function VehiclesView({
                 }}
               >
                 <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#8b5cf6", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.6rem" }}>
-                  3. Suivi Maritime &amp; Châssis (VIN)
+                  {copy.createModal.section3}
                 </div>
                 <div className="ox-form-row">
                   <input
                     name="shippingOriginPort"
-                    placeholder="Port d'origine (ex: Shanghai, Ningbo, Anvers)"
+                    placeholder={copy.createModal.portPlaceholder}
                     className="ox-input"
                   />
                   <input
                     name="etaDate"
                     type="date"
-                    title="Date estimée d'arrivée (ETA)"
+                    title={copy.createModal.etaTitle}
                     className="ox-input"
                   />
                   <input
                     name="containerNumber"
-                    placeholder="N° Conteneur / BL maritime"
+                    placeholder={copy.createModal.containerPlaceholder}
                     className="ox-input"
                   />
                   <input
                     name="vin"
-                    placeholder="Numéro VIN (17 caractères châssis)"
+                    placeholder={copy.createModal.vinPlaceholder}
                     className="ox-input"
-                    title="Numéro VIN"
+                    title={copy.createModal.vinTitle}
                   />
                 </div>
               </div>
@@ -583,16 +571,16 @@ export function VehiclesView({
                 }}
               >
                 <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#ec4899", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.6rem" }}>
-                  4. Tarification en Francs CFA
+                  {copy.createModal.section4}
                 </div>
                 <div className="ox-form-row">
                   <input
                     name="priceXof"
                     type="number"
-                    placeholder="Prix de vente XOF *"
+                    placeholder={copy.createModal.pricePlaceholder}
                     required
                     className="ox-input"
-                    title="Prix de vente en francs CFA"
+                    title={copy.createModal.priceTitle}
                     style={{ fontWeight: 800, fontSize: "1.05rem", color: "#34d399", minWidth: 260 }}
                   />
                 </div>
@@ -615,7 +603,7 @@ export function VehiclesView({
                   className="ox-btn ox-btn-ghost"
                   style={{ color: "#cbd5e1" }}
                 >
-                  Annuler
+                  {copy.createModal.cancel}
                 </button>
                 <button
                   type="submit"
@@ -628,7 +616,7 @@ export function VehiclesView({
                     fontSize: "0.92rem",
                   }}
                 >
-                  Valider et Ajouter au Stock
+                  {copy.createModal.submit}
                 </button>
               </div>
             </form>
@@ -640,13 +628,13 @@ export function VehiclesView({
       <form className="ox-form-row" style={{ marginBottom: 16 }}>
         <input
           name="q"
-          placeholder="Recherche marque / modèle / VIN / Châssis"
+          placeholder={copy.filters.searchPlaceholder}
           defaultValue={initialParams.q}
           className="ox-input"
           style={{ minWidth: 260 }}
         />
         <select name="siteId" defaultValue={initialParams.siteId || ""} className="ox-select">
-          <option value="">Tous les showrooms</option>
+          <option value="">{copy.filters.allShowrooms}</option>
           {sites.map((s) => (
             <option key={s.id} value={s.id}>
               📍 {s.name}
@@ -654,22 +642,22 @@ export function VehiclesView({
           ))}
         </select>
         <select name="energy" defaultValue={initialParams.energy || ""} className="ox-select">
-          <option value="">Toutes énergies</option>
-          <option value="ELECTRIQUE">Électrique</option>
-          <option value="HYBRIDE">Hybride</option>
-          <option value="PHEV">PHEV</option>
-          <option value="ESSENCE">Essence</option>
-          <option value="DIESEL">Diesel</option>
+          <option value="">{copy.filters.allEnergies}</option>
+          <option value="ELECTRIQUE">{copy.energy.ELECTRIQUE}</option>
+          <option value="HYBRIDE">{copy.energy.HYBRIDE}</option>
+          <option value="PHEV">{copy.energy.PHEV}</option>
+          <option value="ESSENCE">{copy.energy.ESSENCE}</option>
+          <option value="DIESEL">{copy.energy.DIESEL}</option>
         </select>
         <select name="vehicleType" defaultValue={initialParams.vehicleType || ""} className="ox-select">
-          <option value="">Toutes gammes</option>
-          <option value="SUV">SUV</option>
-          <option value="PICKUP">Pick-up</option>
-          <option value="BERLINE">Berline</option>
-          <option value="VAN">Van / Minibus</option>
+          <option value="">{copy.filters.allTypes}</option>
+          <option value="SUV">{copy.vehicleType.SUV}</option>
+          <option value="PICKUP">{copy.vehicleType.PICKUP}</option>
+          <option value="BERLINE">{copy.vehicleType.BERLINE}</option>
+          <option value="VAN">{copy.vehicleType.VAN}</option>
         </select>
         <button type="submit" className="ox-btn">
-          Filtrer
+          {copy.filters.submit}
         </button>
       </form>
 
@@ -719,7 +707,7 @@ export function VehiclesView({
                 >
                   <div>
                     <div style={{ fontSize: "0.85rem", fontWeight: 700, color: stage.color }}>
-                      {stage.label}
+                      {copy.stages[stage.key].label}
                     </div>
                     <div style={{ fontSize: "0.74rem", color: "var(--ice-text-muted)" }}>
                       {formatXof(totalStageXof)}
@@ -751,7 +739,7 @@ export function VehiclesView({
                         fontStyle: "italic",
                       }}
                     >
-                      Aucun véhicule à cette étape
+                      {copy.card.emptyStage}
                     </div>
                   ) : (
                     vehiclesInStage.map((v) => (
@@ -814,8 +802,8 @@ export function VehiclesView({
 
                         {/* CARACTÉRISTIQUES */}
                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.74rem", color: "#cbd5e1" }}>
-                          <span>{v.energy}</span>
-                          <span>{v.vehicleType || "SUV"}</span>
+                          <span>{energyLabel(copy, v.energy)}</span>
+                          <span>{vehicleTypeLabel(copy, v.vehicleType || "SUV")}</span>
                           <span>{v.year || 2026}</span>
                         </div>
 
@@ -838,10 +826,10 @@ export function VehiclesView({
                               gap: 2,
                             }}
                           >
-                            {v.vin && <div>VIN: <code>{v.vin}</code></div>}
-                            {v.shippingOriginPort && <div>Port: {v.shippingOriginPort}</div>}
-                            {v.etaDate && <div>ETA: {new Date(v.etaDate).toLocaleDateString("fr-FR")}</div>}
-                            {v.containerNumber && <div>Conteneur: {v.containerNumber}</div>}
+                            {v.vin && <div>{copy.card.vin} <code>{v.vin}</code></div>}
+                            {v.shippingOriginPort && <div>{copy.card.port} {v.shippingOriginPort}</div>}
+                            {v.etaDate && <div>{copy.card.eta} {new Date(v.etaDate).toLocaleDateString(copy.dateLocale)}</div>}
+                            {v.containerNumber && <div>{copy.card.container} {v.containerNumber}</div>}
                           </div>
                         )}
 
@@ -860,7 +848,7 @@ export function VehiclesView({
                             <button
                               type="button"
                               onClick={() => setEditingVehicle(v)}
-                              title="Modifier"
+                              title={copy.card.editTitle}
                               style={{
                                 background: "none",
                                 border: "none",
@@ -875,8 +863,8 @@ export function VehiclesView({
                               href={`/vehicles/${v.id}/fiche-technique`}
                               title={
                                 v.techSheetConfirmed
-                                  ? "Fiche technique confirmée en BDD (enregistrée définitivement)"
-                                  : "Fiche technique à confirmer"
+                                  ? copy.card.sheetConfirmedTitle
+                                  : copy.card.sheetPendingTitle
                               }
                               style={{
                                 color: v.techSheetConfirmed ? "#10b981" : "#f59e0b",
@@ -901,7 +889,7 @@ export function VehiclesView({
                               <input type="hidden" name="status" value={nextKey} />
                               <button
                                 type="submit"
-                                title={`Faire passer en statut : ${nextKey}`}
+                                title={copy.card.nextTitle(statusLabel(copy, nextKey))}
                                 style={{
                                   display: "inline-flex",
                                   alignItems: "center",
@@ -916,7 +904,7 @@ export function VehiclesView({
                                   cursor: "pointer",
                                 }}
                               >
-                                <span>Suivant</span>
+                                <span>{copy.card.nextButton}</span>
                                 <ArrowRight size={11} />
                               </button>
                             </form>
@@ -933,9 +921,19 @@ export function VehiclesView({
       ) : (
         /* VUE TABLEAU TRADITIONNELLE AMÉLIORÉE */
         <DataTable
-          headers={["VIN", "Véhicule", "Gamme", "Énergie", "Fournisseur", "Showroom", "Prix", "Statut Logistique", "Action"]}
+          headers={[
+            copy.table.colVin,
+            copy.table.colVehicle,
+            copy.table.colRange,
+            copy.table.colEnergy,
+            copy.table.colSupplier,
+            copy.table.colShowroom,
+            copy.table.colPrice,
+            copy.table.colStatus,
+            copy.table.colAction,
+          ]}
           rows={vehicles.map((v) => [
-            v.vin || "—",
+            v.vin || "-",
             <div key={v.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
               {v.mainPhotoUrl ? (
                 <div
@@ -976,9 +974,9 @@ export function VehiclesView({
                 {v.variant && <div style={{ fontSize: "0.78rem", opacity: 0.7 }}>{v.variant}</div>}
               </div>
             </div>,
-            v.vehicleType ? TYPE_LABEL[v.vehicleType] || v.vehicleType : "—",
-            v.energy,
-            v.supplier?.name || "—",
+            v.vehicleType ? vehicleTypeLabel(copy, v.vehicleType) : "-",
+            energyLabel(copy, v.energy),
+            v.supplier?.name || "-",
             v.site ? (
               <span
                 key={`site-${v.id}`}
@@ -996,7 +994,7 @@ export function VehiclesView({
                 <span>{v.site.name}</span>
               </span>
             ) : (
-              <span key={`site-${v.id}`} style={{ opacity: 0.5 }}>—</span>
+              <span key={`site-${v.id}`} style={{ opacity: 0.5 }}>-</span>
             ),
             formatXof(v.priceXof),
             <Badge
@@ -1011,7 +1009,7 @@ export function VehiclesView({
                   : "warn"
               }
             >
-              {v.status}
+              {statusLabel(copy, v.status)}
             </Badge>,
             <div key={`act-${v.id}`} style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
               <Link
@@ -1036,12 +1034,12 @@ export function VehiclesView({
                 }}
                 title={
                   v.techSheetConfirmed
-                    ? "Fiche technique confirmée et scellée en BDD (aucun appel OpenAI)"
-                    : "Fiche technique non confirmée (cliquez pour voir et confirmer)"
+                    ? copy.table.sheetConfirmedTitle
+                    : copy.table.sheetPendingTitle
                 }
               >
                 <FileText size={12} />
-                <span>{v.techSheetConfirmed ? "Fiche BDD ✓" : "Fiche à valider"}</span>
+                <span>{v.techSheetConfirmed ? copy.table.sheetConfirmed : copy.table.sheetPending}</span>
               </Link>
               <button
                 key={`edit-${v.id}`}
@@ -1060,10 +1058,10 @@ export function VehiclesView({
                   fontWeight: 600,
                   cursor: "pointer",
                 }}
-                title="Modifier ce véhicule en stock"
+                title={copy.table.editTitle}
               >
                 <Edit2 size={12} color="var(--gold, #d4af37)" />
-                <span>Modifier</span>
+                <span>{copy.table.edit}</span>
               </button>
               {canDelete && (
                 <button
@@ -1086,10 +1084,10 @@ export function VehiclesView({
                     fontWeight: 600,
                     cursor: "pointer",
                   }}
-                  title="Supprimer définitivement cet article du stock (Direction & Admin)"
+                  title={copy.table.deleteTitle}
                 >
                   <Trash2 size={12} />
-                  <span>Supprimer</span>
+                  <span>{copy.table.delete}</span>
                 </button>
               )}
             </div>,
@@ -1128,7 +1126,7 @@ export function VehiclesView({
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700, color: "var(--ice-text)" }}>
-                  ✏️ Modifier le Véhicule en Stock & Étape Logistique
+                  {copy.editModal.title}
                 </h3>
                 <span style={{ fontSize: "0.78rem", opacity: 0.65 }}>
                   {editingVehicle.brand} {editingVehicle.model}
@@ -1155,7 +1153,7 @@ export function VehiclesView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Prix de vente XOF *
+                    {copy.editModal.priceLabel}
                   </label>
                   <input
                     name="priceXof"
@@ -1169,7 +1167,7 @@ export function VehiclesView({
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Étape du Stock Général (5 statuts) *
+                    {copy.editModal.statusLabel}
                   </label>
                   <select
                     name="status"
@@ -1177,13 +1175,13 @@ export function VehiclesView({
                     className="ox-select"
                     style={{ width: "100%", fontWeight: 600, color: "#38bdf8" }}
                   >
-                    <option value="COMMANDE">1. COMMANDE (Usine / BDC)</option>
-                    <option value="EN_PRODUCTION">2. EN PRODUCTION (Chine)</option>
-                    <option value="EN_TRANSIT">3. EN TRANSIT (Maritime)</option>
-                    <option value="AU_PORT">4. AU PORT (Port de Cotonou)</option>
-                    <option value="EN_MAGASIN">5. STOCK SHOWROOM (Disponible Cotonou)</option>
-                    <option value="RESERVE">RÉSERVÉ (Client)</option>
-                    <option value="VENDU">VENDU (Facturé)</option>
+                    <option value="COMMANDE">{copy.statusOption.COMMANDE}</option>
+                    <option value="EN_PRODUCTION">{copy.statusOption.EN_PRODUCTION}</option>
+                    <option value="EN_TRANSIT">{copy.statusOption.EN_TRANSIT}</option>
+                    <option value="AU_PORT">{copy.statusOption.AU_PORT}</option>
+                    <option value="EN_MAGASIN">{copy.statusOption.EN_MAGASIN}</option>
+                    <option value="RESERVE">{copy.statusOption.RESERVE}</option>
+                    <option value="VENDU">{copy.statusOption.VENDU}</option>
                   </select>
                 </div>
               </div>
@@ -1191,12 +1189,12 @@ export function VehiclesView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Port de provenance
+                    {copy.editModal.originPortLabel}
                   </label>
                   <input
                     name="shippingOriginPort"
                     defaultValue={editingVehicle.shippingOriginPort || ""}
-                    placeholder="ex: Shanghai, Ningbo, Anvers"
+                    placeholder={copy.editModal.originPortPlaceholder}
                     className="ox-input"
                     style={{ width: "100%" }}
                   />
@@ -1204,7 +1202,7 @@ export function VehiclesView({
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Date ETA prévue
+                    {copy.editModal.etaLabel}
                   </label>
                   <input
                     name="etaDate"
@@ -1219,12 +1217,12 @@ export function VehiclesView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    N° Conteneur / BL
+                    {copy.editModal.containerLabel}
                   </label>
                   <input
                     name="containerNumber"
                     defaultValue={editingVehicle.containerNumber || ""}
-                    placeholder="ex: COSU12345678"
+                    placeholder={copy.editModal.containerPlaceholder}
                     className="ox-input"
                     style={{ width: "100%" }}
                   />
@@ -1232,12 +1230,12 @@ export function VehiclesView({
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Réf. Bon de commande usine
+                    {copy.editModal.orderRefLabel}
                   </label>
                   <input
                     name="orderReference"
                     defaultValue={editingVehicle.orderReference || ""}
-                    placeholder="ex: PO-CHANGAN-2026-01"
+                    placeholder={copy.editModal.orderRefPlaceholder}
                     className="ox-input"
                     style={{ width: "100%" }}
                   />
@@ -1247,7 +1245,7 @@ export function VehiclesView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Numéro VIN (Châssis)
+                    {copy.editModal.vinLabel}
                   </label>
                   <input
                     name="vin"
@@ -1259,7 +1257,7 @@ export function VehiclesView({
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Finition / Variante
+                    {copy.editModal.variantLabel}
                   </label>
                   <input
                     name="variant"
@@ -1273,7 +1271,7 @@ export function VehiclesView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Année
+                    {copy.editModal.yearLabel}
                   </label>
                   <input
                     name="year"
@@ -1286,7 +1284,7 @@ export function VehiclesView({
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Énergie
+                    {copy.editModal.energyLabel}
                   </label>
                   <select
                     name="energy"
@@ -1294,17 +1292,17 @@ export function VehiclesView({
                     className="ox-select"
                     style={{ width: "100%" }}
                   >
-                    <option value="ELECTRIQUE">Électrique</option>
-                    <option value="HYBRIDE">Hybride</option>
-                    <option value="PHEV">PHEV</option>
-                    <option value="ESSENCE">Essence</option>
-                    <option value="DIESEL">Diesel</option>
+                    <option value="ELECTRIQUE">{copy.energy.ELECTRIQUE}</option>
+                    <option value="HYBRIDE">{copy.energy.HYBRIDE}</option>
+                    <option value="PHEV">{copy.energy.PHEV}</option>
+                    <option value="ESSENCE">{copy.energy.ESSENCE}</option>
+                    <option value="DIESEL">{copy.energy.DIESEL}</option>
                   </select>
                 </div>
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Gamme
+                    {copy.editModal.rangeLabel}
                   </label>
                   <select
                     name="vehicleType"
@@ -1312,11 +1310,11 @@ export function VehiclesView({
                     className="ox-select"
                     style={{ width: "100%" }}
                   >
-                    <option value="">—</option>
-                    <option value="SUV">SUV</option>
-                    <option value="PICKUP">Pick-up</option>
-                    <option value="BERLINE">Berline</option>
-                    <option value="VAN">Van / Minibus</option>
+                    <option value="">-</option>
+                    <option value="SUV">{copy.vehicleType.SUV}</option>
+                    <option value="PICKUP">{copy.vehicleType.PICKUP}</option>
+                    <option value="BERLINE">{copy.vehicleType.BERLINE}</option>
+                    <option value="VAN">{copy.vehicleType.VAN}</option>
                   </select>
                 </div>
               </div>
@@ -1324,7 +1322,7 @@ export function VehiclesView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Showroom d&apos;affectation
+                    {copy.editModal.siteLabel}
                   </label>
                   <select
                     name="siteId"
@@ -1342,7 +1340,7 @@ export function VehiclesView({
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>
-                    Fournisseur
+                    {copy.editModal.supplierLabel}
                   </label>
                   <select
                     name="supplierId"
@@ -1350,7 +1348,7 @@ export function VehiclesView({
                     className="ox-select"
                     style={{ width: "100%" }}
                   >
-                    <option value="">Aucun</option>
+                    <option value="">{copy.editModal.supplierNone}</option>
                     {suppliers.map((s) => (
                       <option key={s.id} value={s.id}>
                         {s.name}
@@ -1383,10 +1381,10 @@ export function VehiclesView({
                       fontWeight: 600,
                       cursor: "pointer",
                     }}
-                    title="Supprimer définitivement cet article du stock"
+                    title={copy.editModal.deleteTitle}
                   >
                     <Trash2 size={14} />
-                    <span>Supprimer du stock</span>
+                    <span>{copy.editModal.deleteButton}</span>
                   </button>
                 ) : <div />}
 
@@ -1404,7 +1402,7 @@ export function VehiclesView({
                       cursor: "pointer",
                     }}
                   >
-                    Annuler
+                    {copy.editModal.cancel}
                   </button>
                   <button
                     type="submit"
@@ -1419,7 +1417,7 @@ export function VehiclesView({
                       cursor: "pointer",
                     }}
                   >
-                    Enregistrer les modifications
+                    {copy.editModal.save}
                   </button>
                 </div>
               </div>
@@ -1474,10 +1472,10 @@ export function VehiclesView({
               </div>
               <div style={{ flex: 1 }}>
                 <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 700, color: "#f87171" }}>
-                  Supprimer cet article en stock ?
+                  {copy.deleteModal.title}
                 </h3>
                 <p style={{ margin: "4px 0 0", fontSize: "0.8rem", opacity: 0.75 }}>
-                  Action réservée aux rôles Direction (PDG, DG, DC, SG) et Administration.
+                  {copy.deleteModal.warning}
                 </p>
               </div>
               <button
@@ -1509,23 +1507,23 @@ export function VehiclesView({
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ opacity: 0.65 }}>Véhicule :</span>
+                <span style={{ opacity: 0.65 }}>{copy.deleteModal.vehicleLabel}</span>
                 <strong style={{ color: "var(--ice-text)" }}>
                   {deletingVehicle.brand} {deletingVehicle.model} {deletingVehicle.variant || ""}
                 </strong>
               </div>
               {deletingVehicle.vin && (
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ opacity: 0.65 }}>VIN :</span>
+                  <span style={{ opacity: 0.65 }}>{copy.deleteModal.vinLabel}</span>
                   <code style={{ fontSize: "0.8rem", color: "var(--gold, #d4af37)" }}>{deletingVehicle.vin}</code>
                 </div>
               )}
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ opacity: 0.65 }}>Showroom :</span>
-                <span>{deletingVehicle.site?.name || "Non assigné"}</span>
+                <span style={{ opacity: 0.65 }}>{copy.deleteModal.siteLabel}</span>
+                <span>{deletingVehicle.site?.name || copy.deleteModal.siteUnassigned}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ opacity: 0.65 }}>Prix :</span>
+                <span style={{ opacity: 0.65 }}>{copy.deleteModal.priceLabel}</span>
                 <strong style={{ color: "#22c55e" }}>{formatXof(deletingVehicle.priceXof)}</strong>
               </div>
             </div>
@@ -1564,7 +1562,7 @@ export function VehiclesView({
                   cursor: "pointer",
                 }}
               >
-                Annuler
+                {copy.deleteModal.cancel}
               </button>
               <button
                 type="button"
@@ -1578,7 +1576,7 @@ export function VehiclesView({
                     await deleteVehicle(fd);
                     setDeletingVehicle(null);
                   } catch (err: unknown) {
-                    setDeleteError(err instanceof Error ? err.message : "Erreur lors de la suppression");
+                    setDeleteError(err instanceof Error ? err.message : copy.errors.deleteFailed);
                   } finally {
                     setIsDeleting(false);
                   }
@@ -1599,7 +1597,7 @@ export function VehiclesView({
                 }}
               >
                 {isDeleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
-                <span>{isDeleting ? "Suppression..." : "Confirmer la suppression"}</span>
+                <span>{isDeleting ? copy.deleteModal.deleting : copy.deleteModal.confirm}</span>
               </button>
             </div>
           </div>

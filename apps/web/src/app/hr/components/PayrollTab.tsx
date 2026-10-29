@@ -437,7 +437,7 @@ export function PayrollTab({
         >
           <div>
             <h2 style={{ fontSize: "1.1rem", fontWeight: 700, margin: 0 }}>
-              Livre de Paie &amp; Suivi des Virements — {selectedMonthName} {selectedYear}
+              Livre de Paie &amp; Suivi des Virements · {selectedMonthName} {selectedYear}
             </h2>
             <p style={{ margin: "2px 0 0", fontSize: "0.8rem", opacity: 0.7 }}>
               Visualisation et validation des rémunérations pour la comptabilité et la direction
@@ -593,7 +593,7 @@ export function PayrollTab({
                             </div>
                           </div>
                         ) : (
-                          <span style={{ opacity: 0.4 }}>—</span>
+                          <span style={{ opacity: 0.4 }}>-</span>
                         )}
                       </td>
 

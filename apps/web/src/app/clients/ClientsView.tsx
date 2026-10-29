@@ -626,7 +626,7 @@ export function ClientsView({
                           <span>{customer.companyName}</span>
                         </div>
                       ) : (
-                        <span style={{ opacity: 0.4 }}>—</span>
+                        <span style={{ opacity: 0.4 }}>-</span>
                       )}
                     </td>
 
@@ -664,7 +664,7 @@ export function ClientsView({
                             <span>{customer.phone}</span>
                           </a>
                         ) : null}
-                        {!customer.email && !customer.phone && <span style={{ opacity: 0.4 }}>—</span>}
+                        {!customer.email && !customer.phone && <span style={{ opacity: 0.4 }}>-</span>}
                       </div>
                     </td>
 
@@ -1314,11 +1314,11 @@ export function ClientsView({
               </div>
               <div>
                 <span style={{ opacity: 0.65 }}>Téléphone : </span>
-                <strong>{selectedDocCustomer.phone || "—"}</strong>
+                <strong>{selectedDocCustomer.phone || "-"}</strong>
               </div>
               <div>
                 <span style={{ opacity: 0.65 }}>Email : </span>
-                <strong>{selectedDocCustomer.email || "—"}</strong>
+                <strong>{selectedDocCustomer.email || "-"}</strong>
               </div>
               <div>
                 <span style={{ opacity: 0.65 }}>Adresse : </span>

@@ -79,7 +79,7 @@ export function formatVehicleDescription(veh: {
     parts.push(`(${veh.color.trim()})`);
   }
   if (veh.vin && veh.vin.trim()) {
-    parts.push(`— VIN: ${veh.vin.trim()}`);
+    parts.push(`· VIN: ${veh.vin.trim()}`);
   }
   return parts.join(" ");
 }

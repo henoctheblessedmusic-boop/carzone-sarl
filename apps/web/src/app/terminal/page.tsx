@@ -438,7 +438,7 @@ export default function TerminalPage() {
               >
                 {stations.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.code} — {s.name} {s.powerKw ? `(${s.powerKw} kW)` : ""} {s.address ? `· ${s.address}` : ""}
+                    {s.code} · {s.name} {s.powerKw ? `(${s.powerKw} kW)` : ""} {s.address ? `· ${s.address}` : ""}
                   </option>
                 ))}
               </select>
@@ -460,7 +460,7 @@ export default function TerminalPage() {
                 {customers.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.isSubscriber ? "⭐ [ABONNÉ] " : "👤 "}
-                    {c.contactName} {c.companyName ? `(${c.companyName})` : ""} — {c.kwhPriceXof} FCFA/kWh
+                    {c.contactName} {c.companyName ? `(${c.companyName})` : ""} · {c.kwhPriceXof} FCFA/kWh
                   </option>
                 ))}
               </select>

@@ -7,9 +7,14 @@ export const fr: Messages = {
     subtitle: "Concession de véhicules multi marques · +229 01 92 61 61 61",
   },
   meta: {
-    title: "CARZONE SARL — Concessionnaire automobile multimarques à Cotonou",
+    title: "CARZONE SARL, concessionnaire automobile multimarques à Cotonou",
     description:
       "Showroom de véhicules neufs, atelier SAV, pièces d'origine et bornes de recharge à Cotonou. Vente, import et entretien. CARZONE SARL, Bénin.",
+  },
+  help: {
+    button: "Aide",
+    title: "Centre d'aide et documentation CARZONE Ops",
+    aria: "Ouvrir le centre d'aide",
   },
   nav: {
     dashboard: "Tableau de bord",

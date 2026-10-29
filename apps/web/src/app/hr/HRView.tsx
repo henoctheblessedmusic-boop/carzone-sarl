@@ -1068,7 +1068,7 @@ export function HRView({
                         </td>
                         <td style={{ padding: "0.8rem 1rem", fontWeight: 600 }}>{req.daysCount} jour(s)</td>
                         <td style={{ padding: "0.8rem 1rem", fontSize: "0.85rem", maxWidth: 200 }}>
-                          {req.reason || "—"}
+                          {req.reason || "-"}
                           {req.rejectionReason && (
                             <div style={{ color: "var(--bad)", fontSize: "0.75rem", marginTop: 2 }}>
                               Motif refus: {req.rejectionReason}
@@ -1170,7 +1170,7 @@ export function HRView({
           {/* Leave Balances Overview */}
           <div className="ox-card" style={{ padding: "1.2rem" }}>
             <h2 style={{ fontSize: "1.1rem", fontWeight: 700, margin: "0 0 1rem" }}>
-              Soldes de congés annuels ({currentYear}) — Norme Bénin (24 jours ouvrables / an)
+              Soldes de congés annuels ({currentYear}) · Norme Bénin (24 jours ouvrables / an)
             </h2>
 
             <div style={{ overflowX: "auto" }}>
@@ -1202,7 +1202,7 @@ export function HRView({
                         <td style={{ padding: "0.8rem 1rem", fontWeight: 600 }}>
                           {emp.firstName} {emp.lastName}
                         </td>
-                        <td style={{ padding: "0.8rem 1rem" }}>{emp.department?.name || "—"}</td>
+                        <td style={{ padding: "0.8rem 1rem" }}>{emp.department?.name || "-"}</td>
                         <td style={{ padding: "0.8rem 1rem" }}>{allocated} jours</td>
                         <td style={{ padding: "0.8rem 1rem", color: "var(--warn)" }}>{used} jours</td>
                         <td style={{ padding: "0.8rem 1rem" }}>
@@ -1702,7 +1702,7 @@ export function HRView({
                   <option value="">Aucun compte lié</option>
                   {availableUsers.map((u) => (
                     <option key={u.id} value={u.id}>
-                      {u.fullName} — {u.email} ({u.role})
+                      {u.fullName} · {u.email} ({u.role})
                     </option>
                   ))}
                 </select>
@@ -1858,10 +1858,10 @@ export function HRView({
                   Coordonnées & Urgence
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-                  <div>Téléphone : <strong>{viewingEmployee.phone || "—"}</strong></div>
-                  <div>Email : <strong>{viewingEmployee.email || "—"}</strong></div>
+                  <div>Téléphone : <strong>{viewingEmployee.phone || "-"}</strong></div>
+                  <div>Email : <strong>{viewingEmployee.email || "-"}</strong></div>
                   <div style={{ gridColumn: "1 / -1" }}>
-                    Urgence : <strong>{viewingEmployee.emergencyContact || "—"}</strong>
+                    Urgence : <strong>{viewingEmployee.emergencyContact || "-"}</strong>
                   </div>
                 </div>
               </div>
@@ -1996,7 +1996,7 @@ export function HRView({
                     <option value="">Sélectionner un employé</option>
                     {employees.map((e) => (
                       <option key={e.id} value={e.id}>
-                        {e.firstName} {e.lastName} ({e.employeeNumber}) — {e.jobTitle}
+                        {e.firstName} {e.lastName} ({e.employeeNumber}) · {e.jobTitle}
                       </option>
                     ))}
                   </select>
@@ -2050,7 +2050,7 @@ export function HRView({
                     <option value="">Sélectionner le type</option>
                     {leaveTypes.map((lt) => (
                       <option key={lt.id} value={lt.id}>
-                        {lt.name} ({lt.isPaid ? "Rémunéré" : "Non payé"}) — {lt.daysAllowedPerYear}j max
+                        {lt.name} ({lt.isPaid ? "Rémunéré" : "Non payé"}) · {lt.daysAllowedPerYear}j max
                       </option>
                     ))}
                   </select>

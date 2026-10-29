@@ -1988,7 +1988,7 @@ function CapabilitiesTable({
                                 fontStyle: "italic",
                               }}
                             >
-                              — {cap.description}
+                              · {cap.description}
                             </span>
                           )}
                         </label>

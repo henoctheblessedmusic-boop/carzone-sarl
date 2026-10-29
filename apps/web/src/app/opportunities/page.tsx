@@ -69,7 +69,7 @@ export default async function OpportunitiesPage() {
         <select name="vehicleId" style={input} defaultValue="">
           <option value="">Véhicule (matching)</option>
           {vehicles.map((v) => (
-            <option key={v.id} value={v.id}>{v.brand} {v.model} — {formatXof(v.priceXof)}</option>
+            <option key={v.id} value={v.id}>{v.brand} {v.model} · {formatXof(v.priceXof)}</option>
           ))}
         </select>
         <input name="amountXof" type="number" placeholder="Montant XOF" style={input} />
@@ -86,9 +86,9 @@ export default async function OpportunitiesPage() {
         headers={["Titre", "Client", "Véhicule", "Montant", "Étape", "Avancer"]}
         rows={opps.map((o) => [
           o.title,
-          o.customer?.contactName || "—",
-          o.vehicle ? `${o.vehicle.brand} ${o.vehicle.model}` : "—",
-          o.amountXof ? formatXof(o.amountXof) : "—",
+          o.customer?.contactName || "-",
+          o.vehicle ? `${o.vehicle.brand} ${o.vehicle.model}` : "-",
+          o.amountXof ? formatXof(o.amountXof) : "-",
           <Badge key={o.id} tone={o.stage === "LIVRE" ? "ok" : o.stage === "PERDU" ? "bad" : "warn"}>{o.stage}</Badge>,
           <form key={`f-${o.id}`} action={setStage} style={{ display: "flex", gap: 4 }}>
             <input type="hidden" name="id" value={o.id} />

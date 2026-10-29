@@ -58,16 +58,16 @@ export type MessageItem = {
 const POPULAR_EMOJIS = ["👍", "❤️", "😂", "🔥", "🚗", "👏"];
 
 const STICKERS = [
-  { code: "🚗", label: "Véhicule prêt" },
-  { code: "✅", label: "Validé" },
-  { code: "🔧", label: "En réparation" },
-  { code: "⚡", label: "Urgent" },
-  { code: "🤝", label: "Accord client" },
-  { code: "💰", label: "Paiement reçu" },
-  { code: "🎯", label: "Objectif atteint" },
-  { code: "📞", label: "Rappeler SVP" },
-  { code: "👏", label: "Bravo l'équipe" },
-  { code: "🚀", label: "Livraison en cours" },
+  { code: "🚗" },
+  { code: "✅" },
+  { code: "🔧" },
+  { code: "⚡" },
+  { code: "🤝" },
+  { code: "💰" },
+  { code: "🎯" },
+  { code: "📞" },
+  { code: "👏" },
+  { code: "🚀" },
 ];
 
 export function ChatView({
@@ -962,7 +962,11 @@ export function ChatView({
                     <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                       <h3 style={{ margin: 0, fontSize: "1.02rem", fontWeight: 700, color: "var(--ice-text)" }}>
                         {activeTab === "CHANNEL"
-                          ? `# ${selectedChannel.toLowerCase()}`
+                          ? selectedChannel === "WORKSHOP"
+                            ? copy.channels.workshop
+                            : selectedChannel === "COMMERCIAL"
+                            ? copy.channels.sales
+                            : copy.channels.general
                           : activeTab === "BROADCAST"
                           ? copy.broadcast.title
                           : selectedPeer?.fullName}
@@ -1316,7 +1320,7 @@ export function ChatView({
                 }}
               >
                 <span style={{ fontSize: "1.2rem" }}>{st.code}</span>
-                <span style={{ fontSize: "0.75rem" }}>{copy.stickers.labels[st.code] ?? st.label}</span>
+                <span style={{ fontSize: "0.75rem" }}>{copy.stickers.labels[st.code] ?? st.code}</span>
               </button>
             ))}
           </div>

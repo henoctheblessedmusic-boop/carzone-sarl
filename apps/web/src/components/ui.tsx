@@ -1,11 +1,5 @@
-"use client";
-
-// PolicyPanel lit la langue active via le contexte client : le module est donc
-// déclaré comme frontière client, les primitives ci-dessous restent inchangées.
 import type { CSSProperties, ReactNode } from "react";
 import Link from "next/link";
-import { usePrefs } from "@/components/PrefsProvider";
-import { sharedCopy } from "@/lib/i18n/messages/shared";
 
 export function Card({ children, style, className = "" }: { children: ReactNode; style?: CSSProperties; className?: string }) {
   return (
@@ -72,31 +66,4 @@ export function Badge({
   tone?: "ok" | "warn" | "bad" | "neutral" | "ice";
 }) {
   return <span className={`ox-badge ox-badge--${tone}`}>{children}</span>;
-}
-
-export function PolicyPanel() {
-  const { locale } = usePrefs();
-  const policy = sharedCopy[locale].policy;
-
-  return (
-    <aside className="ox-callout" aria-label={policy.ariaLabel}>
-      <h3>{policy.title}</h3>
-      <p>
-        {policy.intro.before}
-        <strong>{policy.intro.order}</strong>
-        {policy.intro.between}
-        <strong>{policy.intro.proforma}</strong>
-        {policy.intro.after}
-        <strong>{policy.intro.cannot}</strong>
-        {policy.intro.end}
-      </p>
-      <ul>
-        {policy.bullets.map((bullet) => (
-          <li key={bullet.lead}>
-            <strong>{bullet.lead}</strong> {bullet.text}
-          </li>
-        ))}
-      </ul>
-    </aside>
-  );
 }

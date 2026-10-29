@@ -1,5 +1,5 @@
 import { AppShell } from "@/components/AppShell";
-import { PolicyPanel } from "@/components/ui";
+import { PolicyPanel } from "@/components/PolicyPanel";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { InvoicesView, type InvoiceItem, type PaymentRow } from "./InvoicesView";

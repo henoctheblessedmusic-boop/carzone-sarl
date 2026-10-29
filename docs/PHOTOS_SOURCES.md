@@ -18,14 +18,14 @@ Fichiers installés dans `apps/web/public/images/vehicles/{slug}-{angle}.jpg`
 | Changan CS35 PLUS | `cs35` | changan.mx (avant 3/4, arrière 3/4) ; changan.ae (profil, cockpit, sellerie) | — |
 | Jetour T2 i-DM 2026 | `t2` | jetourksa.com (visuel avant 45, séquence 360°, intérieurs) | Sellerie : siège avant en gros plan (pas de banquette arrière publiée) |
 | Jetour Dashing | `dashing` | jetourksa.com (cam015/cam010 studio, séquence 360°, intérieur) | Sellerie : vue intérieure passagers (pas de banquette arrière publiée) |
+| BAIC X55e REHEV | `x55` | baic.com.ar (kit presse X55 II RE-HEV), baic.es, baicglobal.com/models/26 | Visuels badgés X55 II Hybrid (plaque modèle) |
+| BAIC B40 PRO | `b40` | baic.com.ar (kit presse BJ40 PRO), baicglobal.com/models/36 | Sellerie : banquette rabattue (photo officielle) |
 
 ## Modèles encore à remplacer
 
 | Modèle | Slug | Piste officielle | Statut |
 |---|---|---|---|
 | Geely Starship 7 2026 | `starship7` | galaxy-geely.com (page modèle 星舰7) | Angles à confirmer, le site mélange plusieurs modèles |
-| BAIC X55e REHEV | `x55` | baicglobal.com/models/26 | Visuels officiels identifiés, angles à sélectionner |
-| BAIC B40 PRO | `b40` | baicglobal.com/models/36 | Galerie à compléter |
 | Forthing T5 EVO 2026 | `t5evo` | forthingmotor.com/t5-evo/ | CDN officiel, angles profil/arrière/intérieur à récupérer |
 | Forthing Rich 7 4x4 | `rich7` | forthingmotor.com/pickup-rich/ | Galerie à compléter |
 

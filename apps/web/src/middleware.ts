@@ -12,6 +12,15 @@ const PUBLIC_PATHS = [
   "/images",
   "/favicon.ico",
   "/robots.txt",
+  // Vitrine publique multi-pages (voir docs/SITE_VITRINE_PLAN.md).
+  // "/services" n'est volontairement PAS ajouté ici : il désigne la route CRM interne
+  // protégée (src/app/services/page.tsx) ; la page vitrine équivalente vit sur "/nos-services".
+  "/vehicules",
+  "/sur-mesure",
+  "/nos-services",
+  "/recharge",
+  "/equipe",
+  "/contact",
 ];
 
 async function verifyHmac(body: string, sig: string, secret: string): Promise<boolean> {

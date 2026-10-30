@@ -1,6 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { RoleService } from "@/lib/role-service";
 import type { Role } from "@/lib/roles";
+import {
+  SITE_LOCALE_COOKIE,
+  isSiteLocale,
+  parseAcceptLanguageSite,
+} from "@/lib/site-prefs";
+
+/** Routes de la vitrine publique (locale site gérée séparément de l'app interne). */
+const SITE_PATHS = [
+  "/",
+  "/vehicules",
+  "/sur-mesure",
+  "/nos-services",
+  "/recharge",
+  "/equipe",
+  "/contact",
+] as const;
+
+function isSitePath(pathname: string): boolean {
+  return SITE_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+}
 
 const PUBLIC_PATHS = [
   "/",
@@ -119,7 +139,15 @@ export async function middleware(req: NextRequest) {
   }
 
   // 5. Appliquer les en-têtes de sécurité HTTP
-  const response = NextResponse.next();
+  const requestHeaders = new Headers(req.headers);
+  if (isSitePath(pathname)) {
+    const siteCookieLocale = req.cookies.get(SITE_LOCALE_COOKIE)?.value;
+    const siteLocale = isSiteLocale(siteCookieLocale)
+      ? siteCookieLocale
+      : parseAcceptLanguageSite(req.headers.get("accept-language"));
+    requestHeaders.set("x-site-locale", siteLocale);
+  }
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("X-Frame-Options", "DENY");
   response.headers.set("X-XSS-Protection", "1; mode=block");

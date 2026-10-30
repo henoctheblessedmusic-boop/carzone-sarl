@@ -96,3 +96,15 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - Noms, fonctions, photos réelles des collaborateurs pour la page Notre équipe.
 - Horaires d'ouverture officiels du showroom et de l'atelier.
 - Photos d'ambiance du showroom/atelier si disponibles.
+
+---
+
+## État d'avancement (30/10/2026)
+
+- **Phase 1** : livrée — fondation 4 langues, shell premium, accueil (commit `71dc7ba`).
+- **Phase 2** : livrée — `/vehicules` (catalogue filtrable + modale 5 photos) et `/sur-mesure`.
+- **Phase 3** : livrée — `/nos-services` et `/recharge`, correctif du hero sur-mesure.
+- **Phase 4** : livrée — `/equipe` (6 pôles + message direction), `/contact` (canaux + formulaire mailto), SEO (metadata localisées, sitemap.xml, robots.txt, JSON-LD AutomotiveBusiness), `html lang` SSR piloté par la locale vitrine.
+- **Nettoyage** : ancienne vitrine mono-page supprimée (`PublicShowcase.tsx`, `public-showcase.css`, dicitonnaire associé).
+- **Vérifications** : `tsc --noEmit` + `npm run build` exit 0 ; 7 routes publiques en HTTP 200 ; détection de langue par cookie et `Accept-Language` validée (FR/EN/ES/ZH) ; captures CDP desktop/mobile (320/390/768/1440) sans débordement horizontal.
+- **Reste à fournir par le client** : noms/photos des collaborateurs (page Équipe), liens Facebook officiel, horaires d'ouverture confirmés, éventuelle photo d'ambiance du showroom. Une fois ces éléments fournis, la page Équipe pourra passer des cartes de pôles aux portraits individuels.

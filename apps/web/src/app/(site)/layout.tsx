@@ -1,10 +1,40 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { getSiteLocale } from "@/lib/site-locale-server";
 import { siteCopy } from "@/lib/i18n/site";
+import type { SiteLocale } from "@/lib/site-prefs";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteLangSync } from "@/components/site/SiteLangSync";
+import { OrganizationJsonLd } from "@/components/site/OrganizationJsonLd";
+import { SITE_WEBSITE } from "@/lib/site-constants";
 import "./site.css";
+
+const OG_LOCALE: Record<SiteLocale, string> = {
+  fr: "fr_FR",
+  en: "en_US",
+  es: "es_ES",
+  zh: "zh_CN",
+};
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getSiteLocale();
+  const copy = siteCopy[locale];
+
+  return {
+    metadataBase: new URL(SITE_WEBSITE),
+    title: copy.meta.home.title,
+    description: copy.meta.home.description,
+    robots: { index: true, follow: true },
+    openGraph: {
+      type: "website",
+      siteName: "CARZONE SARL",
+      locale: OG_LOCALE[locale],
+      title: copy.meta.home.title,
+      description: copy.meta.home.description,
+    },
+  };
+}
 
 export default async function SiteLayout({ children }: { children: ReactNode }) {
   const locale = await getSiteLocale();
@@ -13,6 +43,7 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
   return (
     <div className="site-shell" lang={locale}>
       <SiteLangSync locale={locale} />
+      <OrganizationJsonLd />
       <a href="#site-main-content" className="site-skip-link">
         {copy.common.skipToContent}
       </a>

@@ -57,13 +57,24 @@ export interface SiteCopy {
   };
 
   home: {
-    hero: {
+    slideshow: {
+      eyebrow: string;
+      ariaLabel: string;
+      prevLabel: string;
+      nextLabel: string;
+      goToSlideLabel: string;
+      viewVehicleCta: string;
+      viewShowroomCta: string;
+      priceOnRequest: string;
+      emptyTitle: string;
+      emptySubtitle: string;
+      emptyCta: string;
+    };
+    intro: {
       eyebrow: string;
       title: string;
       subtitle: string;
-      primaryCta: string;
-      secondaryCta: string;
-      imageAlt: string;
+      brandsLabel: string;
     };
     stats: Array<{ value: string; label: string }>;
     pillars: {
@@ -125,6 +136,8 @@ export interface SiteCopy {
       sortPriceAsc: string;
       sortPriceDesc: string;
       resetLabel: string;
+      toggleLabel: string;
+      toggleActiveLabel: string;
     };
     resultsCountOne: string;
     resultsCountOther: string;

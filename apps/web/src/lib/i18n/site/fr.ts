@@ -81,14 +81,26 @@ export const fr: SiteCopy = {
   },
 
   home: {
-    hero: {
-      eyebrow: "Concessionnaire multimarques à Cotonou",
-      title: "Votre prochain véhicule commence chez CARZONE",
-      subtitle:
+    slideshow: {
+      eyebrow: "Nouveautés en showroom",
+      ariaLabel: "Diaporama des véhicules en showroom",
+      prevLabel: "Véhicule précédent",
+      nextLabel: "Véhicule suivant",
+      goToSlideLabel: "Véhicule {current} sur {total}",
+      viewVehicleCta: "Découvrir ce véhicule",
+      viewShowroomCta: "Voir tout le showroom",
+      priceOnRequest: "Prix sur demande",
+      emptyTitle: "Votre prochain véhicule commence chez CARZONE",
+      emptySubtitle:
         "Showroom de véhicules neufs, atelier SAV et solutions de recharge électrique, réunis au même endroit à Cotonou.",
-      primaryCta: "Voir les véhicules",
-      secondaryCta: "Nous contacter",
-      imageAlt: "Véhicule exposé au showroom CARZONE SARL",
+      emptyCta: "Voir les véhicules",
+    },
+    intro: {
+      eyebrow: "Concessionnaire multimarques à Cotonou",
+      title: "Un showroom, un atelier, une équipe",
+      subtitle:
+        "CARZONE SARL réunit à Cotonou un showroom de véhicules neufs, un atelier SAV et des solutions de recharge électrique, avec un accompagnement commercial personnalisé du choix du véhicule à l'entretien.",
+      brandsLabel: "Marques distribuées",
     },
     stats: [
       { value: "9", label: "marques distribuées en showroom" },
@@ -203,6 +215,8 @@ export const fr: SiteCopy = {
       sortPriceAsc: "Prix croissant",
       sortPriceDesc: "Prix décroissant",
       resetLabel: "Réinitialiser les filtres",
+      toggleLabel: "Filtres",
+      toggleActiveLabel: "Filtres ({count})",
     },
     resultsCountOne: "{count} véhicule trouvé",
     resultsCountOther: "{count} véhicules trouvés",

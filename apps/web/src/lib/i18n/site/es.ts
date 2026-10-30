@@ -81,14 +81,26 @@ export const es: SiteCopy = {
   },
 
   home: {
-    hero: {
-      eyebrow: "Concesionario multimarca en Cotonú",
-      title: "Su próximo vehículo empieza en CARZONE",
-      subtitle:
+    slideshow: {
+      eyebrow: "Novedades en el showroom",
+      ariaLabel: "Diapositivas de vehículos del showroom",
+      prevLabel: "Vehículo anterior",
+      nextLabel: "Vehículo siguiente",
+      goToSlideLabel: "Vehículo {current} de {total}",
+      viewVehicleCta: "Descubrir este vehículo",
+      viewShowroomCta: "Ver todo el showroom",
+      priceOnRequest: "Precio a consultar",
+      emptyTitle: "Su próximo vehículo empieza en CARZONE",
+      emptySubtitle:
         "Showroom de vehículos nuevos, taller posventa y soluciones de recarga eléctrica, reunidos en un mismo lugar en Cotonú.",
-      primaryCta: "Ver vehículos",
-      secondaryCta: "Contáctenos",
-      imageAlt: "Vehículo expuesto en el showroom de CARZONE SARL",
+      emptyCta: "Ver vehículos",
+    },
+    intro: {
+      eyebrow: "Concesionario multimarca en Cotonú",
+      title: "Un showroom, un taller, un equipo",
+      subtitle:
+        "CARZONE SARL reúne en Cotonú un showroom de vehículos nuevos, un taller posventa y soluciones de recarga eléctrica, con asesoría comercial personalizada desde la elección del vehículo hasta el mantenimiento.",
+      brandsLabel: "Marcas presentes",
     },
     stats: [
       { value: "9", label: "marcas presentes en el showroom" },
@@ -203,6 +215,8 @@ export const es: SiteCopy = {
       sortPriceAsc: "Precio ascendente",
       sortPriceDesc: "Precio descendente",
       resetLabel: "Restablecer filtros",
+      toggleLabel: "Filtros",
+      toggleActiveLabel: "Filtros ({count})",
     },
     resultsCountOne: "{count} vehículo encontrado",
     resultsCountOther: "{count} vehículos encontrados",

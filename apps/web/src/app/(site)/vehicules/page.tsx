@@ -81,7 +81,7 @@ export default async function VehiculesPage() {
 
   return (
     <>
-      <section className="site-page-hero">
+      <section className="site-page-hero site-page-hero--compact">
         <Container>
           <p className="site-eyebrow">{copy.vehicules.hero.eyebrow}</p>
           <h1 className="site-page-title">{copy.vehicules.hero.title}</h1>
@@ -89,7 +89,7 @@ export default async function VehiculesPage() {
         </Container>
       </section>
 
-      <section className="site-section">
+      <section className="site-section site-section--tight-top">
         <Container>
           <VehiclesCatalog vehicles={vehicles} copy={copy.vehicules} locale={locale} />
         </Container>

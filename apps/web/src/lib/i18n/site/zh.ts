@@ -80,13 +80,24 @@ export const zh: SiteCopy = {
   },
 
   home: {
-    hero: {
+    slideshow: {
+      eyebrow: "展厅最新车型",
+      ariaLabel: "展厅车辆轮播",
+      prevLabel: "上一辆车",
+      nextLabel: "下一辆车",
+      goToSlideLabel: "第 {current} 辆，共 {total} 辆",
+      viewVehicleCta: "了解该车型",
+      viewShowroomCta: "查看完整展厅",
+      priceOnRequest: "价格面议",
+      emptyTitle: "您的下一辆车，从 CARZONE 开始",
+      emptySubtitle: "新车展厅、售后维修车间与电动汽车充电方案，齐聚科托努同一地点。",
+      emptyCta: "查看车辆",
+    },
+    intro: {
       eyebrow: "科托努多品牌经销商",
-      title: "您的下一辆车，从 CARZONE 开始",
-      subtitle: "新车展厅、售后维修车间与电动汽车充电方案，齐聚科托努同一地点。",
-      primaryCta: "查看车辆",
-      secondaryCta: "联系我们",
-      imageAlt: "CARZONE SARL 展厅展出车辆",
+      title: "一个展厅，一个车间，一支团队",
+      subtitle: "CARZONE SARL 在科托努汇聚新车展厅、售后维修车间与电动汽车充电方案，从选车到保养全程提供专属销售支持。",
+      brandsLabel: "展示品牌",
     },
     stats: [
       { value: "9", label: "展厅展示品牌数量" },
@@ -191,6 +202,8 @@ export const zh: SiteCopy = {
       sortPriceAsc: "价格从低到高",
       sortPriceDesc: "价格从高到低",
       resetLabel: "重置筛选条件",
+      toggleLabel: "筛选",
+      toggleActiveLabel: "筛选（{count}）",
     },
     resultsCountOne: "找到 {count} 辆车",
     resultsCountOther: "找到 {count} 辆车",

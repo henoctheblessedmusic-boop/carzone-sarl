@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { getSiteLocale } from "@/lib/site-locale-server";
 import { siteCopy } from "@/lib/i18n/site";
@@ -7,7 +6,8 @@ import type { SiteLocale } from "@/lib/site-prefs";
 import { Container } from "@/components/site/Container";
 import { SectionHeading } from "@/components/site/SectionHeading";
 import { CtaLink } from "@/components/site/CtaLink";
-import { VehicleCard, type FeaturedVehicle } from "@/components/site/VehicleCard";
+import { VehicleCard } from "@/components/site/VehicleCard";
+import { HomeHeroSlideshow, type SlideshowVehicle } from "@/components/site/HomeHeroSlideshow";
 import { SITE_BRANDS, SITE_PRIMARY_PHONE, SITE_WEBSITE, whatsAppHref } from "@/lib/site-constants";
 
 const OG_LOCALE: Record<SiteLocale, string> = {
@@ -18,7 +18,8 @@ const OG_LOCALE: Record<SiteLocale, string> = {
 };
 
 const SHOWROOM_STATUSES = ["EN_STOCK", "EN_MAGASIN"];
-const HERO_IMAGE = "/images/vehicles/dashing-main.jpg";
+const HIGHLIGHT_STATUSES = ["EN_STOCK", "EN_MAGASIN", "AU_PORT", "EN_TRANSIT", "EN_PRODUCTION"];
+const HIGHLIGHT_LIMIT = 6;
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getSiteLocale();
@@ -40,10 +41,10 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-async function getFeaturedVehicles(): Promise<FeaturedVehicle[]> {
+async function getHighlightVehicles(): Promise<SlideshowVehicle[]> {
   try {
-    return await prisma.vehicle.findMany({
-      where: { status: { in: SHOWROOM_STATUSES } },
+    const vehicles = await prisma.vehicle.findMany({
+      where: { status: { in: HIGHLIGHT_STATUSES }, mainPhotoUrl: { not: null } },
       select: {
         id: true,
         brand: true,
@@ -51,12 +52,17 @@ async function getFeaturedVehicles(): Promise<FeaturedVehicle[]> {
         variant: true,
         year: true,
         energy: true,
+        status: true,
         priceXof: true,
         mainPhotoUrl: true,
       },
-      orderBy: [{ year: "desc" }, { createdAt: "desc" }],
-      take: 6,
+      orderBy: [{ createdAt: "desc" }],
+      take: HIGHLIGHT_LIMIT,
     });
+
+    return vehicles
+      .filter((vehicle) => vehicle.mainPhotoUrl !== null)
+      .map((vehicle) => ({ ...vehicle, mainPhotoUrl: vehicle.mainPhotoUrl as string }));
   } catch (error) {
     console.error("Erreur chargement des véhicules à la une (accueil vitrine) :", error);
     return [];
@@ -75,80 +81,22 @@ async function getAvailableVehiclesCount(): Promise<number> {
 export default async function HomePage() {
   const locale = await getSiteLocale();
   const copy = siteCopy[locale];
-  const [vehicles, availableCount] = await Promise.all([getFeaturedVehicles(), getAvailableVehiclesCount()]);
+  const [vehicles, availableCount] = await Promise.all([getHighlightVehicles(), getAvailableVehiclesCount()]);
   const stats = copy.home.stats.map((stat, index) =>
     index === 1 ? { ...stat, value: String(availableCount) } : stat,
   );
 
   return (
     <>
-      <section className="site-hero">
-        <Container className="site-hero-grid">
-          <div className="site-hero-copy">
-            <p className="site-eyebrow">{copy.home.hero.eyebrow}</p>
-            <h1 className="site-hero-title">{copy.home.hero.title}</h1>
-            <p className="site-hero-subtitle">{copy.home.hero.subtitle}</p>
-            <div className="site-hero-ctas">
-              <CtaLink href="/vehicules" variant="primary">
-                {copy.home.hero.primaryCta}
-              </CtaLink>
-              <CtaLink href="/contact" variant="ghost">
-                {copy.home.hero.secondaryCta}
-              </CtaLink>
-            </div>
-            <ul className="site-hero-brands" aria-label="Marques distribuées">
-              {SITE_BRANDS.map((brand) => (
-                <li key={brand}>{brand}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="site-hero-media">
-            <Image
-              src={HERO_IMAGE}
-              alt={copy.home.hero.imageAlt}
-              fill
-              priority
-              sizes="(max-width: 1024px) 92vw, 46vw"
-              className="site-hero-img"
-            />
-          </div>
-        </Container>
-      </section>
+      <HomeHeroSlideshow
+        vehicles={vehicles}
+        locale={locale}
+        statusLabels={copy.vehicules.statusLabels}
+        energyLabels={copy.vehicules.energyLabels}
+        copy={copy.home.slideshow}
+      />
 
-      <section className="site-stats" aria-label="Chiffres clés">
-        <Container className="site-stats-grid">
-          {stats.map((stat) => (
-            <div className="site-stat" key={stat.label}>
-              <p className="site-stat-value">{stat.value}</p>
-              <p className="site-stat-label">{stat.label}</p>
-            </div>
-          ))}
-        </Container>
-      </section>
-
-      <section className="site-section" aria-labelledby="pillars-heading">
-        <Container>
-          <SectionHeading
-            id="pillars-heading"
-            eyebrow={copy.home.pillars.eyebrow}
-            title={copy.home.pillars.title}
-            subtitle={copy.home.pillars.subtitle}
-          />
-          <div className="site-pillars-grid">
-            {copy.home.pillars.items.map((item) => (
-              <article className="site-pillar-card" key={item.href}>
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
-                <CtaLink href={item.href} variant="secondary">
-                  {item.linkLabel}
-                </CtaLink>
-              </article>
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      <section className="site-section site-section--muted" aria-labelledby="vehicles-heading">
+      <section className="site-section site-section--tight-top" aria-labelledby="vehicles-heading">
         <Container>
           <SectionHeading
             id="vehicles-heading"
@@ -175,6 +123,55 @@ export default async function HomePage() {
               {copy.home.vehicles.viewAllCta}
             </CtaLink>
           </div>
+        </Container>
+      </section>
+
+      <section className="site-section site-section--muted site-intro" aria-labelledby="intro-heading">
+        <Container>
+          <SectionHeading
+            id="intro-heading"
+            eyebrow={copy.home.intro.eyebrow}
+            title={copy.home.intro.title}
+            subtitle={copy.home.intro.subtitle}
+          />
+          <ul className="site-hero-brands" aria-label={copy.home.intro.brandsLabel}>
+            {SITE_BRANDS.map((brand) => (
+              <li key={brand}>{brand}</li>
+            ))}
+          </ul>
+        </Container>
+      </section>
+
+      <section className="site-section" aria-labelledby="pillars-heading">
+        <Container>
+          <SectionHeading
+            id="pillars-heading"
+            eyebrow={copy.home.pillars.eyebrow}
+            title={copy.home.pillars.title}
+            subtitle={copy.home.pillars.subtitle}
+          />
+          <div className="site-pillars-grid">
+            {copy.home.pillars.items.map((item) => (
+              <article className="site-pillar-card" key={item.href}>
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+                <CtaLink href={item.href} variant="secondary">
+                  {item.linkLabel}
+                </CtaLink>
+              </article>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      <section className="site-stats" aria-label="Chiffres clés">
+        <Container className="site-stats-grid">
+          {stats.map((stat) => (
+            <div className="site-stat" key={stat.label}>
+              <p className="site-stat-value">{stat.value}</p>
+              <p className="site-stat-label">{stat.label}</p>
+            </div>
+          ))}
         </Container>
       </section>
 

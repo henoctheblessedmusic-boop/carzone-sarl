@@ -108,3 +108,8 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - **Nettoyage** : ancienne vitrine mono-page supprimée (`PublicShowcase.tsx`, `public-showcase.css`, dicitonnaire associé).
 - **Vérifications** : `tsc --noEmit` + `npm run build` exit 0 ; 7 routes publiques en HTTP 200 ; détection de langue par cookie et `Accept-Language` validée (FR/EN/ES/ZH) ; captures CDP desktop/mobile (320/390/768/1440) sans débordement horizontal.
 - **Reste à fournir par le client** : noms/photos des collaborateurs (page Équipe), liens Facebook officiel, horaires d'ouverture confirmés, éventuelle photo d'ambiance du showroom. Une fois ces éléments fournis, la page Équipe pourra passer des cartes de pôles aux portraits individuels.
+
+### Évolutions produit (30/10/2026, 2e itération)
+- **Accueil** : ouverture sur un diaporama plein écran des nouveautés (véhicules réels Neon : titre, année/énergie, statut, prix FCFA, CTA), autoplay pausable, flèches, puces, clavier, swipe, `prefers-reduced-motion`. La grille « Nouveautés en showroom » suit immédiatement.
+- **Page Véhicules** : hero compacté (moins d'espace avant le titre et avant les filtres), filtres et première rangée de voitures visibles dès le premier écran desktop ; en mobile, recherche visible + bouton « Filtres » repliable (compteur de filtres actifs) pour faire apparaître les voitures immédiatement.
+- Vérifications : `tsc` + `build` exit 0 ; captures CDP 1920/1440/390 ; `scrollWidth === viewport` ; diaporama testé (slide 1→2, annonce aria-live) ; bouton Filtres testé (aria-expanded true, panneau 7 champs).

@@ -528,6 +528,152 @@
   object-position: center;
 }
 
+/* ——— Home hero slideshow ——— */
+.site-hero-slideshow {
+  position: relative;
+  width: 100%;
+  height: clamp(420px, 72vh, 680px);
+  overflow: hidden;
+  outline: none;
+}
+
+.site-hero-slideshow-track {
+  position: absolute;
+  inset: 0;
+}
+
+.site-hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 600ms var(--site-ease);
+}
+
+.site-hero-slide.is-active {
+  opacity: 1;
+  z-index: 1;
+}
+
+.site-hero-slide-img {
+  object-fit: cover;
+  object-position: center;
+}
+
+.site-hero-slide-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(6, 11, 18, 0.05) 0%, rgba(6, 11, 18, 0.55) 60%, rgba(6, 11, 18, 0.94) 100%),
+    linear-gradient(90deg, rgba(6, 11, 18, 0.8) 0%, rgba(6, 11, 18, 0.2) 55%, transparent 85%);
+  pointer-events: none;
+}
+
+.site-hero-slide-content {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 2;
+  padding-bottom: clamp(1.75rem, 5vw, 3.25rem);
+  color: var(--site-text-strong);
+}
+
+.site-hero-slide-title {
+  margin-top: 0.5rem;
+  font-size: clamp(1.85rem, 4.2vw, 3.25rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  max-width: 28ch;
+}
+
+.site-hero-slide-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.65rem;
+  color: var(--site-text);
+  font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+  opacity: 0.92;
+}
+
+.site-hero-slide-price {
+  margin-top: 0.75rem;
+  font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+  font-weight: 800;
+  color: var(--site-gold);
+}
+
+.site-hero-slide-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 1.5rem;
+}
+
+.site-hero-slide-dot {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-hero-slide-dot::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+  transition: background var(--site-dur) var(--site-ease), transform var(--site-dur) var(--site-ease);
+}
+
+.site-hero-slide-dot.is-active::before {
+  background: var(--site-gold);
+  transform: scale(1.2);
+}
+
+.site-hero-slide-arrow {
+  position: absolute;
+  top: 42%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(6, 11, 18, 0.5);
+  color: var(--site-text-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background var(--site-dur) var(--site-ease), border-color var(--site-dur) var(--site-ease);
+}
+
+.site-hero-slide-arrow:hover {
+  background: rgba(6, 11, 18, 0.75);
+  border-color: var(--site-gold);
+}
+
+.site-hero-slide-arrow--prev {
+  left: 16px;
+}
+
+.site-hero-slide-arrow--next {
+  right: 16px;
+}
+
+/* ——— Home intro (short editorial block after the vehicles grid) ——— */
+.site-intro {
+  padding-top: clamp(2rem, 4vw, 3rem);
+  padding-bottom: clamp(2rem, 4vw, 3rem);
+}
+
 /* ——— Stats ——— */
 .site-stats {
   border-top: 1px solid var(--site-border);
@@ -664,6 +810,11 @@
 .site-badge--accent {
   background: var(--site-accent);
   color: #fff;
+}
+
+.site-badge--inline {
+  position: static;
+  display: inline-flex;
 }
 
 .site-vehicle-card-body {
@@ -951,6 +1102,25 @@
   font-size: clamp(1rem, 1.4vw, 1.15rem);
   color: var(--site-muted);
   max-width: 60ch;
+}
+
+/* ——— Compact page hero (vehicules): filters and first results row must be visible fast ——— */
+.site-page-hero--compact {
+  padding: clamp(1.25rem, 3vw, 1.75rem) 0 clamp(1rem, 2vw, 1.5rem);
+}
+
+.site-page-hero--compact .site-page-title {
+  margin-top: 0.35rem;
+  font-size: clamp(1.6rem, 3.2vw, 2.5rem);
+}
+
+.site-page-hero--compact .site-page-subtitle {
+  margin-top: 0.5rem;
+  font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+}
+
+.site-section--tight-top {
+  padding-top: clamp(1rem, 2.5vw, 1.75rem);
 }
 
 /* ——— Vehicle catalog filters ——— */
@@ -1464,6 +1634,16 @@
   .site-modal-title {
     padding-right: 0;
   }
+
+  .site-hero-slideshow {
+    height: clamp(380px, 62vh, 560px);
+  }
+
+  .site-hero-slide-arrow {
+    top: 36%;
+    width: 40px;
+    height: 40px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1546,6 +1726,14 @@
 
   .site-timeline-step:not(:last-child)::before {
     left: 19px;
+  }
+
+  .site-hero-slideshow {
+    height: clamp(480px, 72vh, 620px);
+  }
+
+  .site-hero-slide-arrow {
+    top: 30%;
   }
 }
 
@@ -1830,5 +2018,89 @@
 @media (max-width: 640px) {
   .site-form-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ——— Compactage supplémentaire du catalogue + filtres repliables mobile ——— */
+.site-page-hero--compact {
+  padding: clamp(0.8rem, 1.8vw, 1.25rem) 0 clamp(0.5rem, 1vw, 0.75rem);
+}
+
+.site-page-hero--compact .site-page-title {
+  margin-top: 0.25rem;
+  font-size: clamp(1.5rem, 2.9vw, 2.25rem);
+}
+
+.site-page-hero--compact .site-page-subtitle {
+  margin-top: 0.4rem;
+  font-size: clamp(0.92rem, 1.1vw, 1rem);
+}
+
+.site-section--tight-top {
+  padding-top: clamp(0.5rem, 1.1vw, 0.85rem);
+}
+
+.site-catalog {
+  gap: 1.1rem;
+}
+
+.site-filters-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--site-border);
+  background: var(--site-surface);
+  color: var(--site-text);
+  font-weight: 650;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.site-filters-fields {
+  display: contents;
+}
+
+@media (max-width: 640px) {
+  .site-filters {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .site-filters-toggle {
+    display: inline-flex;
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .site-filters-fields {
+    display: none;
+  }
+
+  .site-filters-fields.is-open {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.75rem;
+    grid-column: 1 / -1;
+  }
+
+  .site-filters-reset {
+    grid-column: 1 / -1;
+  }
+
+  .site-page-hero--compact {
+    padding: 0.85rem 0 0.6rem;
+  }
+
+  .site-page-hero--compact .site-page-title {
+    font-size: 1.4rem;
+  }
+
+  .site-page-hero--compact .site-page-subtitle {
+    font-size: 0.9rem;
   }
 }

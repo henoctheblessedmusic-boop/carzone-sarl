@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
-import { Search } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
 import type { SiteCopy } from "@/lib/i18n/site";
 import type { SiteLocale } from "@/lib/site-prefs";
 import { VehicleDetailModal, type CatalogVehicle } from "./VehicleDetailModal";
@@ -58,6 +58,7 @@ export function VehiclesCatalog({ vehicles, copy, locale }: VehiclesCatalogProps
   const [priceRange, setPriceRange] = useState<PriceRange>("");
   const [sort, setSort] = useState<SortOption>("recent");
   const [selectedVehicle, setSelectedVehicle] = useState<CatalogVehicle | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
 
   const brandOptions = useMemo(() => uniqueSorted(vehicles.map((v) => v.brand)), [vehicles]);
   const energyOptions = useMemo(() => uniqueSorted(vehicles.map((v) => v.energy)), [vehicles]);
@@ -65,6 +66,7 @@ export function VehiclesCatalog({ vehicles, copy, locale }: VehiclesCatalogProps
   const statusOptions = useMemo(() => uniqueSorted(vehicles.map((v) => v.status)), [vehicles]);
 
   const hasActiveFilters = Boolean(search || brand || energy || vehicleType || status || priceRange);
+  const activeFilterCount = [brand, energy, vehicleType, status, priceRange].filter(Boolean).length;
 
   const filteredVehicles = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -115,6 +117,23 @@ export function VehiclesCatalog({ vehicles, copy, locale }: VehiclesCatalogProps
           </div>
         </div>
 
+        <button
+          type="button"
+          className="site-filters-toggle"
+          aria-expanded={showFilters}
+          aria-controls="vehicle-advanced-filters"
+          onClick={() => setShowFilters((open) => !open)}
+        >
+          <SlidersHorizontal aria-hidden="true" size={16} />
+          {activeFilterCount > 0
+            ? copy.filters.toggleActiveLabel.replace("{count}", String(activeFilterCount))
+            : copy.filters.toggleLabel}
+        </button>
+
+        <div
+          id="vehicle-advanced-filters"
+          className={showFilters ? "site-filters-fields is-open" : "site-filters-fields"}
+        >
         <div className="site-filter-field">
           <label htmlFor="vehicle-brand">{copy.filters.brandLabel}</label>
           <select id="vehicle-brand" value={brand} onChange={(event) => setBrand(event.target.value)}>
@@ -195,6 +214,7 @@ export function VehiclesCatalog({ vehicles, copy, locale }: VehiclesCatalogProps
         >
           {copy.filters.resetLabel}
         </button>
+        </div>
       </form>
 
       <p className="site-results-count" aria-live="polite">

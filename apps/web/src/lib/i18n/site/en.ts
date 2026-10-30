@@ -81,14 +81,26 @@ export const en: SiteCopy = {
   },
 
   home: {
-    hero: {
-      eyebrow: "Multi-brand dealership in Cotonou",
-      title: "Your next vehicle starts at CARZONE",
-      subtitle:
+    slideshow: {
+      eyebrow: "New arrivals in showroom",
+      ariaLabel: "Showroom vehicles slideshow",
+      prevLabel: "Previous vehicle",
+      nextLabel: "Next vehicle",
+      goToSlideLabel: "Vehicle {current} of {total}",
+      viewVehicleCta: "Discover this vehicle",
+      viewShowroomCta: "View the full showroom",
+      priceOnRequest: "Price on request",
+      emptyTitle: "Your next vehicle starts at CARZONE",
+      emptySubtitle:
         "A new-vehicle showroom, an after-sales workshop and EV charging solutions, all in one place in Cotonou.",
-      primaryCta: "View vehicles",
-      secondaryCta: "Contact us",
-      imageAlt: "Vehicle on display at the CARZONE SARL showroom",
+      emptyCta: "View vehicles",
+    },
+    intro: {
+      eyebrow: "Multi-brand dealership in Cotonou",
+      title: "One showroom, one workshop, one team",
+      subtitle:
+        "CARZONE SARL brings together a new-vehicle showroom, an after-sales workshop and EV charging solutions in Cotonou, with dedicated sales support from the choice of vehicle through to maintenance.",
+      brandsLabel: "Brands on display",
     },
     stats: [
       { value: "9", label: "brands on display in showroom" },
@@ -203,6 +215,8 @@ export const en: SiteCopy = {
       sortPriceAsc: "Price: low to high",
       sortPriceDesc: "Price: high to low",
       resetLabel: "Reset filters",
+      toggleLabel: "Filters",
+      toggleActiveLabel: "Filters ({count})",
     },
     resultsCountOne: "{count} vehicle found",
     resultsCountOther: "{count} vehicles found",

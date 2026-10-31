@@ -201,3 +201,9 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - Copy disponible en FR/EN/ES/ZH. Aucune donnée inventée (délais, garantie, chiffres clients non fournis restent absents).
 - **Skill réutilisable** créé : `docs/skills/conversion-trust-vitrine/` (SKILL.md + audit scorecard + questionnaire de collecte + copywriting + checklist + templates) et installé dans `~/.agents/skills/conversion-trust-vitrine` (détecté par le catalogue DSH).
 - Vérifications : tsc/build exit 0 ; DOM : 3 bullets promesse, 4 étapes, 5 preuves, 8 FAQ ; captures desktop/mobile ; scrollWidth = viewport.
+
+### Bloc intro réorganisé en 2 colonnes (itération 17)
+- À gauche : eyebrow + titre + description + marques distribuées.
+- À droite : carte « promesses » avec les 3 bullets (icônes check, fond dégradé subtil, liseré doré).
+- Desktop : grille 1.15fr / 0.85fr, centrage vertical, gap fluide. Mobile/tablette : empilement en une colonne.
+- Vérifications : tsc/build exit 0, capture desktop 1425 et mobile 390, aucun débordement.

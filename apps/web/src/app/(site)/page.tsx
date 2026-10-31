@@ -122,25 +122,32 @@ export default async function HomePage() {
 
       <section className="site-section site-section--muted site-intro" aria-labelledby="intro-heading">
         <Container>
-          <SectionHeading
-            id="intro-heading"
-            eyebrow={copy.home.intro.eyebrow}
-            title={copy.home.intro.title}
-            subtitle={copy.home.intro.subtitle}
-          />
-          <ul className="site-promise-bullets">
-            {copy.home.promise.bullets.map((item) => (
-              <li key={item}>
-                <CheckCircle2 aria-hidden="true" size={18} />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-          <ul className="site-hero-brands" aria-label={copy.home.intro.brandsLabel}>
-            {SITE_BRANDS.map((brand) => (
-              <li key={brand}>{brand}</li>
-            ))}
-          </ul>
+          <div className="site-intro-layout">
+            <div className="site-intro-copy">
+              <SectionHeading
+                id="intro-heading"
+                eyebrow={copy.home.intro.eyebrow}
+                title={copy.home.intro.title}
+                subtitle={copy.home.intro.subtitle}
+              />
+              <ul className="site-hero-brands" aria-label={copy.home.intro.brandsLabel}>
+                {SITE_BRANDS.map((brand) => (
+                  <li key={brand}>{brand}</li>
+                ))}
+              </ul>
+            </div>
+
+            <aside className="site-promise-card" aria-label={copy.home.intro.eyebrow}>
+              <ul className="site-promise-bullets">
+                {copy.home.promise.bullets.map((item) => (
+                  <li key={item}>
+                    <CheckCircle2 aria-hidden="true" size={20} />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          </div>
         </Container>
       </section>
 

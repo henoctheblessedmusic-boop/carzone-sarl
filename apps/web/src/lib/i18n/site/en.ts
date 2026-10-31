@@ -84,6 +84,9 @@ export const en: SiteCopy = {
     messageDefaultVehicleTemplate: "I would like to receive a quote for the {vehicle}.",
     privacyNote:
       "Your details are used only by the CARZONE SARL sales team to contact you about this request.",
+    consentLabel: "I agree that my contact details may be used by CARZONE SARL to contact me about this request.",
+    consentRequired: "Please accept the use of your contact details to send your request.",
+    privacyLinkLabel: "Privacy policy",
     submitLabel: "Send my request",
     submittingLabel: "Sending...",
     successTitle: "Request received",
@@ -113,6 +116,8 @@ export const en: SiteCopy = {
     legalTitle: "Legal information",
     ifuLabel: "Tax ID (IFU)",
     rccmLabel: "Trade register (RCCM)",
+    privacyLabel: "Privacy policy",
+    legalNoticeLabel: "Legal notice",
     rightsReserved: "All rights reserved.",
     socialTitle: "Social media",
   },
@@ -127,6 +132,8 @@ export const en: SiteCopy = {
       viewVehicleCta: "Discover this vehicle",
       viewShowroomCta: "View the full showroom",
       priceOnRequest: "Price on request",
+      pauseLabel: "Pause the slideshow",
+      playLabel: "Resume the slideshow",
       emptyTitle: "Your next vehicle starts at CARZONE",
       emptySubtitle:
         "A new-vehicle showroom, an after-sales workshop and EV charging solutions, all in one place in Cotonou.",

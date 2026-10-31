@@ -16,6 +16,8 @@ const SITE_PATHS = [
   "/recharge",
   "/equipe",
   "/contact",
+  "/confidentialite",
+  "/mentions-legales",
 ] as const;
 
 function isSitePath(pathname: string): boolean {
@@ -41,6 +43,8 @@ const PUBLIC_PATHS = [
   "/recharge",
   "/equipe",
   "/contact",
+  "/confidentialite",
+  "/mentions-legales",
 ];
 
 async function verifyHmac(body: string, sig: string, secret: string): Promise<boolean> {

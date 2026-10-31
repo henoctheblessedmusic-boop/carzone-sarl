@@ -8,6 +8,8 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteLangSync } from "@/components/site/SiteLangSync";
 import { OrganizationJsonLd } from "@/components/site/OrganizationJsonLd";
 import { SITE_WEBSITE } from "@/lib/site-constants";
+import { Analytics } from "@vercel/analytics/react";
+import { MobileWhatsAppBar } from "@/components/site/MobileWhatsAppBar";
 import "./site.css";
 
 const OG_LOCALE: Record<SiteLocale, string> = {
@@ -50,6 +52,8 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
       <SiteHeader locale={locale} copy={copy} />
       <main id="site-main-content">{children}</main>
       <SiteFooter copy={copy} />
+      <MobileWhatsAppBar copy={copy.quote} />
+      <Analytics />
     </div>
   );
 }

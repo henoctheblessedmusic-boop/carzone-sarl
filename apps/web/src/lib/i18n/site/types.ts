@@ -59,6 +59,9 @@ export interface SiteCopy {
     messageDefaultGeneric: string;
     messageDefaultVehicleTemplate: string;
     privacyNote: string;
+    consentLabel: string;
+    consentRequired: string;
+    privacyLinkLabel: string;
     submitLabel: string;
     submittingLabel: string;
     successTitle: string;
@@ -89,6 +92,8 @@ export interface SiteCopy {
     ifuLabel: string;
     rccmLabel: string;
     rightsReserved: string;
+    privacyLabel: string;
+    legalNoticeLabel: string;
     socialTitle: string;
   };
 
@@ -99,6 +104,8 @@ export interface SiteCopy {
       prevLabel: string;
       nextLabel: string;
       goToSlideLabel: string;
+      pauseLabel: string;
+      playLabel: string;
       viewVehicleCta: string;
       viewShowroomCta: string;
       priceOnRequest: string;

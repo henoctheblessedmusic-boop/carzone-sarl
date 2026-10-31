@@ -84,6 +84,9 @@ export const es: SiteCopy = {
     messageDefaultVehicleTemplate: "Deseo recibir una cotización para el {vehicle}.",
     privacyNote:
       "Sus datos son utilizados únicamente por el equipo comercial de CARZONE SARL para contactarle sobre esta solicitud.",
+    consentLabel: "Acepto que CARZONE SARL utilice mis datos de contacto para contactarme sobre esta solicitud.",
+    consentRequired: "Acepte el uso de sus datos de contacto para enviar su solicitud.",
+    privacyLinkLabel: "Política de privacidad",
     submitLabel: "Enviar mi solicitud",
     submittingLabel: "Enviando...",
     successTitle: "Solicitud registrada",
@@ -113,6 +116,8 @@ export const es: SiteCopy = {
     legalTitle: "Información legal",
     ifuLabel: "NIF (IFU)",
     rccmLabel: "Registro mercantil (RCCM)",
+    privacyLabel: "Política de privacidad",
+    legalNoticeLabel: "Aviso legal",
     rightsReserved: "Todos los derechos reservados.",
     socialTitle: "Redes sociales",
   },
@@ -127,6 +132,8 @@ export const es: SiteCopy = {
       viewVehicleCta: "Descubrir este vehículo",
       viewShowroomCta: "Ver todo el showroom",
       priceOnRequest: "Precio a consultar",
+      pauseLabel: "Pausar el pase de diapositivas",
+      playLabel: "Reanudar el pase de diapositivas",
       emptyTitle: "Su próximo vehículo empieza en CARZONE",
       emptySubtitle:
         "Showroom de vehículos nuevos, taller posventa y soluciones de recarga eléctrica, reunidos en un mismo lugar en Cotonú.",

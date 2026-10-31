@@ -1,6 +1,7 @@
 "use client";
 
 import { MessageCircle } from "lucide-react";
+import { track } from "@vercel/analytics";
 import type { SiteCopy } from "@/lib/i18n/site/types";
 import { buildQuoteWhatsAppHref, type QuoteVehicle } from "@/lib/site-quote";
 import { useQuoteRequest } from "./QuoteRequestProvider";
@@ -24,6 +25,12 @@ export function QuoteActions({ vehicle, copy, statusLabels, energyLabels, varian
         target="_blank"
         rel="noopener noreferrer"
         className="site-cta site-quote-whatsapp"
+        onClick={() =>
+          track("cotation_whatsapp", {
+            source: variant,
+            vehicule: vehicle ? [vehicle.brand, vehicle.model, vehicle.variant].filter(Boolean).join(" ") : "general",
+          })
+        }
       >
         <MessageCircle aria-hidden="true" size={16} />
         {copy.whatsappCtaLabel}

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { KeyboardEvent, TouchEvent } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { Container } from "./Container";
 import { CtaLink } from "./CtaLink";
 import type { SiteCopy } from "@/lib/i18n/site/types";
@@ -28,6 +28,8 @@ interface HomeHeroSlideshowCopy {
   prevLabel: string;
   nextLabel: string;
   goToSlideLabel: string;
+  pauseLabel: string;
+  playLabel: string;
   viewVehicleCta: string;
   viewShowroomCta: string;
   priceOnRequest: string;
@@ -74,6 +76,7 @@ export function HomeHeroSlideshow({ vehicles, statusLabels, energyLabels, copy, 
   const total = vehicles.length;
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [isUserPaused, setIsUserPaused] = useState(false);
   const prefersReducedMotion = useReducedMotionPreference();
   const touchStartX = useRef<number | null>(null);
 
@@ -88,12 +91,12 @@ export function HomeHeroSlideshow({ vehicles, statusLabels, energyLabels, copy, 
   const goPrev = useCallback(() => goTo(activeIndex - 1), [goTo, activeIndex]);
 
   useEffect(() => {
-    if (isPaused || prefersReducedMotion || total <= 1) return;
+    if (isPaused || isUserPaused || prefersReducedMotion || total <= 1) return;
     const intervalId = window.setInterval(() => {
       setActiveIndex((current) => (current + 1) % total);
     }, AUTOPLAY_DELAY_MS);
     return () => window.clearInterval(intervalId);
-  }, [isPaused, prefersReducedMotion, total]);
+  }, [isPaused, isUserPaused, prefersReducedMotion, total]);
 
   useEffect(() => {
     function handleVisibilityChange() {
@@ -207,21 +210,32 @@ export function HomeHeroSlideshow({ vehicles, statusLabels, energyLabels, copy, 
           </div>
 
           {total > 1 ? (
-            <div className="site-hero-slide-dots" role="tablist" aria-label={copy.ariaLabel}>
-              {vehicles.map((vehicle, index) => (
-                <button
-                  key={vehicle.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={index === activeIndex}
-                  className={index === activeIndex ? "site-hero-slide-dot is-active" : "site-hero-slide-dot"}
-                  onClick={() => goTo(index)}
-                >
-                  <span className="site-sr-only">
-                    {copy.goToSlideLabel.replace("{current}", String(index + 1)).replace("{total}", String(total))}
-                  </span>
-                </button>
-              ))}
+            <div className="site-hero-slide-controls">
+              <div className="site-hero-slide-dots" role="tablist" aria-label={copy.ariaLabel}>
+                {vehicles.map((vehicle, index) => (
+                  <button
+                    key={vehicle.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={index === activeIndex}
+                    className={index === activeIndex ? "site-hero-slide-dot is-active" : "site-hero-slide-dot"}
+                    onClick={() => goTo(index)}
+                  >
+                    <span className="site-sr-only">
+                      {copy.goToSlideLabel.replace("{current}", String(index + 1)).replace("{total}", String(total))}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                className="site-hero-slide-playpause"
+                aria-pressed={isUserPaused}
+                onClick={() => setIsUserPaused((current) => !current)}
+              >
+                <span className="site-sr-only">{isUserPaused ? copy.playLabel : copy.pauseLabel}</span>
+                {isUserPaused ? <Play aria-hidden="true" size={14} /> : <Pause aria-hidden="true" size={14} />}
+              </button>
             </div>
           ) : null}
         </Container>

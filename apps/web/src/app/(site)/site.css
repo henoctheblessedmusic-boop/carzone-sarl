@@ -2333,3 +2333,128 @@
     justify-content: center;
   }
 }
+
+/* ——— Sprint 1 : barre WhatsApp mobile, légales, consentement, pause carrousel ——— */
+.site-mobile-wa-bar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .site-mobile-wa-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1rem calc(0.8rem + env(safe-area-inset-bottom));
+    background: #25d366;
+    color: #07281c;
+    font-size: 0.98rem;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.35);
+  }
+
+  .site-mobile-wa-bar:active {
+    background: #1ebe5b;
+  }
+
+  .site-footer {
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+  }
+}
+
+.site-legal {
+  max-width: 820px;
+  color: var(--site-text);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.site-legal-updated {
+  margin-bottom: 1.5rem;
+  color: var(--site-muted);
+  font-size: 0.85rem;
+}
+
+.site-legal h2 {
+  margin: 2rem 0 0.65rem;
+  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+  color: var(--site-text-strong);
+}
+
+.site-legal p {
+  margin: 0 0 0.85rem;
+}
+
+.site-legal ul {
+  margin: 0 0 1rem 1.2rem;
+  padding: 0;
+}
+
+.site-legal li {
+  margin-bottom: 0.35rem;
+}
+
+.site-legal a,
+.site-footer-legal-links a,
+.site-form-consent a {
+  color: var(--site-gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.site-footer-legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+}
+
+.site-form-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--site-muted);
+}
+
+.site-form-consent input {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 0.2rem;
+  accent-color: #e11d48;
+}
+
+.site-hero-slide-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.site-hero-slide-controls .site-hero-slide-dots {
+  margin-top: 0;
+}
+
+.site-hero-slide-playpause {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(6, 11, 18, 0.45);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.site-hero-slide-playpause:hover {
+  background: rgba(6, 11, 18, 0.72);
+}

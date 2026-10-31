@@ -98,6 +98,11 @@ export function SiteFooter({ copy }: SiteFooterProps) {
         <p>
           © {year} CARZONE SARL. {copy.footer.rightsReserved}
         </p>
+        <p className="site-footer-legal-links">
+          <Link href="/confidentialite">{copy.footer.privacyLabel}</Link>
+          <span aria-hidden="true"> · </span>
+          <Link href="/mentions-legales">{copy.footer.legalNoticeLabel}</Link>
+        </p>
       </div>
     </footer>
   );

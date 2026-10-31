@@ -84,6 +84,9 @@ export const fr: SiteCopy = {
     messageDefaultVehicleTemplate: "Je souhaite recevoir une cotation pour {vehicle}.",
     privacyNote:
       "Vos coordonnées sont utilisées uniquement par l'équipe commerciale CARZONE SARL pour vous recontacter au sujet de cette demande.",
+    consentLabel: "J'accepte que mes coordonnées soient utilisées par CARZONE SARL pour me recontacter au sujet de cette demande.",
+    consentRequired: "Veuillez accepter l'utilisation de vos coordonnées pour envoyer votre demande.",
+    privacyLinkLabel: "Politique de confidentialité",
     submitLabel: "Envoyer ma demande",
     submittingLabel: "Envoi en cours...",
     successTitle: "Demande enregistrée",
@@ -114,6 +117,8 @@ export const fr: SiteCopy = {
     legalTitle: "Informations légales",
     ifuLabel: "IFU",
     rccmLabel: "RCCM",
+    privacyLabel: "Politique de confidentialité",
+    legalNoticeLabel: "Mentions légales",
     rightsReserved: "Tous droits réservés.",
     socialTitle: "Réseaux sociaux",
   },
@@ -128,6 +133,8 @@ export const fr: SiteCopy = {
       viewVehicleCta: "Découvrir ce véhicule",
       viewShowroomCta: "Voir tout le showroom",
       priceOnRequest: "Prix sur demande",
+      pauseLabel: "Mettre le diaporama en pause",
+      playLabel: "Reprendre le diaporama",
       emptyTitle: "Votre prochain véhicule commence chez CARZONE",
       emptySubtitle:
         "Showroom de véhicules neufs, atelier SAV et solutions de recharge électrique, réunis au même endroit à Cotonou.",

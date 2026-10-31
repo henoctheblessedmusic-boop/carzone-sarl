@@ -135,3 +135,12 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - « Cotation par e-mail » reprend la **couleur de marque (rouge/cramoisi)** ; « Cotation en 1 clic » (WhatsApp) reste en **vert WhatsApp #25D366**.
 - Les trois actions du diaporama (WhatsApp, e-mail, « Voir tout le showroom ») sont **alignées sur une même ligne** en desktop, avec retour à la ligne puis empilement plein largeur en mobile.
 - Vérifications : tsc/build exit 0 ; captures 1440 et 390 ; ordre WhatsApp → e-mail → showroom.
+
+### Sprint 1 (itération 7) : conversion, conformité, accessibilité, performance
+- **Barre WhatsApp collante mobile** : bouton vert fixe en bas de page (toutes pages vitrine), lien WhatsApp prérempli + event analytics `cotation_whatsapp` (source barre_mobile).
+- **Analytics Vercel** : `@vercel/analytics` installé, composant `Analytics` dans le layout vitrine ; events `cotation_ouverture`, `cotation_envoi`, `cotation_whatsapp`. À activer dans le dashboard Vercel (Web Analytics) pour voir les données.
+- **Conformité** : pages `/confidentialite` et `/mentions-legales` (FR), liens dans le footer + sitemap, routes rendues publiques dans le middleware ; **case de consentement obligatoire** dans la modale de cotation + lien vers la politique.
+- **Accessibilité WCAG 2.2.2** : bouton pause/lecture visible du diaporama (`aria-pressed`, labels SR), autoplay respecte prefers-reduced-motion.
+- **Nettoyage** : suppression de 4 images inutilisées (~10,8 Mo) dans `public/images/vehicles`.
+- Vérifications : build/tsc exit 0 ; tests CDP : barre mobile visible (href WA), pause `aria-pressed=true`, consentement requis (erreur sans case), envoi avec consentement = SUCCESS, pages légales accessibles (h1 + 9 sections + liens footer), sitemap OK ; lead de test créé puis supprimé.
+- Reste à faire (dépend des accès client) : alerte e-mail/SMS instantanée à chaque lead (SMTP non fourni par la direction pour l'instant).

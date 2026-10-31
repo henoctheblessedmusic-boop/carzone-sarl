@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { MessageCircle, X } from "lucide-react";
+import { track } from "@vercel/analytics";
 import type { SiteCopy } from "@/lib/i18n/site/types";
 import { SITE_PRIMARY_PHONE, whatsAppHref } from "@/lib/site-constants";
 import { buildQuoteWhatsAppMessage, quoteVehicleTitle, type QuoteVehicle } from "@/lib/site-quote";
@@ -46,6 +47,8 @@ export function QuoteRequestProvider({
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const [validationError, setValidationError] = useState(false);
+  const [consent, setConsent] = useState(false);
+  const [consentError, setConsentError] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
   const titleId = useId();
@@ -54,6 +57,8 @@ export function QuoteRequestProvider({
     setVehicle(undefined);
     setStatus("idle");
     setValidationError(false);
+    setConsent(false);
+    setConsentError(false);
   }, []);
 
   const open = useCallback(
@@ -67,6 +72,11 @@ export function QuoteRequestProvider({
           ? copy.messageDefaultVehicleTemplate.replace("{vehicle}", quoteVehicleTitle(target))
           : copy.messageDefaultGeneric,
       );
+      setConsent(false);
+      setConsentError(false);
+      track("cotation_ouverture", {
+        vehicule: target ? quoteVehicleTitle(target) : "general",
+      });
     },
     [copy.messageDefaultGeneric, copy.messageDefaultVehicleTemplate],
   );
@@ -119,6 +129,11 @@ export function QuoteRequestProvider({
       return;
     }
     setValidationError(false);
+    if (!consent) {
+      setConsentError(true);
+      return;
+    }
+    setConsentError(false);
     setStatus("submitting");
 
     try {
@@ -136,6 +151,9 @@ export function QuoteRequestProvider({
       });
       if (!response.ok) throw new Error("quote request failed");
       setStatus("success");
+      track("cotation_envoi", {
+        vehicule: vehicle ? quoteVehicleTitle(vehicle) : "general",
+      });
     } catch {
       setStatus("error");
     }
@@ -238,7 +256,28 @@ export function QuoteRequestProvider({
                   <textarea rows={4} value={message} onChange={(event) => setMessage(event.target.value)} />
                 </label>
 
-                <p className="site-form-note">{copy.privacyNote}</p>
+                <label className="site-form-consent">
+                  <input
+                    type="checkbox"
+                    checked={consent}
+                    onChange={(event) => {
+                      setConsent(event.target.checked);
+                      if (event.target.checked) setConsentError(false);
+                    }}
+                    required
+                  />
+                  <span>
+                    {copy.consentLabel}{" "}
+                    <a href="/confidentialite" target="_blank" rel="noopener noreferrer">
+                      {copy.privacyLinkLabel}
+                    </a>
+                  </span>
+                </label>
+                {consentError ? (
+                  <p className="site-quote-error" role="alert">
+                    {copy.consentRequired}
+                  </p>
+                ) : null}
 
                 <div className="site-quote-actions">
                   <a

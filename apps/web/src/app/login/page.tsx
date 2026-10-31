@@ -38,7 +38,6 @@ export default async function LoginPage({
       >
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, textAlign: "center" }}>
           <CarzoneLogo size="lg" priority />
-          <div style={{ fontSize: "0.85rem", opacity: 0.7 }}>{messages.brand.tagline}</div>
           <p style={{ margin: 0, opacity: 0.75, fontSize: "0.92rem" }}>{messages.brand.subtitle}</p>
         </div>
 

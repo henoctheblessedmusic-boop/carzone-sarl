@@ -644,22 +644,22 @@ select option:checked,
   box-shadow: 0 4px 16px var(--brand-glow);
 }
 
-.carzone-logo, .oxcar-logo__img {
+.carzone-logo__img, .oxcar-logo__img {
   display: block;
   width: auto;
   height: auto;
   max-width: 100%;
 }
 
-.carzone-logo, .oxcar-logo--sm {
+.carzone-logo--sm, .oxcar-logo--sm {
   max-width: 132px;
 }
 
-.carzone-logo, .oxcar-logo--md {
+.carzone-logo--md, .oxcar-logo--md {
   max-width: 168px;
 }
 
-.carzone-logo, .oxcar-logo--lg {
+.carzone-logo--lg, .oxcar-logo--lg {
   max-width: 228px;
 }
 

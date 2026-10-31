@@ -105,9 +105,6 @@ export function AppShellClient({
         <div className="ox-aside-header">
           <div className="ox-brand">
             <CarzoneLogo size="sm" />
-            <div style={{ fontSize: "0.75rem", opacity: 0.65, paddingLeft: 2 }}>
-              {tagline}
-            </div>
           </div>
           <button
             type="button"

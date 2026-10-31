@@ -174,3 +174,10 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - Recréé en HTML/CSS (pas d'image collée) : police géométrique **Poppins** (800/900) chargée via `next/font/google` pour la vitrine ; emblème `carzone-mark.png` ; CARZONE jaune `#F5B301` ; tagline `#E6EDF7` avec letter-spacing.
 - Header desktop 88 px (emblème 68 px) et mobile 50 px (emblème 44 px) ; lockup horizontal corrigé.
 - Vérifications : build/tsc exit 0 avec téléchargement Poppins OK ; captures desktop DPR2 et mobile.
+
+### Identité visuelle : correction définitive du lockup (itération 13)
+- Cause racine corrigée : l'emblème détouré était rogné (les arcs officiels passent derrière le lettrage, impossible à séparer proprement) → le header utilise désormais **l'image officielle complète** (jamais rognée) comme élément de gauche, avec CARZONE + tagline à droite.
+- Cause racine application : sélecteurs CSS globaux erronés `.carzone-logo, .oxcar-logo--sm { max-width:132px }` qui coupaient le logo dans la sidebar → sélecteurs corrigés (`.carzone-logo--sm` etc.), `max-width: none` sur le composant.
+- Site + application + connexion : même lockup (logo officiel complet + CARZONE jaune Poppins 900 + DRIVE YOUR DREAM clair), plus de tagline dupliquée (retirée de AppShell et du login).
+- Tailles : header 79 px (logo 56 px desktop / 42 px mobile), app sm/md/lg/xl (38/44/60/74 px).
+- Vérifications : tsc/build exit 0 ; captures header desktop DPR2, mobile, login ; aucun rognage.

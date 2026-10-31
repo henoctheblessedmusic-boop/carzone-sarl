@@ -2,17 +2,17 @@ import Image from "next/image";
 import Link from "next/link";
 
 /**
- * Lockup d'en-tête CARZONE : emblème officiel à gauche, CARZONE en jaune,
- * et « Drive your dream » en dessous, dans le style de la charte validée.
+ * En-tête CARZONE : logo officiel complet à gauche (emblème + lettrage, jamais
+ * rogné), puis CARZONE en grand et « Drive your dream » en dessous.
  */
 export function SiteLogo() {
   return (
     <Link href="/" className="site-logo" aria-label="CARZONE SARL — Concessionnaire automobile multimarques">
       <Image
-        src="/brand/carzone-mark.png"
-        alt=""
-        width={110}
-        height={62}
+        src="/brand/carzone-logo.png"
+        alt="CARZONE SARL"
+        width={80}
+        height={57}
         priority
         className="site-logo-emblem"
       />

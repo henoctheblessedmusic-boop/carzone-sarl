@@ -5,6 +5,7 @@ import { siteCopy } from "@/lib/i18n/site";
 import type { SiteLocale } from "@/lib/site-prefs";
 import { Container } from "@/components/site/Container";
 import { SectionHeading } from "@/components/site/SectionHeading";
+import { CheckCircle2 } from "lucide-react";
 import { CtaLink } from "@/components/site/CtaLink";
 import { VehicleCard } from "@/components/site/VehicleCard";
 import { HomeHeroSlideshow, type SlideshowVehicle } from "@/components/site/HomeHeroSlideshow";
@@ -127,6 +128,14 @@ export default async function HomePage() {
             title={copy.home.intro.title}
             subtitle={copy.home.intro.subtitle}
           />
+          <ul className="site-promise-bullets">
+            {copy.home.promise.bullets.map((item) => (
+              <li key={item}>
+                <CheckCircle2 aria-hidden="true" size={18} />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
           <ul className="site-hero-brands" aria-label={copy.home.intro.brandsLabel}>
             {SITE_BRANDS.map((brand) => (
               <li key={brand}>{brand}</li>
@@ -164,6 +173,28 @@ export default async function HomePage() {
               {copy.home.vehicles.viewAllCta}
             </CtaLink>
           </div>
+        </Container>
+      </section>
+
+      <section className="site-section site-section--muted" aria-labelledby="process-heading">
+        <Container>
+          <SectionHeading
+            id="process-heading"
+            eyebrow={copy.home.process.eyebrow}
+            title={copy.home.process.title}
+            subtitle={copy.home.process.subtitle}
+          />
+          <ol className="site-process-grid">
+            {copy.home.process.steps.map((step, index) => (
+              <li className="site-process-card" key={step.title}>
+                <span className="site-process-step" aria-hidden="true">
+                  {index + 1}
+                </span>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </li>
+            ))}
+          </ol>
         </Container>
       </section>
 
@@ -214,6 +245,23 @@ export default async function HomePage() {
               {copy.home.team.cta}
             </CtaLink>
           </div>
+        </Container>
+      </section>
+
+      <section className="site-section site-trust-section" aria-labelledby="trust-heading">
+        <Container>
+          <p className="site-eyebrow">{copy.home.trustPoints.eyebrow}</p>
+          <h2 id="trust-heading" className="site-section-title">
+            {copy.home.trustPoints.title}
+          </h2>
+          <ul className="site-trust-list">
+            {copy.home.trustPoints.items.map((item) => (
+              <li key={item}>
+                <CheckCircle2 aria-hidden="true" size={18} />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
         </Container>
       </section>
 

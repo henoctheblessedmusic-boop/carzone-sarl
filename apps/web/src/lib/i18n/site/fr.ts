@@ -152,6 +152,35 @@ export const fr: SiteCopy = {
       { value: "0", label: "véhicules disponibles en stock" },
       { value: "3", label: "pôles d'expertise : showroom, atelier SAV, recharge" },
     ],
+    promise: {
+      bullets: [
+        "Cotation sur demande, sans engagement",
+        "Commande usine et import suivis par notre équipe",
+        "Livraison, SAV et recharge au même endroit",
+      ],
+    },
+    process: {
+      eyebrow: "Comment ça marche",
+      title: "De votre choix à votre volant, en 4 étapes",
+      subtitle: "Un parcours accompagné, sans zone d'ombre.",
+      steps: [
+        { title: "Choisissez votre véhicule", text: "Parcourez le showroom ou le catalogue, en ligne ou sur place." },
+        { title: "Demandez votre cotation", text: "Par WhatsApp ou par e-mail, en quelques clics." },
+        { title: "Nous commandons et suivons l'import", text: "Commande usine, transport et suivi jusqu'au Bénin." },
+        { title: "Livraison, SAV et recharge", text: "Prise en main, entretien et solutions de recharge." },
+      ],
+    },
+    trustPoints: {
+      eyebrow: "Nos engagements",
+      title: "Un concessionnaire réel, pas une promesse virtuelle",
+      items: [
+        "Showroom physique à Cotonou",
+        "Atelier SAV multimarques ouvert à tous",
+        "9 marques distribuées",
+        "Cotation personnalisée pour chaque véhicule",
+        "Accompagnement avant et après la livraison",
+      ],
+    },
     pillars: {
       eyebrow: "Ce que nous faisons",
       title: "Trois pôles, une seule adresse",
@@ -224,6 +253,31 @@ export const fr: SiteCopy = {
           question: "Proposez-vous l'installation de bornes de recharge ?",
           answer:
             "Oui, CARZONE SARL accompagne l'installation de solutions de recharge électrique pour les particuliers et les entreprises.",
+        },
+        {
+          question: "Comment demander une cotation ?",
+          answer:
+            "Par WhatsApp, par e-mail ou via le formulaire du site. Indiquez le modèle qui vous intéresse : notre équipe vous répond avec une proposition personnalisée, sans engagement.",
+        },
+        {
+          question: "Les prix sont-ils affichés sur le site ?",
+          answer:
+            "Non. Chaque cotation dépend de la configuration, des options et de la disponibilité. Demandez votre cotation pour recevoir un prix précis.",
+        },
+        {
+          question: "Comment se déroule l'import d'un véhicule ?",
+          answer:
+            "Nous prenons en charge la commande usine, le transport et le suivi jusqu'au Bénin. Vous êtes informé à chaque étape.",
+        },
+        {
+          question: "Puis-je visiter le showroom avant de commander ?",
+          answer:
+            "Oui. Notre showroom se trouve à Cotonou, Zone Maro-Militaire, Quartier Gbèdomidji. Contactez-nous avant votre visite pour être accueilli par un conseiller.",
+        },
+        {
+          question: "Comment connaître la garantie applicable à mon véhicule ?",
+          answer:
+            "La garantie et les conditions d'entretien applicables sont précisées dans votre cotation et à la livraison. Contactez notre équipe pour en discuter.",
         },
       ],
     },

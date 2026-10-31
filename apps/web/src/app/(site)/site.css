@@ -2951,3 +2951,116 @@
     letter-spacing: 0.1em;
   }
 }
+
+/* ——— Conversion : promesse, process, réassurance ——— */
+.site-promise-bullets {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.9rem 0 1.1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.site-promise-bullets li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  color: var(--site-text);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.site-promise-bullets svg {
+  color: var(--site-gold);
+  flex: none;
+  margin-top: 0.12rem;
+}
+
+.site-process-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-process-card {
+  padding: 1.25rem;
+  border: 1px solid var(--site-border);
+  border-radius: var(--site-radius);
+  background: var(--site-card);
+}
+
+.site-process-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 0.75rem;
+  border-radius: 999px;
+  background: var(--site-gold);
+  color: #0b0f19;
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.site-process-card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.02rem;
+  color: var(--site-text-strong);
+}
+
+.site-process-card p {
+  margin: 0;
+  color: var(--site-muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.site-trust-list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-trust-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--site-border);
+  border-radius: var(--site-radius);
+  background: var(--site-card);
+  color: var(--site-text);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.site-trust-list svg {
+  color: var(--site-gold);
+  flex: none;
+  margin-top: 0.08rem;
+}
+
+@media (max-width: 1024px) {
+  .site-process-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-trust-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .site-process-grid,
+  .site-trust-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -192,3 +192,12 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - L'ancienne régénération d'emblème avait échoué (détourage 1 px) et produit un favicon/icône iOS dégradés.
 - `icon.png` (512), `apple-icon.png` (180), `favicon.ico` (multi-tailles) et `carzone-badge.png` sont désormais générés à partir du **logo officiel complet** sur fond noir ; `carzone-mark.png` (rogné) supprimé.
 - Vérifications : routes `/icon.png`, `/apple-icon.png`, `/favicon.ico` en 200 avec tailles réelles ; mesure diaporama 2,89 s.
+
+### P0 Conversion (itération 16) : fond avant forme
+- **Promesse client** ajoutée dans le bloc intro : 3 bullets factuels (cotation sans engagement, commande usine/import suivis, livraison + SAV + recharge au même endroit).
+- **Section « Comment ça marche »** : 4 étapes (choisir, demander une cotation, commande/import, livraison/SAV/recharge).
+- **Section « Nos engagements »** : 5 preuves vérifiables (showroom physique, atelier ouvert à tous, 9 marques, cotation personnalisée, accompagnement avant/après livraison).
+- **FAQ conversion** enrichie : 3 → 8 questions (cotation, prix non affichés, import, visite showroom, garantie).
+- Copy disponible en FR/EN/ES/ZH. Aucune donnée inventée (délais, garantie, chiffres clients non fournis restent absents).
+- **Skill réutilisable** créé : `docs/skills/conversion-trust-vitrine/` (SKILL.md + audit scorecard + questionnaire de collecte + copywriting + checklist + templates) et installé dans `~/.agents/skills/conversion-trust-vitrine` (détecté par le catalogue DSH).
+- Vérifications : tsc/build exit 0 ; DOM : 3 bullets promesse, 4 étapes, 5 preuves, 8 FAQ ; captures desktop/mobile ; scrollWidth = viewport.

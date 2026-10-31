@@ -151,6 +151,35 @@ export const en: SiteCopy = {
       { value: "0", label: "vehicles available in stock" },
       { value: "3", label: "areas of expertise: showroom, workshop, charging" },
     ],
+    promise: {
+      bullets: [
+        "Quote on request, with no commitment",
+        "Factory orders and imports tracked by our team",
+        "Delivery, after-sales service and charging in one place",
+      ],
+    },
+    process: {
+      eyebrow: "How it works",
+      title: "From your choice to your keys, in 4 steps",
+      subtitle: "A guided process with no grey areas.",
+      steps: [
+        { title: "Choose your vehicle", text: "Browse the showroom or the catalogue, online or on site." },
+        { title: "Request your quote", text: "By WhatsApp or e-mail, in just a few clicks." },
+        { title: "We order and track the import", text: "Factory order, shipping and tracking all the way to Benin." },
+        { title: "Delivery, servicing and charging", text: "Handover, maintenance and electric charging solutions." },
+      ],
+    },
+    trustPoints: {
+      eyebrow: "Our commitments",
+      title: "A real dealership, not a virtual promise",
+      items: [
+        "Physical showroom in Cotonou",
+        "Multibrand after-sales workshop open to all",
+        "9 brands available",
+        "A personalised quote for every vehicle",
+        "Support before and after delivery",
+      ],
+    },
     pillars: {
       eyebrow: "What we do",
       title: "Three areas of expertise, one address",
@@ -223,6 +252,31 @@ export const en: SiteCopy = {
           question: "Do you install EV charging stations?",
           answer:
             "Yes, CARZONE SARL supports the installation of EV charging solutions for individuals and businesses.",
+        },
+        {
+          question: "How do I request a quote?",
+          answer:
+            "By WhatsApp, e-mail or via the website form. Tell us which model interests you: our team replies with a personalised proposal, with no commitment.",
+        },
+        {
+          question: "Are prices displayed on the website?",
+          answer:
+            "No. Every quote depends on the configuration, options and availability. Request your quote to receive an exact price.",
+        },
+        {
+          question: "How does vehicle import work?",
+          answer:
+            "We handle the factory order, shipping and tracking all the way to Benin. You are kept informed at every stage.",
+        },
+        {
+          question: "Can I visit the showroom before ordering?",
+          answer:
+            "Yes. Our showroom is in Cotonou, Zone Maro-Militaire, Quartier Gbèdomidji. Please contact us before your visit so an adviser can welcome you.",
+        },
+        {
+          question: "How can I find out which warranty applies to my vehicle?",
+          answer:
+            "The applicable warranty and servicing conditions are set out in your quote and at delivery. Contact our team to discuss them.",
         },
       ],
     },

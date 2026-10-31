@@ -151,6 +151,35 @@ export const es: SiteCopy = {
       { value: "0", label: "vehículos disponibles en stock" },
       { value: "3", label: "áreas de especialización: showroom, taller, recarga" },
     ],
+    promise: {
+      bullets: [
+        "Cotización bajo petición, sin compromiso",
+        "Pedidos de fábrica e importación seguidos por nuestro equipo",
+        "Entrega, servicio posventa y recarga en un mismo lugar",
+      ],
+    },
+    process: {
+      eyebrow: "Cómo funciona",
+      title: "De su elección al volante, en 4 etapas",
+      subtitle: "Un recorrido acompañado, sin zonas grises.",
+      steps: [
+        { title: "Elija su vehículo", text: "Recorra el showroom o el catálogo, en línea o en el lugar." },
+        { title: "Solicite su cotización", text: "Por WhatsApp o por correo, en unos pocos clics." },
+        { title: "Pedimos y seguimos la importación", text: "Pedido de fábrica, transporte y seguimiento hasta Benín." },
+        { title: "Entrega, posventa y recarga", text: "Entrega, mantenimiento y soluciones de recarga." },
+      ],
+    },
+    trustPoints: {
+      eyebrow: "Nuestros compromisos",
+      title: "Un concesionario real, no una promesa virtual",
+      items: [
+        "Showroom físico en Cotonú",
+        "Taller posventa multimarca abierto a todos",
+        "9 marcas distribuidas",
+        "Cotización personalizada para cada vehículo",
+        "Acompañamiento antes y después de la entrega",
+      ],
+    },
     pillars: {
       eyebrow: "Lo que hacemos",
       title: "Tres áreas de especialización, una sola dirección",
@@ -223,6 +252,31 @@ export const es: SiteCopy = {
           question: "¿Instalan puntos de recarga eléctrica?",
           answer:
             "Sí, CARZONE SARL acompaña la instalación de soluciones de recarga eléctrica para particulares y empresas.",
+        },
+        {
+          question: "¿Cómo solicitar una cotización?",
+          answer:
+            "Por WhatsApp, por correo o mediante el formulario del sitio. Indique el modelo que le interesa: nuestro equipo le responde con una propuesta personalizada, sin compromiso.",
+        },
+        {
+          question: "¿Los precios aparecen en el sitio?",
+          answer:
+            "No. Cada cotización depende de la configuración, las opciones y la disponibilidad. Solicite su cotización para recibir un precio exacto.",
+        },
+        {
+          question: "¿Cómo funciona la importación de un vehículo?",
+          answer:
+            "Nos encargamos del pedido de fábrica, el transporte y el seguimiento hasta Benín. Le informamos en cada etapa.",
+        },
+        {
+          question: "¿Puedo visitar el showroom antes de encargar?",
+          answer:
+            "Sí. Nuestro showroom está en Cotonú, Zone Maro-Militaire, Quartier Gbèdomidji. Contáctenos antes de su visita para que un asesor le reciba.",
+        },
+        {
+          question: "¿Cómo conocer la garantía aplicable a mi vehículo?",
+          answer:
+            "La garantía y las condiciones de mantenimiento aplicables se detallan en su cotización y en la entrega. Contacte a nuestro equipo para hablar de ello.",
         },
       ],
     },

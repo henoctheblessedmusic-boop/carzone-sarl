@@ -120,6 +120,20 @@ export interface SiteCopy {
       brandsLabel: string;
     };
     stats: Array<{ value: string; label: string }>;
+    promise: {
+      bullets: string[];
+    };
+    process: {
+      eyebrow: string;
+      title: string;
+      subtitle: string;
+      steps: Array<{ title: string; text: string }>;
+    };
+    trustPoints: {
+      eyebrow: string;
+      title: string;
+      items: string[];
+    };
     pillars: {
       eyebrow: string;
       title: string;

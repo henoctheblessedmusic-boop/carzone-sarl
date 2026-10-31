@@ -47,7 +47,8 @@ interface HomeHeroSlideshowProps {
   quoteCopy: SiteCopy["quote"];
 }
 
-const AUTOPLAY_DELAY_MS = 6000;
+const AUTOPLAY_FIRST_DELAY_MS = 2600;
+const AUTOPLAY_INTERVAL_MS = 6000;
 const SWIPE_THRESHOLD_PX = 40;
 
 function useReducedMotionPreference(): boolean {
@@ -92,10 +93,20 @@ export function HomeHeroSlideshow({ vehicles, statusLabels, energyLabels, copy, 
 
   useEffect(() => {
     if (isPaused || isUserPaused || prefersReducedMotion || total <= 1) return;
-    const intervalId = window.setInterval(() => {
+
+    let intervalId: number | undefined;
+    // Premier changement rapide (3 s max), puis rythme normal.
+    const firstTimeoutId = window.setTimeout(() => {
       setActiveIndex((current) => (current + 1) % total);
-    }, AUTOPLAY_DELAY_MS);
-    return () => window.clearInterval(intervalId);
+      intervalId = window.setInterval(() => {
+        setActiveIndex((current) => (current + 1) % total);
+      }, AUTOPLAY_INTERVAL_MS);
+    }, AUTOPLAY_FIRST_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(firstTimeoutId);
+      if (intervalId !== undefined) window.clearInterval(intervalId);
+    };
   }, [isPaused, isUserPaused, prefersReducedMotion, total]);
 
   useEffect(() => {
@@ -181,6 +192,7 @@ export function HomeHeroSlideshow({ vehicles, statusLabels, energyLabels, copy, 
               alt={vehicleTitle(vehicle)}
               fill
               priority={index === 0}
+              loading={index > 0 && index <= 2 ? "eager" : undefined}
               sizes="100vw"
               className="site-hero-slide-img"
             />

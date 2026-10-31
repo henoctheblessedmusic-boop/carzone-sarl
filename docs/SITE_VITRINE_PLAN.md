@@ -181,3 +181,9 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - Site + application + connexion : même lockup (logo officiel complet + CARZONE jaune Poppins 900 + DRIVE YOUR DREAM clair), plus de tagline dupliquée (retirée de AppShell et du login).
 - Tailles : header 79 px (logo 56 px desktop / 42 px mobile), app sm/md/lg/xl (38/44/60/74 px).
 - Vérifications : tsc/build exit 0 ; captures header desktop DPR2, mobile, login ; aucun rognage.
+
+### Diaporama d'accueil : démarrage rapide (itération 14)
+- Ancien comportement : premier défilement après 6 s (intervalle unique).
+- Nouveau : **premier changement automatique à 2,6 s** (mesuré à 2,9 s max dans le navigateur, sous la limite de 3 s demandée), puis rythme normal de 6 s par diapositive.
+- Préchargement des 3 premières images du diaporama (`priority` sur la 1re, `loading="eager"` sur les 2 suivantes) pour éviter tout temps mort entre les slides.
+- Mesures CDP : `delayMs = 2885`, 2 images eager + 11 ressources optimisées chargées.

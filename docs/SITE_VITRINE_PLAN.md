@@ -130,3 +130,8 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - Libellés mis à jour en FR/EN/ES/ZH.
 - **Statut retiré du public** : plus de badge « Arrivé au port / En transit / En production / Disponible en showroom » sur le diaporama, les cartes ou la fiche détail ; filtre « Disponibilité » supprimé ; mention de statut retirée du message WhatsApp (le statut est communiqué lors de l'échange commercial).
 - Vérifications : `tsc` + `build` exit 0 ; capture 1440/mobile ; href WhatsApp sans statut ; modale e-mail testée ; Échap ferme.
+
+### Itération 6 : couleurs d'action et alignement des CTA du diaporama
+- « Cotation par e-mail » reprend la **couleur de marque (rouge/cramoisi)** ; « Cotation en 1 clic » (WhatsApp) reste en **vert WhatsApp #25D366**.
+- Les trois actions du diaporama (WhatsApp, e-mail, « Voir tout le showroom ») sont **alignées sur une même ligne** en desktop, avec retour à la ligne puis empilement plein largeur en mobile.
+- Vérifications : tsc/build exit 0 ; captures 1440 et 390 ; ordre WhatsApp → e-mail → showroom.

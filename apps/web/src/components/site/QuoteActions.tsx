@@ -28,7 +28,7 @@ export function QuoteActions({ vehicle, copy, statusLabels, energyLabels, varian
         <MessageCircle aria-hidden="true" size={16} />
         {copy.whatsappCtaLabel}
       </a>
-      <button type="button" className="site-cta site-cta--secondary site-quote-main" onClick={() => open(vehicle)}>
+      <button type="button" className="site-cta site-cta--primary site-quote-main" onClick={() => open(vehicle)}>
         {copy.ctaLabel}
       </button>
     </div>

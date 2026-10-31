@@ -252,7 +252,7 @@ export function QuoteRequestProvider({
                   </a>
                   <button
                     type="submit"
-                    className="site-cta site-cta--secondary"
+                    className="site-cta site-cta--primary"
                     disabled={status === "submitting"}
                   >
                     {status === "submitting" ? copy.submittingLabel : copy.submitLabel}

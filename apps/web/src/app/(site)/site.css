@@ -2298,3 +2298,38 @@
   width: 100%;
   flex: 0 0 auto;
 }
+
+/* ——— Hero : les 3 CTA (WhatsApp vert, e-mail rouge, showroom) alignés ——— */
+.site-hero-slide-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.site-hero-slide-ctas .site-quote-actions {
+  margin-top: 0;
+  flex-wrap: wrap;
+}
+
+.site-hero-slide-ctas .site-cta {
+  min-height: 46px;
+}
+
+@media (max-width: 640px) {
+  .site-hero-slide-ctas {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .site-hero-slide-ctas .site-quote-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .site-hero-slide-ctas .site-cta {
+    width: 100%;
+    justify-content: center;
+  }
+}

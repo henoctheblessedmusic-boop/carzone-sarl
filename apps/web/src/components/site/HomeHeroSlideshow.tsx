@@ -193,18 +193,18 @@ export function HomeHeroSlideshow({ vehicles, statusLabels, energyLabels, copy, 
           <div className="site-hero-slide-meta">
             <span>{[activeVehicle.year, energyLabel].filter(Boolean).join(" · ")}</span>
           </div>
-          <QuoteActions
-            vehicle={activeVehicle}
-            copy={quoteCopy}
-            statusLabels={statusLabels}
-            energyLabels={energyLabels}
-            variant="hero"
-          />
-          <p className="site-hero-slide-more">
+          <div className="site-hero-slide-ctas">
+            <QuoteActions
+              vehicle={activeVehicle}
+              copy={quoteCopy}
+              statusLabels={statusLabels}
+              energyLabels={energyLabels}
+              variant="hero"
+            />
             <CtaLink href="/vehicules" variant="ghost">
               {copy.viewShowroomCta}
             </CtaLink>
-          </p>
+          </div>
 
           {total > 1 ? (
             <div className="site-hero-slide-dots" role="tablist" aria-label={copy.ariaLabel}>

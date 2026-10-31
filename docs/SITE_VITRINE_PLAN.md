@@ -187,3 +187,8 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - Nouveau : **premier changement automatique à 2,6 s** (mesuré à 2,9 s max dans le navigateur, sous la limite de 3 s demandée), puis rythme normal de 6 s par diapositive.
 - Préchargement des 3 premières images du diaporama (`priority` sur la 1re, `loading="eager"` sur les 2 suivantes) pour éviter tout temps mort entre les slides.
 - Mesures CDP : `delayMs = 2885`, 2 images eager + 11 ressources optimisées chargées.
+
+### Correctif icônes (itération 15)
+- L'ancienne régénération d'emblème avait échoué (détourage 1 px) et produit un favicon/icône iOS dégradés.
+- `icon.png` (512), `apple-icon.png` (180), `favicon.ico` (multi-tailles) et `carzone-badge.png` sont désormais générés à partir du **logo officiel complet** sur fond noir ; `carzone-mark.png` (rogné) supprimé.
+- Vérifications : routes `/icon.png`, `/apple-icon.png`, `/favicon.ico` en 200 avec tailles réelles ; mesure diaporama 2,89 s.

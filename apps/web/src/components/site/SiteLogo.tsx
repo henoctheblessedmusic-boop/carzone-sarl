@@ -2,25 +2,21 @@ import Image from "next/image";
 import Link from "next/link";
 
 /**
- * Lockup d'en-tête CARZONE : emblème officiel + CARZONE jaune + tagline visible.
- * Le logo complet officiel est utilisé en pied de page, sur l'écran de
- * connexion et dans les documents imprimés.
+ * En-tête CARZONE : logo officiel complet (emblème + CARZONE) affiché en entier,
+ * avec la tagline « Drive your dream » en blanc juste en dessous.
  */
 export function SiteLogo() {
   return (
     <Link href="/" className="site-logo" aria-label="CARZONE SARL — Concessionnaire automobile multimarques">
       <Image
-        src="/brand/carzone-mark.png"
-        alt=""
-        width={100}
-        height={56}
+        src="/brand/carzone-logo.png"
+        alt="CARZONE SARL"
+        width={107}
+        height={76}
         priority
-        className="site-logo-mark-img"
+        className="site-logo-img"
       />
-      <span className="site-logo-text">
-        <span className="site-logo-word">CARZONE</span>
-        <span className="site-logo-tagline">Drive your dream</span>
-      </span>
+      <span className="site-logo-tagline">Drive your dream</span>
     </Link>
   );
 }

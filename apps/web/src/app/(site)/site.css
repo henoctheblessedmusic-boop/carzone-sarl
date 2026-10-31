@@ -2562,3 +2562,90 @@
     font-size: 1.15rem;
   }
 }
+
+/* ——— Lockup d'en-tête : logo plus visible + tagline bien lisible ——— */
+.site-header-inner {
+  padding: 0.65rem 24px;
+}
+
+.site-logo {
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.site-logo-mark-img {
+  display: block;
+  width: auto;
+  height: 56px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.site-logo-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.3rem;
+  line-height: 1;
+  min-width: 0;
+}
+
+.site-logo-word {
+  font-size: clamp(1.45rem, 1.8vw, 1.62rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: #f5b301;
+  white-space: nowrap;
+}
+
+.site-logo-tagline {
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: #fbbf24;
+  white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+  .site-logo-mark-img {
+    height: 48px;
+  }
+
+  .site-logo-word {
+    font-size: 1.34rem;
+  }
+
+  .site-logo-tagline {
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-logo {
+    gap: 0.6rem;
+  }
+
+  .site-logo-mark-img {
+    height: 42px;
+  }
+
+  .site-logo-word {
+    font-size: 1.2rem;
+  }
+
+  .site-logo-tagline {
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+  }
+}
+
+/* La tagline « Drive your dream » doit rester visible sur tous les écrans. */
+@media (max-width: 1024px) {
+  .site-logo-tagline {
+    display: block;
+  }
+}

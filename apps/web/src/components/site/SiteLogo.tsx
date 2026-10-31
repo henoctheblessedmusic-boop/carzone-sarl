@@ -2,9 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 /**
- * Lockup d'en-tête CARZONE : emblème officiel resserré + lettrage entièrement jaune.
- * Le logo complet officiel (emblème + CARZONE) est utilisé en pied de page,
- * sur l'écran de connexion et dans les documents imprimés.
+ * Lockup d'en-tête CARZONE : emblème officiel + CARZONE jaune + tagline visible.
+ * Le logo complet officiel est utilisé en pied de page, sur l'écran de
+ * connexion et dans les documents imprimés.
  */
 export function SiteLogo() {
   return (
@@ -12,12 +12,15 @@ export function SiteLogo() {
       <Image
         src="/brand/carzone-mark.png"
         alt=""
-        width={83}
-        height={46}
+        width={100}
+        height={56}
         priority
         className="site-logo-mark-img"
       />
-      <span className="site-logo-word">CARZONE</span>
+      <span className="site-logo-text">
+        <span className="site-logo-word">CARZONE</span>
+        <span className="site-logo-tagline">Drive your dream</span>
+      </span>
     </Link>
   );
 }

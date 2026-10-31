@@ -157,3 +157,8 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - En-tête vitrine : emblème + **CARZONE entièrement jaune**, tagline retirée pour un rendu plus propre, hauteur de header ajustée (46 px desktop / 36 px mobile), espacement et alignement revus.
 - Logo complet officiel conservé en pied de page, connexion, AppShell et documents imprimés ; icône/favicon et OpenGraph régénérés avec la transparence propre.
 - Vérifications : build/tsc exit 0 ; captures DPR2 header desktop, header mobile, login ; aucun débordement.
+
+### Identité visuelle : lockups header vitrine + application (itération 10)
+- Header vitrine : emblème agrandi (46/40/36 px) + CARZONE jaune + **tagline « Drive your dream » visible sur tous les écrans** (y compris mobile, ancienne règle qui la masquait neutralisée).
+- Application de gestion / connexion : composant `CarzoneLogo` transformé en lockup **emblème officiel + CARZONE entièrement jaune (#F5B301)** au lieu du logo complet réduit (lettrage illisible). La tagline de l'app reste affichée sous le lockup.
+- Vérifications : build/tsc exit 0 ; captures header desktop DPR2 + mobile + login ; contrôle DOM du composant app : `CARZONE` couleur `rgb(245,179,1)`, poids 900, emblème `carzone-mark.png`.

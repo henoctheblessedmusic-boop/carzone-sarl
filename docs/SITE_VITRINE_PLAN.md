@@ -168,3 +168,9 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - Vitrine : en-tête = image officielle complète (hauteur 76 px desktop / 58 px tablette / 50 px mobile) + tagline « Drive your dream » **en blanc**, centrée sous le logo ; pied de page = logo complet.
 - Application de gestion / connexion / documents : composant `CarzoneLogo` = logo officiel complet (tailles 52/64/84/96 px), tagline applicative conservée.
 - Vérifications : build/tsc exit 0 ; captures header desktop (logo entier + tagline blanche), header mobile, login.
+
+### Identité visuelle : lockup d'en-tête conforme à la maquette client (itération 12)
+- Maquette Photoshop fournie : emblème officiel à gauche, CARZONE en gros jaune, DRIVE YOUR DREAM en dessous en blanc/gris clair.
+- Recréé en HTML/CSS (pas d'image collée) : police géométrique **Poppins** (800/900) chargée via `next/font/google` pour la vitrine ; emblème `carzone-mark.png` ; CARZONE jaune `#F5B301` ; tagline `#E6EDF7` avec letter-spacing.
+- Header desktop 88 px (emblème 68 px) et mobile 50 px (emblème 44 px) ; lockup horizontal corrigé.
+- Vérifications : build/tsc exit 0 avec téléchargement Poppins OK ; captures desktop DPR2 et mobile.

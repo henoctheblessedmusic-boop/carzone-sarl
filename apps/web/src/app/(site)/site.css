@@ -2762,3 +2762,100 @@
     letter-spacing: 0.1em;
   }
 }
+
+/* ——— Lockup d'en-tête façon charte validée : emblème + CARZONE + tagline ——— */
+.site-header-inner {
+  padding: 0.6rem 24px;
+}
+
+.site-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.15rem;
+  flex-shrink: 0;
+}
+
+.site-logo-emblem {
+  display: block;
+  width: auto;
+  height: clamp(54px, 5vw, 68px);
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.site-logo-lockup {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.42rem;
+  line-height: 1;
+  min-width: 0;
+}
+
+.site-logo-word {
+  font-family: var(--font-logo), "Poppins", system-ui, sans-serif;
+  font-size: clamp(1.75rem, 2.5vw, 2.3rem);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+  color: #f5b301;
+  white-space: nowrap;
+}
+
+.site-logo-tagline {
+  font-family: var(--font-logo), "Poppins", system-ui, sans-serif;
+  display: block;
+  margin: 0;
+  font-size: clamp(0.8rem, 1.05vw, 0.98rem);
+  font-weight: 800;
+  letter-spacing: 0.17em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: #e6edf7;
+  white-space: nowrap;
+  text-align: left;
+}
+
+@media (max-width: 1024px) {
+  .site-logo {
+    gap: 0.85rem;
+  }
+
+  .site-logo-emblem {
+    height: 52px;
+  }
+
+  .site-logo-word {
+    font-size: 1.7rem;
+  }
+
+  .site-logo-tagline {
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-logo {
+    gap: 0.65rem;
+  }
+
+  .site-logo-emblem {
+    height: 44px;
+  }
+
+  .site-logo-word {
+    font-size: 1.35rem;
+  }
+
+  .site-logo-tagline {
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+  }
+}
+
+/* Correction : lockup horizontal (emblème à gauche, texte à droite) */
+.site-logo {
+  flex-direction: row;
+  align-items: center;
+}

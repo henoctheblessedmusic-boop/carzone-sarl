@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Poppins } from "next/font/google";
 import type { ReactNode } from "react";
 import { getSiteLocale } from "@/lib/site-locale-server";
 import { siteCopy } from "@/lib/i18n/site";
@@ -11,6 +12,13 @@ import { SITE_WEBSITE } from "@/lib/site-constants";
 import { Analytics } from "@vercel/analytics/react";
 import { MobileWhatsAppBar } from "@/components/site/MobileWhatsAppBar";
 import "./site.css";
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["800", "900"],
+  variable: "--font-logo",
+  display: "swap",
+});
 
 const OG_LOCALE: Record<SiteLocale, string> = {
   fr: "fr_FR",
@@ -50,7 +58,7 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
   const copy = siteCopy[locale];
 
   return (
-    <div className="site-shell" lang={locale}>
+    <div className={`site-shell ${poppins.variable}`} lang={locale}>
       <SiteLangSync locale={locale} />
       <OrganizationJsonLd />
       <a href="#site-main-content" className="site-skip-link">

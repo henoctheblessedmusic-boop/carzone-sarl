@@ -65,6 +65,44 @@ export const fr: SiteCopy = {
     getDirections: "Itinéraire",
   },
 
+  quote: {
+    ctaLabel: "Demander une cotation",
+    whatsappCtaLabel: "Cotation WhatsApp",
+    dialogTitle: "Demander une cotation",
+    dialogSubtitleVehicle: "Pour {vehicle}.",
+    dialogSubtitleGeneric:
+      "Indiquez vos coordonnées, notre équipe commerciale vous recontacte avec une proposition.",
+    nameLabel: "Nom complet",
+    namePlaceholder: "Votre nom",
+    phoneLabel: "Téléphone",
+    phonePlaceholder: "+229 ...",
+    emailLabel: "Adresse e-mail",
+    emailPlaceholder: "vous@exemple.com",
+    contactHint: "Renseignez au moins un téléphone ou un e-mail.",
+    messageLabel: "Votre message",
+    messageDefaultGeneric: "Je souhaite recevoir une cotation pour un véhicule CARZONE.",
+    messageDefaultVehicleTemplate: "Je souhaite recevoir une cotation pour {vehicle}.",
+    privacyNote:
+      "Vos coordonnées sont utilisées uniquement par l'équipe commerciale CARZONE SARL pour vous recontacter au sujet de cette demande.",
+    submitLabel: "Envoyer ma demande",
+    submittingLabel: "Envoi en cours...",
+    successTitle: "Demande enregistrée",
+    successMessage:
+      "Merci, votre demande a bien été transmise. Notre équipe commerciale vous recontacte rapidement.",
+    errorValidation: "Veuillez renseigner votre nom et au moins un téléphone ou un e-mail.",
+    errorGeneric: "Une erreur est survenue. Vous pouvez réessayer ou nous écrire directement sur WhatsApp.",
+    closeLabel: "Fermer",
+    whatsappSecondaryCta: "Envoyer aussi sur WhatsApp",
+    whatsapp: {
+      introGeneric: "Bonjour CARZONE SARL, je souhaite une demande de cotation.",
+      introWithVehicleTemplate: "Bonjour CARZONE SARL, je souhaite une cotation pour {vehicle}.",
+      detailsLabel: "Détails",
+      linkLabel: "Lien",
+      contactNameLabel: "Nom",
+      contactPhoneLabel: "Téléphone",
+      contactEmailLabel: "E-mail",
+    },
+  },
   footer: {
     tagline:
       "Concessionnaire automobile multimarques à Cotonou : showroom, atelier SAV et solutions de recharge électrique.",

@@ -113,3 +113,10 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - **Accueil** : ouverture sur un diaporama plein écran des nouveautés (véhicules réels Neon : titre, année/énergie, statut, prix FCFA, CTA), autoplay pausable, flèches, puces, clavier, swipe, `prefers-reduced-motion`. La grille « Nouveautés en showroom » suit immédiatement.
 - **Page Véhicules** : hero compacté (moins d'espace avant le titre et avant les filtres), filtres et première rangée de voitures visibles dès le premier écran desktop ; en mobile, recherche visible + bouton « Filtres » repliable (compteur de filtres actifs) pour faire apparaître les voitures immédiatement.
 - Vérifications : `tsc` + `build` exit 0 ; captures CDP 1920/1440/390 ; `scrollWidth === viewport` ; diaporama testé (slide 1→2, annonce aria-live) ; bouton Filtres testé (aria-expanded true, panneau 7 champs).
+
+### Évolutions produit (itération 3)
+- **Diaporama d'accueil** : uniquement les marques chinoises, CHANGAN UNI-K 2026 2.0T AWD forcée en première position ; prix retirés ; CTA « Demander une cotation » (modale de capture) + « Cotation WhatsApp » préremplie.
+- **Prix masqués sur toute la vitrine** : plus aucun montant affiché sur l'accueil, le catalogue ou la fiche détail ; le filtre budget et le tri par prix ont été retirés côté public.
+- **Flux de cotation** : modale accessible (nom, téléphone, e-mail, message prérempli avec le véhicule), enregistrement en base via `POST /api/public/lead` (lead + notification admin, validation Zod, rate limiting 5/10 min/IP), état de succès, alternative WhatsApp 1 clic avec message prérempli (véhicule, année, énergie, statut, lien).
+- **Bloc intro accueil** : espacements réduits et alignement compact (une information par ligne).
+- Vérifications : `tsc` + `build` exit 0 ; premier slide = CHANGAN UNI-K ; 0 nœud prix visible ; 7 boutons cotation sur l'accueil et 13 sur le catalogue ; modale testée (ouverture, champs, Échap) ; lien WhatsApp prérempli vérifié ; API testée (succès + 400 + 429) ; lead de test créé puis supprimé de la base ; `scrollWidth == viewport` desktop/mobile.

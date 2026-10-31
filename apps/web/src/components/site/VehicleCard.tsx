@@ -1,4 +1,6 @@
 import Image from "next/image";
+import type { SiteCopy } from "@/lib/i18n/site";
+import { QuoteActions } from "./QuoteActions";
 
 export interface FeaturedVehicle {
   id: string;
@@ -7,23 +9,21 @@ export interface FeaturedVehicle {
   variant: string | null;
   year: number | null;
   energy: string;
-  priceXof: number;
+  status: string;
   mainPhotoUrl: string | null;
 }
 
 interface VehicleCardProps {
   vehicle: FeaturedVehicle;
-  priceOnRequestLabel: string;
   newBadgeLabel: string;
+  quoteCopy: SiteCopy["quote"];
+  statusLabels?: Record<string, string>;
+  energyLabels?: Record<string, string>;
 }
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-function formatPriceXof(priceXof: number, locale: string): string {
-  return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(priceXof) + " FCFA";
-}
-
-export function VehicleCard({ vehicle, priceOnRequestLabel, newBadgeLabel }: VehicleCardProps) {
+export function VehicleCard({ vehicle, newBadgeLabel, quoteCopy, statusLabels, energyLabels }: VehicleCardProps) {
   const title = [vehicle.brand, vehicle.model, vehicle.variant].filter(Boolean).join(" ");
   const isRecent = vehicle.year !== null && vehicle.year >= CURRENT_YEAR - 1;
 
@@ -47,9 +47,13 @@ export function VehicleCard({ vehicle, priceOnRequestLabel, newBadgeLabel }: Veh
         <p className="site-vehicle-card-energy">{vehicle.energy}</p>
         <h3 className="site-vehicle-card-title">{title}</h3>
         {vehicle.year ? <p className="site-vehicle-card-year">{vehicle.year}</p> : null}
-        <p className="site-vehicle-card-price">
-          {vehicle.priceXof > 0 ? formatPriceXof(vehicle.priceXof, "fr-FR") : priceOnRequestLabel}
-        </p>
+        <QuoteActions
+          vehicle={vehicle}
+          copy={quoteCopy}
+          statusLabels={statusLabels}
+          energyLabels={energyLabels}
+          variant="card"
+        />
       </div>
     </article>
   );

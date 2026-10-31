@@ -2,12 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { MessageCircle, X } from "lucide-react";
+import { X } from "lucide-react";
 import type { SiteCopy } from "@/lib/i18n/site";
 import type { SiteLocale } from "@/lib/site-prefs";
-import { SITE_PRIMARY_PHONE, whatsAppHref } from "@/lib/site-constants";
-import { CtaLink } from "./CtaLink";
-import { formatSiteNumber, formatSitePrice } from "./vehicle-format";
+import { formatSiteNumber } from "./vehicle-format";
+import { QuoteActions } from "./QuoteActions";
 
 export interface CatalogVehicle {
   id: string;
@@ -33,6 +32,7 @@ interface VehicleDetailModalProps {
   vehicle: CatalogVehicle;
   copy: SiteCopy["vehicules"];
   locale: SiteLocale;
+  quoteCopy: SiteCopy["quote"];
   onClose: () => void;
 }
 
@@ -59,7 +59,7 @@ function buildGallery(vehicle: CatalogVehicle, copy: SiteCopy["vehicules"]): Gal
   return candidates.filter((photo): photo is GalleryPhoto => photo !== null);
 }
 
-export function VehicleDetailModal({ vehicle, copy, locale, onClose }: VehicleDetailModalProps) {
+export function VehicleDetailModal({ vehicle, copy, locale, quoteCopy, onClose }: VehicleDetailModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -71,7 +71,6 @@ export function VehicleDetailModal({ vehicle, copy, locale, onClose }: VehicleDe
   const statusLabel = copy.statusLabels[vehicle.status] ?? vehicle.status;
   const energyLabel = copy.energyLabels[vehicle.energy] ?? vehicle.energy;
   const typeLabel = vehicle.vehicleType ? copy.typeLabels[vehicle.vehicleType] ?? vehicle.vehicleType : null;
-  const whatsappMessage = copy.modal.whatsappMessageTemplate.replace("{vehicle}", title);
 
   useEffect(() => {
     previouslyFocused.current = document.activeElement as HTMLElement;
@@ -160,7 +159,6 @@ export function VehicleDetailModal({ vehicle, copy, locale, onClose }: VehicleDe
           <h2 id="vehicle-modal-title" className="site-modal-title">
             {title}
           </h2>
-          <p className="site-modal-price">{formatSitePrice(vehicle.priceXof, locale)}</p>
 
           <dl className="site-modal-specs">
             <div>
@@ -217,20 +215,12 @@ export function VehicleDetailModal({ vehicle, copy, locale, onClose }: VehicleDe
             </div>
           </dl>
 
-          <div className="site-modal-ctas">
-            <a
-              href={whatsAppHref(SITE_PRIMARY_PHONE, whatsappMessage)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="site-cta site-cta--primary"
-            >
-              <MessageCircle aria-hidden="true" size={18} />
-              {copy.modal.whatsappCta}
-            </a>
-            <CtaLink href="/contact" variant="secondary">
-              {copy.modal.contactCta}
-            </CtaLink>
-          </div>
+          <QuoteActions
+            vehicle={vehicle}
+            copy={quoteCopy}
+            statusLabels={copy.statusLabels}
+            energyLabels={copy.energyLabels}
+          />
         </div>
       </div>
     </div>

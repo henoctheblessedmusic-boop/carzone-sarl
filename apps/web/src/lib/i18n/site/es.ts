@@ -65,6 +65,43 @@ export const es: SiteCopy = {
     getDirections: "Cómo llegar",
   },
 
+  quote: {
+    ctaLabel: "Solicitar cotización",
+    whatsappCtaLabel: "Cotización por WhatsApp",
+    dialogTitle: "Solicitar cotización",
+    dialogSubtitleVehicle: "Para el {vehicle}.",
+    dialogSubtitleGeneric:
+      "Déjenos sus datos y nuestro equipo comercial se pondrá en contacto con una propuesta.",
+    nameLabel: "Nombre completo",
+    namePlaceholder: "Su nombre",
+    phoneLabel: "Teléfono",
+    phonePlaceholder: "+229 ...",
+    emailLabel: "Correo electrónico",
+    emailPlaceholder: "usted@ejemplo.com",
+    contactHint: "Indique al menos un teléfono o un correo electrónico.",
+    messageLabel: "Su mensaje",
+    messageDefaultGeneric: "Deseo recibir una cotización para un vehículo CARZONE.",
+    messageDefaultVehicleTemplate: "Deseo recibir una cotización para el {vehicle}.",
+    privacyNote:
+      "Sus datos son utilizados únicamente por el equipo comercial de CARZONE SARL para contactarle sobre esta solicitud.",
+    submitLabel: "Enviar mi solicitud",
+    submittingLabel: "Enviando...",
+    successTitle: "Solicitud registrada",
+    successMessage: "Gracias, su solicitud ha sido transmitida. Nuestro equipo comercial le contactará en breve.",
+    errorValidation: "Indique su nombre y al menos un teléfono o un correo electrónico.",
+    errorGeneric: "Ha ocurrido un error. Puede intentarlo de nuevo o escribirnos por WhatsApp.",
+    closeLabel: "Cerrar",
+    whatsappSecondaryCta: "Enviar también por WhatsApp",
+    whatsapp: {
+      introGeneric: "Hola CARZONE SARL, deseo solicitar una cotización.",
+      introWithVehicleTemplate: "Hola CARZONE SARL, deseo una cotización para el {vehicle}.",
+      detailsLabel: "Detalles",
+      linkLabel: "Enlace",
+      contactNameLabel: "Nombre",
+      contactPhoneLabel: "Teléfono",
+      contactEmailLabel: "Correo",
+    },
+  },
   footer: {
     tagline:
       "Concesionario multimarca en Cotonú: showroom, taller posventa y soluciones de recarga eléctrica.",

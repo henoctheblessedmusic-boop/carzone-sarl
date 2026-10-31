@@ -6,7 +6,8 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Container } from "./Container";
 import { CtaLink } from "./CtaLink";
-import { formatSitePrice } from "./vehicle-format";
+import type { SiteCopy } from "@/lib/i18n/site/types";
+import { QuoteActions } from "./QuoteActions";
 import type { SiteLocale } from "@/lib/site-prefs";
 
 export interface SlideshowVehicle {
@@ -41,6 +42,7 @@ interface HomeHeroSlideshowProps {
   statusLabels: Record<string, string>;
   energyLabels: Record<string, string>;
   copy: HomeHeroSlideshowCopy;
+  quoteCopy: SiteCopy["quote"];
 }
 
 const AUTOPLAY_DELAY_MS = 6000;
@@ -68,7 +70,7 @@ function vehicleTitle(vehicle: SlideshowVehicle): string {
   return [vehicle.brand, vehicle.model, vehicle.variant].filter(Boolean).join(" ");
 }
 
-export function HomeHeroSlideshow({ vehicles, locale, statusLabels, energyLabels, copy }: HomeHeroSlideshowProps) {
+export function HomeHeroSlideshow({ vehicles, statusLabels, energyLabels, copy, quoteCopy }: HomeHeroSlideshowProps) {
   const total = vehicles.length;
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -145,7 +147,6 @@ export function HomeHeroSlideshow({ vehicles, locale, statusLabels, energyLabels
   const title = vehicleTitle(activeVehicle);
   const statusLabel = statusLabels[activeVehicle.status] ?? activeVehicle.status;
   const energyLabel = energyLabels[activeVehicle.energy] ?? activeVehicle.energy;
-  const price = activeVehicle.priceXof > 0 ? formatSitePrice(activeVehicle.priceXof, locale) : copy.priceOnRequest;
   const liveText = copy.goToSlideLabel
     .replace("{current}", String(activeIndex + 1))
     .replace("{total}", String(total));
@@ -194,15 +195,18 @@ export function HomeHeroSlideshow({ vehicles, locale, statusLabels, energyLabels
             <span>{[activeVehicle.year, energyLabel].filter(Boolean).join(" · ")}</span>
             <span className="site-badge site-badge--accent site-badge--inline">{statusLabel}</span>
           </div>
-          <p className="site-hero-slide-price">{price}</p>
-          <div className="site-hero-ctas">
-            <CtaLink href="/vehicules" variant="primary">
-              {copy.viewVehicleCta}
-            </CtaLink>
+          <QuoteActions
+            vehicle={activeVehicle}
+            copy={quoteCopy}
+            statusLabels={statusLabels}
+            energyLabels={energyLabels}
+            variant="hero"
+          />
+          <p className="site-hero-slide-more">
             <CtaLink href="/vehicules" variant="ghost">
               {copy.viewShowroomCta}
             </CtaLink>
-          </div>
+          </p>
 
           {total > 1 ? (
             <div className="site-hero-slide-dots" role="tablist" aria-label={copy.ariaLabel}>

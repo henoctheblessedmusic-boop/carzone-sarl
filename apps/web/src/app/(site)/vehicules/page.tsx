@@ -5,6 +5,7 @@ import { siteCopy } from "@/lib/i18n/site";
 import type { SiteLocale } from "@/lib/site-prefs";
 import { Container } from "@/components/site/Container";
 import { VehiclesCatalog } from "@/components/site/VehiclesCatalog";
+import { QuoteRequestProvider } from "@/components/site/QuoteRequestProvider";
 import type { CatalogVehicle } from "@/components/site/VehicleDetailModal";
 import { SITE_WEBSITE } from "@/lib/site-constants";
 
@@ -80,7 +81,12 @@ export default async function VehiculesPage() {
   const vehicles = await getCatalogVehicles();
 
   return (
-    <>
+    <QuoteRequestProvider
+      copy={copy.quote}
+      statusLabels={copy.vehicules.statusLabels}
+      energyLabels={copy.vehicules.energyLabels}
+    >
+      <>
       <section className="site-page-hero site-page-hero--compact">
         <Container>
           <p className="site-eyebrow">{copy.vehicules.hero.eyebrow}</p>
@@ -91,9 +97,10 @@ export default async function VehiculesPage() {
 
       <section className="site-section site-section--tight-top">
         <Container>
-          <VehiclesCatalog vehicles={vehicles} copy={copy.vehicules} locale={locale} />
+          <VehiclesCatalog vehicles={vehicles} copy={copy.vehicules} locale={locale} quoteCopy={copy.quote} />
         </Container>
       </section>
-    </>
+      </>
+    </QuoteRequestProvider>
   );
 }

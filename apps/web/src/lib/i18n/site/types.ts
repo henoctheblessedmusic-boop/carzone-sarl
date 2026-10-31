@@ -42,6 +42,42 @@ export interface SiteCopy {
     getDirections: string;
   };
 
+  quote: {
+    ctaLabel: string;
+    whatsappCtaLabel: string;
+    dialogTitle: string;
+    dialogSubtitleVehicle: string;
+    dialogSubtitleGeneric: string;
+    nameLabel: string;
+    namePlaceholder: string;
+    phoneLabel: string;
+    phonePlaceholder: string;
+    emailLabel: string;
+    emailPlaceholder: string;
+    contactHint: string;
+    messageLabel: string;
+    messageDefaultGeneric: string;
+    messageDefaultVehicleTemplate: string;
+    privacyNote: string;
+    submitLabel: string;
+    submittingLabel: string;
+    successTitle: string;
+    successMessage: string;
+    errorValidation: string;
+    errorGeneric: string;
+    closeLabel: string;
+    whatsappSecondaryCta: string;
+    whatsapp: {
+      introGeneric: string;
+      introWithVehicleTemplate: string;
+      detailsLabel: string;
+      linkLabel: string;
+      contactNameLabel: string;
+      contactPhoneLabel: string;
+      contactEmailLabel: string;
+    };
+  };
+
   footer: {
     tagline: string;
     addressTitle: string;

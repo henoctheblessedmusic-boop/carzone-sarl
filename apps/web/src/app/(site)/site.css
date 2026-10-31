@@ -2104,3 +2104,168 @@
     font-size: 0.9rem;
   }
 }
+
+/* ===================== Cotation & capture de contacts ===================== */
+.site-quote-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.site-quote-actions--card {
+  margin-top: 0.85rem;
+}
+
+.site-quote-actions--card .site-cta {
+  flex: 1 1 auto;
+  min-height: 40px;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.85rem;
+  justify-content: center;
+}
+
+.site-quote-actions--hero {
+  gap: 0.75rem;
+  margin-top: 1.1rem;
+}
+
+.site-hero-slide-more {
+  margin-top: 0.85rem;
+}
+
+.site-hero-slide-more .site-cta {
+  min-height: 40px;
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+}
+
+/* Sécurité : aucun prix public ne doit s'afficher */
+.site-hero-slide-price,
+.site-vehicle-card-price,
+.site-modal-price {
+  display: none !important;
+}
+
+.site-quote-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+  background: rgba(3, 7, 12, 0.74);
+  backdrop-filter: blur(6px);
+}
+
+.site-quote-dialog {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-radius: var(--site-radius-lg);
+  border: 1px solid var(--site-border);
+  background: var(--site-surface);
+  box-shadow: var(--site-shadow);
+}
+
+.site-quote-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--site-border);
+  background: var(--site-card);
+  color: var(--site-text);
+  cursor: pointer;
+}
+
+.site-quote-dialog h2 {
+  margin: 0 0 0.4rem;
+  padding-right: 2.5rem;
+  font-size: clamp(1.25rem, 2.2vw, 1.55rem);
+}
+
+.site-quote-subtitle {
+  margin: 0 0 1.1rem;
+  color: var(--site-muted);
+  font-size: 0.93rem;
+}
+
+.site-quote-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.site-quote-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.85rem;
+}
+
+.site-quote-grid > .site-form-field:first-child {
+  grid-column: 1 / -1;
+}
+
+.site-quote-form .site-form-field textarea {
+  min-height: 100px;
+}
+
+.site-quote-error {
+  margin: 0;
+  color: #fda4af;
+  font-size: 0.86rem;
+}
+
+.site-quote-success h2 {
+  margin: 0 0 0.5rem;
+}
+
+.site-quote-success p {
+  margin: 0 0 1.25rem;
+  color: var(--site-muted);
+}
+
+/* ===================== Bloc intro accueil compact ===================== */
+.site-intro {
+  padding-top: clamp(1.5rem, 3vw, 2.25rem);
+  padding-bottom: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.site-intro .site-section-heading {
+  margin-bottom: 0.9rem;
+}
+
+.site-intro .site-section-title {
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+}
+
+@media (min-width: 1025px) {
+  .site-intro .site-section-title {
+    white-space: nowrap;
+  }
+}
+
+.site-intro .site-hero-brands {
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 640px) {
+  .site-quote-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .site-quote-actions .site-cta {
+    flex: 1 1 100%;
+  }
+}

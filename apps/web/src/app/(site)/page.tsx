@@ -8,6 +8,8 @@ import { SectionHeading } from "@/components/site/SectionHeading";
 import { CtaLink } from "@/components/site/CtaLink";
 import { VehicleCard } from "@/components/site/VehicleCard";
 import { HomeHeroSlideshow, type SlideshowVehicle } from "@/components/site/HomeHeroSlideshow";
+import { QuoteRequestProvider } from "@/components/site/QuoteRequestProvider";
+import { QuoteOpenButton } from "@/components/site/QuoteOpenButton";
 import { SITE_BRANDS, SITE_PRIMARY_PHONE, SITE_WEBSITE, whatsAppHref } from "@/lib/site-constants";
 
 const OG_LOCALE: Record<SiteLocale, string> = {
@@ -20,6 +22,9 @@ const OG_LOCALE: Record<SiteLocale, string> = {
 const SHOWROOM_STATUSES = ["EN_STOCK", "EN_MAGASIN"];
 const HIGHLIGHT_STATUSES = ["EN_STOCK", "EN_MAGASIN", "AU_PORT", "EN_TRANSIT", "EN_PRODUCTION"];
 const HIGHLIGHT_LIMIT = 6;
+
+/** Marques chinoises mises en avant dans le diaporama d'accueil (Toyota exclu). */
+const CHINESE_BRANDS = ["CHANGAN", "JETOUR", "BYD", "GEELY", "BAIC", "FORTHING", "CHERY", "DEEPAL"];
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getSiteLocale();
@@ -57,11 +62,21 @@ async function getHighlightVehicles(): Promise<SlideshowVehicle[]> {
         mainPhotoUrl: true,
       },
       orderBy: [{ createdAt: "desc" }],
-      take: HIGHLIGHT_LIMIT,
+      take: 20,
     });
 
-    return vehicles
+    const chineseVehicles = vehicles.filter((vehicle) => CHINESE_BRANDS.includes(vehicle.brand.toUpperCase()));
+    const isUniK = (vehicle: { brand: string; model: string }): number =>
+      vehicle.brand.toUpperCase() === "CHANGAN" && vehicle.model.toUpperCase().includes("UNI-K") ? 0 : 1;
+    const ordered = [...chineseVehicles].sort((a, b) => {
+      const unitDiff = isUniK(a) - isUniK(b);
+      if (unitDiff !== 0) return unitDiff;
+      return (b.year ?? 0) - (a.year ?? 0);
+    });
+
+    return ordered
       .filter((vehicle) => vehicle.mainPhotoUrl !== null)
+      .slice(0, HIGHLIGHT_LIMIT)
       .map((vehicle) => ({ ...vehicle, mainPhotoUrl: vehicle.mainPhotoUrl as string }));
   } catch (error) {
     console.error("Erreur chargement des véhicules à la une (accueil vitrine) :", error);
@@ -87,13 +102,19 @@ export default async function HomePage() {
   );
 
   return (
-    <>
+    <QuoteRequestProvider
+      copy={copy.quote}
+      statusLabels={copy.vehicules.statusLabels}
+      energyLabels={copy.vehicules.energyLabels}
+    >
+      <>
       <HomeHeroSlideshow
         vehicles={vehicles}
         locale={locale}
         statusLabels={copy.vehicules.statusLabels}
         energyLabels={copy.vehicules.energyLabels}
         copy={copy.home.slideshow}
+        quoteCopy={copy.quote}
       />
 
       <section className="site-section site-section--tight-top" aria-labelledby="vehicles-heading">
@@ -110,8 +131,10 @@ export default async function HomePage() {
                 <VehicleCard
                   key={vehicle.id}
                   vehicle={vehicle}
-                  priceOnRequestLabel={copy.home.vehicles.priceOnRequest}
                   newBadgeLabel={copy.home.vehicles.newBadge}
+                  quoteCopy={copy.quote}
+                  statusLabels={copy.vehicules.statusLabels}
+                  energyLabels={copy.vehicules.energyLabels}
                 />
               ))}
             </div>
@@ -213,15 +236,14 @@ export default async function HomePage() {
           <h2>{copy.home.finalCta.title}</h2>
           <p>{copy.home.finalCta.subtitle}</p>
           <div className="site-hero-ctas">
-            <CtaLink href="/contact" variant="primary">
-              {copy.home.finalCta.primaryCta}
-            </CtaLink>
+            <QuoteOpenButton copy={copy.quote} />
             <CtaLink href={whatsAppHref(SITE_PRIMARY_PHONE)} variant="secondary" external>
               {copy.home.finalCta.secondaryCta}
             </CtaLink>
           </div>
         </Container>
       </section>
-    </>
+      </>
+    </QuoteRequestProvider>
   );
 }

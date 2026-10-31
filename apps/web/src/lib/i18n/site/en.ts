@@ -65,6 +65,43 @@ export const en: SiteCopy = {
     getDirections: "Get directions",
   },
 
+  quote: {
+    ctaLabel: "Request a quote",
+    whatsappCtaLabel: "Quote via WhatsApp",
+    dialogTitle: "Request a quote",
+    dialogSubtitleVehicle: "For the {vehicle}.",
+    dialogSubtitleGeneric:
+      "Leave your details and our sales team will get back to you with an offer.",
+    nameLabel: "Full name",
+    namePlaceholder: "Your name",
+    phoneLabel: "Phone",
+    phonePlaceholder: "+229 ...",
+    emailLabel: "E-mail address",
+    emailPlaceholder: "you@example.com",
+    contactHint: "Give at least a phone number or an e-mail address.",
+    messageLabel: "Your message",
+    messageDefaultGeneric: "I would like to receive a quote for a CARZONE vehicle.",
+    messageDefaultVehicleTemplate: "I would like to receive a quote for the {vehicle}.",
+    privacyNote:
+      "Your details are used only by the CARZONE SARL sales team to contact you about this request.",
+    submitLabel: "Send my request",
+    submittingLabel: "Sending...",
+    successTitle: "Request received",
+    successMessage: "Thank you, your request has been passed on. Our sales team will contact you shortly.",
+    errorValidation: "Please enter your name and at least a phone number or an e-mail address.",
+    errorGeneric: "Something went wrong. You can try again or message us directly on WhatsApp.",
+    closeLabel: "Close",
+    whatsappSecondaryCta: "Also send on WhatsApp",
+    whatsapp: {
+      introGeneric: "Hello CARZONE SARL, I would like to request a quote.",
+      introWithVehicleTemplate: "Hello CARZONE SARL, I would like a quote for the {vehicle}.",
+      detailsLabel: "Details",
+      linkLabel: "Link",
+      contactNameLabel: "Name",
+      contactPhoneLabel: "Phone",
+      contactEmailLabel: "E-mail",
+    },
+  },
   footer: {
     tagline:
       "Multi-brand car dealership in Cotonou: showroom, after-sales workshop and EV charging solutions.",

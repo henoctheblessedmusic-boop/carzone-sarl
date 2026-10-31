@@ -2506,3 +2506,59 @@
     height: 38px;
   }
 }
+
+/* ——— Lockup d'en-tête affiné (emblème officiel + CARZONE jaune) ——— */
+.site-header-inner {
+  padding: 0.7rem 24px;
+}
+
+.site-logo {
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.site-logo-mark-img {
+  display: block;
+  width: auto;
+  height: 46px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.site-logo-word {
+  font-size: clamp(1.28rem, 1.5vw, 1.42rem);
+  font-weight: 900;
+  letter-spacing: 0.015em;
+  line-height: 1;
+  color: #f5b301;
+  white-space: nowrap;
+}
+
+.site-logo:hover .site-logo-mark-img {
+  transform: scale(1.03);
+  transition: transform 220ms var(--site-ease);
+}
+
+@media (max-width: 1024px) {
+  .site-logo-mark-img {
+    height: 40px;
+  }
+
+  .site-logo-word {
+    font-size: 1.22rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-logo {
+    gap: 0.55rem;
+  }
+
+  .site-logo-mark-img {
+    height: 36px;
+  }
+
+  .site-logo-word {
+    font-size: 1.15rem;
+  }
+}

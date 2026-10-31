@@ -151,3 +151,9 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - Application interne : page de connexion, AppShell et documents imprimés (devis, factures, reçus, fiches atelier, fiche technique) utilisent le logo officiel (version fond noir pour l'impression).
 - Ancien logo vectoriel `carzone-logo.svg` supprimé ; copie du fichier source officiel conservée dans `docs/brand/carzone-logo-officiel.png`.
 - Vérifications : endpoints `/brand/carzone-logo.png`, `/icon.png`, `/apple-icon.png`, `/favicon.ico` en 200 ; balises og:image/twitter:image présentes ; captures header desktop/mobile + login.
+
+### Identité visuelle : affinage du lockup d'en-tête (itération 9)
+- Emblème régénéré en version resserrée (`public/brand/carzone-mark.png`) et transparence nettoyée (suppression du liseré/ombre grise issue du logo source).
+- En-tête vitrine : emblème + **CARZONE entièrement jaune**, tagline retirée pour un rendu plus propre, hauteur de header ajustée (46 px desktop / 36 px mobile), espacement et alignement revus.
+- Logo complet officiel conservé en pied de page, connexion, AppShell et documents imprimés ; icône/favicon et OpenGraph régénérés avec la transparence propre.
+- Vérifications : build/tsc exit 0 ; captures DPR2 header desktop, header mobile, login ; aucun débordement.

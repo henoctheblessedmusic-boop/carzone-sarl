@@ -120,3 +120,7 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - **Flux de cotation** : modale accessible (nom, téléphone, e-mail, message prérempli avec le véhicule), enregistrement en base via `POST /api/public/lead` (lead + notification admin, validation Zod, rate limiting 5/10 min/IP), état de succès, alternative WhatsApp 1 clic avec message prérempli (véhicule, année, énergie, statut, lien).
 - **Bloc intro accueil** : espacements réduits et alignement compact (une information par ligne).
 - Vérifications : `tsc` + `build` exit 0 ; premier slide = CHANGAN UNI-K ; 0 nœud prix visible ; 7 boutons cotation sur l'accueil et 13 sur le catalogue ; modale testée (ouverture, champs, Échap) ; lien WhatsApp prérempli vérifié ; API testée (succès + 400 + 429) ; lead de test créé puis supprimé de la base ; `scrollWidth == viewport` desktop/mobile.
+
+### Correction ordre accueil (itération 4)
+- Ordre imposé par le client : diaporama plein écran → bloc « Concessionnaire multimarques à Cotonou / Un showroom, un atelier, une équipe » → section « Véhicules à la une » → piliers → chiffres → équipe → FAQ → CTA.
+- Style du diaporama conservé tel que validé : image plein écran (pas de voiture encadrée), textes par-dessus à gauche, flèches + puces.

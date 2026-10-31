@@ -117,6 +117,22 @@ export default async function HomePage() {
         quoteCopy={copy.quote}
       />
 
+      <section className="site-section site-section--muted site-intro" aria-labelledby="intro-heading">
+        <Container>
+          <SectionHeading
+            id="intro-heading"
+            eyebrow={copy.home.intro.eyebrow}
+            title={copy.home.intro.title}
+            subtitle={copy.home.intro.subtitle}
+          />
+          <ul className="site-hero-brands" aria-label={copy.home.intro.brandsLabel}>
+            {SITE_BRANDS.map((brand) => (
+              <li key={brand}>{brand}</li>
+            ))}
+          </ul>
+        </Container>
+      </section>
+
       <section className="site-section site-section--tight-top" aria-labelledby="vehicles-heading">
         <Container>
           <SectionHeading
@@ -146,22 +162,6 @@ export default async function HomePage() {
               {copy.home.vehicles.viewAllCta}
             </CtaLink>
           </div>
-        </Container>
-      </section>
-
-      <section className="site-section site-section--muted site-intro" aria-labelledby="intro-heading">
-        <Container>
-          <SectionHeading
-            id="intro-heading"
-            eyebrow={copy.home.intro.eyebrow}
-            title={copy.home.intro.title}
-            subtitle={copy.home.intro.subtitle}
-          />
-          <ul className="site-hero-brands" aria-label={copy.home.intro.brandsLabel}>
-            {SITE_BRANDS.map((brand) => (
-              <li key={brand}>{brand}</li>
-            ))}
-          </ul>
         </Container>
       </section>
 

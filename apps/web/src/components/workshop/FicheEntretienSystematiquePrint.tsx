@@ -213,7 +213,7 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ position: "relative", width: 56, height: 56, flexShrink: 0 }}>
               <Image
-                src="/brand/carzone-logo.png"
+                src="/brand/carzone-logo-print.png"
                 alt="CARZONE SARL"
                 width={56}
                 height={56}

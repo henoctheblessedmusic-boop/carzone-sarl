@@ -13,8 +13,10 @@ export const metadata: Metadata = {
     description: "Comment CARZONE SARL collecte et protège vos données personnelles.",
     url: "/confidentialite",
     siteName: "CARZONE SARL",
+    images: [{ url: "/brand/carzone-og.png", width: 1200, height: 630, alt: "CARZONE SARL" }],
     type: "website",
   },
+  twitter: { card: "summary_large_image", images: ["/brand/carzone-og.png"] },
 };
 
 const LAST_UPDATED = "31 octobre 2026";

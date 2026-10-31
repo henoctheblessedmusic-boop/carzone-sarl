@@ -2458,3 +2458,51 @@
 .site-hero-slide-playpause:hover {
   background: rgba(6, 11, 18, 0.72);
 }
+
+/* ——— Logo officiel CARZONE (lettrage jaune) ——— */
+.site-logo-img {
+  display: block;
+  width: auto;
+  height: clamp(44px, 4.2vw, 62px);
+}
+
+.site-footer-logo-img {
+  display: block;
+  width: auto;
+  height: 56px;
+  margin: 0 0 0.85rem;
+}
+
+@media (max-width: 640px) {
+  .site-logo-img {
+    height: 40px;
+  }
+
+  .site-footer-logo-img {
+    height: 48px;
+  }
+}
+
+/* ——— Logo d'en-tête : emblème officiel + CARZONE entièrement jaune ——— */
+.site-logo-mark-img {
+  display: block;
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.site-logo-word {
+  color: #f5b301;
+}
+
+.site-logo-tagline {
+  color: var(--site-muted);
+}
+
+@media (max-width: 640px) {
+  .site-logo-mark-img {
+    width: 38px;
+    height: 38px;
+  }
+}

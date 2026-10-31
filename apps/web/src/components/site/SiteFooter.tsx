@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
 import type { SiteCopy } from "@/lib/i18n/site";
@@ -32,7 +33,14 @@ export function SiteFooter({ copy }: SiteFooterProps) {
     <footer className="site-footer">
       <div className="site-container site-footer-grid">
         <div className="site-footer-brand">
-          <p className="site-footer-logo">CARZONE SARL</p>
+          <Image
+            src="/brand/carzone-logo.png"
+            alt="CARZONE SARL"
+            width={180}
+            height={129}
+            sizes="180px"
+            className="site-footer-logo-img"
+          />
           <p className="site-footer-tagline">{copy.footer.tagline}</p>
         </div>
 

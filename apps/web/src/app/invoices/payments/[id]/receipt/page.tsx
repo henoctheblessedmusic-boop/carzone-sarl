@@ -94,7 +94,7 @@ export default async function PaymentReceiptPage({
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element -- print-friendly static asset */}
             <img
-              src="/brand/carzone-logo.png"
+              src="/brand/carzone-logo-print.png"
               alt="CARZONE SARL"
               width={70}
               height={70}

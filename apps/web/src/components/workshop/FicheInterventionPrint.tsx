@@ -214,7 +214,7 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ position: "relative", width: 64, height: 64, flexShrink: 0 }}>
               <Image
-                src="/brand/carzone-logo.png"
+                src="/brand/carzone-logo-print.png"
                 alt="CARZONE SARL"
                 width={64}
                 height={64}

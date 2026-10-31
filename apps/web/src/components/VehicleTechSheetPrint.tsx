@@ -96,7 +96,7 @@ export function VehicleTechSheetPrint({
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/brand/carzone-logo.png"
+              src="/brand/carzone-logo-print.png"
               alt="Logo Officiel Carzone SARL"
               style={{
                 height: "52px",

@@ -13,8 +13,10 @@ export const metadata: Metadata = {
     description: "Informations légales relatives au site de CARZONE SARL.",
     url: "/mentions-legales",
     siteName: "CARZONE SARL",
+    images: [{ url: "/brand/carzone-og.png", width: 1200, height: 630, alt: "CARZONE SARL" }],
     type: "website",
   },
+  twitter: { card: "summary_large_image", images: ["/brand/carzone-og.png"] },
 };
 
 export default function MentionsLegalesPage() {

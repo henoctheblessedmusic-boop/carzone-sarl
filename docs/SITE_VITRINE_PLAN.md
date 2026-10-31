@@ -144,3 +144,10 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - **Nettoyage** : suppression de 4 images inutilisées (~10,8 Mo) dans `public/images/vehicles`.
 - Vérifications : build/tsc exit 0 ; tests CDP : barre mobile visible (href WA), pause `aria-pressed=true`, consentement requis (erreur sans case), envoi avec consentement = SUCCESS, pages légales accessibles (h1 + 9 sections + liens footer), sitemap OK ; lead de test créé puis supprimé.
 - Reste à faire (dépend des accès client) : alerte e-mail/SMS instantanée à chaque lead (SMTP non fourni par la direction pour l'instant).
+
+### Identité visuelle : logo officiel CARZONE (itération 8)
+- Logo officiel fourni (emblème Z + lettrage CARZONE doré) décliné en : logo web transparent (`public/brand/carzone-logo.png`), version impression fond noir (`carzone-logo-print.png`), badge carré (`carzone-badge.png`), image OpenGraph 1200x630, `icon.png` 512, `apple-icon.png` 180 et `favicon.ico` multi-tailles (16/32/48/64/128/256).
+- Site vitrine : en-tête = emblème officiel + **CARZONE entièrement jaune** (plus de blanc mélangé), pied de page = logo complet ; image de partage og:image/twitter:image sur toutes les pages.
+- Application interne : page de connexion, AppShell et documents imprimés (devis, factures, reçus, fiches atelier, fiche technique) utilisent le logo officiel (version fond noir pour l'impression).
+- Ancien logo vectoriel `carzone-logo.svg` supprimé ; copie du fichier source officiel conservée dans `docs/brand/carzone-logo-officiel.png`.
+- Vérifications : endpoints `/brand/carzone-logo.png`, `/icon.png`, `/apple-icon.png`, `/favicon.ico` en 200 ; balises og:image/twitter:image présentes ; captures header desktop/mobile + login.

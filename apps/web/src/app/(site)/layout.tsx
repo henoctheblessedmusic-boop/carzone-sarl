@@ -34,6 +34,13 @@ export async function generateMetadata(): Promise<Metadata> {
       locale: OG_LOCALE[locale],
       title: copy.meta.home.title,
       description: copy.meta.home.description,
+      images: [{ url: "/brand/carzone-og.png", width: 1200, height: 630, alt: "CARZONE SARL" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: copy.meta.home.title,
+      description: copy.meta.home.description,
+      images: ["/brand/carzone-og.png"],
     },
   };
 }

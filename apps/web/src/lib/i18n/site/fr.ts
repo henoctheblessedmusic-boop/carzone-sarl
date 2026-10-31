@@ -66,9 +66,9 @@ export const fr: SiteCopy = {
   },
 
   quote: {
-    ctaLabel: "Demander une cotation",
-    whatsappCtaLabel: "Cotation WhatsApp",
-    dialogTitle: "Demander une cotation",
+    ctaLabel: "Cotation par e-mail",
+    whatsappCtaLabel: "Cotation en 1 clic",
+    dialogTitle: "Cotation par e-mail",
     dialogSubtitleVehicle: "Pour {vehicle}.",
     dialogSubtitleGeneric:
       "Indiquez vos coordonnées, notre équipe commerciale vous recontacte avec une proposition.",

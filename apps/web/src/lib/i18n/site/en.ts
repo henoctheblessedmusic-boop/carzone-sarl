@@ -66,9 +66,9 @@ export const en: SiteCopy = {
   },
 
   quote: {
-    ctaLabel: "Request a quote",
-    whatsappCtaLabel: "Quote via WhatsApp",
-    dialogTitle: "Request a quote",
+    ctaLabel: "Quote by e-mail",
+    whatsappCtaLabel: "Quote in 1 click",
+    dialogTitle: "Quote by e-mail",
     dialogSubtitleVehicle: "For the {vehicle}.",
     dialogSubtitleGeneric:
       "Leave your details and our sales team will get back to you with an offer.",

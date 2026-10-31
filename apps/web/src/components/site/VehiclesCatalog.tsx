@@ -26,7 +26,6 @@ export function VehiclesCatalog({ vehicles, copy, locale, quoteCopy }: VehiclesC
   const [brand, setBrand] = useState("");
   const [energy, setEnergy] = useState("");
   const [vehicleType, setVehicleType] = useState("");
-  const [status, setStatus] = useState("");
 
   const [selectedVehicle, setSelectedVehicle] = useState<CatalogVehicle | null>(null);
   const [showFilters, setShowFilters] = useState(false);
@@ -34,10 +33,9 @@ export function VehiclesCatalog({ vehicles, copy, locale, quoteCopy }: VehiclesC
   const brandOptions = useMemo(() => uniqueSorted(vehicles.map((v) => v.brand)), [vehicles]);
   const energyOptions = useMemo(() => uniqueSorted(vehicles.map((v) => v.energy)), [vehicles]);
   const typeOptions = useMemo(() => uniqueSorted(vehicles.map((v) => v.vehicleType)), [vehicles]);
-  const statusOptions = useMemo(() => uniqueSorted(vehicles.map((v) => v.status)), [vehicles]);
 
-  const hasActiveFilters = Boolean(search || brand || energy || vehicleType || status);
-  const activeFilterCount = [brand, energy, vehicleType, status].filter(Boolean).length;
+  const hasActiveFilters = Boolean(search || brand || energy || vehicleType);
+  const activeFilterCount = [brand, energy, vehicleType].filter(Boolean).length;
 
   const filteredVehicles = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -45,7 +43,6 @@ export function VehiclesCatalog({ vehicles, copy, locale, quoteCopy }: VehiclesC
       if (brand && vehicle.brand !== brand) return false;
       if (energy && vehicle.energy !== energy) return false;
       if (vehicleType && vehicle.vehicleType !== vehicleType) return false;
-      if (status && vehicle.status !== status) return false;
       if (query) {
         const haystack = [vehicle.brand, vehicle.model, vehicle.variant].filter(Boolean).join(" ").toLowerCase();
         if (!haystack.includes(query)) return false;
@@ -53,14 +50,13 @@ export function VehiclesCatalog({ vehicles, copy, locale, quoteCopy }: VehiclesC
       return true;
     });
     return [...filtered].sort(byNewestYear);
-  }, [vehicles, search, brand, energy, vehicleType, status]);
+  }, [vehicles, search, brand, energy, vehicleType]);
 
   function resetFilters() {
     setSearch("");
     setBrand("");
     setEnergy("");
     setVehicleType("");
-    setStatus("");
   }
 
   const resultsLabel =
@@ -138,18 +134,6 @@ export function VehiclesCatalog({ vehicles, copy, locale, quoteCopy }: VehiclesC
           </select>
         </div>
 
-        <div className="site-filter-field">
-          <label htmlFor="vehicle-status">{copy.filters.statusLabel}</label>
-          <select id="vehicle-status" value={status} onChange={(event) => setStatus(event.target.value)}>
-            <option value="">{copy.filters.allOption}</option>
-            {statusOptions.map((option) => (
-              <option key={option} value={option}>
-                {copy.statusLabels[option] ?? option}
-              </option>
-            ))}
-          </select>
-        </div>
-
         <button
           type="button"
           className="site-cta site-cta--ghost site-filters-reset"
@@ -208,7 +192,6 @@ interface CatalogCardProps {
 
 function CatalogCard({ vehicle, copy, locale, quoteCopy, onOpen }: CatalogCardProps) {
   const title = [vehicle.brand, vehicle.model, vehicle.variant].filter(Boolean).join(" ");
-  const statusLabel = copy.statusLabels[vehicle.status] ?? vehicle.status;
   const energyLabel = copy.energyLabels[vehicle.energy] ?? vehicle.energy;
 
   return (
@@ -226,7 +209,6 @@ function CatalogCard({ vehicle, copy, locale, quoteCopy, onOpen }: CatalogCardPr
           ) : (
             <div className="site-vehicle-card-placeholder" aria-hidden="true" />
           )}
-          <span className="site-badge site-badge--accent">{statusLabel}</span>
         </div>
         <div className="site-vehicle-card-body">
           <p className="site-vehicle-card-energy">{energyLabel}</p>

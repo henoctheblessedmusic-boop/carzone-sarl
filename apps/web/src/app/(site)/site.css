@@ -2269,3 +2269,32 @@
     flex: 1 1 100%;
   }
 }
+
+/* ——— Bouton WhatsApp officiel (vert) & priorité visuelle ——— */
+.site-shell .site-quote-whatsapp {
+  background: #25d366;
+  color: #07281c;
+  border-color: #25d366;
+  font-weight: 700;
+}
+
+.site-shell .site-quote-whatsapp:hover {
+  background: #1ebe5b;
+  border-color: #1ebe5b;
+  color: #041a12;
+  transform: translateY(-2px);
+}
+
+.site-shell .site-quote-whatsapp svg {
+  color: #07281c;
+}
+
+.site-quote-actions--card {
+  display: flex;
+  flex-direction: column;
+}
+
+.site-quote-actions--card .site-cta {
+  width: 100%;
+  flex: 0 0 auto;
+}

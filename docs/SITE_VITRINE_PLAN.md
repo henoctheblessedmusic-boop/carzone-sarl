@@ -124,3 +124,9 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 ### Correction ordre accueil (itération 4)
 - Ordre imposé par le client : diaporama plein écran → bloc « Concessionnaire multimarques à Cotonou / Un showroom, un atelier, une équipe » → section « Véhicules à la une » → piliers → chiffres → équipe → FAQ → CTA.
 - Style du diaporama conservé tel que validé : image plein écran (pas de voiture encadrée), textes par-dessus à gauche, flèches + puces.
+
+### Itération 5 : priorité WhatsApp & statut masqué
+- Boutons voiture réordonnés : **« Cotation en 1 clic » (WhatsApp) en premier**, en **vert WhatsApp (#25D366)**, puis **« Cotation par e-mail »** (modale de capture).
+- Libellés mis à jour en FR/EN/ES/ZH.
+- **Statut retiré du public** : plus de badge « Arrivé au port / En transit / En production / Disponible en showroom » sur le diaporama, les cartes ou la fiche détail ; filtre « Disponibilité » supprimé ; mention de statut retirée du message WhatsApp (le statut est communiqué lors de l'échange commercial).
+- Vérifications : `tsc` + `build` exit 0 ; capture 1440/mobile ; href WhatsApp sans statut ; modale e-mail testée ; Échap ferme.

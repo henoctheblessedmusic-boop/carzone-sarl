@@ -68,7 +68,6 @@ export function VehicleDetailModal({ vehicle, copy, locale, quoteCopy, onClose }
   const photos = buildGallery(vehicle, copy);
   const activePhoto = photos[activeIndex] ?? photos[0];
 
-  const statusLabel = copy.statusLabels[vehicle.status] ?? vehicle.status;
   const energyLabel = copy.energyLabels[vehicle.energy] ?? vehicle.energy;
   const typeLabel = vehicle.vehicleType ? copy.typeLabels[vehicle.vehicleType] ?? vehicle.vehicleType : null;
 
@@ -208,10 +207,6 @@ export function VehicleDetailModal({ vehicle, copy, locale, quoteCopy, onClose }
               <dd>
                 {formatSiteNumber(vehicle.mileage, locale)} {copy.modal.mileageUnit}
               </dd>
-            </div>
-            <div>
-              <dt>{copy.modal.statusLabel}</dt>
-              <dd>{statusLabel}</dd>
             </div>
           </dl>
 

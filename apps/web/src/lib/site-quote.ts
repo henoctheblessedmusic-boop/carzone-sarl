@@ -42,7 +42,6 @@ export function buildQuoteWhatsAppMessage(
     const details = [
       vehicle.year ? String(vehicle.year) : null,
       vehicle.energy ? maps?.energyLabels?.[vehicle.energy] ?? vehicle.energy : null,
-      vehicle.status ? maps?.statusLabels?.[vehicle.status] ?? vehicle.status : null,
     ].filter((detail): detail is string => Boolean(detail));
 
     lines.push("");

@@ -66,9 +66,9 @@ export const zh: SiteCopy = {
   },
 
   quote: {
-    ctaLabel: "索取报价",
-    whatsappCtaLabel: "WhatsApp 报价",
-    dialogTitle: "索取报价",
+    ctaLabel: "邮件报价",
+    whatsappCtaLabel: "一键报价",
+    dialogTitle: "邮件报价",
     dialogSubtitleVehicle: "车型：{vehicle}。",
     dialogSubtitleGeneric: "留下您的联系方式，我们的销售团队将尽快为您提供报价。",
     nameLabel: "姓名",

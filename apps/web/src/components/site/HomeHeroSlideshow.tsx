@@ -145,7 +145,6 @@ export function HomeHeroSlideshow({ vehicles, statusLabels, energyLabels, copy, 
 
   const activeVehicle = vehicles[activeIndex];
   const title = vehicleTitle(activeVehicle);
-  const statusLabel = statusLabels[activeVehicle.status] ?? activeVehicle.status;
   const energyLabel = energyLabels[activeVehicle.energy] ?? activeVehicle.energy;
   const liveText = copy.goToSlideLabel
     .replace("{current}", String(activeIndex + 1))
@@ -193,7 +192,6 @@ export function HomeHeroSlideshow({ vehicles, statusLabels, energyLabels, copy, 
           <h1 className="site-hero-slide-title">{title}</h1>
           <div className="site-hero-slide-meta">
             <span>{[activeVehicle.year, energyLabel].filter(Boolean).join(" · ")}</span>
-            <span className="site-badge site-badge--accent site-badge--inline">{statusLabel}</span>
           </div>
           <QuoteActions
             vehicle={activeVehicle}

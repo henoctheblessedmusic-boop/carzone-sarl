@@ -168,7 +168,7 @@ export function QuoteRequestProvider({
                     href={whatsappLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="site-cta site-cta--primary"
+                    className="site-cta site-quote-whatsapp"
                   >
                     <MessageCircle aria-hidden="true" size={18} />
                     {copy.whatsappSecondaryCta}
@@ -241,22 +241,22 @@ export function QuoteRequestProvider({
                 <p className="site-form-note">{copy.privacyNote}</p>
 
                 <div className="site-quote-actions">
-                  <button
-                    type="submit"
-                    className="site-cta site-cta--primary"
-                    disabled={status === "submitting"}
-                  >
-                    {status === "submitting" ? copy.submittingLabel : copy.submitLabel}
-                  </button>
                   <a
                     href={whatsappLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="site-cta site-cta--ghost"
+                    className="site-cta site-quote-whatsapp"
                   >
                     <MessageCircle aria-hidden="true" size={18} />
                     {copy.whatsappSecondaryCta}
                   </a>
+                  <button
+                    type="submit"
+                    className="site-cta site-cta--secondary"
+                    disabled={status === "submitting"}
+                  >
+                    {status === "submitting" ? copy.submittingLabel : copy.submitLabel}
+                  </button>
                 </div>
               </form>
             )}

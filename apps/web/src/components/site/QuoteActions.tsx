@@ -19,18 +19,18 @@ export function QuoteActions({ vehicle, copy, statusLabels, energyLabels, varian
 
   return (
     <div className={variant === "default" ? "site-quote-actions" : `site-quote-actions site-quote-actions--${variant}`}>
-      <button type="button" className="site-cta site-cta--primary site-quote-main" onClick={() => open(vehicle)}>
-        {copy.ctaLabel}
-      </button>
       <a
         href={whatsappHref}
         target="_blank"
         rel="noopener noreferrer"
-        className="site-cta site-cta--ghost site-quote-whatsapp"
+        className="site-cta site-quote-whatsapp"
       >
         <MessageCircle aria-hidden="true" size={16} />
         {copy.whatsappCtaLabel}
       </a>
+      <button type="button" className="site-cta site-cta--secondary site-quote-main" onClick={() => open(vehicle)}>
+        {copy.ctaLabel}
+      </button>
     </div>
   );
 }

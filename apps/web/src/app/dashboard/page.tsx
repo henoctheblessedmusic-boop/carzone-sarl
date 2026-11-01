@@ -64,6 +64,7 @@ export default async function DashboardPage() {
       },
     }),
     prisma.invoice.findMany({
+      where: { isDemo: false },
       include: { customer: true },
       orderBy: { createdAt: "desc" },
     }),

@@ -23,6 +23,7 @@ export async function GET() {
 
   const [invoices, quotes, payments] = await Promise.all([
     prisma.invoice.findMany({
+      where: { isDemo: false },
       include: { customer: true },
       orderBy: { createdAt: "desc" },
     }),
@@ -31,6 +32,7 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     }),
     prisma.payment.findMany({
+      where: { invoice: { isDemo: false } },
       include: { invoice: { include: { customer: true } } },
       orderBy: { paidAt: "desc" },
     }),

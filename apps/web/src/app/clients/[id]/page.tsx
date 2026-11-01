@@ -42,6 +42,7 @@ export default async function CustomerDetailPage({
         include: { lines: true, invoice: true },
       },
       invoices: {
+        where: { isDemo: false },
         orderBy: { createdAt: "desc" },
         include: { payments: true, quote: true },
       },

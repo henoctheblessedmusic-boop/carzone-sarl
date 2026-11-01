@@ -265,6 +265,17 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     "hr:read", "hr:write",
     "expenses:read", "expenses:write",
   ],
+
+  // Comptable Garage : périmètre comptable de l'atelier uniquement (supervisé par COMPTA)
+  COMPTA_GARAGE: [
+    "financial_report:export",
+    "invoices:read", "invoices:write",
+    "quotes:read", "quotes:write",
+    "workshop:read", "workshop:write",
+    "vehicles:read",
+    "mailbox:read",
+    "clients:read",
+  ],
   STOCK: [
     "vehicles:read", "vehicles:write",
     "fleet:read",
@@ -415,6 +426,9 @@ export class RoleService {
     if (pathname.startsWith("/expenses")) {
       return role === "COMPTA" || role === "ASSISTANTE_COMPTABLE" || role === "RH" || role === "ADMIN" || this.hasPermission(role, "expenses:read");
     }
+    if (pathname.startsWith("/delivery-notes")) {
+      return role === "COMPTA" || role === "COMPTA_GARAGE" || role === "ADMIN";
+    }
     return true;
   }
 
@@ -509,6 +523,9 @@ export class RoleService {
     }
     if (pathname.startsWith("/charging") || pathname.startsWith("/terminal")) {
       return this.userHasPermission(user, "charging:read");
+    }
+    if (pathname.startsWith("/delivery-notes")) {
+      return user.role === "COMPTA" || user.role === "COMPTA_GARAGE";
     }
 
     return this.isRouteAllowed(user.role, pathname);

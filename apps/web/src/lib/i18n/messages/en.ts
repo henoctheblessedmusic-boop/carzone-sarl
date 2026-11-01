@@ -40,6 +40,7 @@ export const en: Messages = {
     users: "Team & roles",
     hr: "Human resources (HR)",
     expenses: "Expenses & vendors",
+    deliveryNotes: "Delivery notes",
     aria: "Main navigation",
   },
   pages: {
@@ -65,6 +66,7 @@ export const en: Messages = {
     users: "Team & roles management",
     hr: "Human resources management (HR)",
     expenses: "Operating expenses & purchase orders",
+    deliveryNotes: "Internal delivery notes (non-fiscal)",
   },
   common: {
     logout: "Sign out",
@@ -121,6 +123,7 @@ export const en: Messages = {
     ASSISTANTE_COMPTABLE: "Accounting assistant",
     ADMIN: "Administrator (vehicles & inquiries)",
     COMPTA: "Accounting",
+    COMPTA_GARAGE: "Workshop Accountant",
     STOCK: "Inventory",
     ATELIER: "Workshop",
     BORNES_OPS: "Chargers & energy",

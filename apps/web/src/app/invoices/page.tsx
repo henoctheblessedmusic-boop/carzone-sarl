@@ -2,6 +2,7 @@ import { AppShell } from "@/components/AppShell";
 import { PolicyPanel } from "@/components/PolicyPanel";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
+import { ACTIVITY } from "@/lib/permissions";
 import { InvoicesView, type InvoiceItem, type PaymentRow } from "./InvoicesView";
 import type { ExpenseItem, SalaryItem, VehicleStat, WorkOrderStat } from "./FinancialBilanTab";
 
@@ -17,10 +18,12 @@ export default async function InvoicesPage() {
     "CHEF_ATELIER",
     "ASSISTANTE_COMPTABLE",
     "COMPTA",
+    "COMPTA_GARAGE",
     "ADMIN",
   ]);
 
   const currentYear = new Date().getFullYear();
+  const invoiceScope = user.role === "COMPTA_GARAGE" ? { activity: ACTIVITY.GARAGE } : undefined;
 
   const [
     rawInvoices,
@@ -31,6 +34,7 @@ export default async function InvoicesPage() {
     rawWorkOrders,
   ] = await Promise.all([
     prisma.invoice.findMany({
+      where: invoiceScope,
       include: {
         customer: true,
         payments: {
@@ -41,6 +45,7 @@ export default async function InvoicesPage() {
       orderBy: { createdAt: "desc" },
     }),
     prisma.payment.findMany({
+      where: invoiceScope ? { invoice: invoiceScope } : undefined,
       include: {
         invoice: {
           include: {
@@ -90,6 +95,7 @@ export default async function InvoicesPage() {
     number: inv.number,
     status: inv.status,
     kind: inv.kind,
+    activity: inv.activity,
     taxMode: inv.taxMode,
     taxRatePct: inv.taxRatePct,
     subtotalHtXof: inv.subtotalHtXof,

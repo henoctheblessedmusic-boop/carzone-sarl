@@ -49,6 +49,7 @@ export type QuoteItem = {
   number: string;
   status: string;
   docKind: string;
+  activity: string;
   taxMode: string;
   taxRatePct: number;
   subtotalHtXof: number;
@@ -110,6 +111,7 @@ export function QuotesView({
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [activityFilter, setActivityFilter] = useState<"ALL" | "SHOWROOM" | "GARAGE">("ALL");
   const [voidModalQuoteId, setVoidModalQuoteId] = useState<string | null>(null);
   const [voidReason, setVoidReason] = useState("");
   const [editingQuote, setEditingQuote] = useState<QuoteItem | null>(null);
@@ -196,7 +198,9 @@ export function QuotesView({
   const confirmedRevenue = confirmedQuotes.reduce((sum, q) => sum + q.totalXof, 0);
 
   // Filtering
+  const showActivityToggle = quotes.some((q) => q.activity === "GARAGE");
   const filteredQuotes = quotes.filter((q) => {
+    if (activityFilter !== "ALL" && q.activity !== activityFilter) return false;
     if (statusFilter !== "ALL") {
       if (statusFilter === "PENDING") {
         if (!["BROUILLON", "PROFORMA_ENVOYEE", "ENVOYE"].includes(q.status)) return false;
@@ -391,6 +395,33 @@ export function QuotesView({
               </button>
             ))}
           </div>
+
+          {showActivityToggle && (
+            <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+              {[
+                { id: "ALL" as const, label: "Toutes" },
+                { id: "SHOWROOM" as const, label: "Showroom" },
+                { id: "GARAGE" as const, label: "Garage" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActivityFilter(tab.id)}
+                  className="ox-btn ox-btn-sm"
+                  style={{
+                    background:
+                      activityFilter === tab.id ? "rgba(197, 216, 228, 0.25)" : "transparent",
+                    color: activityFilter === tab.id ? "#fff" : "rgba(255, 255, 255, 0.65)",
+                    border:
+                      activityFilter === tab.id
+                        ? "1px solid rgba(197, 216, 228, 0.4)"
+                        : "1px solid transparent",
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Creator Trigger */}

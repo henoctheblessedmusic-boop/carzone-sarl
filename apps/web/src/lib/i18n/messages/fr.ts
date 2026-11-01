@@ -40,6 +40,7 @@ export const fr: Messages = {
     users: "Équipe & Rôles",
     hr: "Ressources Humaines (RH)",
     expenses: "Dépenses & Prestataires",
+    deliveryNotes: "Bons de livraison",
     aria: "Navigation principale",
   },
   pages: {
@@ -65,6 +66,7 @@ export const fr: Messages = {
     users: "Gestion de l'équipe & des rôles",
     hr: "Gestion des ressources humaines (RH)",
     expenses: "Charges, dépenses & bons de commande",
+    deliveryNotes: "Bons de livraison internes (non fiscaux)",
   },
   common: {
     logout: "Déconnexion",
@@ -121,6 +123,7 @@ export const fr: Messages = {
     ASSISTANTE_COMPTABLE: "Assistante Comptable",
     ADMIN: "Administrateur (Véhicules & Messages)",
     COMPTA: "Comptabilité",
+    COMPTA_GARAGE: "Comptable Garage",
     STOCK: "Stock",
     ATELIER: "Atelier",
     BORNES_OPS: "Bornes & énergie",

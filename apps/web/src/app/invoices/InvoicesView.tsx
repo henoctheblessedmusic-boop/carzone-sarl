@@ -38,6 +38,7 @@ export type InvoiceItem = {
   number: string;
   status: string;
   kind: string;
+  activity: string;
   taxMode: string;
   taxRatePct: number;
   subtotalHtXof: number;
@@ -126,6 +127,7 @@ export function InvoicesView({
   const [activeTab, setActiveTab] = useState<"INVOICES" | "PAYMENTS" | "BILAN">("INVOICES");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [activityFilter, setActivityFilter] = useState<"ALL" | "SHOWROOM" | "GARAGE">("ALL");
   const [methodFilter, setMethodFilter] = useState("ALL");
 
   // Payment modal state
@@ -174,7 +176,9 @@ export function InvoicesView({
   const fullyPaidCount = productionInvoices.filter((i) => i.status === "PAYEE").length;
 
   // Filtered invoices
+  const showActivityToggle = invoices.some((inv) => inv.activity === "GARAGE");
   const filteredInvoices = invoices.filter((inv) => {
+    if (activityFilter !== "ALL" && inv.activity !== activityFilter) return false;
     if (statusFilter !== "ALL") {
       if (statusFilter === "UNPAID") {
         if (inv.status === "PAYEE" || inv.status === "ANNULEE") return false;
@@ -515,7 +519,36 @@ export function InvoicesView({
                 </button>
               ))}
             </div>
-          ) : (
+          ) : null}
+
+          {activeTab === "INVOICES" && showActivityToggle && (
+            <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+              {[
+                { id: "ALL" as const, label: "Toutes" },
+                { id: "SHOWROOM" as const, label: "Showroom" },
+                { id: "GARAGE" as const, label: "Garage" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActivityFilter(tab.id)}
+                  className="ox-btn ox-btn-sm"
+                  style={{
+                    background:
+                      activityFilter === tab.id ? "rgba(197, 216, 228, 0.25)" : "transparent",
+                    color: activityFilter === tab.id ? "#fff" : "rgba(255, 255, 255, 0.65)",
+                    border:
+                      activityFilter === tab.id
+                        ? "1px solid rgba(197, 216, 228, 0.4)"
+                        : "1px solid transparent",
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {activeTab !== "INVOICES" && (
             <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
               {[
                 { id: "ALL", label: copy.filters.methodAll },

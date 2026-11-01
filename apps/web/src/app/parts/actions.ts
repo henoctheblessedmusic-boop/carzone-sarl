@@ -17,6 +17,7 @@ const AUTHORIZED_ROLES: Role[] = [
   "ATELIER",
   "STOCK",
   "COMPTA",
+  "COMPTA_GARAGE",
   "ADMIN",
 ];
 

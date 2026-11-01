@@ -32,6 +32,7 @@ export type Messages = {
     users?: string;
     hr?: string;
     expenses?: string;
+    deliveryNotes?: string;
     aria: string;
   };
   pages: {
@@ -57,6 +58,7 @@ export type Messages = {
     users?: string;
     hr?: string;
     expenses?: string;
+    deliveryNotes?: string;
   };
   common: {
     logout: string;

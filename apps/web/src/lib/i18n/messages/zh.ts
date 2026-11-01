@@ -40,6 +40,7 @@ export const zh: Messages = {
     users: "团队与角色",
     hr: "人力资源（HR）",
     expenses: "支出与供应商",
+    deliveryNotes: "内部出库单",
     aria: "主导航",
   },
   pages: {
@@ -65,6 +66,7 @@ export const zh: Messages = {
     users: "团队与角色管理",
     hr: "人力资源管理（HR）",
     expenses: "费用、支出与采购单",
+    deliveryNotes: "内部出库单（非税务文件）",
   },
   common: {
     logout: "退出登录",
@@ -121,6 +123,7 @@ export const zh: Messages = {
     ASSISTANTE_COMPTABLE: "会计助理",
     ADMIN: "管理员（车辆与消息）",
     COMPTA: "财务",
+    COMPTA_GARAGE: "车间会计",
     STOCK: "库存",
     ATELIER: "车间",
     BORNES_OPS: "充电桩与能源",

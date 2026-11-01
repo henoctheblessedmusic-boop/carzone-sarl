@@ -27,11 +27,16 @@ import {
 } from "lucide-react";
 import { ExecutiveDashboardCharts } from "@/components/ExecutiveDashboardCharts";
 import { buildRealDashboardAnalytics } from "@/lib/dashboard-analytics";
+import { ACTIVITY } from "@/lib/permissions";
 
 export default async function DashboardPage() {
   const user = await requireUser();
   const { locale, messages } = await getServerMessages();
   const copy = dashboardPageCopy[locale];
+  // La Comptable Garage ne doit voir que le périmètre GARAGE (comptabilité séparée).
+  const garageOnly = user.role === "COMPTA_GARAGE";
+  const invoiceScope = garageOnly ? { activity: ACTIVITY.GARAGE } : undefined;
+  const quoteScope = garageOnly ? { activity: ACTIVITY.GARAGE } : undefined;
 
   const [
     customersCount,
@@ -56,6 +61,7 @@ export default async function DashboardPage() {
     prisma.vehicle.count({ where: { status: { in: ["EN_STOCK", "EN_MAGASIN"] } } }),
     prisma.vehicle.count({ where: { status: { in: ["COMMANDE", "EN_COMMANDE", "EN_PRODUCTION", "EN_TRANSIT", "AU_PORT"] } } }),
     prisma.quote.findMany({
+      where: quoteScope,
       select: {
         id: true,
         status: true,
@@ -64,11 +70,12 @@ export default async function DashboardPage() {
       },
     }),
     prisma.invoice.findMany({
-      where: { isDemo: false },
+      where: { isDemo: false, ...invoiceScope },
       include: { customer: true },
       orderBy: { createdAt: "desc" },
     }),
     prisma.payment.findMany({
+      where: invoiceScope ? { invoice: invoiceScope } : undefined,
       take: 6,
       orderBy: { paidAt: "desc" },
       include: {
@@ -115,6 +122,7 @@ export default async function DashboardPage() {
       orderBy: { paymentDate: "asc" },
     }),
     prisma.payment.findMany({
+      where: invoiceScope ? { invoice: invoiceScope } : undefined,
       select: {
         amountXof: true,
         paidAt: true,

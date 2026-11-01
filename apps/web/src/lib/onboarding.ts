@@ -120,6 +120,12 @@ export const ONBOARDING_STEPS: Record<Role, OnboardingStep[]> = {
     { id: "workshop", label: "Ordres de réparation atelier facturables", href: "/workshop", hint: "Main-d'œuvre et pièces détachées facturées" },
     { id: "hr", label: "Contrôle de la masse salariale", href: "/hr", hint: "Paiements des salaires et régularisations" },
   ],
+  COMPTA_GARAGE: [
+    { id: "workshop", label: "Ordres de réparation atelier facturables", href: "/workshop", hint: "Main-d'œuvre et pièces détachées de l'atelier" },
+    { id: "invoices", label: "Facturation normalisée garage & conformité TVA", href: "/invoices", hint: "Certification DGI et encaissements du périmètre atelier" },
+    { id: "delivery-notes", label: "Bons de livraison internes du garage", href: "/delivery-notes", hint: "Déstockage pièces, document non fiscal BL-GAR" },
+    { id: "parts", label: "Inventaire des pièces de rechange", href: "/parts", hint: "Stock physique et alertes de seuil minimal" },
+  ],
   STOCK: [
     { id: "catalog", label: "Catalogue officiel & marques chinoises partenaires", href: "/catalog", hint: "BYD, ChangAn, Jetour, Geely, Voyah, Tank, etc." },
     { id: "stock", label: "Ajouter un véhicule en stock avec fiches IA", href: "/vehicles", hint: "Fiches techniques avec confirmation définitive BDD" },

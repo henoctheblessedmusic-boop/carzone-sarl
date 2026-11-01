@@ -21,7 +21,7 @@ export default async function QuotePrintPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireUser(["DG", "COMMERCIAL", "COMPTA", "ADMIN"]);
+  await requireUser(["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE", "ADMIN"]);
   const { locale } = await getServerMessages();
   const copy = quotesCopy[locale];
   const { id } = await params;

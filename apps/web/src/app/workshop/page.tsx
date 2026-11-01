@@ -16,6 +16,7 @@ export default async function WorkshopPage() {
     "ASSISTANTE_COMPTABLE",
     "ATELIER",
     "COMPTA",
+    "COMPTA_GARAGE",
     "ADMIN",
   ]);
 

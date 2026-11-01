@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { getServerMessages } from "@/lib/i18n/server";
 import { invoicesCopy } from "@/lib/i18n/messages/invoices";
+import { ACTIVITY } from "@/lib/permissions";
 
 export async function addPayment(formData: FormData) {
   const user = await requireUser([
@@ -20,6 +21,7 @@ export async function addPayment(formData: FormData) {
     "CHEF_ATELIER",
     "ASSISTANTE_COMPTABLE",
     "COMPTA",
+    "COMPTA_GARAGE",
     "ADMIN",
   ]);
   const { locale } = await getServerMessages();
@@ -39,6 +41,10 @@ export async function addPayment(formData: FormData) {
     where: { id: invoiceId },
     include: { payments: true, customer: true },
   });
+
+  if (user.role === "COMPTA_GARAGE" && invoice.activity !== ACTIVITY.GARAGE) {
+    throw new Error("La Comptable Garage ne peut encaisser que des factures du périmètre GARAGE.");
+  }
 
   if (invoice.isDemo) {
     throw new Error("Facture de démonstration : aucun encaissement réel ne peut être enregistré.");
@@ -83,12 +89,15 @@ export async function addPayment(formData: FormData) {
 }
 
 export async function voidInvoice(formData: FormData) {
-  const user = await requireUser(["PDG", "SG", "DG", "ADV", "RF", "COMPTA"]);
+  const user = await requireUser(["PDG", "SG", "DG", "ADV", "RF", "COMPTA", "COMPTA_GARAGE"]);
   const id = String(formData.get("id"));
   const reason = String(formData.get("cancelReason") || "").trim();
   if (reason.length < 8) throw new Error("Motif d'annulation obligatoire (au moins 8 caractères)");
 
   const inv = await prisma.invoice.findUniqueOrThrow({ where: { id } });
+  if (user.role === "COMPTA_GARAGE" && inv.activity !== ACTIVITY.GARAGE) {
+    throw new Error("La Comptable Garage ne peut annuler que des factures du périmètre GARAGE.");
+  }
   if (inv.status === "ANNULEE" || inv.status === "PAYEE") {
     throw new Error("Impossible d'annuler une facture soldée ou déjà annulée");
   }
@@ -112,9 +121,16 @@ export async function voidInvoice(formData: FormData) {
 }
 
 export async function certifyInvoiceDgi(formData: FormData): Promise<void> {
-  await requireUser(["PDG", "SG", "DG", "ADV", "RF", "COMPTA"]);
+  const user = await requireUser(["PDG", "SG", "DG", "ADV", "RF", "COMPTA", "COMPTA_GARAGE"]);
   const invoiceId = String(formData.get("invoiceId") || "");
   if (!invoiceId) throw new Error("Facture requise");
+
+  if (user.role === "COMPTA_GARAGE") {
+    const invoice = await prisma.invoice.findUniqueOrThrow({ where: { id: invoiceId } });
+    if (invoice.activity !== ACTIVITY.GARAGE) {
+      throw new Error("La Comptable Garage ne peut certifier que des factures du périmètre GARAGE.");
+    }
+  }
 
   await certifyInvoiceWithMecef(invoiceId);
   revalidatePath("/invoices");

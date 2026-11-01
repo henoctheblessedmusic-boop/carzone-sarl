@@ -37,6 +37,10 @@ model User {
   installer     Installer?     @relation(fields: [installerId], references: [id])
   employeeId    String?        @unique
   employee      Employee?      @relation(fields: [employeeId], references: [id])
+  /// Comptable Garage supervisé par cette personne (comptable principale COMPTA, en général).
+  supervisorId  String?
+  supervisor    User?          @relation("Supervision", fields: [supervisorId], references: [id], onDelete: SetNull)
+  supervisees   User[]         @relation("Supervision")
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   assignedLeads Lead[]         @relation("LeadAssignee")
@@ -65,6 +69,7 @@ model Customer {
   opportunities    Opportunity[]
   quotes           Quote[]
   invoices         Invoice[]
+  deliveryNotes    DeliveryNote[]
   rentals          Rental[]
   installRequests  ChargeInstallRequest[]
   subscriptions    ChargingSubscription[]
@@ -197,6 +202,8 @@ model Vehicle {
   importOrderId   String?
   importOrder     ImportOrder?   @relation(fields: [importOrderId], references: [id])
   workshopEntries WorkshopEntry[]
+  deliveryNotes       DeliveryNote[]
+  deliveryNoteLines   DeliveryNoteLine[]
 }
 
 model Opportunity {
@@ -239,6 +246,8 @@ model Quote {
   number           String       @unique
   status           String       @default("BROUILLON")
   docKind          String       @default("PROFORMA")
+  /// SHOWROOM | GARAGE — périmètre comptable (comptabilité séparée)
+  activity         String       @default("SHOWROOM")
   customerId       String
   customer         Customer     @relation(fields: [customerId], references: [id])
   opportunityId    String?
@@ -266,6 +275,7 @@ model Quote {
   updatedAt        DateTime     @updatedAt
   lines            QuoteLine[]
   invoice          Invoice?
+  deliveryNotes    DeliveryNote[]
 }
 
 model QuoteLine {
@@ -285,6 +295,8 @@ model Invoice {
   status       String    @default("BROUILLON")
   /// NORMALISEE = facture fiscale ; PROFORMA = rare / legacy
   kind         String    @default("NORMALISEE")
+  /// SHOWROOM | GARAGE — périmètre comptable (comptabilité séparée)
+  activity     String    @default("SHOWROOM")
   customerId   String
   customer     Customer  @relation(fields: [customerId], references: [id])
   quoteId      String?   @unique
@@ -317,6 +329,7 @@ model Invoice {
   payments     Payment[]
   rental       Rental?
   workOrder    WorkOrder?
+  deliveryNotes DeliveryNote[]
 }
 
 model Payment {
@@ -389,6 +402,8 @@ model WorkOrder {
   id           String    @id @default(cuid())
   number       String    @unique
   status       String    @default("OUVERT")
+  /// SHOWROOM | GARAGE — périmètre comptable (les OR sont par nature GARAGE)
+  activity     String    @default("GARAGE")
   vehicleId    String?
   vehicle      Vehicle?  @relation(fields: [vehicleId], references: [id])
   customerName String?
@@ -903,6 +918,7 @@ model PartItem {
   compatibilities  PartCompatibility[]
   movements        PartStockMovement[]
   workOrderUsages  WorkOrderPartUsage[]
+  deliveryNoteLines DeliveryNoteLine[]
 }
 
 /// Références croisées (cross-references) : correspondances entre constructeurs et équipementiers
@@ -983,6 +999,52 @@ model LoginAttempt {
   @@unique([email, ipAddress])
   @@index([email])
   @@index([ipAddress])
+}
+
+// ==========================================
+// BONS DE LIVRAISON INTERNES (BL) — documents NON FISCAUX de déstockage
+// Deux périmètres cloisonnés : GARAGE (BL-GAR-) et SHOWROOM (BL-SHW-)
+// ==========================================
+
+/// Bon de livraison interne : document non fiscal de déstockage, jamais une facture.
+/// Statuts : EMIS (déstockage effectué) → ANNULE (motif + mouvements inverses).
+model DeliveryNote {
+  id              String             @id @default(cuid())
+  number          String             @unique
+  /// SHOWROOM | GARAGE — détermine la séquence de numérotation (BL-SHW- / BL-GAR-)
+  activity        String
+  status          String             @default("EMIS")
+  customerId      String?
+  customer        Customer?          @relation(fields: [customerId], references: [id])
+  quoteId         String?
+  quote           Quote?             @relation(fields: [quoteId], references: [id])
+  invoiceId       String?
+  invoice         Invoice?           @relation(fields: [invoiceId], references: [id])
+  vehicleId       String?
+  vehicle         Vehicle?           @relation(fields: [vehicleId], references: [id])
+  notes           String?
+  createdByName   String
+  cancelReason    String?
+  cancelledAt     DateTime?
+  cancelledByName String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  lines           DeliveryNoteLine[]
+}
+
+/// Ligne de bon de livraison interne (véhicule et/ou pièce détachée).
+model DeliveryNoteLine {
+  id             String       @id @default(cuid())
+  deliveryNoteId String
+  deliveryNote   DeliveryNote @relation(fields: [deliveryNoteId], references: [id], onDelete: Cascade)
+  description    String
+  quantity       Int          @default(1)
+  unitPriceXof   Int?
+  vehicleId      String?
+  vehicle        Vehicle?     @relation(fields: [vehicleId], references: [id])
+  partItemId     String?
+  partItem       PartItem?    @relation(fields: [partItemId], references: [id])
+  createdAt      DateTime     @default(now())
 }
 
 

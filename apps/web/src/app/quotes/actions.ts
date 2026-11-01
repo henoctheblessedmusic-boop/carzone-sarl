@@ -19,6 +19,7 @@ import {
   encodeDiscountInNotes,
   type DiscountType,
 } from "@/lib/quote-discount";
+import { ACTIVITY } from "@/lib/permissions";
 
 export async function createProformaWithLines(payload: {
   customerId: string;
@@ -38,7 +39,7 @@ export async function createProformaWithLines(payload: {
     vehicleId?: string | null;
   }>;
 }) {
-  await requireUser([
+  const user = await requireUser([
     "PDG",
     "SG",
     "DG",
@@ -51,8 +52,10 @@ export async function createProformaWithLines(payload: {
     "CHEF_ATELIER",
     "ASSISTANTE_COMPTABLE",
     "COMPTA",
+    "COMPTA_GARAGE",
     "ADMIN",
   ]);
+  const activity = user.role === "COMPTA_GARAGE" ? ACTIVITY.GARAGE : ACTIVITY.SHOWROOM;
 
   const {
     customerId,
@@ -95,6 +98,7 @@ export async function createProformaWithLines(payload: {
       opportunityId: opportunityId || null,
       status: "BROUILLON",
       docKind: "PROFORMA",
+      activity,
       taxMode,
       taxRatePct,
       subtotalHtXof: totals.subtotalHtXof,
@@ -121,12 +125,15 @@ export async function createProformaWithLines(payload: {
 }
 
 export async function sendProforma(formData: FormData) {
-  await requireUser(["DG", "COMMERCIAL", "COMPTA", "ADMIN"]);
+  const user = await requireUser(["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE", "ADMIN"]);
   const id = String(formData.get("id"));
   const quote = await prisma.quote.findUniqueOrThrow({
     where: { id },
     include: { customer: true, lines: true },
   });
+  if (user.role === "COMPTA_GARAGE" && quote.activity !== ACTIVITY.GARAGE) {
+    throw new Error("La Comptable Garage ne peut envoyer que des proformas du périmètre GARAGE.");
+  }
   if (!canSendProforma(quote.status)) return;
 
   const emailTo =
@@ -177,7 +184,7 @@ export async function sendProforma(formData: FormData) {
 }
 
 export async function confirmOrder(formData: FormData) {
-  await requireUser([
+  const user = await requireUser([
     "PDG",
     "SG",
     "DG",
@@ -190,10 +197,14 @@ export async function confirmOrder(formData: FormData) {
     "CHEF_ATELIER",
     "ASSISTANTE_COMPTABLE",
     "COMPTA",
+    "COMPTA_GARAGE",
     "ADMIN",
   ]);
   const id = String(formData.get("id"));
   const quote = await prisma.quote.findUniqueOrThrow({ where: { id } });
+  if (user.role === "COMPTA_GARAGE" && quote.activity !== ACTIVITY.GARAGE) {
+    throw new Error("La Comptable Garage ne peut confirmer que des commandes du périmètre GARAGE.");
+  }
   if (!canConfirmOrder(quote.status)) return;
   const now = new Date();
   await prisma.quote.update({
@@ -211,7 +222,7 @@ export async function confirmOrder(formData: FormData) {
 }
 
 export async function normalizeInvoice(formData: FormData) {
-  await requireUser([
+  const user = await requireUser([
     "PDG",
     "SG",
     "DG",
@@ -224,19 +235,24 @@ export async function normalizeInvoice(formData: FormData) {
     "CHEF_ATELIER",
     "ASSISTANTE_COMPTABLE",
     "COMPTA",
+    "COMPTA_GARAGE",
     "ADMIN",
   ]);
   const id = String(formData.get("id"));
   const quote = await prisma.quote.findUniqueOrThrow({ where: { id } });
+  if (user.role === "COMPTA_GARAGE" && quote.activity !== ACTIVITY.GARAGE) {
+    throw new Error("La Comptable Garage ne peut normaliser que des proformas du périmètre GARAGE.");
+  }
   if (!canNormalizeInvoice(quote.status)) return;
   const existing = await prisma.invoice.findUnique({ where: { quoteId: id } });
   if (!existing) {
     const count = await prisma.invoice.count();
     await prisma.invoice.create({
       data: {
-        number: nextDocNumber("FAC", count),
+        number: nextDocNumber(quote.activity === ACTIVITY.GARAGE ? "FAC-GAR" : "FAC", count),
         status: "ENVOYEE",
         kind: "NORMALISEE",
+        activity: quote.activity,
         isDemo: process.env.DGI_EMECEF_MODE === "DEMO",
         certificationMode: process.env.DGI_EMECEF_MODE === "DEMO" ? "DEMO" : null,
         customerId: quote.customerId,
@@ -276,12 +292,16 @@ export async function voidInternally(formData: FormData) {
     "RTA",
     "DC",
     "COMPTA",
+    "COMPTA_GARAGE",
     "ADMIN",
   ]);
   const id = String(formData.get("id"));
   const reason = String(formData.get("cancelReason") || "").trim();
   if (reason.length < 8) return;
   const quote = await prisma.quote.findUniqueOrThrow({ where: { id } });
+  if (user.role === "COMPTA_GARAGE" && quote.activity !== ACTIVITY.GARAGE) {
+    throw new Error("La Comptable Garage ne peut annuler que des devis du périmètre GARAGE.");
+  }
   if (!canStaffVoid(quote.status)) return;
   const now = new Date();
   await prisma.quote.update({
@@ -303,7 +323,7 @@ export async function voidInternally(formData: FormData) {
 }
 
 export async function deleteQuote(id: string) {
-  await requireUser([
+  const user = await requireUser([
     "PDG",
     "SG",
     "DG",
@@ -312,6 +332,7 @@ export async function deleteQuote(id: string) {
     "RTA",
     "DC",
     "COMPTA",
+    "COMPTA_GARAGE",
     "ASSISTANTE_COMPTABLE",
     "COMMERCIAL",
     "ADMIN",
@@ -320,6 +341,9 @@ export async function deleteQuote(id: string) {
     where: { id },
     include: { invoice: true },
   });
+  if (user.role === "COMPTA_GARAGE" && quote.activity !== ACTIVITY.GARAGE) {
+    throw new Error("La Comptable Garage ne peut supprimer que des devis du périmètre GARAGE.");
+  }
   if (quote.status === "FACTURE_NORMALISEE" || quote.invoice) {
     throw new Error(quotesCopy[await getLocale()].server.deleteNormalized);
   }
@@ -348,7 +372,7 @@ export async function updateProformaWithLines(payload: {
     vehicleId?: string | null;
   }>;
 }) {
-  await requireUser([
+  const user = await requireUser([
     "PDG",
     "SG",
     "DG",
@@ -361,6 +385,7 @@ export async function updateProformaWithLines(payload: {
     "CHEF_ATELIER",
     "ASSISTANTE_COMPTABLE",
     "COMPTA",
+    "COMPTA_GARAGE",
     "ADMIN",
   ]);
 
@@ -388,6 +413,9 @@ export async function updateProformaWithLines(payload: {
     where: { id: quoteId },
   });
   if (!existing) throw new Error(copy.server.quoteNotFound);
+  if (user.role === "COMPTA_GARAGE" && existing.activity !== ACTIVITY.GARAGE) {
+    throw new Error("La Comptable Garage ne peut modifier que des devis du périmètre GARAGE.");
+  }
 
   // RÈGLE COMMERCIALE & LÉGALE STRICTE :
   // Non modifiable si le bon de commande a déjà été confirmé ou s'il y a une facture normalisée !

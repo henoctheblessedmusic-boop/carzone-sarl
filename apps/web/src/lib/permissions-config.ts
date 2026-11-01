@@ -267,6 +267,17 @@ export const DEFAULT_ROLE_CAPABILITIES: Record<Role, string[]> = {
     "services:view",
   ],
 
+  // Comptable Garage : même périmètre que COMPTA mais restreint au garage (activity = GARAGE)
+  COMPTA_GARAGE: [
+    "customers:view_global", "customers:create", "customers:edit", "customers:documents",
+    "invoices:view_global", "invoices:create", "invoices:edit", "invoices:financial_export",
+    "estimates:view_global", "estimates:create", "estimates:edit",
+    "orders:view_global", "orders:create", "orders:edit",
+    "workshop:view_global", "workshop:create", "workshop:edit",
+    "stock:view",
+    "services:view",
+  ],
+
   STOCK: [
     "stock:view", "stock:create", "stock:edit", "stock:delete",
     "workshop:view_global",

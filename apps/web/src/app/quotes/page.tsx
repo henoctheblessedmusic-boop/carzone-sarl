@@ -2,13 +2,15 @@ import { AppShell } from "@/components/AppShell";
 import { PolicyPanel } from "@/components/PolicyPanel";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
+import { ACTIVITY } from "@/lib/permissions";
 import { QuotesView, type QuoteItem } from "./QuotesView";
 
 export default async function QuotesPage() {
-  const user = await requireUser(["DG", "COMMERCIAL", "COMPTA", "ADMIN"]);
+  const user = await requireUser(["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE", "ADMIN"]);
 
   const [rawQuotes, customers, articles, vehicles, opps] = await Promise.all([
     prisma.quote.findMany({
+      where: user.role === "COMPTA_GARAGE" ? { activity: ACTIVITY.GARAGE } : undefined,
       include: {
         customer: true,
         lines: {
@@ -95,6 +97,7 @@ export default async function QuotesPage() {
     number: q.number,
     status: q.status,
     docKind: q.docKind,
+    activity: q.activity,
     taxMode: q.taxMode,
     taxRatePct: q.taxRatePct,
     subtotalHtXof: q.subtotalHtXof,

@@ -26,6 +26,7 @@ const WORKSHOP_ALLOWED_ROLES = [
   "ASSISTANTE_COMPTABLE",
   "ATELIER",
   "COMPTA",
+  "COMPTA_GARAGE",
   "ADMIN",
 ] as const;
 

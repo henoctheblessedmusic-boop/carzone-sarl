@@ -19,7 +19,7 @@ export default async function InvoicePrintPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireUser(["DG", "COMMERCIAL", "COMPTA", "ADMIN"]);
+  await requireUser(["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE", "ADMIN"]);
   const { locale } = await getServerMessages();
   const copy = invoicesCopy[locale];
   const { id } = await params;
@@ -136,6 +136,9 @@ export default async function InvoicePrintPage({
                 {copy.print.quoteRef(invoice.quote.number)}
               </div>
             )}
+            <div style={{ fontSize: "0.78rem", opacity: 0.7, marginTop: 2, fontWeight: 700 }}>
+              {invoice.activity === "GARAGE" ? "Périmètre : Atelier / Garage" : "Périmètre : Showroom"}
+            </div>
             <div
               style={{
                 display: "inline-block",

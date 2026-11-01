@@ -16,6 +16,7 @@ export default async function PartsPage() {
     "ATELIER",
     "STOCK",
     "COMPTA",
+    "COMPTA_GARAGE",
     "ADMIN",
     "COMMERCIAL",
   ]);

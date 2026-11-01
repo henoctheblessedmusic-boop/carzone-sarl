@@ -97,6 +97,7 @@ export default async function InvoicesPage() {
     totalXof: inv.totalXof,
     paidXof: inv.paidXof,
     isFiscalCertified: inv.isFiscalCertified,
+    isDemo: inv.isDemo,
     mecefCode: inv.mecefCode,
     mecefNim: inv.mecefNim,
     mecefQrCode: inv.mecefQrCode,

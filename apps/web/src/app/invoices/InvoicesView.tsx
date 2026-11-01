@@ -47,6 +47,7 @@ export type InvoiceItem = {
   dueDate: string | null;
   createdAt: string;
   isFiscalCertified?: boolean;
+  isDemo?: boolean;
   mecefCode?: string | null;
   mecefNim?: string | null;
   mecefQrCode?: string | null;
@@ -153,19 +154,24 @@ export function InvoicesView({
     userRole === "RF" ||
     userRole === "COMPTA";
 
+  // Les documents de démonstration sont exclus de la comptabilité.
+  const productionInvoices = invoices.filter((i) => !i.isDemo);
+  const demoInvoiceIds = new Set(invoices.filter((i) => i.isDemo).map((i) => i.id));
+  const productionPayments = allPayments.filter((p) => !demoInvoiceIds.has(p.invoice.id));
+
   // KPIs
-  const totalInvoicedTtc = invoices
+  const totalInvoicedTtc = productionInvoices
     .filter((i) => i.status !== "ANNULEE")
     .reduce((s, i) => s + i.totalXof, 0);
 
-  const totalCollected = invoices
+  const totalCollected = productionInvoices
     .filter((i) => i.status !== "ANNULEE")
     .reduce((s, i) => s + i.paidXof, 0);
 
   const totalOutstanding = Math.max(0, totalInvoicedTtc - totalCollected);
 
-  const overdueCount = invoices.filter((i) => i.status === "EN_RETARD").length;
-  const fullyPaidCount = invoices.filter((i) => i.status === "PAYEE").length;
+  const overdueCount = productionInvoices.filter((i) => i.status === "EN_RETARD").length;
+  const fullyPaidCount = productionInvoices.filter((i) => i.status === "PAYEE").length;
 
   // Filtered invoices
   const filteredInvoices = invoices.filter((inv) => {
@@ -237,6 +243,23 @@ export function InvoicesView({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+      {invoices.some((i) => i.isDemo) ? (
+        <div
+          style={{
+            border: "1px solid #b45309",
+            background: "rgba(180, 83, 9, 0.12)",
+            color: "#fbbf24",
+            borderRadius: 8,
+            padding: "0.85rem 1.1rem",
+            fontSize: "0.86rem",
+            fontWeight: 600,
+            lineHeight: 1.5,
+          }}
+        >
+          Mode démonstration actif : les documents marqués <strong>DÉMO</strong> sont sans valeur fiscale et exclus de la comptabilité et des encaissements.
+        </div>
+      ) : null}
+
       {/* KPI Cards */}
       <div
         style={{
@@ -1002,8 +1025,8 @@ export function InvoicesView({
       {/* VIEW 3: BILAN FINANCIER & RENTABILITE P&L */}
       {activeTab === "BILAN" && (
         <FinancialBilanTab
-          invoices={invoices}
-          payments={allPayments}
+          invoices={productionInvoices}
+          payments={productionPayments}
           expenses={expenses}
           salaries={salaries}
           vehicles={vehicles}

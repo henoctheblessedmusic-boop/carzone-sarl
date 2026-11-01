@@ -8,155 +8,187 @@ export type MecefCertificationResult = {
   mecefCounters: string;
   mecefDateTime: Date;
   isSimulated: boolean;
+  mode: "LIVE" | "DEMO";
   message: string;
 };
 
+/** Mode de certification : LIVE (API DGI réelle) ou DEMO (démonstration uniquement). */
+function getCertificationMode(): "LIVE" | "DEMO" {
+  return (process.env.DGI_EMECEF_MODE || "LIVE").toUpperCase() === "DEMO" ? "DEMO" : "LIVE";
+}
+
+function buildInvoicePayload(invoice: {
+  customer: { contactName: string; companyName: string | null; city: string | null; phone: string | null; ifu: string | null };
+  taxRatePct: number;
+  subtotalHtXof: number;
+  number: string;
+  quote: { lines: Array<{ description: string; unitPriceXof: number; quantity: number }> } | null;
+}, ifu: string, nim: string) {
+  const taxGroup = invoice.taxRatePct > 0 ? "B" : "A"; // A = exonéré, B = TVA 18 %
+  return {
+    ifu,
+    nim,
+    type: "FV", // Facture de vente
+    client: {
+      contact: invoice.customer.contactName,
+      ifu: invoice.customer.ifu || null,
+      name: invoice.customer.companyName || invoice.customer.contactName,
+      address: invoice.customer.city || "Cotonou",
+      phone: invoice.customer.phone || null,
+    },
+    operator: { name: "CARZONE SARL" },
+    items:
+      invoice.quote?.lines.map((line) => ({
+        name: line.description,
+        price: line.unitPriceXof,
+        quantity: line.quantity,
+        taxGroup,
+      })) || [
+        {
+          name: `Prestation facturée ${invoice.number}`,
+          price: invoice.subtotalHtXof,
+          quantity: 1,
+          taxGroup,
+        },
+      ],
+  };
+}
+
 /**
- * Client d'intégration DGI Bénin (e-MECeF / SyGMEF)
- * Conforme à la documentation officielle developper.impots.bj
+ * Certifie une facture via l'API e-MECeF de la DGI Bénin.
+ *
+ * Deux modes :
+ * - LIVE (défaut) : appel réel de l'API SyGMEF. Aucune facture n'est marquée
+ *   certifiée si l'API échoue : l'erreur est remontée à l'utilisateur.
+ * - DEMO : simulation réservée aux démonstrations. Le document est marqué
+ *   isDemo = true, exclu de la comptabilité et imprimé avec un avertissement.
  */
 export async function certifyInvoiceWithMecef(invoiceId: string): Promise<MecefCertificationResult> {
   const invoice = await prisma.invoice.findUniqueOrThrow({
     where: { id: invoiceId },
     include: {
       customer: true,
-      quote: {
-        include: {
-          lines: true,
-        },
-      },
+      quote: { include: { lines: true } },
     },
   });
 
   if (invoice.isFiscalCertified && invoice.mecefCode) {
+    const mode = invoice.certificationMode === "DEMO" ? "DEMO" : "LIVE";
     return {
       success: true,
-      mecefNim: invoice.mecefNim || "MCF01-CARZONE-BJ01",
+      mecefNim: invoice.mecefNim || "",
       mecefCode: invoice.mecefCode,
       mecefQrCode: invoice.mecefQrCode || "",
-      mecefCounters: invoice.mecefCounters || "1/1 F",
+      mecefCounters: invoice.mecefCounters || "",
       mecefDateTime: invoice.mecefDateTime || new Date(),
-      isSimulated: false,
-      message: "Facture déjà certifiée auprès de la DGI",
+      isSimulated: mode === "DEMO",
+      mode,
+      message: mode === "DEMO" ? "Document de démonstration déjà généré" : "Facture déjà certifiée auprès de la DGI",
     };
   }
 
-  const baseUrl = process.env.DGI_EMECEF_BASE_URL || "https://developper.impots.bj/sygmef-emcf";
-  const jwt = process.env.DGI_EMECEF_JWT;
-  const nim = process.env.DGI_EMECEF_NIM || "MCF01-CARZONE-BJ01";
-  const ifu = process.env.DGI_EMECEF_IFU || "0201910815523";
+  const mode = getCertificationMode();
+  const nim = process.env.DGI_EMECEF_NIM || "";
+  const ifu = process.env.DGI_EMECEF_IFU || "";
+  const jwt = process.env.DGI_EMECEF_JWT || "";
+  const baseUrl = process.env.DGI_EMECEF_BASE_URL || "https://developper.impots.bj/sygmef-emcf/api";
 
-  // Si le JWT Sandbox est présent, appel direct de l'API DGI
-  if (jwt && jwt.trim().length > 10) {
-    try {
-      // 1. Initialiser la facture auprès du SFE DGI
-      const createRes = await fetch(`${baseUrl}/api/invoice`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-        body: JSON.stringify({
-          ifu,
-          nim,
-          type: "FV", // Facture de Vente
-          client: {
-            contact: invoice.customer.contactName,
-            ifu: null,
-            name: invoice.customer.companyName || invoice.customer.contactName,
-            address: invoice.customer.city || "Cotonou",
-            phone: invoice.customer.phone || null,
-          },
-          items: invoice.quote?.lines.map((l) => ({
-            name: l.description,
-            price: l.unitPriceXof,
-            quantity: l.quantity,
-            taxGroup: invoice.taxRatePct > 0 ? "B" : "A", // B = TVA 18%, A = Exonéré
-          })) || [
-            {
-              name: `Prestation facturée ${invoice.number}`,
-              price: invoice.subtotalHtXof,
-              quantity: 1,
-              taxGroup: invoice.taxRatePct > 0 ? "B" : "A",
-            },
-          ],
-        }),
-      });
+  // ---------- MODE DÉMONSTRATION ----------
+  if (mode === "DEMO") {
+    const count = await prisma.invoice.count({ where: { isDemo: true } });
+    const index = count + 1;
+    const seed = Math.abs(invoiceId.split("").reduce((acc, char) => acc * 31 + char.charCodeAt(0), 7));
+    const hex = seed.toString(16).toUpperCase().padStart(8, "0").slice(0, 8);
+    const mecefCode = `DEMO-${hex.slice(0, 4)}-${hex.slice(4, 8)}-${index.toString().padStart(4, "0")}`;
+    const mecefDateTime = new Date();
+    const mecefCounters = `DEMO ${index}/${index}`;
+    const mecefNim = nim || "DEMO-NIM";
+    const mecefQrCode = `https://e-mecef.impots.bj/verify?demo=1&code=${mecefCode}`;
 
-      if (createRes.ok) {
-        const createData = await createRes.json();
-        const uid = createData.uid;
+    await prisma.invoice.update({
+      where: { id: invoiceId },
+      data: {
+        mecefNim,
+        mecefCode,
+        mecefCounters,
+        mecefQrCode,
+        mecefDateTime,
+        isFiscalCertified: true,
+        isDemo: true,
+        certificationMode: "DEMO",
+      },
+    });
 
-        // 2. Confirmer la facture pour obtenir les jetons de sécurité
-        const confirmRes = await fetch(`${baseUrl}/api/invoice/${uid}/confirm`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${jwt}`,
-          },
-        });
-
-        if (confirmRes.ok) {
-          const confirmData = await confirmRes.json();
-          const mecefNim = confirmData.nim || nim;
-          const mecefCode = confirmData.codeMECeFDGI;
-          const mecefCounters = confirmData.counters || "1/1 F";
-          const mecefQrCode = confirmData.qrCode || `https://e-mecef.impots.bj/verify?code=${mecefCode}&nim=${mecefNim}`;
-          const mecefDateTime = new Date();
-
-          await prisma.invoice.update({
-            where: { id: invoiceId },
-            data: {
-              mecefNim,
-              mecefCode,
-              mecefCounters,
-              mecefQrCode,
-              mecefDateTime,
-              isFiscalCertified: true,
-            },
-          });
-
-          return {
-            success: true,
-            mecefNim,
-            mecefCode,
-            mecefQrCode,
-            mecefCounters,
-            mecefDateTime,
-            isSimulated: false,
-            message: "Facture normalisée certifiée avec succès par la DGI Bénin",
-          };
-        }
-      }
-    } catch (error) {
-      console.error(
-        "[e-MECeF] Échec de l'appel à l'API DGI :",
-        error instanceof Error ? error.message : "erreur inconnue",
-      );
-    }
+    return {
+      success: true,
+      mecefNim,
+      mecefCode,
+      mecefQrCode,
+      mecefCounters,
+      mecefDateTime,
+      isSimulated: true,
+      mode: "DEMO",
+      message: "Document de démonstration généré. Sans valeur fiscale.",
+    };
   }
 
-  // GARDE-FOU FISCAL : aucune facture ne doit être marquée certifiée DGI
-  // sans une réponse réelle de l'API. La simulation n'est autorisée qu'en
-  // développement, sur activation explicite.
-  const allowSimulation =
-    process.env.DGI_EMECEF_ALLOW_SIMULATION === "true" && process.env.NODE_ENV !== "production";
-  if (!allowSimulation) {
+  // ---------- MODE RÉEL (LIVE) ----------
+  if (!jwt.trim() || !ifu.trim() || !nim.trim()) {
     throw new Error(
-      "Certification DGI impossible : JWT e-MECeF manquant ou API non configurée. Aucune facture fiscale ne peut être émise sans certification réelle de la DGI.",
+      "Certification DGI impossible : JWT, IFU et NIM e-MECeF non configurés. Renseignez les variables DGI_EMECEF_JWT, DGI_EMECEF_IFU et DGI_EMECEF_NIM.",
     );
   }
 
-  // Moteur de certification Sandbox (conforme aux spécifications DGI)
-  const count = await prisma.invoice.count({ where: { isFiscalCertified: true } });
-  const invoiceIndex = count + 1;
-  const hashSeed = Math.abs(invoiceId.split("").reduce((acc, char) => acc * 31 + char.charCodeAt(0), 7));
-  const hexPart = hashSeed.toString(16).toUpperCase().padStart(8, "0").slice(0, 8);
-  const mecefCode = `DGI-${hexPart.slice(0, 4)}-${hexPart.slice(4, 8)}-${invoiceIndex.toString().padStart(4, "0")}`;
-  const mecefNim = nim;
-  const mecefCounters = `${invoiceIndex}/${invoiceIndex} F`;
-  const mecefDateTime = new Date();
-  const mecefQrCode = `https://e-mecef.impots.bj/verify?code=${mecefCode}&nim=${mecefNim}&total=${invoice.totalXof}`;
+  const createRes = await fetch(`${baseUrl.replace(/\/$/, "")}/invoice`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwt}`,
+    },
+    body: JSON.stringify(buildInvoicePayload(invoice, ifu, nim)),
+  });
+
+  if (!createRes.ok) {
+    const detail = await createRes.text().catch(() => "");
+    throw new Error(`e-MECeF : échec de la soumission de la facture (HTTP ${createRes.status}). ${detail.slice(0, 300)}`);
+  }
+
+  const createData = (await createRes.json()) as { uid?: string };
+  if (!createData.uid) {
+    throw new Error("e-MECeF : réponse de soumission invalide (UID manquant).");
+  }
+
+  const confirmRes = await fetch(`${baseUrl.replace(/\/$/, "")}/invoice/${createData.uid}/confirm`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwt}`,
+    },
+  });
+
+  if (!confirmRes.ok) {
+    const detail = await confirmRes.text().catch(() => "");
+    throw new Error(`e-MECeF : échec de la confirmation (HTTP ${confirmRes.status}). ${detail.slice(0, 300)}`);
+  }
+
+  const confirmData = (await confirmRes.json()) as {
+    nim?: string;
+    codeMECeFDGI?: string;
+    counters?: string;
+    qrCode?: string;
+    dateTime?: string;
+  };
+
+  if (!confirmData.codeMECeFDGI) {
+    throw new Error("e-MECeF : réponse de confirmation invalide (code MECeF manquant).");
+  }
+
+  const mecefNim = confirmData.nim || nim;
+  const mecefCode = confirmData.codeMECeFDGI;
+  const mecefCounters = confirmData.counters || "";
+  const mecefQrCode =
+    confirmData.qrCode || `https://e-mecef.impots.bj/verify?code=${mecefCode}&nim=${mecefNim}`;
+  const mecefDateTime = confirmData.dateTime ? new Date(confirmData.dateTime) : new Date();
 
   await prisma.invoice.update({
     where: { id: invoiceId },
@@ -167,6 +199,8 @@ export async function certifyInvoiceWithMecef(invoiceId: string): Promise<MecefC
       mecefQrCode,
       mecefDateTime,
       isFiscalCertified: true,
+      isDemo: false,
+      certificationMode: "LIVE",
     },
   });
 
@@ -177,7 +211,8 @@ export async function certifyInvoiceWithMecef(invoiceId: string): Promise<MecefC
     mecefQrCode,
     mecefCounters,
     mecefDateTime,
-    isSimulated: true,
-    message: "Certification DGI e-MECeF Sandbox générée avec succès",
+    isSimulated: false,
+    mode: "LIVE",
+    message: "Facture normalisée certifiée par la DGI Bénin",
   };
 }

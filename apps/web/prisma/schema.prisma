@@ -308,6 +308,10 @@ model Invoice {
   mecefCounters   String?
   mecefDateTime   DateTime?
   isFiscalCertified Boolean @default(false)
+  /// Document de démonstration : sans valeur fiscale, exclu de la comptabilité.
+  isDemo          Boolean   @default(false)
+  /// LIVE = certification réelle DGI ; DEMO = simulation de démonstration.
+  certificationMode String?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   payments     Payment[]

@@ -40,6 +40,9 @@ export async function addPayment(formData: FormData) {
     include: { payments: true, customer: true },
   });
 
+  if (invoice.isDemo) {
+    throw new Error("Facture de démonstration : aucun encaissement réel ne peut être enregistré.");
+  }
   const payment = await prisma.payment.create({
     data: {
       invoiceId,

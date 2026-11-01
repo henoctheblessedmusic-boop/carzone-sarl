@@ -237,6 +237,8 @@ export async function normalizeInvoice(formData: FormData) {
         number: nextDocNumber("FAC", count),
         status: "ENVOYEE",
         kind: "NORMALISEE",
+        isDemo: process.env.DGI_EMECEF_MODE === "DEMO",
+        certificationMode: process.env.DGI_EMECEF_MODE === "DEMO" ? "DEMO" : null,
         customerId: quote.customerId,
         quoteId: quote.id,
         taxMode: quote.taxMode,

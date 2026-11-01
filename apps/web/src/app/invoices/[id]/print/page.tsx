@@ -340,6 +340,25 @@ export default async function InvoicePrintPage({
           </div>
         </div>
 
+        {invoice.isDemo ? (
+          <div
+            style={{
+              border: "2px dashed #b91c1c",
+              background: "#fef2f2",
+              color: "#991b1b",
+              padding: "0.9rem 1.1rem",
+              marginBottom: "1.25rem",
+              borderRadius: 6,
+              textAlign: "center",
+              fontWeight: 800,
+              fontSize: "0.95rem",
+              letterSpacing: "0.05em",
+            }}
+          >
+            DOCUMENT DE DÉMONSTRATION — SANS VALEUR FISCALE
+          </div>
+        ) : null}
+
         {/* Mention légale d'arrêté de la facture normalisée en toutes lettres */}
         <div
           style={{
@@ -388,14 +407,14 @@ export default async function InvoicePrintPage({
           >
             <div>
               <div style={{ fontWeight: 800, fontSize: "0.95rem", color: "#166534", display: "flex", alignItems: "center", gap: 6 }}>
-                {copy.print.dgiHeading}
+                {invoice.isDemo ? "e-MECeF — DÉMONSTRATION (sans valeur fiscale)" : copy.print.dgiHeading}
               </div>
               <div style={{ fontSize: "0.85rem", marginTop: 6, color: "#1e293b", lineHeight: 1.6 }}>
                 <div><strong>{copy.print.mecefCode}</strong> <span style={{ fontFamily: "monospace", fontSize: "0.98rem", fontWeight: 700, letterSpacing: "0.04em", color: "#0078d4" }}>{invoice.mecefCode}</span></div>
                 <div><strong>{copy.print.nim}</strong> {invoice.mecefNim || "MCF01-CARZONE-BJ01"}</div>
                 <div><strong>{copy.print.counters}</strong> {invoice.mecefCounters || "1/1 F"} · {formatInvoiceDate(copy, invoice.mecefDateTime || invoice.createdAt)}</div>
                 <div style={{ fontSize: "0.75rem", opacity: 0.7, marginTop: 4 }}>
-                  {copy.print.certifiedNote}
+                  {invoice.isDemo ? "Code généré en mode démonstration. Ne pas transmettre à un client ni à l'administration." : copy.print.certifiedNote}
                 </div>
               </div>
             </div>

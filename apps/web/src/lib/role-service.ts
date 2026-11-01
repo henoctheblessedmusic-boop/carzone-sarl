@@ -254,14 +254,23 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     "hr:read", "hr:write",
     "expenses:read", "expenses:write",
   ],
+  // COMPTA : union fonctionnelle Comptabilité + RAF (ex-RF) + RH (ex-RH), cohérente avec
+  // DEFAULT_ROLE_CAPABILITIES.COMPTA. N'inclut pas "admin:all" / vehicles:write / fleet:*
+  // / installers:* / charging:write / mailbox:write que RF porte par ailleurs : ces permissions
+  // dépassent le périmètre Comptabilité+RAF+RH et ne correspondent à aucune capacité UI de COMPTA.
   COMPTA: [
     "financial_report:export",
+    "roles:manage",
+    "users:manage",
+    "services:manage",
+    "quotes:delete",
     "invoices:read", "invoices:write",
     "quotes:read", "quotes:write",
+    "vehicles:read",
     "workshop:read",
     "charging:read",
     "mailbox:read",
-    "clients:read",
+    "clients:read", "clients:write",
     "hr:read", "hr:write",
     "expenses:read", "expenses:write",
   ],

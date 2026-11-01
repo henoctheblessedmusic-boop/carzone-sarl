@@ -47,7 +47,7 @@ export const ROLE_LABELS: Record<Role, string> = {
   HOTESSE: "Hôtesse d'Accueil",
   ASSISTANTE_COMPTABLE: "Assistante Comptable",
   ADMIN: "Administrateur (Véhicules & Messages)",
-  COMPTA: "Comptabilité & RH (comptable principale)",
+  COMPTA: "Comptable principale — Comptabilité, RAF & RH",
   COMPTA_GARAGE: "Comptable Garage",
   STOCK: "Gestionnaire Stock",
   ATELIER: "Technicien Atelier",

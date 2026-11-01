@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { UsersView, type UserItem } from "./UsersView";
 
 export default async function UsersPage() {
-  const user = await requireUser(["PDG", "SG", "DG", "ADV", "RTA", "DC", "ADMIN", "RH"]);
+  const user = await requireUser(["PDG", "SG", "DG", "ADV", "RTA", "DC", "ADMIN", "RH", "COMPTA"]);
 
   const isDeveloper = user.role === "DEVELOPER";
 

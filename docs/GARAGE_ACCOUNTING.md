@@ -96,23 +96,50 @@ Déstockage (dans la même transaction) :
   `PartStockMovement` inverse (`RETOUR_STOCK`, quantité positive) +
   `PartItem.stockQuantity` réincrémenté.
 
-## 4bis. RH : la comptable principale (COMPTA) cumule la gestion RH
+## 4bis. RH & RAF : la comptable principale (COMPTA) cumule Comptabilité + RAF + RH
 
-La comptable principale (`COMPTA`) **cumule la gestion RH** en plus de son périmètre
-comptable consolidé (showroom + garage). Ce cumul n'est pas une nouveauté de ce lot : les
-pages et actions RH (`src/app/hr/page.tsx`, `src/app/hr/actions.ts`, nav `/hr` dans
-`AppShell.tsx`, `RoleService.isRouteAllowedForUser`) autorisaient déjà `COMPTA` — ce lot ne
-fait que le documenter et clarifier le libellé du rôle (`ROLE_LABELS.COMPTA` =
-« Comptabilité & RH (comptable principale) » dans `src/lib/roles.ts`).
+La comptable principale (`COMPTA`) **cumule trois casquettes** : Comptabilité (facturation,
+proformas, bilan, encaissements, exports financiers), **RAF — Responsable des Affaires
+Financières** (ex-rôle `RF` : devis/factures/BDC complets, exports bilan, services), et
+**RH — Ressources Humaines** (ex-rôle `RH` : personnel, congés, contrats, paie, et gestion
+des comptes utilisateurs/rôles, puisque `RH` en disposait déjà). Libellé du rôle
+(`ROLE_LABELS.COMPTA` dans `src/lib/roles.ts`) : « Comptable principale — Comptabilité,
+RAF & RH ».
 
-- **`COMPTA`** : accès `/hr` (salariés, congés, départements, paie) + accès comptable
-  consolidé (showroom + garage).
-- **`COMPTA_GARAGE`** (comptable garage) : **aucun accès RH**. Ni dans la liste de rôles
-  de `hr/page.tsx` / `CAN_MANAGE_HR` de `hr/actions.ts`, ni dans la nav `/hr` de
-  `AppShell.tsx`, ni dans `RoleService.isRouteAllowed`/`isRouteAllowedForUser` (son tableau
-  de permissions dans `role-service.ts` ne contient pas `hr:read`/`hr:write`). Son
-  périmètre reste strictement limité à GARAGE sur devis/factures/BL + atelier/pièces
-  (voir §2-3).
+Les rôles `RF` et `RH` **restent dans le référentiel** (`src/lib/roles.ts`,
+`DEFAULT_ROLE_CAPABILITIES`, `ROLE_PERMISSIONS`) pour une éventuelle séparation future ;
+la préconfiguration de `COMPTA` ne fait que cumuler leurs capacités, elle ne les supprime
+pas des autres rôles.
+
+- **`COMPTA`** : accès `/hr` (salariés, congés, départements, paie), `/users` (gestion des
+  comptes et rôles — capacité héritée de `RH`), `/expenses`, `/invoices`, `/quotes`,
+  `/delivery-notes`, export bilan Excel (`/api/reports/financial-excel`, consolidé
+  showroom + garage), accès comptable consolidé (showroom + garage).
+- **`COMPTA_GARAGE`** (comptable garage) : **aucun accès RH, aucun accès `/users` ou
+  gestion des rôles, aucune comptabilité showroom, aucun export consolidé non filtré**.
+  Ni dans la liste de rôles de `hr/page.tsx` / `CAN_MANAGE_HR` de `hr/actions.ts`, ni dans
+  la nav `/hr` de `AppShell.tsx`, ni dans `RoleService.isRouteAllowed`/
+  `isRouteAllowedForUser` (son tableau de permissions dans `role-service.ts` ne contient
+  pas `hr:read`/`hr:write`/`roles:manage`/`users:manage`). Son périmètre reste strictement
+  limité à GARAGE sur devis/factures/BL + atelier/pièces (voir §2-3). L'export financier
+  Excel (`/api/reports/financial-excel`) est filtré par `activity = GARAGE` pour ce rôle
+  (correctif apporté avec ce lot : la route exportait auparavant l'intégralité des
+  factures/devis/encaissements showroom + garage sans filtrage).
+
+### Préconfiguration des rôles (résumé)
+
+| Rôle | Préconfiguration (`DEFAULT_ROLE_CAPABILITIES` + `ROLE_PERMISSIONS`) |
+|---|---|
+| `COMPTA` | Comptabilité + RAF (ex-`RF`) + RH (ex-`RH`), union sans doublon : factures/proformas/BDC complets, exports financiers, dépenses, RH complet, gestion utilisateurs/rôles, lecture atelier/stock, clients. |
+| `COMPTA_GARAGE` | Comptabilité **GARAGE uniquement** : factures/proformas/BDC, BL internes GARAGE, atelier/pièces, clients. Aucun RH, aucun `/users`, aucune comptabilité showroom. |
+| `RF`, `RH` | Conservés inchangés dans le référentiel pour une séparation future des trois casquettes de `COMPTA`. |
+
+**Important** : les capacités personnalisées déjà enregistrées sur un compte utilisateur
+existant (`User.customPermissions`) ne sont **pas écrasées automatiquement** par ce
+changement de préconfiguration — `getEffectiveCapabilities` (`permissions-config.ts`)
+privilégie toujours les `customPermissions` d'un utilisateur si elles existent. Le bouton
+« Réinitialiser selon le rôle » dans `/users` (`UsersView.tsx`) reste le seul moyen
+explicite de réappliquer la nouvelle préconfiguration à un compte `COMPTA` déjà créé.
 
 ## 5. Schéma de données (additif uniquement)
 

@@ -19,7 +19,7 @@ const navDefs = [
   { href: "/expenses", roles: ["PDG", "SG", "DG", "ADV", "RF", "COMPTA", "ASSISTANTE_COMPTABLE", "RH", "ADMIN"] },
   { href: "/services", roles: ["PDG", "SG", "DG", "ADV", "RF", "RTA", "DC", "COMMERCIAL", "HOTESSE", "ASSISTANTE_COMPTABLE", "CHEF_ATELIER", "STOCK", "COMPTA", "ADMIN"] },
   { href: "/hr", roles: ["PDG", "SG", "DG", "RH", "COMPTA", "RF", "ASSISTANTE_COMPTABLE", "ADMIN"] },
-  { href: "/users", roles: ["PDG", "SG", "DG", "ADV", "RTA", "DC", "ADMIN", "RH"] },
+  { href: "/users", roles: ["PDG", "SG", "DG", "ADV", "RTA", "DC", "ADMIN", "RH", "COMPTA"] },
   { href: "/opportunities", roles: ["PDG", "SG", "DG", "ADV", "RF", "DC", "COMMERCIAL", "COMPTA", "ADMIN"] },
   { href: "/leads", roles: ["PDG", "SG", "DG", "ADV", "RF", "DC", "COMMERCIAL", "COMPTA", "ADMIN"] },
   { href: "/catalog", roles: ["PDG", "SG", "DG", "ADV", "RF", "RTA", "DC", "STOCK", "ADMIN"] },

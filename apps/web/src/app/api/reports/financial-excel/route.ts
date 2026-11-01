@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { RoleService } from "@/lib/role-service";
 import { prisma } from "@/lib/prisma";
+import { ACTIVITY } from "@/lib/permissions";
 import * as XLSX from "xlsx";
 
 export async function GET() {
@@ -21,18 +22,24 @@ export async function GET() {
     );
   }
 
+  // La Comptable Garage n'extrait que le périmètre GARAGE : jamais de bilan consolidé showroom.
+  const activityScope = session.role === "COMPTA_GARAGE" ? ACTIVITY.GARAGE : undefined;
+
   const [invoices, quotes, payments] = await Promise.all([
     prisma.invoice.findMany({
-      where: { isDemo: false },
+      where: { isDemo: false, ...(activityScope ? { activity: activityScope } : {}) },
       include: { customer: true },
       orderBy: { createdAt: "desc" },
     }),
     prisma.quote.findMany({
+      where: activityScope ? { activity: activityScope } : undefined,
       include: { customer: true },
       orderBy: { createdAt: "desc" },
     }),
     prisma.payment.findMany({
-      where: { invoice: { isDemo: false } },
+      where: {
+        invoice: { isDemo: false, ...(activityScope ? { activity: activityScope } : {}) },
+      },
       include: { invoice: { include: { customer: true } } },
       orderBy: { paidAt: "desc" },
     }),

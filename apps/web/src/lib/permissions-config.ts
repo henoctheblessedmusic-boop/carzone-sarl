@@ -257,17 +257,25 @@ export const DEFAULT_ROLE_CAPABILITIES: Record<Role, string[]> = {
     "hr:view", "hr:manage_employees", "hr:manage_leaves", "hr:setup",
   ],
 
+  // COMPTA : Comptable principale = Comptabilité + RAF (ex-RF) + RH (ex-RH), union sans doublon.
+  // RF et RH restent des rôles séparés dans le référentiel pour une éventuelle scission future ;
+  // cette préconfiguration ne fait que cumuler leurs capacités sur le rôle historique COMPTA.
   COMPTA: [
-    "customers:view_global", "customers:create", "customers:edit", "customers:documents",
-    "invoices:view_global", "invoices:create", "invoices:edit", "invoices:financial_export",
-    "estimates:view_global", "estimates:create", "estimates:edit",
-    "orders:view_global", "orders:create", "orders:edit",
+    "customers:view_own", "customers:view_global", "customers:create", "customers:edit", "customers:documents",
+    "invoices:view_own", "invoices:view_global", "invoices:create", "invoices:edit", "invoices:delete", "invoices:financial_export",
+    "estimates:view_own", "estimates:view_global", "estimates:create", "estimates:edit", "estimates:delete",
+    "orders:view_own", "orders:view_global", "orders:create", "orders:edit", "orders:delete",
     "workshop:view_global",
     "stock:view",
-    "services:view",
+    "services:view", "services:create", "services:edit",
+    "users:view", "users:create", "users:assign_role", "users:custom_permissions",
+    "hr:view", "hr:manage_employees", "hr:manage_leaves", "hr:setup",
   ],
 
-  // Comptable Garage : même périmètre que COMPTA mais restreint au garage (activity = GARAGE)
+  // Comptable Garage : comptabilité GARAGE uniquement (jamais RH, jamais users/rôles, jamais showroom).
+  // Les libellés "_global" restent corrects : le filtrage par activity=GARAGE est garanti côté
+  // pages/actions (invoices, quotes, delivery-notes `page.tsx` + `actions.ts`, voir
+  // docs/GARAGE_ACCOUNTING.md), donc ces capacités ne donnent jamais accès au périmètre showroom.
   COMPTA_GARAGE: [
     "customers:view_global", "customers:create", "customers:edit", "customers:documents",
     "invoices:view_global", "invoices:create", "invoices:edit", "invoices:financial_export",

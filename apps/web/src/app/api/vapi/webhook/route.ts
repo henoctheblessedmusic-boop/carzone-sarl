@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
               status: "BROUILLON",
               docKind: "PROFORMA",
               taxMode: "HT",
-              taxRatePct: 18,
+              taxRatePct: 0,
               subtotalHtXof: priceXof,
               taxXof: Math.round(priceXof * 0.18),
               totalXof: Math.round(priceXof * 1.18),

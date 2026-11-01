@@ -228,7 +228,7 @@ export default async function QuotePrintPage({
             </div>
           )}
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-            <span>{copy.print.totals.vat(quote.taxRatePct)}</span>
+            <span>{quote.taxRatePct > 0 ? copy.print.totals.vat(quote.taxRatePct) : copy.print.exempt}</span>
             <strong>{formatXof(quote.taxXof)}</strong>
           </div>
           <div

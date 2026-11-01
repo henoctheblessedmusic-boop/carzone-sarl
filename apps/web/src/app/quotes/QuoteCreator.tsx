@@ -105,7 +105,7 @@ export function QuoteCreator({
   const [customerId, setCustomerId] = useState("");
   const [opportunityId, setOpportunityId] = useState("");
   const [taxMode, setTaxMode] = useState<TaxMode>("HT");
-  const [taxRatePct, setTaxRatePct] = useState<number>(18);
+  const [taxRatePct, setTaxRatePct] = useState<number>(0);
   const [validDays, setValidDays] = useState<number>(14);
   const [notes, setNotes] = useState("");
 
@@ -371,7 +371,7 @@ export function QuoteCreator({
     setCustomerId("");
     setOpportunityId("");
     setTaxMode("HT");
-    setTaxRatePct(18);
+    setTaxRatePct(0);
     setValidDays(14);
     setNotes("");
     setDiscountType("NONE");

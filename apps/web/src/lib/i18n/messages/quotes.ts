@@ -326,6 +326,7 @@ export type QuotesCopy = {
     date: (value: string) => string;
     validUntil: (value: string) => string;
     taxBase: (taxMode: string, rate: number) => string;
+    exempt: string;
     cgvRef: (kind: string) => string;
     cgvKindVehicle: string;
     cgvKindWorkshop: string;
@@ -719,7 +720,8 @@ Web : www.topcarzone.com`,
     ifu: (value) => `N° IFU : ${value}`,
     date: (value) => `Date : ${value}`,
     validUntil: (value) => `Validité : ${value}`,
-    taxBase: (taxMode, rate) => `Base : ${taxMode} · TVA ${rate} %`,
+    taxBase: (taxMode, rate) => (rate > 0 ? `Base : ${taxMode} · TVA ${rate} %` : `Base : ${taxMode} · Exonéré de TVA`),
+    exempt: "Exonéré de TVA",
     cgvRef: (kind) => `Réf. CGV : ${kind}`,
     cgvKindVehicle: "Vente véhicules showroom",
     cgvKindWorkshop: "Atelier SAV Carzone Cotonou",
@@ -1119,7 +1121,8 @@ Web: www.topcarzone.com`,
     ifu: (value) => `Tax ID: ${value}`,
     date: (value) => `Date: ${value}`,
     validUntil: (value) => `Valid until: ${value}`,
-    taxBase: (taxMode, rate) => `Basis: ${taxMode} · VAT ${rate}%`,
+    taxBase: (taxMode, rate) => (rate > 0 ? `Basis: ${taxMode} · VAT ${rate}%` : `Basis: ${taxMode} · VAT exempt`),
+    exempt: "VAT exempt",
     cgvRef: (kind) => `Terms ref.: ${kind}`,
     cgvKindVehicle: "Showroom vehicle sales",
     cgvKindWorkshop: "Carzone Cotonou aftersales workshop",
@@ -1509,7 +1512,8 @@ CARZONE SARL 销售团队
     ifu: (value) => `税号:${value}`,
     date: (value) => `日期:${value}`,
     validUntil: (value) => `有效期:${value}`,
-    taxBase: (taxMode, rate) => `计税:${taxMode} · 增值税 ${rate}%`,
+    taxBase: (taxMode, rate) => (rate > 0 ? `计税:${taxMode} · 增值税 ${rate}%` : `计税:${taxMode} · 免征增值税`),
+    exempt: "免征增值税",
     cgvRef: (kind) => `条款依据:${kind}`,
     cgvKindVehicle: "展厅车辆销售",
     cgvKindWorkshop: "Carzone 科托努售后维修",

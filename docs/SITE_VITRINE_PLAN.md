@@ -207,3 +207,9 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - À droite : carte « promesses » avec les 3 bullets (icônes check, fond dégradé subtil, liseré doré).
 - Desktop : grille 1.15fr / 0.85fr, centrage vertical, gap fluide. Mobile/tablette : empilement en une colonne.
 - Vérifications : tsc/build exit 0, capture desktop 1425 et mobile 390, aucun débordement.
+
+### Facturation / fiscalité — correctifs immédiats (itération 18)
+- TVA par défaut à **0 % (exonéré)** dans le créateur de proforma et dans la création automatique par l'assistant vocal (véhicules neufs exonérés de TVA au Bénin) ; modifiable manuellement pour les prestations taxables.
+- Impression proforma : la ligne TVA affiche désormais **« Exonéré de TVA »** quand le taux est à 0, et la base fiscale indique « Exonéré » (FR/EN/ZH).
+- **Garde-fou e-MECeF critique** : la certification « simulée » ne peut plus marquer une facture comme certifiée DGI en production. Sans JWT/API réelle, une erreur explicite est levée ; la simulation est réservée au développement via `DGI_EMECEF_ALLOW_SIMULATION=true` et `NODE_ENV !== "production"`.
+- Plan d'intégration complet (facture simple + déstockage, conversion proforma → normalisée, avoirs justifiés, e-MECeF DGI) documenté et en attente des accès DGI.

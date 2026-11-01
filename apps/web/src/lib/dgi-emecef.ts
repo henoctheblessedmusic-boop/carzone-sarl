@@ -128,9 +128,23 @@ export async function certifyInvoiceWithMecef(invoiceId: string): Promise<MecefC
           };
         }
       }
-    } catch {
-      // Fallback sur le moteur de certification Sandbox si l'API est injoignable
+    } catch (error) {
+      console.error(
+        "[e-MECeF] Échec de l'appel à l'API DGI :",
+        error instanceof Error ? error.message : "erreur inconnue",
+      );
     }
+  }
+
+  // GARDE-FOU FISCAL : aucune facture ne doit être marquée certifiée DGI
+  // sans une réponse réelle de l'API. La simulation n'est autorisée qu'en
+  // développement, sur activation explicite.
+  const allowSimulation =
+    process.env.DGI_EMECEF_ALLOW_SIMULATION === "true" && process.env.NODE_ENV !== "production";
+  if (!allowSimulation) {
+    throw new Error(
+      "Certification DGI impossible : JWT e-MECeF manquant ou API non configurée. Aucune facture fiscale ne peut être émise sans certification réelle de la DGI.",
+    );
   }
 
   // Moteur de certification Sandbox (conforme aux spécifications DGI)

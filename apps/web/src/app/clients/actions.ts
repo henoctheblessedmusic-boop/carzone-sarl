@@ -32,6 +32,22 @@ const CLIENT_MANAGERS = [
   "ADMIN",
 ] as const;
 
+function readScopeFlags(formData: FormData): {
+  scopeShowroom: boolean;
+  scopeGarage: boolean;
+  isPartner: boolean;
+} {
+  const scopeShowroomRaw = formData.get("scopeShowroom");
+  const scopeGarageRaw = formData.get("scopeGarage");
+  const scopeShowroom = scopeShowroomRaw === null ? true : scopeShowroomRaw === "true";
+  const scopeGarage = scopeGarageRaw === null ? false : scopeGarageRaw === "true";
+  const isPartner = formData.get("isPartner") === "true";
+  if (!scopeShowroom && !scopeGarage) {
+    throw new Error("Un client doit appartenir au périmètre Showroom et/ou Garage.");
+  }
+  return { scopeShowroom, scopeGarage, isPartner };
+}
+
 export async function createCustomer(formData: FormData) {
   const user = await requireUser([...CLIENT_MANAGERS]);
 
@@ -49,6 +65,7 @@ export async function createCustomer(formData: FormData) {
   const category = String(formData.get("category") || "Particulier").trim();
   const notes = String(formData.get("notes") || "").trim() || null;
   const showroomNotes = String(formData.get("showroomNotes") || "").trim() || null;
+  const { scopeShowroom, scopeGarage, isPartner } = readScopeFlags(formData);
 
   const customer = await prisma.customer.create({
     data: {
@@ -62,6 +79,9 @@ export async function createCustomer(formData: FormData) {
       category,
       notes,
       showroomNotes,
+      scopeShowroom,
+      scopeGarage,
+      isPartner,
       active: true,
     },
   });
@@ -101,6 +121,7 @@ export async function updateCustomer(formData: FormData) {
     formData.get("active") === "true" ||
     formData.get("active") === "1" ||
     formData.get("active") === "on";
+  const { scopeShowroom, scopeGarage, isPartner } = readScopeFlags(formData);
 
   const updated = await prisma.customer.update({
     where: { id },
@@ -115,6 +136,9 @@ export async function updateCustomer(formData: FormData) {
       category,
       notes,
       showroomNotes,
+      scopeShowroom,
+      scopeGarage,
+      isPartner,
       active,
     },
   });

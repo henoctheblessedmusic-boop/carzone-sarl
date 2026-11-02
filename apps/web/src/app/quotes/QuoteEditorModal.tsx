@@ -30,16 +30,19 @@ export function QuoteEditorModal({
   customers,
   articles,
   vehicles,
+  scope = "SHOWROOM",
   onClose,
 }: {
   quote: QuoteItem;
   customers: CustomerOption[];
   articles: ArticleOption[];
   vehicles: VehicleOption[];
+  scope?: "SHOWROOM" | "GARAGE";
   onClose: () => void;
 }) {
   const { locale } = usePrefs();
   const copy = quotesCopy[locale];
+  const isGarageScope = scope === "GARAGE";
 
   const { discount: initialDiscount, cleanNotes: initialCleanNotes } = decodeDiscountFromNotes(quote.notes);
   const [customerId, setCustomerId] = useState(quote.customer?.id || quote.customerId || "");
@@ -378,24 +381,26 @@ export function QuoteEditorModal({
               <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--gold, #d4af37)" }}>
                 {copy.editor.pickStock}
               </span>
-              <select
-                defaultValue=""
-                onChange={(e) => {
-                  if (e.target.value) {
-                    handleSelectVehicle(e.target.value);
-                    e.target.value = "";
-                  }
-                }}
-                className="ox-select"
-                style={{ fontSize: "0.78rem", flex: 1, minWidth: 200 }}
-              >
-                <option value="">{copy.editor.vehicleOption}</option>
-                {vehicles.map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.brand} {v.model} ({formatXof(v.priceXof)})
-                  </option>
-                ))}
-              </select>
+              {!isGarageScope && (
+                <select
+                  defaultValue=""
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      handleSelectVehicle(e.target.value);
+                      e.target.value = "";
+                    }
+                  }}
+                  className="ox-select"
+                  style={{ fontSize: "0.78rem", flex: 1, minWidth: 200 }}
+                >
+                  <option value="">{copy.editor.vehicleOption}</option>
+                  {vehicles.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.brand} {v.model} ({formatXof(v.priceXof)})
+                    </option>
+                  ))}
+                </select>
+              )}
 
               <select
                 defaultValue=""

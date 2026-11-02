@@ -99,6 +99,7 @@ export function QuotesView({
   vehicles,
   opportunities,
   userRole,
+  scope,
 }: {
   quotes: QuoteItem[];
   customers: CustomerOption[];
@@ -106,6 +107,7 @@ export function QuotesView({
   vehicles: VehicleOption[];
   opportunities: OpportunityOption[];
   userRole: string;
+  scope: "SHOWROOM" | "GARAGE";
 }) {
   const { locale } = usePrefs();
   const copy = quotesCopy[locale];
@@ -457,6 +459,7 @@ export function QuotesView({
           articles={articles}
           vehicles={vehicles}
           opportunities={opportunities}
+          scope={scope}
         />
       </div>
 
@@ -1224,6 +1227,7 @@ export function QuotesView({
           customers={customers}
           articles={articles}
           vehicles={vehicles}
+          scope={scope}
           onClose={() => setEditingQuote(null)}
         />
       )}

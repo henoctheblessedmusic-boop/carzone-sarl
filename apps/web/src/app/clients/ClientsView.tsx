@@ -64,6 +64,9 @@ export type CustomerItem = {
   ifu?: string | null;
   showroomNotes?: string | null;
   category: string | null;
+  scopeShowroom: boolean;
+  scopeGarage: boolean;
+  isPartner: boolean;
   active: boolean;
   notes: string | null;
   createdAt: string | Date;
@@ -80,11 +83,15 @@ export type CustomerItem = {
 export function ClientsView({
   initialCustomers,
   canManage,
+  canDelete,
   canImport,
+  defaultGarageScope = false,
 }: {
   initialCustomers: CustomerItem[];
   canManage: boolean;
+  canDelete: boolean;
   canImport: boolean;
+  defaultGarageScope?: boolean;
 }) {
   const { locale } = usePrefs();
   const router = useRouter();
@@ -94,6 +101,7 @@ export function ClientsView({
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL");
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
+  const [scopeFilter, setScopeFilter] = useState<"ALL" | "SHOWROOM" | "GARAGE" | "PARTNER">("ALL");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<CustomerItem | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -271,7 +279,13 @@ export function ClientsView({
       (categoryFilter === "Particulier" && c.category === "Particulier" && !c.companyName) ||
       c.category === categoryFilter;
 
-    return matchesSearch && matchesStatus && matchesCategory;
+    const matchesScope =
+      scopeFilter === "ALL" ||
+      (scopeFilter === "SHOWROOM" && c.scopeShowroom) ||
+      (scopeFilter === "GARAGE" && c.scopeGarage) ||
+      (scopeFilter === "PARTNER" && c.isPartner);
+
+    return matchesSearch && matchesStatus && matchesCategory && matchesScope;
   });
 
   function exportCsv() {
@@ -484,6 +498,19 @@ export function ClientsView({
             <option value="ONG / Diplomate">{copy.filters.categoryNgos}</option>
             <option value="Flotte">{copy.filters.categoryFleets}</option>
             <option value="Autre">{copy.filters.categoryOther}</option>
+          </select>
+
+          {/* Scope Filter */}
+          <select
+            value={scopeFilter}
+            onChange={(e) => setScopeFilter(e.target.value as "ALL" | "SHOWROOM" | "GARAGE" | "PARTNER")}
+            className="ox-select"
+            style={{ height: 38, fontSize: "0.88rem" }}
+          >
+            <option value="ALL">Tous les périmètres</option>
+            <option value="SHOWROOM">Showroom</option>
+            <option value="GARAGE">Garage / Atelier</option>
+            <option value="PARTNER">Entreprises partenaires</option>
           </select>
         </div>
 
@@ -709,6 +736,47 @@ export function ClientsView({
                           ? copy.category.company
                           : copy.category.individual}
                       </span>
+                      <div style={{ display: "flex", gap: 4, marginTop: 4, flexWrap: "wrap" }}>
+                        {customer.scopeShowroom && (
+                          <span
+                            className="ox-badge"
+                            style={{
+                              fontSize: "0.68rem",
+                              background: "rgba(126, 200, 227, 0.12)",
+                              color: "var(--ice-highlight)",
+                              borderColor: "rgba(126, 200, 227, 0.25)",
+                            }}
+                          >
+                            Showroom
+                          </span>
+                        )}
+                        {customer.scopeGarage && (
+                          <span
+                            className="ox-badge"
+                            style={{
+                              fontSize: "0.68rem",
+                              background: "rgba(16, 185, 129, 0.12)",
+                              color: "var(--ok)",
+                              borderColor: "rgba(16, 185, 129, 0.3)",
+                            }}
+                          >
+                            Garage
+                          </span>
+                        )}
+                        {customer.isPartner && (
+                          <span
+                            className="ox-badge"
+                            style={{
+                              fontSize: "0.68rem",
+                              background: "rgba(196, 163, 90, 0.15)",
+                              color: "var(--gold)",
+                              borderColor: "rgba(196, 163, 90, 0.3)",
+                            }}
+                          >
+                            Partenaire
+                          </span>
+                        )}
+                      </div>
                     </td>
 
                     <td>
@@ -796,27 +864,27 @@ export function ClientsView({
                         </button>
 
                         {canManage && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => setEditingCustomer(customer)}
-                              className="ox-btn ox-btn-ghost ox-btn-sm"
-                              title={copy.table.editTitle}
-                              style={{ padding: "0.3rem 0.5rem" }}
-                            >
-                              <Edit2 size={14} />
-                            </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditingCustomer(customer)}
+                            className="ox-btn ox-btn-ghost ox-btn-sm"
+                            title={copy.table.editTitle}
+                            style={{ padding: "0.3rem 0.5rem" }}
+                          >
+                            <Edit2 size={14} />
+                          </button>
+                        )}
 
-                            <button
-                              type="button"
-                              onClick={() => handleDelete(customer)}
-                              className="ox-btn ox-btn-ghost ox-btn-sm"
-                              title={copy.table.deleteTitle}
-                              style={{ padding: "0.3rem 0.5rem", color: "var(--bad)" }}
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </>
+                        {canDelete && (
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(customer)}
+                            className="ox-btn ox-btn-ghost ox-btn-sm"
+                            title={copy.table.deleteTitle}
+                            style={{ padding: "0.3rem 0.5rem", color: "var(--bad)" }}
+                          >
+                            <Trash2 size={14} />
+                          </button>
                         )}
                       </div>
                     </td>
@@ -980,6 +1048,29 @@ export function ClientsView({
                     <option value="Flotte">{copy.category.fleet}</option>
                     <option value="Autre">{copy.category.other}</option>
                   </select>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 6 }}>
+                  Périmètre client <span style={{ color: "var(--bad)" }}>*</span>
+                </label>
+                <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: "0.85rem" }}>
+                  <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <input type="checkbox" name="scopeShowroom" value="true" defaultChecked={!defaultGarageScope} />
+                    Showroom
+                  </label>
+                  <input type="hidden" name="scopeShowroom" value="false" />
+                  <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <input type="checkbox" name="scopeGarage" value="true" defaultChecked={defaultGarageScope} />
+                    Garage / Atelier
+                  </label>
+                  <input type="hidden" name="scopeGarage" value="false" />
+                  <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <input type="checkbox" name="isPartner" value="true" />
+                    Entreprise partenaire
+                  </label>
+                  <input type="hidden" name="isPartner" value="false" />
                 </div>
               </div>
 
@@ -1186,6 +1277,44 @@ export function ClientsView({
                     <option value="Flotte">{copy.category.fleet}</option>
                     <option value="Autre">{copy.category.other}</option>
                   </select>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 6 }}>
+                  Périmètre client <span style={{ color: "var(--bad)" }}>*</span>
+                </label>
+                <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: "0.85rem" }}>
+                  <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <input
+                      type="checkbox"
+                      name="scopeShowroom"
+                      value="true"
+                      defaultChecked={editingCustomer.scopeShowroom}
+                    />
+                    Showroom
+                  </label>
+                  <input type="hidden" name="scopeShowroom" value="false" />
+                  <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <input
+                      type="checkbox"
+                      name="scopeGarage"
+                      value="true"
+                      defaultChecked={editingCustomer.scopeGarage}
+                    />
+                    Garage / Atelier
+                  </label>
+                  <input type="hidden" name="scopeGarage" value="false" />
+                  <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <input
+                      type="checkbox"
+                      name="isPartner"
+                      value="true"
+                      defaultChecked={editingCustomer.isPartner}
+                    />
+                    Entreprise partenaire
+                  </label>
+                  <input type="hidden" name="isPartner" value="false" />
                 </div>
               </div>
 

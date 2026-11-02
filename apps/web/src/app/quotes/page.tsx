@@ -2,7 +2,7 @@ import { AppShell } from "@/components/AppShell";
 import { PolicyPanel } from "@/components/PolicyPanel";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
-import { ACTIVITY } from "@/lib/permissions";
+import { ACTIVITY, customerScopeFilterForRole, quoteScopeForRole } from "@/lib/permissions";
 import { QuotesView, type QuoteItem } from "./QuotesView";
 
 export default async function QuotesPage() {
@@ -20,6 +20,10 @@ export default async function QuotesPage() {
     "HOTESSE",
     "ASSISTANTE_COMPTABLE",
   ]);
+
+  const scope = quoteScopeForRole(user.role);
+  const isGarageScope = scope === ACTIVITY.GARAGE;
+  const customerScopeFilter = customerScopeFilterForRole(user.role);
 
   const [rawQuotes, customers, articles, vehicles, opps] = await Promise.all([
     prisma.quote.findMany({
@@ -40,7 +44,7 @@ export default async function QuotesPage() {
       orderBy: { createdAt: "desc" },
     }),
     prisma.customer.findMany({
-      where: { active: true },
+      where: { active: true, ...customerScopeFilter },
       orderBy: { contactName: "asc" },
       select: {
         id: true,
@@ -54,7 +58,7 @@ export default async function QuotesPage() {
       },
     }),
     prisma.article.findMany({
-      where: { active: true },
+      where: { active: true, ...(isGarageScope ? { category: { not: "VEHICULE" } } : {}) },
       orderBy: [{ category: "asc" }, { name: "asc" }],
       select: {
         id: true,
@@ -66,30 +70,34 @@ export default async function QuotesPage() {
         description: true,
       },
     }),
-    prisma.vehicle.findMany({
-      where: {
-        status: { notIn: ["VENDU", "ARCHIVE"] },
-      },
-      orderBy: [{ brand: "asc" }, { model: "asc" }],
-      select: {
-        id: true,
-        vin: true,
-        brand: true,
-        model: true,
-        variant: true,
-        color: true,
-        priceXof: true,
-        status: true,
-      },
-    }),
-    prisma.opportunity.findMany({
-      where: { stage: { in: ["DEVIS", "ESSAI", "MATCHING", "NEGOCIATION"] } },
-      select: {
-        id: true,
-        title: true,
-        customerId: true,
-      },
-    }),
+    isGarageScope
+      ? Promise.resolve([])
+      : prisma.vehicle.findMany({
+          where: {
+            status: { notIn: ["VENDU", "ARCHIVE"] },
+          },
+          orderBy: [{ brand: "asc" }, { model: "asc" }],
+          select: {
+            id: true,
+            vin: true,
+            brand: true,
+            model: true,
+            variant: true,
+            color: true,
+            priceXof: true,
+            status: true,
+          },
+        }),
+    isGarageScope
+      ? Promise.resolve([])
+      : prisma.opportunity.findMany({
+          where: { stage: { in: ["DEVIS", "ESSAI", "MATCHING", "NEGOCIATION"] } },
+          select: {
+            id: true,
+            title: true,
+            customerId: true,
+          },
+        }),
   ]);
 
   // Trier les véhicules pour que le Stock Showroom apparaisse en premier, puis Au Port, En Transit, etc.
@@ -168,6 +176,7 @@ export default async function QuotesPage() {
         vehicles={sortedVehicles}
         opportunities={opps}
         userRole={user.role}
+        scope={scope}
       />
     </AppShell>
   );

@@ -58,3 +58,28 @@ export function peutGererBL(role: Role, activity: Activity): boolean {
   }
   return role === "COMPTA";
 }
+
+/**
+ * Périmètre d'activité du formulaire de devis proforma selon le rôle connecté.
+ * COMPTA_GARAGE est le seul rôle à opérer en GARAGE ; tous les autres (y compris
+ * la direction) restent sur le périmètre SHOWROOM historique, comme pour
+ * `createProformaWithLines`.
+ */
+export function quoteScopeForRole(role: Role): Activity {
+  return role === "COMPTA_GARAGE" ? ACTIVITY.GARAGE : ACTIVITY.SHOWROOM;
+}
+
+/**
+ * Filtre Prisma à appliquer sur `Customer` pour la liste de clients proposée dans
+ * un contexte SHOWROOM/GARAGE (ex : sélecteur client du formulaire de devis) :
+ * - COMPTA_GARAGE : uniquement les clients du périmètre garage.
+ * - Direction (super-admin) : aucun filtre, comportement historique inchangé.
+ * - Tous les autres rôles : uniquement les clients du périmètre showroom.
+ */
+export function customerScopeFilterForRole(
+  role: Role
+): { scopeGarage: true } | { scopeShowroom: true } | undefined {
+  if (role === "COMPTA_GARAGE") return { scopeGarage: true };
+  if (estSuperAdmin(role)) return undefined;
+  return { scopeShowroom: true };
+}

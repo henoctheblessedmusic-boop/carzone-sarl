@@ -77,6 +77,27 @@ export async function createProformaWithLines(payload: {
   if (!customerId) throw new Error(copy.server.customerRequired);
   if (!lines || lines.length === 0) throw new Error(copy.server.lineRequired);
 
+  if (activity === ACTIVITY.GARAGE) {
+    if (lines.some((l) => l.vehicleId)) {
+      throw new Error("Une proforma garage ne peut pas vendre un véhicule showroom.");
+    }
+    if (opportunityId) {
+      throw new Error("Une proforma garage ne peut pas être liée à une opportunité commerciale showroom.");
+    }
+  }
+
+  const customer = await prisma.customer.findUnique({
+    where: { id: customerId },
+    select: { scopeShowroom: true, scopeGarage: true },
+  });
+  if (!customer) throw new Error(copy.server.customerRequired);
+  if (activity === ACTIVITY.GARAGE && !customer.scopeGarage) {
+    throw new Error("Ce client n'est pas rattaché au périmètre garage : proforma garage impossible.");
+  }
+  if (activity === ACTIVITY.SHOWROOM && !customer.scopeShowroom) {
+    throw new Error("Ce client n'est pas rattaché au périmètre showroom : proforma showroom impossible.");
+  }
+
   const grossTotal = lines.reduce((s, l) => s + l.quantity * l.unitPriceXof, 0);
   const discountAmount = calculateDiscountAmount(grossTotal, {
     type: discountType,
@@ -484,6 +505,23 @@ export async function updateProformaWithLines(payload: {
   if (!existing) throw new Error(copy.server.quoteNotFound);
   if (user.role === "COMPTA_GARAGE" && existing.activity !== ACTIVITY.GARAGE) {
     throw new Error("La Comptable Garage ne peut modifier que des devis du périmètre GARAGE.");
+  }
+
+  const existingActivity = existing.activity as Activity;
+  if (existingActivity === ACTIVITY.GARAGE && lines.some((l) => l.vehicleId)) {
+    throw new Error("Une proforma garage ne peut pas vendre un véhicule showroom.");
+  }
+
+  const customer = await prisma.customer.findUnique({
+    where: { id: customerId },
+    select: { scopeShowroom: true, scopeGarage: true },
+  });
+  if (!customer) throw new Error(copy.server.customerRequired);
+  if (existingActivity === ACTIVITY.GARAGE && !customer.scopeGarage) {
+    throw new Error("Ce client n'est pas rattaché au périmètre garage : proforma garage impossible.");
+  }
+  if (existingActivity === ACTIVITY.SHOWROOM && !customer.scopeShowroom) {
+    throw new Error("Ce client n'est pas rattaché au périmètre showroom : proforma showroom impossible.");
   }
 
   // RÈGLE COMMERCIALE & LÉGALE STRICTE :

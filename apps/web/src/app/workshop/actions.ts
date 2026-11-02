@@ -69,8 +69,11 @@ export async function importWorkshopExcel(formData: FormData) {
           category: row.clientType === "Interne" ? "Interne" : "Particulier",
           city: "Cotonou",
           notes: `Importé depuis fichier SAV atelier (${sheetName})`,
+          scopeGarage: true,
         },
       });
+    } else if (!customer.scopeGarage) {
+      await prisma.customer.update({ where: { id: customer.id }, data: { scopeGarage: true } });
     }
 
     // 2. Lier au véhicule concession uniquement s'il existe déjà par son VIN (ex: vendu par Carzone)
@@ -188,12 +191,13 @@ export async function createWorkshopEntry(formData: FormData) {
         phone,
         category: String(formData.get("clientType") || "Client"),
         city: "Cotonou",
+        scopeGarage: true,
       },
     });
-  } else if (phone && !customer.phone) {
+  } else if ((phone && !customer.phone) || !customer.scopeGarage) {
     await prisma.customer.update({
       where: { id: customer.id },
-      data: { phone },
+      data: { ...(phone && !customer.phone ? { phone } : {}), scopeGarage: true },
     });
   }
 

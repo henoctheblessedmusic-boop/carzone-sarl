@@ -30,7 +30,13 @@ export type DeliveryNoteItem = {
   }>;
 };
 
-type CustomerOption = { id: string; contactName: string; companyName: string | null };
+type CustomerOption = {
+  id: string;
+  contactName: string;
+  companyName: string | null;
+  scopeShowroom: boolean;
+  scopeGarage: boolean;
+};
 type VehicleOption = { id: string; vin: string | null; brand: string; model: string; priceXof: number };
 type PartOption = { id: string; partNumber: string; name: string; stockQuantity: number; sellingPriceXof: number };
 
@@ -313,7 +319,10 @@ export function DeliveryNotesView({
                   className="ox-input"
                   value={activity}
                   disabled={isGarageOnly}
-                  onChange={(e) => setActivity(e.target.value as "SHOWROOM" | "GARAGE")}
+                  onChange={(e) => {
+                    setActivity(e.target.value as "SHOWROOM" | "GARAGE");
+                    setCustomerId("");
+                  }}
                 >
                   <option value="GARAGE">{copy.tabs.garage}</option>
                   <option value="SHOWROOM">{copy.tabs.showroom}</option>
@@ -324,11 +333,13 @@ export function DeliveryNotesView({
                 {copy.createModal.customer}
                 <select className="ox-input" value={customerId} onChange={(e) => setCustomerId(e.target.value)}>
                   <option value="">{copy.createModal.customerPlaceholder}</option>
-                  {customers.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.companyName || c.contactName}
-                    </option>
-                  ))}
+                  {customers
+                    .filter((c) => (activity === "GARAGE" ? c.scopeGarage : c.scopeShowroom))
+                    .map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.companyName || c.contactName}
+                      </option>
+                    ))}
                 </select>
               </label>
 

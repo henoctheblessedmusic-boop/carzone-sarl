@@ -29,7 +29,9 @@ export default async function WorkshopPage() {
   });
 
   // Récupérer les clients en base pour la sélection et l'auto-remplissage (téléphone, véhicule)
+  // Le garage ne doit jamais proposer un client purement showroom.
   const customers = await prisma.customer.findMany({
+    where: { scopeGarage: true },
     select: {
       id: true,
       contactName: true,

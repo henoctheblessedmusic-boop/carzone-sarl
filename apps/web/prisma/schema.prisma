@@ -62,6 +62,12 @@ model Customer {
   active           Boolean                @default(true)
   notes            String?
   showroomNotes    String?
+  /// Client du périmètre showroom (vente véhicules).
+  scopeShowroom    Boolean                @default(true)
+  /// Client du périmètre garage / atelier (pièces, prestations, entretien).
+  scopeGarage      Boolean                @default(false)
+  /// Entreprise partenaire (peut cumuler les deux périmètres).
+  isPartner        Boolean                @default(false)
   createdAt        DateTime               @default(now())
   updatedAt        DateTime               @updatedAt
   documents        CustomerDocument[]

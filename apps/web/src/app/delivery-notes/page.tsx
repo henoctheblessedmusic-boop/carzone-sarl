@@ -21,7 +21,7 @@ export default async function DeliveryNotesPage() {
     prisma.customer.findMany({
       where: { active: true },
       orderBy: { contactName: "asc" },
-      select: { id: true, contactName: true, companyName: true },
+      select: { id: true, contactName: true, companyName: true, scopeShowroom: true, scopeGarage: true },
     }),
     prisma.vehicle.findMany({
       where: { status: { in: ["EN_STOCK", "EN_MAGASIN"] } },

@@ -78,16 +78,19 @@ export function QuoteCreator({
   articles,
   vehicles,
   opportunities,
+  scope = "SHOWROOM",
   onCreated,
 }: {
   customers: CustomerOption[];
   articles: ArticleOption[];
   vehicles: VehicleOption[];
   opportunities: OpportunityOption[];
+  scope?: "SHOWROOM" | "GARAGE";
   onCreated?: () => void;
 }) {
   const { locale } = usePrefs();
   const copy = quotesCopy[locale];
+  const isGarageScope = scope === "GARAGE";
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -110,8 +113,10 @@ export function QuoteCreator({
   const [notes, setNotes] = useState("");
 
   // CGV Page 2 contract states
-  const [cgvType, setCgvType] = useState<CgvType>("VEHICULE");
-  const [customCgvText, setCustomCgvText] = useState<string>(() => getDefaultCgv("VEHICULE"));
+  const [cgvType, setCgvType] = useState<CgvType>(isGarageScope ? "ATELIER" : "VEHICULE");
+  const [customCgvText, setCustomCgvText] = useState<string>(() =>
+    getDefaultCgv(isGarageScope ? "ATELIER" : "VEHICULE")
+  );
   const [isCgvCustomized, setIsCgvCustomized] = useState(false);
   const [showCgvEditor, setShowCgvEditor] = useState(false);
 
@@ -209,6 +214,10 @@ export function QuoteCreator({
       if (newIfu.trim()) fd.append("ifu", newIfu.trim());
       if (newAddress.trim()) fd.append("address", newAddress.trim());
       fd.append("category", newCategory);
+      if (isGarageScope) {
+        fd.append("scopeGarage", "true");
+        fd.append("scopeShowroom", "false");
+      }
 
       const created = await createCustomer(fd);
       const newOption: CustomerOption = {
@@ -520,11 +529,13 @@ export function QuoteCreator({
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <ShoppingCart size={22} color="var(--gold)" />
                   <h2 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 700, color: "var(--ice-text-strong)" }}>
-                    {copy.creator.title}
+                    {isGarageScope ? "Devis proforma — Garage / Atelier" : copy.creator.title}
                   </h2>
                 </div>
                 <div style={{ fontSize: "0.85rem", color: "var(--ice-text-muted)", marginTop: 4 }}>
-                  {copy.creator.subtitle}
+                  {isGarageScope
+                    ? "Pièces détachées, prestations et réparations — aucun véhicule showroom."
+                    : copy.creator.subtitle}
                 </div>
               </div>
               <button
@@ -617,27 +628,29 @@ export function QuoteCreator({
                   </select>
                 </div>
 
-                <div>
-                  <label style={{ display: "block", fontSize: "0.8rem", opacity: 0.8, marginBottom: 4, fontWeight: 600 }}>
-                    {copy.creator.client.opportunityLabel}
-                  </label>
-                  <select
-                    className="ox-select"
-                    style={{ width: "100%" }}
-                    value={opportunityId}
-                    onChange={(e) => setOpportunityId(e.target.value)}
-                    disabled={isPending}
-                  >
-                    <option value="">{copy.creator.client.noOpportunity}</option>
-                    {opportunities
-                      .filter((o) => !customerId || o.customerId === customerId)
-                      .map((o) => (
-                        <option key={o.id} value={o.id}>
-                          {o.title}
-                        </option>
-                      ))}
-                  </select>
-                </div>
+                {!isGarageScope && (
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.8rem", opacity: 0.8, marginBottom: 4, fontWeight: 600 }}>
+                      {copy.creator.client.opportunityLabel}
+                    </label>
+                    <select
+                      className="ox-select"
+                      style={{ width: "100%" }}
+                      value={opportunityId}
+                      onChange={(e) => setOpportunityId(e.target.value)}
+                      disabled={isPending}
+                    >
+                      <option value="">{copy.creator.client.noOpportunity}</option>
+                      {opportunities
+                        .filter((o) => !customerId || o.customerId === customerId)
+                        .map((o) => (
+                          <option key={o.id} value={o.id}>
+                            {o.title}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                )}
               </div>
 
               {selectedCustomer && (
@@ -767,40 +780,42 @@ export function QuoteCreator({
                   ))}
                 </select>
 
-                <select
-                  className="ox-select"
-                  style={{ width: "100%", fontSize: "0.83rem" }}
-                  value={selectedVehicleId}
-                  onChange={(e) => {
-                    setSelectedVehicleId(e.target.value);
-                    if (e.target.value) handleSelectVehicle(e.target.value);
-                  }}
-                  disabled={isPending}
-                >
-                  <option value="">{copy.creator.quickAdd.vehicleOption}</option>
-                  {vehicles.map((v) => {
-                    const statusBadge =
-                      v.status === "EN_MAGASIN" || v.status === "EN_STOCK"
-                        ? copy.creator.quickAdd.vehicleStatus.showroom
-                        : v.status === "AU_PORT"
-                        ? copy.creator.quickAdd.vehicleStatus.port
-                        : v.status === "EN_TRANSIT"
-                        ? copy.creator.quickAdd.vehicleStatus.transit
-                        : v.status === "EN_PRODUCTION"
-                        ? copy.creator.quickAdd.vehicleStatus.production
-                        : v.status === "COMMANDE"
-                        ? copy.creator.quickAdd.vehicleStatus.order
-                        : "";
-                    const badgeText = statusBadge ? ` [${statusBadge}]` : "";
-                    const variantText = v.variant ? ` · ${v.variant}` : "";
-                    const colorText = v.color ? ` (${v.color})` : "";
-                    return (
-                      <option key={v.id} value={v.id}>
-                        {v.brand} {v.model}{variantText}{colorText}{badgeText} · {formatXof(v.priceXof)}
-                      </option>
-                    );
-                  })}
-                </select>
+                {!isGarageScope && (
+                  <select
+                    className="ox-select"
+                    style={{ width: "100%", fontSize: "0.83rem" }}
+                    value={selectedVehicleId}
+                    onChange={(e) => {
+                      setSelectedVehicleId(e.target.value);
+                      if (e.target.value) handleSelectVehicle(e.target.value);
+                    }}
+                    disabled={isPending}
+                  >
+                    <option value="">{copy.creator.quickAdd.vehicleOption}</option>
+                    {vehicles.map((v) => {
+                      const statusBadge =
+                        v.status === "EN_MAGASIN" || v.status === "EN_STOCK"
+                          ? copy.creator.quickAdd.vehicleStatus.showroom
+                          : v.status === "AU_PORT"
+                          ? copy.creator.quickAdd.vehicleStatus.port
+                          : v.status === "EN_TRANSIT"
+                          ? copy.creator.quickAdd.vehicleStatus.transit
+                          : v.status === "EN_PRODUCTION"
+                          ? copy.creator.quickAdd.vehicleStatus.production
+                          : v.status === "COMMANDE"
+                          ? copy.creator.quickAdd.vehicleStatus.order
+                          : "";
+                      const badgeText = statusBadge ? ` [${statusBadge}]` : "";
+                      const variantText = v.variant ? ` · ${v.variant}` : "";
+                      const colorText = v.color ? ` (${v.color})` : "";
+                      return (
+                        <option key={v.id} value={v.id}>
+                          {v.brand} {v.model}{variantText}{colorText}{badgeText} · {formatXof(v.priceXof)}
+                        </option>
+                      );
+                    })}
+                  </select>
+                )}
               </div>
 
               {/* Panneau de Personnalisation Immédiate (Quantité & Prix Négocié) */}
@@ -1252,45 +1267,60 @@ export function QuoteCreator({
                   <span style={{ fontWeight: 700, fontSize: "0.82rem", color: "var(--ice-highlight)" }}>
                     {copy.creator.cgv.title}
                   </span>
-                  <div
-                    style={{
-                      display: "inline-flex",
-                      borderRadius: 6,
-                      overflow: "hidden",
-                      border: "1px solid var(--ice-border)",
-                    }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => handleCgvTypeChange("VEHICULE")}
+                  {isGarageScope ? (
+                    <span
                       style={{
                         padding: "0.25rem 0.6rem",
                         fontSize: "0.75rem",
                         fontWeight: 650,
-                        border: "none",
-                        cursor: "pointer",
-                        background: cgvType === "VEHICULE" ? "var(--brand)" : "rgba(255,255,255,0.05)",
-                        color: cgvType === "VEHICULE" ? "#fff" : "var(--ice-text)",
-                      }}
-                    >
-                      🚗 {copy.creator.cgv.vehicle}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleCgvTypeChange("ATELIER")}
-                      style={{
-                        padding: "0.25rem 0.6rem",
-                        fontSize: "0.75rem",
-                        fontWeight: 650,
-                        border: "none",
-                        cursor: "pointer",
-                        background: cgvType === "ATELIER" ? "var(--brand)" : "rgba(255,255,255,0.05)",
-                        color: cgvType === "ATELIER" ? "#fff" : "var(--ice-text)",
+                        borderRadius: 6,
+                        background: "var(--brand)",
+                        color: "#fff",
                       }}
                     >
                       🔧 {copy.creator.cgv.workshop}
-                    </button>
-                  </div>
+                    </span>
+                  ) : (
+                    <div
+                      style={{
+                        display: "inline-flex",
+                        borderRadius: 6,
+                        overflow: "hidden",
+                        border: "1px solid var(--ice-border)",
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => handleCgvTypeChange("VEHICULE")}
+                        style={{
+                          padding: "0.25rem 0.6rem",
+                          fontSize: "0.75rem",
+                          fontWeight: 650,
+                          border: "none",
+                          cursor: "pointer",
+                          background: cgvType === "VEHICULE" ? "var(--brand)" : "rgba(255,255,255,0.05)",
+                          color: cgvType === "VEHICULE" ? "#fff" : "var(--ice-text)",
+                        }}
+                      >
+                        🚗 {copy.creator.cgv.vehicle}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleCgvTypeChange("ATELIER")}
+                        style={{
+                          padding: "0.25rem 0.6rem",
+                          fontSize: "0.75rem",
+                          fontWeight: 650,
+                          border: "none",
+                          cursor: "pointer",
+                          background: cgvType === "ATELIER" ? "var(--brand)" : "rgba(255,255,255,0.05)",
+                          color: cgvType === "ATELIER" ? "#fff" : "var(--ice-text)",
+                        }}
+                      >
+                        🔧 {copy.creator.cgv.workshop}
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <button

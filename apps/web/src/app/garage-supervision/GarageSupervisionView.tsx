@@ -211,7 +211,7 @@ export function GarageSupervisionView({
                 return (
                   <tr key={entry.id}>
                     <td>
-                      <strong>{entry.orNumber || "—"}</strong>
+                      <strong>{entry.orNumber || "-"}</strong>
                       <div style={{ opacity: 0.6, fontSize: "0.76rem" }}>
                         {entry.entryDate || entry.createdAt.slice(0, 10)}
                       </div>

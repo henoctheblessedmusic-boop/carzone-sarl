@@ -138,7 +138,7 @@ export default async function DeliveryNotePrintPage({
               {copy.print.customer}
             </div>
             <div style={{ fontWeight: 700 }}>
-              {note.customer ? note.customer.companyName || note.customer.contactName : "—"}
+              {note.customer ? note.customer.companyName || note.customer.contactName : "-"}
             </div>
           </div>
           <div style={{ textAlign: "right", fontSize: "0.85rem" }}>
@@ -176,7 +176,7 @@ export default async function DeliveryNotePrintPage({
                 </td>
                 <td style={{ padding: "0.7rem 0.6rem", textAlign: "center" }}>{l.quantity}</td>
                 <td style={{ padding: "0.7rem 0.6rem", textAlign: "right" }}>
-                  {l.unitPriceXof != null ? formatXof(l.unitPriceXof) : "—"}
+                  {l.unitPriceXof != null ? formatXof(l.unitPriceXof) : "-"}
                 </td>
               </tr>
             ))}
@@ -209,7 +209,7 @@ export default async function DeliveryNotePrintPage({
               fontSize: "0.85rem",
             }}
           >
-            <strong>ANNULÉ</strong> le {formatDate(note.cancelledAt)} par {note.cancelledByName} — motif : {note.cancelReason}
+            <strong>ANNULÉ</strong> le {formatDate(note.cancelledAt)} par {note.cancelledByName} - motif : {note.cancelReason}
           </div>
         )}
 

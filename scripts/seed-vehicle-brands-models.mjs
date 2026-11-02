@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Référentiel marques/modèles véhicules — CARZONE.
+ * Référentiel marques/modèles véhicules - CARZONE.
  * - marques chinoises d'abord (celles du catalogue existant conservent leur ordre) ;
  * - puis les marques les plus courantes (Toyota, Nissan, Kia, Hyundai, etc.).
  * Réexécutable et idempotent (upsert par nom).

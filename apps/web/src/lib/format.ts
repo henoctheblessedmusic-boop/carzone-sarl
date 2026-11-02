@@ -25,7 +25,7 @@ export function nextDocNumber(prefix: string, count: number) {
 }
 
 /**
- * Numérotation des bons de livraison internes — séquences séparées par activité :
+ * Numérotation des bons de livraison internes - séquences séparées par activité :
  * BL-GAR-0001… pour le garage, BL-SHW-0001… pour le showroom.
  */
 export function nextDeliveryNoteNumber(activity: "SHOWROOM" | "GARAGE", count: number) {

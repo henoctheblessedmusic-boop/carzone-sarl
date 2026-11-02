@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Audit de cohérence des rôles CARZONE — complète audit-navigation.mjs.
+ * Audit de cohérence des rôles CARZONE - complète audit-navigation.mjs.
  *
  * audit-navigation.mjs vérifie déjà : liens morts (onboarding + menu) et
  * rôle onboarding/menu <-> requireUser() de la page cible.
@@ -196,18 +196,18 @@ function main() {
   console.log("");
 
   if (warnings.length > 0) {
-    console.log(`AVERTISSEMENT — ${warnings.length} drift(s) résiduel(s) connu(s), hors scope :`);
+    console.log(`AVERTISSEMENT - ${warnings.length} drift(s) résiduel(s) connu(s), hors scope :`);
     for (const w of warnings) console.log(" - " + w);
     console.log("");
   }
 
   if (failures.length > 0) {
-    console.error(`ÉCHEC — ${failures.length} incohérence(s) essentielle(s) détectée(s) :\n`);
+    console.error(`ÉCHEC - ${failures.length} incohérence(s) essentielle(s) détectée(s) :\n`);
     for (const f of failures) console.error(" - " + f);
     process.exit(1);
   }
 
-  console.log("OK — aucune incohérence essentielle détectée pour COMPTA_GARAGE / ASSISTANTE_COMPTABLE.");
+  console.log("OK - aucune incohérence essentielle détectée pour COMPTA_GARAGE / ASSISTANTE_COMPTABLE.");
   process.exit(0);
 }
 

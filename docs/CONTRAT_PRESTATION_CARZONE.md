@@ -12,7 +12,7 @@
 **CARZONE SARL**  
 Société à Responsabilité Limitée  
 Showroom : Zone Maro-Militaire, Quartier Gbèdomidji, Cotonou, Bénin  
-RCCM : RB/COT/23 B 34567 — IFU : 0202314589201  
+RCCM : RB/COT/23 B 34567 - IFU : 0202314589201  
 Représentée par sa Direction Générale,  
 Ci-après dénommée **« Le Client »** ou **« CARZONE SARL »**,  
 *D'une part,*

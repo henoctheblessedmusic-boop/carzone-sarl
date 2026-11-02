@@ -1113,7 +1113,7 @@ export function PresentationClient() {
                     transition: "all 0.2s ease",
                   }}
                 >
-                  {sc.number}. {copy.scenes[sc.id].title.split("—")[0].split("&")[0].trim()}
+                  {sc.number}. {copy.scenes[sc.id].title.split("-")[0].split("&")[0].trim()}
                 </button>
               ))}
             </div>

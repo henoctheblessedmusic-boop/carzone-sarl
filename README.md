@@ -1,4 +1,4 @@
-# CARZONE SARL — Logiciel de Gestion Concession & SAV Automobile
+# CARZONE SARL - Logiciel de Gestion Concession & SAV Automobile
 
 Application SaaS DMS / ERP sur-mesure développée pour **CARZONE SARL**, concessionnaire automobile et showroom véhicules neufs à Cotonou (Bénin).
 

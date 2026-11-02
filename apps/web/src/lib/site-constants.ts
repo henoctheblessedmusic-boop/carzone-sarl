@@ -23,7 +23,7 @@ export const SITE_ADDRESS = {
 export const SITE_MAPS_URL = "https://maps.app.goo.gl/ie79JAW6ri2km8Qx8?g_st=ac";
 export const SITE_WEBSITE = "https://www.topcarzone.com";
 
-/** Facebook has no confirmed official URL — shown as plain text. Instagram URL is confirmed and linked. */
+/** Facebook has no confirmed official URL - shown as plain text. Instagram URL is confirmed and linked. */
 export const SITE_SOCIAL = {
   instagram: "@carzone_229",
   instagramUrl: "https://www.instagram.com/carzone_229",

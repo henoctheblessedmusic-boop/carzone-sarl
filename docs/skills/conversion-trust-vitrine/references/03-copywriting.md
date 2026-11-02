@@ -1,4 +1,4 @@
-# Copywriting persuasif — formules et règles
+# Copywriting persuasif - formules et règles
 
 ## Règles générales
 - Bénéfice avant caractéristique.

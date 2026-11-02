@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Audit de navigation CARZONE — anti-régression sans dépendance.
+ * Audit de navigation CARZONE - anti-régression sans dépendance.
  *
  * Vérifie que :
  *  1) tous les href statiques du didacticiel "Premiers pas" (onboarding.ts) et
@@ -209,12 +209,12 @@ function main() {
   console.log("");
 
   if (failures.length > 0) {
-    console.error(`ÉCHEC — ${failures.length} problème(s) détecté(s) :\n`);
+    console.error(`ÉCHEC - ${failures.length} problème(s) détecté(s) :\n`);
     for (const f of failures) console.error(" - " + f);
     process.exit(1);
   }
 
-  console.log("OK — aucun lien mort ni rôle bloqué détecté dans le didacticiel ou le menu.");
+  console.log("OK - aucun lien mort ni rôle bloqué détecté dans le didacticiel ou le menu.");
   process.exit(0);
 }
 

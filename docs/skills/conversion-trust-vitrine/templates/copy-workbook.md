@@ -1,4 +1,4 @@
-# Copy workbook — à remplir avant implémentation
+# Copy workbook - à remplir avant implémentation
 
 ## 1. Promesse
 - Titre :

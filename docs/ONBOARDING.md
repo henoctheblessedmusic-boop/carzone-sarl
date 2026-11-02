@@ -23,10 +23,10 @@ Plateforme interne pour CARZONE SARL (Cotonou) : gestion concession (leads → s
 
 ## Demo accounts
 All passwords: `carzone2026`
-- `igor@carzone.bj` — DG
-- `basile@carzone.bj` — Compta
-- `jennifer@carzone.bj` — Commercial
-- `installateur@volthome.bj` — Installateur
+- `igor@carzone.bj` - DG
+- `basile@carzone.bj` - Compta
+- `jennifer@carzone.bj` - Commercial
+- `installateur@volthome.bj` - Installateur
 
 ## Sites
 - Showroom & Siège : Zone Maro-Militaire, Gbèdomidji, Cotonou

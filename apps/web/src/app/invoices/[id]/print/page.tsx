@@ -364,7 +364,7 @@ export default async function InvoicePrintPage({
               letterSpacing: "0.05em",
             }}
           >
-            DOCUMENT DE DÉMONSTRATION — SANS VALEUR FISCALE
+            DOCUMENT DE DÉMONSTRATION - SANS VALEUR FISCALE
           </div>
         ) : null}
 
@@ -416,7 +416,7 @@ export default async function InvoicePrintPage({
           >
             <div>
               <div style={{ fontWeight: 800, fontSize: "0.95rem", color: "#166534", display: "flex", alignItems: "center", gap: 6 }}>
-                {invoice.isDemo ? "e-MECeF — DÉMONSTRATION (sans valeur fiscale)" : copy.print.dgiHeading}
+                {invoice.isDemo ? "e-MECeF - DÉMONSTRATION (sans valeur fiscale)" : copy.print.dgiHeading}
               </div>
               <div style={{ fontSize: "0.85rem", marginTop: 6, color: "#1e293b", lineHeight: 1.6 }}>
                 <div><strong>{copy.print.mecefCode}</strong> <span style={{ fontFamily: "monospace", fontSize: "0.98rem", fontWeight: 700, letterSpacing: "0.04em", color: "#0078d4" }}>{invoice.mecefCode}</span></div>

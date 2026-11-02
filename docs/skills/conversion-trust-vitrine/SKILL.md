@@ -58,7 +58,7 @@ Composants standard :
 - Processus en 3 à 5 étapes.
 - Bandeau réassurance (5 preuves factuelles).
 - Bloc témoignages + galerie de réalisations/livraisons.
-- Avis externes (Google, Trustpilot) — réels uniquement.
+- Avis externes (Google, Trustpilot) - réels uniquement.
 - FAQ conversion (délais, prix/cotation, garantie, paiement, accompagnement).
 - CTA sticky mobile (canal principal).
 - Formulaire lead : champs utiles, consentement, état de succès.

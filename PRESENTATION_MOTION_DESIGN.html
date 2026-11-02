@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CARZONE SARL — Présentation Motion Design 16:9 & Mobile</title>
+  <title>CARZONE SARL - Présentation Motion Design 16:9 & Mobile</title>
   <style>
     :root {
       --bg-dark: #030307;
@@ -452,7 +452,7 @@
     const SCENES = [
       {
         number: "01",
-        title: "CARZONE Ops — Système d'Exploitation Concessionnaire",
+        title: "CARZONE Ops - Système d'Exploitation Concessionnaire",
         badge: "100% Production · BDD Neon",
         desktopImg: "apps/web/public/presentation/dashboard_16_9.png",
         mobileImg: "apps/web/public/presentation/dashboard_mobile.png",
@@ -638,7 +638,7 @@
       const pills = document.getElementById('scenePills');
       pills.innerHTML = SCENES.map((sc, i) => `
         <button class="pill-btn ${i === currentIdx ? 'active' : ''}" onclick="goToScene(${i})">
-          ${sc.number}. ${sc.title.split('—')[0].split('&')[0].trim()}
+          ${sc.number}. ${sc.title.split('-')[0].split('&')[0].trim()}
         </button>
       `).join('');
     }

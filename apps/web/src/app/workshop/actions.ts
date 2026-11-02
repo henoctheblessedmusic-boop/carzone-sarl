@@ -532,7 +532,7 @@ export async function saveWorkshopTabletInspection(payload: WorkshopTabletPayloa
     );
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      // P2002 : collision sur (workshopEntryId, taskLabel) — une autre tablette
+      // P2002 : collision sur (workshopEntryId, taskLabel) - une autre tablette
       // a sauvegardé la même fiche en même temps. Rien n'est corrompu (la
       // transaction est annulée) : on demande une nouvelle tentative.
       if (error.code === "P2002") {

@@ -194,7 +194,7 @@ export default async function QuotePrintPage({
               }}
             >
               <strong style={{ display: "block", marginBottom: 4 }}>
-                Véhicule client — dossier atelier
+                Véhicule client - dossier atelier
               </strong>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem 1.5rem" }}>
                 {quote.vehicleImmatriculation && (

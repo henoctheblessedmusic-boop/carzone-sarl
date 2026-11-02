@@ -1,4 +1,4 @@
-# AGENTS.md — Discipline d'ingénierie (ECC) pour CARZONE SARL Ops
+# AGENTS.md - Discipline d'ingénierie (ECC) pour CARZONE SARL Ops
 
 > Fichier chargé automatiquement par DSH à chaque session. Il complète `CLAUDE.md`
 > (identité entreprise, stack, comptes seed) : en cas de divergence, **CLAUDE.md fait foi
@@ -7,6 +7,14 @@
 > Source : pack ECC (Everything Claude Code, dépôt `affaan-m/ECC`, licence MIT), adapté
 > au harnais DSH et au stack Next.js 15 / Prisma / Neon de ce dépôt.
 > Packs complets : `.dsh/rules/ecc/` · Fiches de rôle : `.dsh/agents/` (+ `INDEX.md`).
+
+## 0. REGLE PRIMORDIALE - INTERDICTION DU TIRET CADRATIN
+
+- **Le tiret cadratin (caractere Unicode U+2014) est formellement interdit dans tout le projet, present et futur.**
+- Partout (code, UI, textes, docs, commentaires, commits, emails generes), utiliser uniquement le **tiret simple "-"**.
+- Ne jamais reintroduire ce caractere, meme dans une citation ou un exemple.
+- Avant chaque commit : `npm run check:no-em-dash` (dans `apps/web`) doit passer.
+- Scripts disponibles : `node scripts/strip-em-dash.mjs` (remplacement) et `node scripts/check-no-em-dash.mjs` (controle).
 
 ## 1. Boucle de travail obligatoire
 
@@ -23,10 +31,10 @@
    sensibles, faire une revue à contexte frais via `subagent` (fichier de rôle dans
    `.dsh/agents/`, ex. `code-reviewer.md`, `security-reviewer.md`).
 5. **Vérifier avant de déclarer terminé** : build/lint/tests + preuve réelle (sortie de
-   commande, URL vérifiée) — jamais une affirmation sans preuve.
+   commande, URL vérifiée) - jamais une affirmation sans preuve.
 6. **Committer** : message conventionnel explicite, puis push (Vercel déploie `main`).
 7. **Capturer l'apprentissage** : consigner les pièges rencontrés (docs/ ou commentaire de
-   PR) pour ne pas répéter les erreurs — voir la section 5 du document de passation.
+   PR) pour ne pas répéter les erreurs - voir la section 5 du document de passation.
 
 ## 2. Standards de code (résumé des packs ECC)
 
@@ -53,9 +61,9 @@
   variables CSS ; HTML sémantique et accessibilité (WCAG 2.2 AA).
 - Hooks groupés en haut du composant ; pas de state dupliqué (dériver pendant le rendu).
 
-## 4. Sécurité — checklist avant CHAQUE commit
+## 4. Sécurité - checklist avant CHAQUE commit
 
-- [ ] Aucun secret en dur (clé API, mot de passe, token) — variables d'environnement uniquement.
+- [ ] Aucun secret en dur (clé API, mot de passe, token) - variables d'environnement uniquement.
 - [ ] Entrées utilisateur validées ; requêtes SQL/Prisma paramétrées.
 - [ ] Authz vérifiée (`requireUser` / rôle attendu) sur chaque route/action sensible.
 - [ ] Rate limiting sur les endpoints publics ; erreurs sans fuite d'information.
@@ -79,10 +87,10 @@
 
 | Niveau | Signification | Action |
 |---|---|---|
-| CRITICAL | Faille de sécurité / perte de données | **BLOQUER** — corriger avant merge |
-| HIGH | Bug ou qualité significative | **AVERTIR** — corriger avant merge |
-| MEDIUM | Maintenabilité | **INFO** — corriger si possible |
-| LOW | Style / suggestion | **NOTE** — optionnel |
+| CRITICAL | Faille de sécurité / perte de données | **BLOQUER** - corriger avant merge |
+| HIGH | Bug ou qualité significative | **AVERTIR** - corriger avant merge |
+| MEDIUM | Maintenabilité | **INFO** - corriger si possible |
+| LOW | Style / suggestion | **NOTE** - optionnel |
 
 Revue obligatoire : auth, paiements, données clients, requêtes DB, appels externes, avant
 tout commit sur `main`.

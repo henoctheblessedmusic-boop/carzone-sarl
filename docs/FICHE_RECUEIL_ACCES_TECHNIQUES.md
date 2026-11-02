@@ -1,5 +1,5 @@
 # FICHE DE RECUEIL DES ACCÈS TECHNIQUES & INFRASTRUCTURE
-### Direction des Systèmes d'Information — CARZONE SARL
+### Direction des Systèmes d'Information - CARZONE SARL
 **Objet :** Rapatriement, sécurisation et centralisation des accès du domaine `topcarzone.com`  
 **Date :** 21 Octobre 2026  
 
@@ -42,7 +42,7 @@ Merci de transmettre ces éléments directement en réponse à ce message, ou pa
 
 Comptant sur votre franche collaboration habituelle.
 Bien cordialement,
-La Direction Générale — CARZONE SARL
+La Direction Générale - CARZONE SARL
 ```
 
 ---

@@ -1,4 +1,4 @@
-/** Public showcase ("vitrine") locale preferences — separate from the internal app's `Locale` (`@/lib/prefs`). */
+/** Public showcase ("vitrine") locale preferences - separate from the internal app's `Locale` (`@/lib/prefs`). */
 
 export type SiteLocale = "fr" | "en" | "es" | "zh";
 

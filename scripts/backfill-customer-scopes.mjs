@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Backfill des périmètres client (scopeShowroom / scopeGarage / isPartner) — CARZONE.
+ * Backfill des périmètres client (scopeShowroom / scopeGarage / isPartner) - CARZONE.
  *
  * Règle métier (cf. plan "cloisonnement garage/showroom") :
  *  - scopeShowroom = true pour TOUS les clients existants (comportement historique :

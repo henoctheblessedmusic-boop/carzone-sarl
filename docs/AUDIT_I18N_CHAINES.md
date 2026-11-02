@@ -1,4 +1,4 @@
-﻿# Audit i18n & humanisation — chaînes visibles (approx.)
+﻿# Audit i18n & humanisation - chaînes visibles (approx.)
 
 > Étape 0 (aucune modification de code). Comptage heuristique : littéraux de chaîne de 12+ caractères avec 3+ mots + texte JSX. Volume approximatif, hors fichiers factuels.
 
@@ -9,7 +9,7 @@
 | Fichiers avec texte visible | 131 |
 | Chaînes UI approximatives | 10735 |
 | Fichiers factuels exclus de l'humanisation | 6 (1014 chaînes : specs véhicules, matrice atelier, prompts IA) |
-| Dictionnaires i18n existants | fr.ts, en.ts (2 langues, ~160 clés) — zh absent |
+| Dictionnaires i18n existants | fr.ts, en.ts (2 langues, ~160 clés) - zh absent |
 | Fichiers branchés sur l'i18n | 6 (AppShell, login, OnboardingHost, PrefsProvider, layout, lib/i18n) |
 
 ## Volume par groupe
@@ -185,9 +185,9 @@
 
 ## Fichiers factuels à NE PAS humaniser/traduire
 
-- $(@{Count=730; File=lib/vehicle-catalog-specs.ts}.File) — 730 chaînes factuelles (specs, références) : fidélité exigée, aucune réécriture.
-- $(@{Count=82; File=lib/tech-sheet-generator.ts}.File) — 82 chaînes factuelles (specs, références) : fidélité exigée, aucune réécriture.
-- $(@{Count=73; File=lib/i18n/messages/fr.ts}.File) — 73 chaînes factuelles (specs, références) : fidélité exigée, aucune réécriture.
-- $(@{Count=69; File=lib/i18n/messages/en.ts}.File) — 69 chaînes factuelles (specs, références) : fidélité exigée, aucune réécriture.
-- $(@{Count=47; File=lib/openai-tech-sheet.ts}.File) — 47 chaînes factuelles (specs, références) : fidélité exigée, aucune réécriture.
-- $(@{Count=13; File=lib/workshop-checklist-data.ts}.File) — 13 chaînes factuelles (specs, références) : fidélité exigée, aucune réécriture.
+- $(@{Count=730; File=lib/vehicle-catalog-specs.ts}.File) - 730 chaînes factuelles (specs, références) : fidélité exigée, aucune réécriture.
+- $(@{Count=82; File=lib/tech-sheet-generator.ts}.File) - 82 chaînes factuelles (specs, références) : fidélité exigée, aucune réécriture.
+- $(@{Count=73; File=lib/i18n/messages/fr.ts}.File) - 73 chaînes factuelles (specs, références) : fidélité exigée, aucune réécriture.
+- $(@{Count=69; File=lib/i18n/messages/en.ts}.File) - 69 chaînes factuelles (specs, références) : fidélité exigée, aucune réécriture.
+- $(@{Count=47; File=lib/openai-tech-sheet.ts}.File) - 47 chaînes factuelles (specs, références) : fidélité exigée, aucune réécriture.
+- $(@{Count=13; File=lib/workshop-checklist-data.ts}.File) - 13 chaînes factuelles (specs, références) : fidélité exigée, aucune réécriture.

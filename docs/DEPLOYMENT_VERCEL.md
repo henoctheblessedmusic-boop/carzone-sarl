@@ -1,4 +1,4 @@
-# Déploiement Vercel — CARZONE SARL
+# Déploiement Vercel - CARZONE SARL
 
 ## Projet
 - **Équipe Vercel** : `theblessed-team`
@@ -15,13 +15,13 @@ n'est **pas encore** géré par Vercel :
 - Résolution actuelle : `35.204.150.5` (ancien serveur nginx « Topcarzone »)
 
 ### Modifications DNS à appliquer chez Google Cloud DNS / le registrar
-Pour `topcarzone.com` (apex) — remplacer l'enregistrement A existant :
+Pour `topcarzone.com` (apex) - remplacer l'enregistrement A existant :
 ```
 A  @  216.150.1.1
 A  @  216.150.16.1
 ```
 
-Pour `www.topcarzone.com` — remplacer l'enregistrement A existant par :
+Pour `www.topcarzone.com` - remplacer l'enregistrement A existant par :
 ```
 CNAME  www  25ecc0d0856b8e68.vercel-dns-017.com.
 ```

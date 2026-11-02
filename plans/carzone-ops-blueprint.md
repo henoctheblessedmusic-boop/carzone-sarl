@@ -1,14 +1,14 @@
-# Blueprint — CARZONE Ops SaaS
+# Blueprint - CARZONE Ops SaaS
 
 ## Objective
 Replace Djaboo with CARZONE Ops DMS + EV charging modules (install quotes, subscriptions, terminal payments).
 
 ## Steps
-1. **Socle** — Next.js, Prisma, auth, roles, CLAUDE.md ✅
-2. **MVP concession** — CRM, stock VIN, pipeline, devis→facture, règlements ✅
-3. **Bornes devis** — installateurs panel + charge install requests ✅
-4. **Bornes charge** — plans, subscriptions, terminal MM/carte, charging invoices ✅
-5. **Extend** — location LCD/LLD/LOA, flotte, atelier OR, import ports ✅
+1. **Socle** - Next.js, Prisma, auth, roles, CLAUDE.md ✅
+2. **MVP concession** - CRM, stock VIN, pipeline, devis→facture, règlements ✅
+3. **Bornes devis** - installateurs panel + charge install requests ✅
+4. **Bornes charge** - plans, subscriptions, terminal MM/carte, charging invoices ✅
+5. **Extend** - location LCD/LLD/LOA, flotte, atelier OR, import ports ✅
 
 ## Invariants
 - XOF everywhere

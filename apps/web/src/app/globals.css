@@ -1,4 +1,4 @@
-/* Dark (default) — liquid ice */
+/* Dark (default) - liquid ice */
 :root,
 html[data-theme="dark"] {
   color-scheme: dark;
@@ -44,7 +44,7 @@ html[data-theme="dark"] {
     linear-gradient(165deg, #071018 0%, #0c1a24 50%, #081410 100%);
   --ice-nav-active-fg: #fff;
   --ice-glass-shadow: 0 8px 28px rgba(0, 20, 40, 0.25);
-  /* Brand accent — official OXCAR X blue; gold kept as secondary warm accent */
+  /* Brand accent - official OXCAR X blue; gold kept as secondary warm accent */
   --brand: #e11d48;
   --brand-deep: #be123c;
   --brand-glow: rgba(225, 29, 72, 0.42);
@@ -120,7 +120,7 @@ html[data-theme="light"] select option {
   color: #0e2233 !important;
 }
 
-/* Light — polished ice / brand / gold (readable, high contrast, radiant) */
+/* Light - polished ice / brand / gold (readable, high contrast, radiant) */
 html[data-theme="light"] {
   --ice-bg-deep: #f2f7fa;
   --ice-bg-mid: #e8f1f6;
@@ -245,7 +245,7 @@ a {
   transition: color var(--dur) var(--ease), opacity var(--dur) var(--ease);
 }
 
-/* ——— Liquid ice surfaces ——— */
+/* --- Liquid ice surfaces --- */
 .ox-glass {
   background: linear-gradient(
     145deg,
@@ -285,7 +285,7 @@ a {
   transform: translateY(1px);
 }
 
-/* ——— Buttons ——— */
+/* --- Buttons --- */
 .ox-btn {
   display: inline-flex;
   align-items: center;
@@ -350,7 +350,7 @@ a {
   border-radius: 8px;
 }
 
-/* ——— Forms ——— */
+/* --- Forms --- */
 .ox-input,
 .ox-select,
 .ox-textarea {
@@ -419,7 +419,7 @@ select option:checked,
   align-items: center;
 }
 
-/* ——— Tables ——— */
+/* --- Tables --- */
 .ox-table-wrap {
   overflow-x: auto;
   border-radius: 14px;
@@ -470,7 +470,7 @@ select option:checked,
   box-shadow: inset 3px 0 0 var(--ice-highlight);
 }
 
-/* ——— Badges ——— */
+/* --- Badges --- */
 .ox-badge {
   display: inline-block;
   padding: 0.18rem 0.55rem;
@@ -511,7 +511,7 @@ select option:checked,
   border-color: rgba(126, 200, 227, 0.35);
 }
 
-/* ——— App shell / sticky nav ——— */
+/* --- App shell / sticky nav --- */
 .ox-layout {
   min-height: 100vh;
   display: grid;
@@ -580,7 +580,7 @@ select option:checked,
     background var(--dur) var(--ease);
 }
 
-/* Hover: quiet ice lift only — never selected look */
+/* Hover: quiet ice lift only - never selected look */
 .ox-nav-link:hover:not(.is-active) {
   color: var(--ice-text);
   background: rgba(126, 200, 227, 0.08);
@@ -591,7 +591,7 @@ select option:checked,
   outline-offset: 2px;
 }
 
-/* Active: pathname only — brand blue accent bar + filled surface */
+/* Active: pathname only - brand blue accent bar + filled surface */
 .ox-nav-link.is-active {
   color: var(--ice-nav-active-fg);
   background: linear-gradient(
@@ -630,7 +630,7 @@ select option:checked,
   padding: 0.15rem 0.35rem 0.35rem;
 }
 
-/* Official OXCAR mark — white+blue on black; dark nest on light theme */
+/* Official OXCAR mark - white+blue on black; dark nest on light theme */
 .carzone-logo, .oxcar-logo {
   display: inline-flex;
   align-items: center;
@@ -692,7 +692,7 @@ select option:checked,
   overflow: auto;
 }
 
-/* ——— Callouts / policy ——— */
+/* --- Callouts / policy --- */
 .ox-callout {
   padding: 1rem 1.15rem;
   border-radius: 14px;
@@ -731,7 +731,7 @@ select option:checked,
   padding-left: 1.15rem;
 }
 
-/* ——— Onboarding ——— */
+/* --- Onboarding --- */
 .ox-onboarding {
   position: fixed;
   bottom: 1.25rem;
@@ -772,7 +772,7 @@ select option:checked,
   opacity: 0.55;
 }
 
-/* ——— Print ——— */
+/* --- Print --- */
 @media print {
   .ox-aside,
   .ox-header,
@@ -798,7 +798,7 @@ select option:checked,
   }
 }
 
-/* ——— Responsive Layout & Drawer ——— */
+/* --- Responsive Layout & Drawer --- */
 .ox-mobile-header-bar {
   display: none;
 }
@@ -961,7 +961,7 @@ select option:checked,
   }
 }
 
-/* ——— Login ——— */
+/* --- Login --- */
 .ox-login-page {
   min-height: 100vh;
   display: grid;
@@ -980,7 +980,7 @@ select option:checked,
   z-index: 10;
 }
 
-/* ——— Theme / language prefs ——— */
+/* --- Theme / language prefs --- */
 .ox-prefs-menu {
   position: relative;
 }
@@ -1092,7 +1092,7 @@ html[data-theme="light"] .ox-btn-ghost:hover {
   box-shadow: 0 4px 14px rgba(0, 120, 212, 0.15);
 }
 
-/* ——— Component Surfaces & Metric Tokens ——— */
+/* --- Component Surfaces & Metric Tokens --- */
 .ox-hero-card {
   background: var(--ice-hero-bg);
   border: 1px solid var(--ice-hero-border);
@@ -1152,7 +1152,7 @@ html[data-theme="light"] .ox-btn-ghost:hover {
   line-height: 1.15;
 }
 
-/* ——— Chat View Responsive Layout ——— */
+/* --- Chat View Responsive Layout --- */
 .ox-chat-container {
   display: grid;
   grid-template-columns: 320px 1fr;
@@ -1329,7 +1329,7 @@ body:has(.ox-chat-container) .ox-onboarding-fab {
 }
 
 /* ========================================================================= */
-/* DASHBOARD — RESPONSIVE (hero, actions rapides, KPI, pipeline stock)        */
+/* DASHBOARD - RESPONSIVE (hero, actions rapides, KPI, pipeline stock)        */
 /* Règle générale : aucun débordement horizontal, montants adaptatifs via    */
 /* container queries (fallback clamp/vw si non supportées).                  */
 /* ========================================================================= */
@@ -1385,7 +1385,7 @@ body:has(.ox-chat-container) .ox-onboarding-fab {
   font-weight: 700;
 }
 
-/* ——— KPI cards (indicateurs financiers) ——— */
+/* --- KPI cards (indicateurs financiers) --- */
 .ox-kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
@@ -1434,7 +1434,7 @@ body:has(.ox-chat-container) .ox-onboarding-fab {
   }
 }
 
-/* ——— Stock Général — Pipeline Logistique & Showroom ——— */
+/* --- Stock Général - Pipeline Logistique & Showroom --- */
 .ox-stock-card {
   padding: 1.1rem 1.35rem;
   border-radius: 14px;
@@ -1594,7 +1594,7 @@ body:has(.ox-chat-container) .ox-onboarding-fab {
   }
 }
 
-/* ——— Indicateurs opérationnels & colonnes compactes ——— */
+/* --- Indicateurs opérationnels & colonnes compactes --- */
 .ox-ops-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));

@@ -1,7 +1,7 @@
-# Guide — Compte développeur e-MECeF / SyGMEF (SANDBOX)
+# Guide - Compte développeur e-MECeF / SyGMEF (SANDBOX)
 
 > **Objectif** : permettre à Henoc (Giani / CARZONE Ops) d’obtenir un **compte développeur sur le serveur de test** DGI Bénin, puis de récupérer un **JWT** pour brancher plus tard l’adaptateur fiscal CARZONE.  
-> **Périmètre** : documentation opérationnelle uniquement — **pas** d’implémentation API dans ce document.  
+> **Périmètre** : documentation opérationnelle uniquement - **pas** d’implémentation API dans ce document.  
 > **Sources** (consultées) : formulaire d’enregistrement, portail e-MECeF, Swagger/OpenAPI, page SDK, plaquette PDF DGI.
 
 ---
@@ -32,22 +32,22 @@
 | 9 | **Nombre de clients actifs** | Estimation (peut être `0` ou `1` en phase projet). |
 | 10 | **OS supportés** | Windows / Linux / Other + versions (ex. Linux serveur, Other = navigateur / Next.js). |
 | 11 | **Approbation MCF existante** | Pour un nouveau SFE : **Non**. |
-| 12 | **E-mail du compte développeur** | Boîte technique stable (accès Henoc / Giani) — distincte ou égale à l’e-mail IFU selon le parcours. |
+| 12 | **E-mail du compte développeur** | Boîte technique stable (accès Henoc / Giani) - distincte ou égale à l’e-mail IFU selon le parcours. |
 | 13 | **Demandeur** | Nom & prénoms, titre (facultatif), lieu. |
 
 **Rappel métier** : un SFE (Système de Facturation d’Entreprise) ne peut être utilisé en production e-MECeF qu’après **approbation DGI**. Le sandbox sert à intégrer l’API et à passer les cas de tests.
 
 ---
 
-## Étapes numérotées — créer le compte sandbox
+## Étapes numérotées - créer le compte sandbox
 
-### Étape 0 — Lire le contexte (optionnel mais utile)
+### Étape 0 - Lire le contexte (optionnel mais utile)
 
 - Portail contribuable / présentation : [https://e-mecef.impots.bj/](https://e-mecef.impots.bj/)
 - Plaquette PDF : [Plaquette e-MECeF](https://api.impots.bj/media/616853eb7b6c7_Plaquette%20emecef.pdf)
 - Entrée développeur : [https://developper.impots.bj/sygmef-emcf](https://developper.impots.bj/sygmef-emcf)
 
-### Étape 1 — Ouvrir le formulaire d’enregistrement développeur
+### Étape 1 - Ouvrir le formulaire d’enregistrement développeur
 
 **URL (sandbox)** :  
 [https://developper.impots.bj/sygmef-emcf/Registration](https://developper.impots.bj/sygmef-emcf/Registration)
@@ -59,7 +59,7 @@ Message officiel (accueil) :
 - Après vérification DGI, réception sous **72 heures** d’un e-mail avec les instructions d’accès.
 - Contacts indiqués sur la page : **téléphone 133**, **e-mail `cdgi@finances.bj`**.
 
-### Étape 2 — Vérification IFU (pré-formulaire)
+### Étape 2 - Vérification IFU (pré-formulaire)
 
 Le parcours commence par la saisie de l’**IFU** :
 
@@ -69,7 +69,7 @@ Le parcours commence par la saisie de l’**IFU** :
    - **Erreur « informations pas à jour »** → même lien de mise à jour IFU.
    - **Erreur « IFU ne peut pas être vérifiée »** → réessayer plus tard.
 
-### Étape 3 — Formulaire 1/3 : Informations sur l’éditeur de SFE
+### Étape 3 - Formulaire 1/3 : Informations sur l’éditeur de SFE
 
 | Champ | Obligatoire | Notes |
 |-------|-------------|--------|
@@ -81,7 +81,7 @@ Le parcours commence par la saisie de l’**IFU** :
 | **Téléphone** | Oui (`*`) | |
 | **E-mail** | Oui | Contact éditeur |
 
-### Étape 4 — Formulaire 2/3 : Informations sur le SFE
+### Étape 4 - Formulaire 2/3 : Informations sur le SFE
 
 | Champ | Obligatoire | Valeur suggérée CARZONE |
 |-------|-------------|------------------------|
@@ -93,7 +93,7 @@ Le parcours commence par la saisie de l’**IFU** :
 | **SFE déjà approuvé pour MCF-machine ?** | Oui | **Non** (nouveau SFE logiciel e-MECeF) |
 | **Référence lettre d’approbation DGI** | Si « Oui » | Laisser vide si Non |
 
-### Étape 5 — Formulaire 3/3 : Informations sur le demandeur
+### Étape 5 - Formulaire 3/3 : Informations sur le demandeur
 
 Texte officiel : demande de compte développeur pour le **serveur de test** e-MECeF, avec l’e-mail du compte ci-dessous.
 
@@ -104,14 +104,14 @@ Texte officiel : demande de compte développeur pour le **serveur de test** e-ME
 | **Titre** | Non | Facultatif |
 | **Lieu** | Oui (`*`) | Ville / lieu de la demande |
 
-### Étape 6 — Vérification récapitulative puis soumission
+### Étape 6 - Vérification récapitulative puis soumission
 
 Écran de contrôle listant les 3 blocs, puis **Soumettre la demande**.
 
 Confirmation attendue :
 
 - Date de la demande
-- **ID de la demande** (`uid`) — lien de suivi du type  
+- **ID de la demande** (`uid`) - lien de suivi du type  
   `/sygmef-emcf/Registration?uid=…`
 - E-mail de confirmation / vérification envoyé à l’adresse indiquée
 - **Délai de traitement : jusqu’à 72 heures**
@@ -119,7 +119,7 @@ Confirmation attendue :
 
 > Un second message peut demander de **finaliser** la demande via un lien e-mail avant traitement DGI.
 
-### Étape 7 — Attendre l’e-mail DGI
+### Étape 7 - Attendre l’e-mail DGI
 
 Contenu attendu (d’après les messages du formulaire + plaquette / portail) :
 
@@ -129,7 +129,7 @@ Contenu attendu (d’après les messages du formulaire + plaquette / portail) :
 
 ---
 
-## Après validation — où se connecter, token, test `/api/info`
+## Après validation - où se connecter, token, test `/api/info`
 
 ### 1. Connexion sandbox (portail développeurs SyGMEF)
 
@@ -142,7 +142,7 @@ Contenu attendu (d’après les messages du formulaire + plaquette / portail) :
 Notes :
 
 - Le login développeur affiche **« PORTAIL POUR LES DEVELOPPEURS »**.
-- Une **2FA** peut être exigée (`/sygmef-test/Account/Login2FA`) — prévoir un moyen de recevoir le code.
+- Une **2FA** peut être exigée (`/sygmef-test/Account/Login2FA`) - prévoir un moyen de recevoir le code.
 - Sans compte autorisé : « Vous devez être autorisé pour accéder à SyGMEF. »
 
 ### 2. Documentation API & SDK (après accès)
@@ -171,7 +171,7 @@ Plaquette : envoyer les **vingt (20) cas de tests** à `emecefbenin@finances.bj`
 - Le jeton est un **JWT** à placer dans l’en-tête HTTP :  
   `Authorization: Bearer <token>`  
   (schéma `Bearer` documenté dans le Swagger OpenAPI).
-- Émis / récupéré depuis l’**interface de gestion** e-MECeF / SyGMEF (espace connecté) — un jeton par e-MCF selon les pratiques d’intégration.
+- Émis / récupéré depuis l’**interface de gestion** e-MECeF / SyGMEF (espace connecté) - un jeton par e-MCF selon les pratiques d’intégration.
 - **Ne jamais** committer le JWT dans le dépôt Git ; le stocker hors code (`.env` local non versionné, secret manager).
 
 ### 4. Premier smoke test : `GET /api/info/status`
@@ -212,11 +212,11 @@ Flux facture (à brancher plus tard dans l’adaptateur CARZONE, **sandbox only*
 | **Base API e-MCF** | `https://developper.impots.bj/sygmef-emcf` | `https://sygmef.impots.bj/emcf` |
 | **Info** | `…/api/info/status` (etc.) | `…/api/info/status` (etc.) |
 | **Factures** | `…/api/invoice` | `…/api/invoice` |
-| **Portail login dev** | `https://developper.impots.bj/sygmef-test/` | (portail prod SyGMEF / e-MECeF — comptes homologués) |
+| **Portail login dev** | `https://developper.impots.bj/sygmef-test/` | (portail prod SyGMEF / e-MECeF - comptes homologués) |
 | **Enregistrement compte dev** | `https://developper.impots.bj/sygmef-emcf/Registration` | N/A (ce formulaire = serveur de **test**) |
 | **Swagger** | `https://developper.impots.bj/sygmef-emcf/swagger` | Doc de référence souvent sur le même host développeur |
-| **Portail contribuable** | — | [https://e-mecef.impots.bj/](https://e-mecef.impots.bj/) |
-| **SyGMEF prod (réf. publique)** | — | `https://sygmef.impots.bj` / `https://sygmef.impots.bj/emcf` |
+| **Portail contribuable** | - | [https://e-mecef.impots.bj/](https://e-mecef.impots.bj/) |
+| **SyGMEF prod (réf. publique)** | - | `https://sygmef.impots.bj` / `https://sygmef.impots.bj/emcf` |
 
 SDK officiel (extrait) : par défaut configuré pour **SyGMEF-test** ; pour la prod, base path :
 
@@ -224,7 +224,7 @@ SDK officiel (extrait) : par défaut configuré pour **SyGMEF-test** ; pour la p
 https://sygmef.impots.bj/emcf
 ```
 
-> Orthographe host développeur : **`developper.impots.bj`** (avec deux « p ») — c’est l’URL officielle DGI.
+> Orthographe host développeur : **`developper.impots.bj`** (avec deux « p ») - c’est l’URL officielle DGI.
 
 ---
 
@@ -258,7 +258,7 @@ https://sygmef.impots.bj/emcf
 Variables d’environnement **prévues** (ne pas les peupler en prod avant homologation) :
 
 ```env
-# Exemple — à créer plus tard dans .env (non versionné)
+# Exemple - à créer plus tard dans .env (non versionné)
 DGI_EMECEF_BASE_URL=https://developper.impots.bj/sygmef-emcf
 DGI_EMECEF_JWT=
 DGI_EMECEF_IFU=
@@ -268,15 +268,15 @@ DGI_EMECEF_IFU=
 
 ## Ce qu’il NE FAUT PAS faire
 
-1. **Ne pas** générer localement un faux QR / `codeMECeFDGI` / NIM — seuls les éléments renvoyés par l’API DGI après `confirm` sont valides.
+1. **Ne pas** générer localement un faux QR / `codeMECeFDGI` / NIM - seuls les éléments renvoyés par l’API DGI après `confirm` sont valides.
 2. **Ne pas** pointer l’adaptateur CARZONE vers **`https://sygmef.impots.bj/emcf`** tant que le SFE n’est **pas homologué** et que le compte / jeton prod n’est pas délivré.
 3. **Ne pas** committer JWT, mots de passe, ou captures d’écran contenant des secrets.
 4. **Ne pas** confondre :
    - compte **contribuable** e-MECeF (émission factures / e-SFE) ;
    - compte **développeur** sandbox (intégration SFE + tests) ;
-   - API **INTEGRATOR** (parcours partenaires — hors besoin immédiat CARZONE Ops).
+   - API **INTEGRATOR** (parcours partenaires - hors besoin immédiat CARZONE Ops).
 5. **Ne pas** déclarer le SFE comme « déjà approuvé » sans lettre DGI réelle.
-6. **Ne pas** utiliser l’orthographe erronée `developer.impots.bj` (un « p ») — l’hôte officiel est `developper.impots.bj`.
+6. **Ne pas** utiliser l’orthographe erronée `developer.impots.bj` (un « p ») - l’hôte officiel est `developper.impots.bj`.
 
 ---
 

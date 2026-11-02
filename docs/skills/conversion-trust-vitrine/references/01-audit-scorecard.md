@@ -1,4 +1,4 @@
-# Scorecard d'audit — 5 piliers
+# Scorecard d'audit - 5 piliers
 
 Noter chaque pilier de 0 à 5. Justifier par des observations concrètes (pages, composants, textes).
 

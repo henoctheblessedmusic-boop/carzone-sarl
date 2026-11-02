@@ -1,4 +1,4 @@
-# Collecte de données — questionnaire client
+# Collecte de données - questionnaire client
 
 À remplir avant toute rédaction. Les réponses non fournies restent absentes du site.
 

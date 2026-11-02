@@ -46,7 +46,7 @@ export function computeTaxTotals(input: {
   };
 }
 
-/** Statuts proforma / BDC — machine d'états métier. */
+/** Statuts proforma / BDC - machine d'états métier. */
 export const QuoteStatus = {
   BROUILLON: "BROUILLON",
   PROFORMA_ENVOYEE: "PROFORMA_ENVOYEE",

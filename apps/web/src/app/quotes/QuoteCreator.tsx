@@ -399,7 +399,7 @@ export function QuoteCreator({
     }
     const total = Math.round(hours * rate);
     addOrIncrementLine({
-      description: `Main-d'œuvre — ${laborDescription.trim()} (${hours} h × ${formatXof(rate)}/h)`,
+      description: `Main-d'œuvre - ${laborDescription.trim()} (${hours} h × ${formatXof(rate)}/h)`,
       quantity: 1,
       unitPriceXof: total,
       title: "Main-d'œuvre",
@@ -645,12 +645,12 @@ export function QuoteCreator({
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <ShoppingCart size={22} color="var(--gold)" />
                   <h2 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 700, color: "var(--ice-text-strong)" }}>
-                    {isGarageScope ? "Devis proforma — Garage / Atelier" : copy.creator.title}
+                    {isGarageScope ? "Devis proforma - Garage / Atelier" : copy.creator.title}
                   </h2>
                 </div>
                 <div style={{ fontSize: "0.85rem", color: "var(--ice-text-muted)", marginTop: 4 }}>
                   {isGarageScope
-                    ? "Pièces détachées, prestations et réparations — aucun véhicule showroom."
+                    ? "Pièces détachées, prestations et réparations - aucun véhicule showroom."
                     : copy.creator.subtitle}
                 </div>
               </div>
@@ -808,7 +808,7 @@ export function QuoteCreator({
                   }}
                 >
                   <strong style={{ fontSize: "0.86rem", color: "#7dd3fc" }}>
-                    Véhicule client — dossier atelier
+                    Véhicule client - dossier atelier
                   </strong>
                   <div
                     style={{
@@ -837,7 +837,7 @@ export function QuoteCreator({
                           setVehicleModel("");
                         }}
                       >
-                        <option value="">— Choisir une marque —</option>
+                        <option value="">- Choisir une marque -</option>
                         {vehicleBrand &&
                           !vehicleBrands.some((brand) => brand.name === vehicleBrand) && (
                             <option value={vehicleBrand}>{vehicleBrand}</option>
@@ -857,7 +857,7 @@ export function QuoteCreator({
                         onChange={(e) => setVehicleModel(e.target.value)}
                         disabled={!vehicleBrand}
                       >
-                        <option value="">— Choisir un modèle —</option>
+                        <option value="">- Choisir un modèle -</option>
                         {vehicleModel &&
                           !(vehicleBrands.find((brand) => brand.name === vehicleBrand)?.models ?? []).some(
                             (model) => model.name === vehicleModel

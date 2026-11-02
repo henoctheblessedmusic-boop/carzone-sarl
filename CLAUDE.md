@@ -1,4 +1,9 @@
-# Project Instructions — CARZONE SARL Ops (Cotonou)
+# Project Instructions - CARZONE SARL Ops (Cotonou)
+
+## REGLE PRIMORDIALE - TIRET CADRATIN INTERDIT
+- Le caractere U+2014 (tiret cadratin) est interdit dans tout le projet et tout futur projet.
+- Toujours utiliser le tiret simple "-" a la place, sans exception.
+- Controle avant commit : `npm run check:no-em-dash` depuis `apps/web`.
 
 ## Enterprise Identity
 - **Société** : CARZONE SARL
@@ -14,7 +19,7 @@
 
 ## Tech Stack
 - Next.js 15 (App Router) + TypeScript
-- Prisma + SQLite (local) — switch provider to postgresql for production
+- Prisma + SQLite (local) - switch provider to postgresql for production
 - Cookie session auth (HMAC) + bcrypt passwords
 - Locale: fr-BJ (default UI), currency: XOF (FCFA)
 - UI prefs: theme (`carzone-theme`) + language (`carzone-locale`) cookies
@@ -37,7 +42,7 @@
   - `atelier@carzone.bj` / `carzone2026` (Chef Atelier SAV)
 
 ## Project Structure
-- `apps/web/src/app` — routes (dashboard, CRM, stock, finance, atelier SAV, bornes…)
-- `apps/web/prisma` — schema + seed
-- `plans/` — blueprints CARZONE
-- `docs/` — documentation métier
+- `apps/web/src/app` - routes (dashboard, CRM, stock, finance, atelier SAV, bornes…)
+- `apps/web/prisma` - schema + seed
+- `plans/` - blueprints CARZONE
+- `docs/` - documentation métier

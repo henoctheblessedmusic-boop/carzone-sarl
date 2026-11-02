@@ -1,4 +1,4 @@
-# Architecture du module Garage / Atelier — CARZONE SARL Ops
+# Architecture du module Garage / Atelier - CARZONE SARL Ops
 
 ## 1. Objectif
 Structurer l'activité garage de façon professionnelle et cloisonnée : réception, diagnostic,

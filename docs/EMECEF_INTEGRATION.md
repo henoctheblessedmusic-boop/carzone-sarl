@@ -1,4 +1,4 @@
-# Intégration e-MECeF (DGI Bénin) — CARZONE SARL
+# Intégration e-MECeF (DGI Bénin) - CARZONE SARL
 
 ## État actuel
 - L'entreprise dispose déjà d'un compte **SyGMEF e-MCF**.
@@ -25,7 +25,7 @@ DGI_EMECEF_MODE=DEMO
 ```
 - Génère des codes `DEMO-…` et des QR de démonstration.
 - Les factures sont marquées `isDemo = true` et `certificationMode = "DEMO"`.
-- **Bandeau rouge sur l'impression** : « DOCUMENT DE DÉMONSTRATION — SANS VALEUR FISCALE ».
+- **Bandeau rouge sur l'impression** : « DOCUMENT DE DÉMONSTRATION - SANS VALEUR FISCALE ».
 - Badge **DÉMO** dans la liste des factures + bandeau d'avertissement.
 - **Exclues** des KPI, du dashboard, du rapport financier Excel et du bilan.
 - **Encaissements bloqués** sur ces factures.

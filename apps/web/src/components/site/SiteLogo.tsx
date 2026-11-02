@@ -7,7 +7,7 @@ import Link from "next/link";
  */
 export function SiteLogo() {
   return (
-    <Link href="/" className="site-logo" aria-label="CARZONE SARL — Concessionnaire automobile multimarques">
+    <Link href="/" className="site-logo" aria-label="CARZONE SARL - Concessionnaire automobile multimarques">
       <Image
         src="/brand/carzone-logo.png"
         alt="CARZONE SARL"

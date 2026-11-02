@@ -2,7 +2,7 @@ import type { Locale } from "@/lib/prefs";
 
 /**
  * Dictionnaire du module BONS DE LIVRAISON INTERNES (BL).
- * Documents internes NON FISCAUX de déstockage — jamais une facture.
+ * Documents internes NON FISCAUX de déstockage - jamais une facture.
  */
 export type DeliveryNotesCopy = {
   title: string;
@@ -62,8 +62,8 @@ export type DeliveryNotesCopy = {
 
 const fr: DeliveryNotesCopy = {
   title: "Bons de livraison internes",
-  subtitle: "Documents internes de déstockage — ne peuvent jamais servir de facture.",
-  nonFiscalBanner: "DOCUMENT INTERNE NON FISCAL — NE PEUT SERVIR DE FACTURE",
+  subtitle: "Documents internes de déstockage - ne peuvent jamais servir de facture.",
+  nonFiscalBanner: "DOCUMENT INTERNE NON FISCAL - NE PEUT SERVIR DE FACTURE",
   tabs: { all: "Toutes", showroom: "Showroom", garage: "Garage" },
   statusFilters: { all: "Tous", issued: "Émis", cancelled: "Annulés" },
   table: {
@@ -106,7 +106,7 @@ const fr: DeliveryNotesCopy = {
   print: {
     docTitle: "BON DE LIVRAISON INTERNE",
     legalNotice:
-      "Document interne de déstockage — aucune TVA, aucune valeur fiscale. Ne peut en aucun cas servir de facture ni être présenté à l'administration fiscale.",
+      "Document interne de déstockage - aucune TVA, aucune valeur fiscale. Ne peut en aucun cas servir de facture ni être présenté à l'administration fiscale.",
     number: "N°",
     activityLabel: "Périmètre",
     customer: "Client",
@@ -119,8 +119,8 @@ const fr: DeliveryNotesCopy = {
 
 const en: DeliveryNotesCopy = {
   title: "Internal delivery notes",
-  subtitle: "Internal stock-out documents — can never be used as an invoice.",
-  nonFiscalBanner: "INTERNAL NON-FISCAL DOCUMENT — CANNOT BE USED AS AN INVOICE",
+  subtitle: "Internal stock-out documents - can never be used as an invoice.",
+  nonFiscalBanner: "INTERNAL NON-FISCAL DOCUMENT - CANNOT BE USED AS AN INVOICE",
   tabs: { all: "All", showroom: "Showroom", garage: "Workshop" },
   statusFilters: { all: "All", issued: "Issued", cancelled: "Cancelled" },
   table: {
@@ -163,7 +163,7 @@ const en: DeliveryNotesCopy = {
   print: {
     docTitle: "INTERNAL DELIVERY NOTE",
     legalNotice:
-      "Internal stock-out document — no VAT, no fiscal value. Cannot be used as an invoice or submitted to tax authorities.",
+      "Internal stock-out document - no VAT, no fiscal value. Cannot be used as an invoice or submitted to tax authorities.",
     number: "No.",
     activityLabel: "Scope",
     customer: "Customer",
@@ -176,8 +176,8 @@ const en: DeliveryNotesCopy = {
 
 const zh: DeliveryNotesCopy = {
   title: "内部出库单",
-  subtitle: "内部出库文件 — 不得用作发票。",
-  nonFiscalBanner: "内部非税务文件 — 不得用作发票",
+  subtitle: "内部出库文件 - 不得用作发票。",
+  nonFiscalBanner: "内部非税务文件 - 不得用作发票",
   tabs: { all: "全部", showroom: "展厅", garage: "车间" },
   statusFilters: { all: "全部", issued: "已出库", cancelled: "已取消" },
   table: {
@@ -219,7 +219,7 @@ const zh: DeliveryNotesCopy = {
   },
   print: {
     docTitle: "内部出库单",
-    legalNotice: "内部出库文件 — 无增值税，无税务价值。不得用作发票或提交给税务机关。",
+    legalNotice: "内部出库文件 - 无增值税，无税务价值。不得用作发票或提交给税务机关。",
     number: "编号",
     activityLabel: "范围",
     customer: "客户",

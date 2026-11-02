@@ -1,5 +1,5 @@
 /**
- * Import Excel de clients — définitions partagées client/serveur.
+ * Import Excel de clients - définitions partagées client/serveur.
  *
  * Le fichier Excel est lu côté navigateur (xlsx), les colonnes sont mappées vers
  * les champs du modèle Customer, puis seules les lignes normalisées sont envoyées

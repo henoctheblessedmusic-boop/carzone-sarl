@@ -1,4 +1,4 @@
-# Guide d'Intégration — Assistant Vocal IA (VAPI.ai) pour CARZONE Motors
+# Guide d'Intégration - Assistant Vocal IA (VAPI.ai) pour CARZONE Motors
 
 Ce document décrit la configuration complète de l'assistant vocal IA **VAPI** connecté à la plateforme **CARZONE Ops**.
 

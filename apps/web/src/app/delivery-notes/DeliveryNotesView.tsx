@@ -263,7 +263,7 @@ export function DeliveryNotesView({
                     <td style={{ padding: "0.7rem 1rem", fontWeight: 700 }}>{n.number}</td>
                     <td style={{ padding: "0.7rem 1rem" }}>{n.activity === "GARAGE" ? copy.tabs.garage : copy.tabs.showroom}</td>
                     <td style={{ padding: "0.7rem 1rem" }}>
-                      {n.customer ? n.customer.companyName || n.customer.contactName : "—"}
+                      {n.customer ? n.customer.companyName || n.customer.contactName : "-"}
                     </td>
                     <td style={{ padding: "0.7rem 1rem" }}>{n.lines.length}</td>
                     <td style={{ padding: "0.7rem 1rem" }}>
@@ -365,7 +365,7 @@ export function DeliveryNotesView({
                         <option value="">{copy.createModal.linePart}</option>
                         {parts.map((p) => (
                           <option key={p.id} value={p.id}>
-                            {p.name} ({p.partNumber}) — stock {p.stockQuantity}
+                            {p.name} ({p.partNumber}) - stock {p.stockQuantity}
                           </option>
                         ))}
                       </select>

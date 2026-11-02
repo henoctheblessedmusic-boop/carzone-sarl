@@ -252,7 +252,7 @@ model Quote {
   number           String       @unique
   status           String       @default("BROUILLON")
   docKind          String       @default("PROFORMA")
-  /// SHOWROOM | GARAGE — périmètre comptable (comptabilité séparée)
+  /// SHOWROOM | GARAGE - périmètre comptable (comptabilité séparée)
   activity         String       @default("SHOWROOM")
   /// Véhicule client pour une proforma garage/atelier (le garage ne vend pas le stock showroom).
   vehicleImmatriculation String?
@@ -286,7 +286,7 @@ model Quote {
   auditNotes       String?
   /// Date de transcription en BL interne ou facture normalisée (flux de transcription proforma).
   transcribedAt      DateTime?
-  /// BL_INTERNE | FACTURE_NORMALISEE — mode de transcription choisi.
+  /// BL_INTERNE | FACTURE_NORMALISEE - mode de transcription choisi.
   transcriptionMode  String?
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
@@ -302,7 +302,7 @@ model QuoteLine {
   description  String
   quantity     Int      @default(1)
   unitPriceXof Int
-  /// ARTICLE | LABOR | PART | VEHICLE | FREE — nature de la ligne (estimateur garage).
+  /// ARTICLE | LABOR | PART | VEHICLE | FREE - nature de la ligne (estimateur garage).
   lineType     String   @default("ARTICLE")
   laborHours   Float?
   unitLabel    String?
@@ -318,7 +318,7 @@ model Invoice {
   status       String    @default("BROUILLON")
   /// NORMALISEE = facture fiscale ; PROFORMA = rare / legacy
   kind         String    @default("NORMALISEE")
-  /// SHOWROOM | GARAGE — périmètre comptable (comptabilité séparée)
+  /// SHOWROOM | GARAGE - périmètre comptable (comptabilité séparée)
   activity     String    @default("SHOWROOM")
   customerId   String
   customer     Customer  @relation(fields: [customerId], references: [id])
@@ -425,7 +425,7 @@ model WorkOrder {
   id           String    @id @default(cuid())
   number       String    @unique
   status       String    @default("OUVERT")
-  /// SHOWROOM | GARAGE — périmètre comptable (les OR sont par nature GARAGE)
+  /// SHOWROOM | GARAGE - périmètre comptable (les OR sont par nature GARAGE)
   activity     String    @default("GARAGE")
   vehicleId    String?
   vehicle      Vehicle?  @relation(fields: [vehicleId], references: [id])
@@ -1059,7 +1059,7 @@ model LoginAttempt {
 }
 
 // ==========================================
-// BONS DE LIVRAISON INTERNES (BL) — documents NON FISCAUX de déstockage
+// BONS DE LIVRAISON INTERNES (BL) - documents NON FISCAUX de déstockage
 // Deux périmètres cloisonnés : GARAGE (BL-GAR-) et SHOWROOM (BL-SHW-)
 // ==========================================
 
@@ -1068,7 +1068,7 @@ model LoginAttempt {
 model DeliveryNote {
   id              String             @id @default(cuid())
   number          String             @unique
-  /// SHOWROOM | GARAGE — détermine la séquence de numérotation (BL-SHW- / BL-GAR-)
+  /// SHOWROOM | GARAGE - détermine la séquence de numérotation (BL-SHW- / BL-GAR-)
   activity        String
   status          String             @default("EMIS")
   customerId      String?

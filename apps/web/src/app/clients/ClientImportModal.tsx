@@ -242,7 +242,7 @@ export function ClientImportModal({
               Importer des clients depuis Excel
             </h2>
             <p style={{ margin: "4px 0 0", opacity: 0.7, fontSize: "0.86rem" }}>
-              Fichiers acceptés : .xlsx, .xls, .csv — {CLIENT_IMPORT_MAX_ROWS} lignes maximum (5 Mo).
+              Fichiers acceptés : .xlsx, .xls, .csv - {CLIENT_IMPORT_MAX_ROWS} lignes maximum (5 Mo).
             </p>
           </div>
           <button type="button" className="ox-btn ox-btn-ghost" onClick={onClose} aria-label="Fermer">
@@ -280,7 +280,7 @@ export function ClientImportModal({
 
             {fileName && (
               <div style={{ fontSize: "0.85rem", opacity: 0.8 }}>
-                Fichier sélectionné : <strong>{fileName}</strong> — {rawRows.length} ligne(s) détectée(s).
+                Fichier sélectionné : <strong>{fileName}</strong> - {rawRows.length} ligne(s) détectée(s).
               </div>
             )}
 
@@ -325,7 +325,7 @@ export function ClientImportModal({
                           }
                           disabled={isPending}
                         >
-                          <option value="">— Ignorer —</option>
+                          <option value="">- Ignorer -</option>
                           {headers.map((header) => (
                             <option key={header} value={header}>
                               {header}
@@ -368,10 +368,10 @@ export function ClientImportModal({
                       {prepared.slice(0, 10).map((item) => (
                         <tr key={item.excelRow}>
                           <td style={{ opacity: 0.6 }}>{item.excelRow}</td>
-                          <td>{item.row.contactName || "—"}</td>
-                          <td>{item.row.companyName || "—"}</td>
-                          <td>{item.row.email || "—"}</td>
-                          <td>{item.row.phone || "—"}</td>
+                          <td>{item.row.contactName || "-"}</td>
+                          <td>{item.row.companyName || "-"}</td>
+                          <td>{item.row.email || "-"}</td>
+                          <td>{item.row.phone || "-"}</td>
                           <td>{item.row.city || "Cotonou"}</td>
                           <td>
                             {item.errors.length > 0 ? (

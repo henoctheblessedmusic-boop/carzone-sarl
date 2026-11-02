@@ -119,8 +119,8 @@ export function AuditView({
                   {log.entityType}
                   {log.entityLabel ? ` · ${log.entityLabel}` : ""}
                 </td>
-                <td style={{ padding: "8px 12px" }}>{log.activity || "—"}</td>
-                <td style={{ padding: "8px 12px", color: "#9ca3af" }}>{log.details || "—"}</td>
+                <td style={{ padding: "8px 12px" }}>{log.activity || "-"}</td>
+                <td style={{ padding: "8px 12px", color: "#9ca3af" }}>{log.details || "-"}</td>
               </tr>
             ))}
             {logs.length === 0 && (

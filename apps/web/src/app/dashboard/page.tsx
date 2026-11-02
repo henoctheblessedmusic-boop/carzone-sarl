@@ -418,7 +418,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Stock Général CARZONE — Pipeline Logistique & Magasin */}
+        {/* Stock Général CARZONE - Pipeline Logistique & Magasin */}
         <div className="ox-glass ox-stock-card">
           <div className="ox-stock-header">
             <div className="ox-stock-header-left">

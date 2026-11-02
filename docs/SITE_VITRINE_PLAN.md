@@ -1,4 +1,4 @@
-# Refonte vitrine publique CARZONE SARL — plan directeur
+# Refonte vitrine publique CARZONE SARL - plan directeur
 
 Statut : validé par la demande utilisateur du 29/10/2026. Exécution par phases déléguées à Claude Code, vérifiées par l'orchestrateur.
 
@@ -20,7 +20,7 @@ Statut : validé par la demande utilisateur du 29/10/2026. Exécution par phases
    - `/contact` Contact & accès showroom
 5. **Page Notre équipe** : présentation du personnel par pôle (direction, commerce/showroom, après-vente/atelier, recharge/énergie, logistique/imports, administration/finance). Aucune identité inventée : cartes de pôle avec initiales, responsabilités et message de la direction. Noms/photos réels à fournir par le client pour finaliser.
 6. **Design ultra professionnel et responsive** : direction artistique premium automobile, cohérente avec la marque (Racing Red `#E11D48`, Carbon `#0B0F19`, or `#F59E0B`, glace/textes clairs), typographie fluide `clamp()`, grille maîtrisée, animations discrètes et accessibles, mobile irréprochable (drawer, cibles tactiles ≥ 44px).
-7. **Zéro tiret cadratin (—)**, zéro jargon IA, copy factuelle (téléphones, adresse, e-mail, IFU/RCCM, marques, services réels).
+7. **Zéro tiret cadratin (-)**, zéro jargon IA, copy factuelle (téléphones, adresse, e-mail, IFU/RCCM, marques, services réels).
 
 ## 2. Architecture technique
 
@@ -77,10 +77,10 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 
 ## 5. Phases de délégation (Claude Code)
 
-1. **Phase 1 — Fondation + shell + Accueil** : site-prefs, dictionnaires (structure + FR/EN/ES/ZH complets pour shell + accueil), layout `(site)`, header/footer/switcher, CSS design system, page Accueil, middleware, suppression ancienne page. Build vert.
-2. **Phase 2 — Véhicules + Sur-mesure** : catalogue filtrable, cartes, fiche détail, page import.
-3. **Phase 3 — Services + Recharge**.
-4. **Phase 4 — Équipe + Contact + finitions** : SEO, sitemap/robots, og, responsive polish, audit accessibilité, revue indépendante Claude, build, commit, push.
+1. **Phase 1 - Fondation + shell + Accueil** : site-prefs, dictionnaires (structure + FR/EN/ES/ZH complets pour shell + accueil), layout `(site)`, header/footer/switcher, CSS design system, page Accueil, middleware, suppression ancienne page. Build vert.
+2. **Phase 2 - Véhicules + Sur-mesure** : catalogue filtrable, cartes, fiche détail, page import.
+3. **Phase 3 - Services + Recharge**.
+4. **Phase 4 - Équipe + Contact + finitions** : SEO, sitemap/robots, og, responsive polish, audit accessibilité, revue indépendante Claude, build, commit, push.
 
 ## 6. Critères d'acceptation
 
@@ -101,10 +101,10 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 
 ## État d'avancement (30/10/2026)
 
-- **Phase 1** : livrée — fondation 4 langues, shell premium, accueil (commit `71dc7ba`).
-- **Phase 2** : livrée — `/vehicules` (catalogue filtrable + modale 5 photos) et `/sur-mesure`.
-- **Phase 3** : livrée — `/nos-services` et `/recharge`, correctif du hero sur-mesure.
-- **Phase 4** : livrée — `/equipe` (6 pôles + message direction), `/contact` (canaux + formulaire mailto), SEO (metadata localisées, sitemap.xml, robots.txt, JSON-LD AutomotiveBusiness), `html lang` SSR piloté par la locale vitrine.
+- **Phase 1** : livrée - fondation 4 langues, shell premium, accueil (commit `71dc7ba`).
+- **Phase 2** : livrée - `/vehicules` (catalogue filtrable + modale 5 photos) et `/sur-mesure`.
+- **Phase 3** : livrée - `/nos-services` et `/recharge`, correctif du hero sur-mesure.
+- **Phase 4** : livrée - `/equipe` (6 pôles + message direction), `/contact` (canaux + formulaire mailto), SEO (metadata localisées, sitemap.xml, robots.txt, JSON-LD AutomotiveBusiness), `html lang` SSR piloté par la locale vitrine.
 - **Nettoyage** : ancienne vitrine mono-page supprimée (`PublicShowcase.tsx`, `public-showcase.css`, dicitonnaire associé).
 - **Vérifications** : `tsc --noEmit` + `npm run build` exit 0 ; 7 routes publiques en HTTP 200 ; détection de langue par cookie et `Accept-Language` validée (FR/EN/ES/ZH) ; captures CDP desktop/mobile (320/390/768/1440) sans débordement horizontal.
 - **Reste à fournir par le client** : noms/photos des collaborateurs (page Équipe), liens Facebook officiel, horaires d'ouverture confirmés, éventuelle photo d'ambiance du showroom. Une fois ces éléments fournis, la page Équipe pourra passer des cartes de pôles aux portraits individuels.
@@ -208,7 +208,7 @@ Chaque page : titre, chapô, sections, CTA, métadonnées SEO localisées (title
 - Desktop : grille 1.15fr / 0.85fr, centrage vertical, gap fluide. Mobile/tablette : empilement en une colonne.
 - Vérifications : tsc/build exit 0, capture desktop 1425 et mobile 390, aucun débordement.
 
-### Facturation / fiscalité — correctifs immédiats (itération 18)
+### Facturation / fiscalité - correctifs immédiats (itération 18)
 - TVA par défaut à **0 % (exonéré)** dans le créateur de proforma et dans la création automatique par l'assistant vocal (véhicules neufs exonérés de TVA au Bénin) ; modifiable manuellement pour les prestations taxables.
 - Impression proforma : la ligne TVA affiche désormais **« Exonéré de TVA »** quand le taux est à 0, et la base fiscale indique « Exonéré » (FR/EN/ZH).
 - **Garde-fou e-MECeF critique** : la certification « simulée » ne peut plus marquer une facture comme certifiée DGI en production. Sans JWT/API réelle, une erreur explicite est levée ; la simulation est réservée au développement via `DGI_EMECEF_ALLOW_SIMULATION=true` et `NODE_ENV !== "production"`.

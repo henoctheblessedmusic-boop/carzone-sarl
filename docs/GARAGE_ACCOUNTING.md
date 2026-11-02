@@ -1,4 +1,4 @@
-# Comptabilité Garage — Rôle COMPTA_GARAGE & Bons de Livraison internes
+# Comptabilité Garage - Rôle COMPTA_GARAGE & Bons de Livraison internes
 
 ## 1. Objectif
 
@@ -12,10 +12,10 @@ factures normalisées.
 | Point | Détail |
 |---|---|
 | Libellé | "Comptable Garage" |
-| Supervision | Champ additif `User.supervisorId` (relation `Supervision`), facultatif, pointant vers un `COMPTA`. Pas d'UI dédiée dans ce lot — à faire dans `/users` si besoin. |
+| Supervision | Champ additif `User.supervisorId` (relation `Supervision`), facultatif, pointant vers un `COMPTA`. Pas d'UI dédiée dans ce lot - à faire dans `/users` si besoin. |
 | Périmètre | GARAGE uniquement, sur devis/proformas, factures, BL internes, et le tableau de bord. |
-| Accès atelier/pièces | Oui (workshop, parts) — ces modules sont par nature 100% garage, pas de filtre nécessaire. |
-| Accès showroom | Non — ne voit jamais les devis/factures/BL `activity = SHOWROOM`. |
+| Accès atelier/pièces | Oui (workshop, parts) - ces modules sont par nature 100% garage, pas de filtre nécessaire. |
+| Accès showroom | Non - ne voit jamais les devis/factures/BL `activity = SHOWROOM`. |
 | Certification e-MECeF | Autorisée, mais uniquement sur les factures `activity = GARAGE`. |
 
 ## 3. Matrice de permissions (implémentée)
@@ -29,15 +29,15 @@ factures normalisées.
 | Annuler une facture/devis | ✅ | ❌ | ✅ (tout) | ✅ |
 | Créer un BL interne | ✅ (BL-GAR) | ❌ | ✅ (BL-GAR ou BL-SHW) | ✅ |
 | Annuler un BL interne | ✅ (BL-GAR) | ❌ | ✅ (BL-GAR ou BL-SHW) | ✅ |
-| Voir `/dashboard`, `/invoices`, `/quotes` | GARAGE uniquement | — | Consolidé | Consolidé |
-| Voir `/workshop`, `/parts` | ✅ (100% garage) | — | ✅ | ✅ |
-| Voir `/users`, `/hr`, `/expenses` | ❌ | — | selon rôle existant | ✅ |
+| Voir `/dashboard`, `/invoices`, `/quotes` | GARAGE uniquement | - | Consolidé | Consolidé |
+| Voir `/workshop`, `/parts` | ✅ (100% garage) | - | ✅ | ✅ |
+| Voir `/users`, `/hr`, `/expenses` | ❌ | - | selon rôle existant | ✅ |
 
 La logique centrale vit dans `src/lib/permissions.ts` :
 - `ACTIVITY` = `{ SHOWROOM, GARAGE }`
 - `activityScopeForRole(role)` → `"ALL"` ou `["GARAGE"]` pour `COMPTA_GARAGE`
-- `peutVoirDocuments(role, activity)` — lecture
-- `peutGererBL(role, activity)` — création/annulation des BL internes (GARAGE → `COMPTA_GARAGE`/`COMPTA`/super-admin ; SHOWROOM → `COMPTA`/super-admin uniquement)
+- `peutVoirDocuments(role, activity)` - lecture
+- `peutGererBL(role, activity)` - création/annulation des BL internes (GARAGE → `COMPTA_GARAGE`/`COMPTA`/super-admin ; SHOWROOM → `COMPTA`/super-admin uniquement)
 - `estSuperAdmin(role)`
 
 Les gardes sont appliquées dans les Server Actions (`requireUser([...])` + vérification
@@ -51,10 +51,10 @@ côté UI/route.
 | | BL interne (DeliveryNote) | Facture normalisée (Invoice) |
 |---|---|---|
 | Valeur fiscale | Aucune | Oui, soumise à e-MECeF |
-| Mentions interdites | "facture", "TVA", "normalisée", "e-MECeF" | — |
-| Mention imprimée | **DOCUMENT INTERNE NON FISCAL — NE PEUT SERVIR DE FACTURE** | Mentions légales + bloc e-MECeF |
+| Mentions interdites | "facture", "TVA", "normalisée", "e-MECeF" | - |
+| Mention imprimée | **DOCUMENT INTERNE NON FISCAL - NE PEUT SERVIR DE FACTURE** | Mentions légales + bloc e-MECeF |
 | Numérotation | `BL-GAR-0001…` (garage) / `BL-SHW-0001…` (showroom), séquences séparées | `FAC-年-0001…` (partagé, préfixe `FAC-GAR` possible côté facture normalisée garage) |
-| Annulation | Statut `EMIS → ANNULE`, motif ≥ 8 caractères, mouvements de stock inversés | Avoir/annulation DGI — **une facture normalisée certifiée ne s'annule que par avoir justifié DGI**, jamais par simple annulation interne une fois certifiée |
+| Annulation | Statut `EMIS → ANNULE`, motif ≥ 8 caractères, mouvements de stock inversés | Avoir/annulation DGI - **une facture normalisée certifiée ne s'annule que par avoir justifié DGI**, jamais par simple annulation interne une fois certifiée |
 | Création | `createAndIssueDeliveryNote` (création + déstockage en une seule transaction Prisma) | `normalizeInvoice` depuis un devis `COMMANDE_CONFIRMEE` |
 
 ### Création + déstockage (`createAndIssueDeliveryNote`)
@@ -62,7 +62,7 @@ côté UI/route.
 Action serveur **unique et atomique** (une seule transaction Prisma) : le flux
 `createDeliveryNote` puis `issueDeliveryNote` séparé a été supprimé. Si une seule ligne
 échoue (stock insuffisant, véhicule indisponible, périmètre d'activité incohérent),
-**aucun BL n'est créé** — rollback complet, message d'erreur explicite renvoyé à l'UI.
+**aucun BL n'est créé** - rollback complet, message d'erreur explicite renvoyé à l'UI.
 
 Validations avant écriture :
 - au moins une ligne réelle (véhicule ou pièce) par ligne du BL ;
@@ -99,11 +99,11 @@ Déstockage (dans la même transaction) :
 ## 4bis. RH & RAF : la comptable principale (COMPTA) cumule Comptabilité + RAF + RH
 
 La comptable principale (`COMPTA`) **cumule trois casquettes** : Comptabilité (facturation,
-proformas, bilan, encaissements, exports financiers), **RAF — Responsable des Affaires
+proformas, bilan, encaissements, exports financiers), **RAF - Responsable des Affaires
 Financières** (ex-rôle `RF` : devis/factures/BDC complets, exports bilan, services), et
-**RH — Ressources Humaines** (ex-rôle `RH` : personnel, congés, contrats, paie, et gestion
+**RH - Ressources Humaines** (ex-rôle `RH` : personnel, congés, contrats, paie, et gestion
 des comptes utilisateurs/rôles, puisque `RH` en disposait déjà). Libellé du rôle
-(`ROLE_LABELS.COMPTA` dans `src/lib/roles.ts`) : « Comptable principale — Comptabilité,
+(`ROLE_LABELS.COMPTA` dans `src/lib/roles.ts`) : « Comptable principale - Comptabilité,
 RAF & RH ».
 
 Les rôles `RF` et `RH` **restent dans le référentiel** (`src/lib/roles.ts`,
@@ -112,7 +112,7 @@ la préconfiguration de `COMPTA` ne fait que cumuler leurs capacités, elle ne l
 pas des autres rôles.
 
 - **`COMPTA`** : accès `/hr` (salariés, congés, départements, paie), `/users` (gestion des
-  comptes et rôles — capacité héritée de `RH`), `/expenses`, `/invoices`, `/quotes`,
+  comptes et rôles - capacité héritée de `RH`), `/expenses`, `/invoices`, `/quotes`,
   `/delivery-notes`, export bilan Excel (`/api/reports/financial-excel`, consolidé
   showroom + garage), accès comptable consolidé (showroom + garage).
 - **`COMPTA_GARAGE`** (comptable garage) : **aucun accès RH, aucun accès `/users` ou
@@ -136,7 +136,7 @@ pas des autres rôles.
 
 **Important** : les capacités personnalisées déjà enregistrées sur un compte utilisateur
 existant (`User.customPermissions`) ne sont **pas écrasées automatiquement** par ce
-changement de préconfiguration — `getEffectiveCapabilities` (`permissions-config.ts`)
+changement de préconfiguration - `getEffectiveCapabilities` (`permissions-config.ts`)
 privilégie toujours les `customPermissions` d'un utilisateur si elles existent. Le bouton
 « Réinitialiser selon le rôle » dans `/users` (`UsersView.tsx`) reste le seul moyen
 explicite de réappliquer la nouvelle préconfiguration à un compte `COMPTA` déjà créé.
@@ -145,12 +145,12 @@ explicite de réappliquer la nouvelle préconfiguration à un compte `COMPTA` d�
 
 - `User.supervisorId` (+ relation self `Supervision`, `onDelete: SetNull`).
 - `Quote.activity` / `Invoice.activity` / `WorkOrder.activity` : `String @default(...)`
-  (`SHOWROOM` pour Quote/Invoice, `GARAGE` pour WorkOrder — un ordre de réparation est par
+  (`SHOWROOM` pour Quote/Invoice, `GARAGE` pour WorkOrder - un ordre de réparation est par
   nature un acte d'atelier).
 - `DeliveryNote` / `DeliveryNoteLine` : nouveaux modèles (voir `prisma/schema.prisma`).
 
 Aucune colonne existante n'a été supprimée, renommée ou retypée. Le diff SQL généré est
-strictement additif (`ADD COLUMN`, `CREATE TABLE`, `ADD CONSTRAINT`) — voir rapport de
+strictement additif (`ADD COLUMN`, `CREATE TABLE`, `ADD CONSTRAINT`) - voir rapport de
 vérification.
 
 ## 6. Numérotation
@@ -165,11 +165,11 @@ vérification.
 Les compteurs BL sont comptés par `activity` (`prisma.deliveryNote.count({ where: { activity } })`),
 ce qui garantit deux séquences indépendantes.
 
-## 7. e-MECeF — plan d'intégration garage
+## 7. e-MECeF - plan d'intégration garage
 
 Le mode `DGI_EMECEF_MODE` (`LIVE`/`DEMO`, voir `docs/EMECEF_INTEGRATION.md`) s'applique de
 façon identique aux factures `activity = GARAGE` et `SHOWROOM` : `certifyInvoiceDgi`
-(`src/app/invoices/actions.ts`) ajoute uniquement une garde supplémentaire — un
+(`src/app/invoices/actions.ts`) ajoute uniquement une garde supplémentaire - un
 `COMPTA_GARAGE` ne peut certifier qu'une facture `activity = GARAGE`. Aucune modification
 du client e-MECeF (`src/lib/dgi-emecef.ts`) n'était nécessaire : le payload soumis à la DGI
 ne distingue pas les deux périmètres (une facture certifiée reste une facture CARZONE SARL
@@ -178,9 +178,9 @@ unique du point de vue fiscal).
 ## 8. Points restants / risques
 
 1. **Pas d'UI de supervision** : `User.supervisorId` est modélisé mais aucun écran
-   `/users` ne permet encore de l'éditer — à ajouter si le besoin se confirme.
+   `/users` ne permet encore de l'éditer - à ajouter si le besoin se confirme.
 2. **Bilan financier (onglet `/invoices` → Bilan)** : les dépenses (`Expense`) et salaires
-   (`SalaryPayment`) ne portent pas de champ `activity` (jugé hors périmètre pour ce lot —
+   (`SalaryPayment`) ne portent pas de champ `activity` (jugé hors périmètre pour ce lot -
    ce sont des charges globales d'entreprise, pas des documents clients). Le bilan complet
    reste donc consolidé même pour `COMPTA_GARAGE` ; seules les listes factures/devis/BL et
    les KPI du tableau de bord sont filtrés par activité.
@@ -188,11 +188,11 @@ unique du point de vue fiscal).
    dédié, un véhicule annulé repasse toujours à `EN_STOCK` (pas de restitution d'un état
    intermédiaire comme `EN_TRANSIT`).
 4. **Pas de séquence séparée pour les factures/devis** (`FAC-GAR` reste un préfixe
-   cosmétique sur un compteur global partagé) — jugé acceptable car le sujet n'était que
+   cosmétique sur un compteur global partagé) - jugé acceptable car le sujet n'était que
    "recommandé", pas obligatoire.
 5. **Double déstockage / double annulation concurrentiels (résolu)** : `createAndIssueDeliveryNote`
    et `cancelDeliveryNote` utilisent chacun un `updateMany` à condition d'état (statut
-   véhicule/pièce/BL) à l'intérieur d'une transaction Prisma unique — la création et le
+   véhicule/pièce/BL) à l'intérieur d'une transaction Prisma unique - la création et le
    déstockage ne font plus qu'une seule opération atomique, et l'annulation ne peut pas
    rejouer une restitution de stock déjà effectuée. Pas de verrou explicite au niveau base
    (non nécessaire au volume actuel de CARZONE SARL), mais plus de fenêtre où un BL `EMIS`
@@ -200,6 +200,6 @@ unique du point de vue fiscal).
 6. **Numéro de BL non garanti sous forte concurrence** : le numéro (`nextDeliveryNoteNumber`)
    est calculé via `count()` dans la transaction ; en cas de création strictement
    simultanée de deux BL sur la même activité, la contrainte `@unique` sur `number` fait
-   échouer (et annule) la seconde transaction plutôt que de produire un doublon — l'auteur
+   échouer (et annule) la seconde transaction plutôt que de produire un doublon - l'auteur
    doit alors relancer la création. Acceptable au volume actuel ; à revoir si le volume de
    création simultanée augmente (séquence dédiée en base).

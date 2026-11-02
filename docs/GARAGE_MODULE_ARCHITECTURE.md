@@ -22,6 +22,12 @@ ne doit jamais être mélangé au showroom (vente de véhicules neufs).
    - notes de coût, statut de validation, validateur et date.
 6. **Facturation garage** : proforma → facture normalisée / BL interne, toujours avec
    `activity = GARAGE` ; aucune vente de véhicule showroom dans une proforma garage.
+   L'estimateur proforma garage comprend :
+   - véhicule client (immatriculation, marque, modèle, VIN, kilométrage, panne/motif) ;
+   - lignes **main-d'œuvre** (opération, heures × taux horaire) ;
+   - lignes **pièces détachées** issues du stock (référence, stock disponible, prix de vente) ;
+   - lignes **articles / prestations** et **lignes libres** ;
+   - totaux HT/TVA/TTC et CGV Atelier, impression dédiée avec bloc véhicule.
 7. **Supervision et audit** : validation des coûts par la Comptable Garage, journal d'audit
    de toutes les actions sensibles.
 

@@ -26,6 +26,8 @@ export default async function FicheInterventionPage({
     "CHEF_ATELIER",
     "ATELIER",
     "COMPTA",
+    "COMPTA_GARAGE",
+    "ASSISTANTE_COMPTABLE",
     "ADMIN",
     "COMMERCIAL",
   ]);

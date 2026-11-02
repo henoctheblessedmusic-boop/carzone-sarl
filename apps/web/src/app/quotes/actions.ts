@@ -22,6 +22,7 @@ import {
 import { ACTIVITY, peutGererBL, type Activity } from "@/lib/permissions";
 import { certifyInvoiceWithMecef } from "@/lib/dgi-emecef";
 import { createAndIssueDeliveryNote } from "../delivery-notes/actions";
+import { logAudit } from "@/lib/audit";
 
 export async function createProformaWithLines(payload: {
   customerId: string;
@@ -121,13 +122,37 @@ export async function createProformaWithLines(payload: {
     },
   });
 
+  await logAudit({
+    user,
+    action: "quote.create",
+    entityType: "Quote",
+    entityId: quote.id,
+    entityLabel: quote.number,
+    activity,
+  });
+
   revalidatePath("/quotes");
   revalidatePath(`/clients/${customerId}`);
   return quote.id;
 }
 
 export async function sendProforma(formData: FormData) {
-  const user = await requireUser(["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE", "ADMIN"]);
+  const user = await requireUser([
+    "PDG",
+    "SG",
+    "DG",
+    "ADV",
+    "RF",
+    "RTA",
+    "DC",
+    "COMMERCIAL",
+    "HOTESSE",
+    "CHEF_ATELIER",
+    "ASSISTANTE_COMPTABLE",
+    "COMPTA",
+    "COMPTA_GARAGE",
+    "ADMIN",
+  ]);
   const id = String(formData.get("id"));
   const quote = await prisma.quote.findUniqueOrThrow({
     where: { id },
@@ -181,6 +206,15 @@ export async function sendProforma(formData: FormData) {
     },
   });
 
+  await logAudit({
+    user,
+    action: "quote.send_proforma",
+    entityType: "Quote",
+    entityId: quote.id,
+    entityLabel: quote.number,
+    activity: quote.activity as Activity,
+  });
+
   revalidatePath("/quotes");
   revalidatePath("/mailbox");
 }
@@ -219,6 +253,14 @@ export async function confirmOrder(formData: FormData) {
         .filter(Boolean)
         .join("\n"),
     },
+  });
+  await logAudit({
+    user,
+    action: "quote.confirm_order",
+    entityType: "Quote",
+    entityId: quote.id,
+    entityLabel: quote.number,
+    activity: quote.activity as Activity,
   });
   revalidatePath("/quotes");
 }
@@ -280,6 +322,14 @@ export async function normalizeInvoice(formData: FormData) {
         .join("\n"),
     },
   });
+  await logAudit({
+    user,
+    action: "quote.normalize_invoice",
+    entityType: "Quote",
+    entityId: quote.id,
+    entityLabel: quote.number,
+    activity: quote.activity as Activity,
+  });
   revalidatePath("/quotes");
   revalidatePath("/invoices");
 }
@@ -321,6 +371,15 @@ export async function voidInternally(formData: FormData) {
         .join("\n"),
     },
   });
+  await logAudit({
+    user,
+    action: "quote.void_internally",
+    entityType: "Quote",
+    entityId: quote.id,
+    entityLabel: quote.number,
+    activity: quote.activity as Activity,
+    details: reason,
+  });
   revalidatePath("/quotes");
 }
 
@@ -352,6 +411,14 @@ export async function deleteQuote(id: string) {
 
   await prisma.quoteLine.deleteMany({ where: { quoteId: id } });
   await prisma.quote.delete({ where: { id } });
+  await logAudit({
+    user,
+    action: "quote.delete",
+    entityType: "Quote",
+    entityId: quote.id,
+    entityLabel: quote.number,
+    activity: quote.activity as Activity,
+  });
   revalidatePath("/quotes");
   revalidatePath("/dashboard");
 }
@@ -472,6 +539,15 @@ export async function updateProformaWithLines(payload: {
     },
   });
 
+  await logAudit({
+    user,
+    action: "quote.update",
+    entityType: "Quote",
+    entityId: updated.id,
+    entityLabel: updated.number,
+    activity: updated.activity as Activity,
+  });
+
   revalidatePath("/quotes");
   revalidatePath(`/clients/${customerId}`);
   return updated.id;
@@ -578,6 +654,16 @@ export async function transcribeQuote(formData: FormData): Promise<TranscribeQuo
       },
     });
 
+    await logAudit({
+      user,
+      action: "quote.transcribe_bl",
+      entityType: "Quote",
+      entityId: quote.id,
+      entityLabel: quote.number,
+      activity,
+      details: `BL interne ${note.number}`,
+    });
+
     revalidatePath("/quotes");
     revalidatePath("/delivery-notes");
 
@@ -659,6 +745,16 @@ export async function transcribeQuote(formData: FormData): Promise<TranscribeQuo
         .filter(Boolean)
         .join("\n"),
     },
+  });
+
+  await logAudit({
+    user,
+    action: "quote.transcribe_invoice",
+    entityType: "Quote",
+    entityId: quote.id,
+    entityLabel: quote.number,
+    activity,
+    details: `Facture ${invoice.number}`,
   });
 
   revalidatePath("/quotes");

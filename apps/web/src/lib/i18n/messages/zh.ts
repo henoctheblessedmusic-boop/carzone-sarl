@@ -41,6 +41,7 @@ export const zh: Messages = {
     hr: "人力资源（HR）",
     expenses: "支出与供应商",
     deliveryNotes: "内部出库单",
+    audit: "审计日志",
     aria: "主导航",
   },
   pages: {
@@ -67,6 +68,7 @@ export const zh: Messages = {
     hr: "人力资源管理（HR）",
     expenses: "费用、支出与采购单",
     deliveryNotes: "内部出库单（非税务文件）",
+    audit: "审计日志与可追溯性",
   },
   common: {
     logout: "退出登录",

@@ -41,6 +41,7 @@ export const en: Messages = {
     hr: "Human resources (HR)",
     expenses: "Expenses & vendors",
     deliveryNotes: "Delivery notes",
+    audit: "Audit log",
     aria: "Main navigation",
   },
   pages: {
@@ -67,6 +68,7 @@ export const en: Messages = {
     hr: "Human resources management (HR)",
     expenses: "Operating expenses & purchase orders",
     deliveryNotes: "Internal delivery notes (non-fiscal)",
+    audit: "Audit log & traceability",
   },
   common: {
     logout: "Sign out",

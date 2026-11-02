@@ -41,6 +41,7 @@ export const fr: Messages = {
     hr: "Ressources Humaines (RH)",
     expenses: "Dépenses & Prestataires",
     deliveryNotes: "Bons de livraison",
+    audit: "Journal d'audit",
     aria: "Navigation principale",
   },
   pages: {
@@ -67,6 +68,7 @@ export const fr: Messages = {
     hr: "Gestion des ressources humaines (RH)",
     expenses: "Charges, dépenses & bons de commande",
     deliveryNotes: "Bons de livraison internes (non fiscaux)",
+    audit: "Journal d'audit & traçabilité",
   },
   common: {
     logout: "Déconnexion",

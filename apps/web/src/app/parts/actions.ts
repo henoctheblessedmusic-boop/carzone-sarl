@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/require-user";
 import type { Role } from "@/lib/roles";
+import { logAudit } from "@/lib/audit";
 
 const AUTHORIZED_ROLES: Role[] = [
   "PDG",
@@ -100,13 +101,21 @@ export async function createPart(formData: FormData) {
     });
   }
 
+  await logAudit({
+    user,
+    action: "part.create",
+    entityType: "PartItem",
+    entityId: part.id,
+    entityLabel: `${part.partNumber} · ${part.name}`,
+  });
+
   revalidatePath("/parts");
   revalidatePath("/workshop");
   return { success: true, partId: part.id };
 }
 
 export async function updatePart(formData: FormData) {
-  await requireUser(AUTHORIZED_ROLES);
+  const user = await requireUser(AUTHORIZED_ROLES);
   const id = String(formData.get("id"));
 
   const partNumber = String(formData.get("partNumber") || "").trim().toUpperCase();
@@ -121,7 +130,7 @@ export async function updatePart(formData: FormData) {
   const sellingPriceXof = parseInt(String(formData.get("sellingPriceXof") || "0"), 10) || 0;
   const description = String(formData.get("description") || "").trim() || null;
 
-  await prisma.partItem.update({
+  const updated = await prisma.partItem.update({
     where: { id },
     data: {
       partNumber,
@@ -138,15 +147,31 @@ export async function updatePart(formData: FormData) {
     },
   });
 
+  await logAudit({
+    user,
+    action: "part.update",
+    entityType: "PartItem",
+    entityId: updated.id,
+    entityLabel: `${updated.partNumber} · ${updated.name}`,
+  });
+
   revalidatePath("/parts");
   revalidatePath("/workshop");
   return { success: true };
 }
 
 export async function deletePart(id: string) {
-  await requireUser(["PDG", "SG", "DG", "DC", "CHEF_ATELIER", "ADMIN"]);
+  const user = await requireUser(["PDG", "SG", "DG", "DC", "CHEF_ATELIER", "ADMIN"]);
+  const existing = await prisma.partItem.findUnique({ where: { id }, select: { partNumber: true, name: true } });
   await prisma.partItem.delete({
     where: { id },
+  });
+  await logAudit({
+    user,
+    action: "part.delete",
+    entityType: "PartItem",
+    entityId: id,
+    entityLabel: existing ? `${existing.partNumber} · ${existing.name}` : id,
   });
   revalidatePath("/parts");
   revalidatePath("/workshop");
@@ -265,6 +290,15 @@ export async function recordStockMovement(formData: FormData) {
     }),
   ]);
 
+  await logAudit({
+    user,
+    action: "part.stock_movement",
+    entityType: "PartItem",
+    entityId: partItemId,
+    entityLabel: `${part.partNumber} · ${part.name}`,
+    details: `${type} : ${deltaQuantity > 0 ? "+" : ""}${deltaQuantity}${reason ? ` (${reason})` : ""}`,
+  });
+
   revalidatePath("/parts");
   revalidatePath("/workshop");
   return { success: true, newStock };
@@ -338,6 +372,16 @@ export async function assignPartToWorkshopEntry(formData: FormData) {
         ]
       : []),
   ]);
+
+  await logAudit({
+    user,
+    action: "part.assign_to_workshop_entry",
+    entityType: "PartItem",
+    entityId: partItemId,
+    entityLabel: `${part.partNumber} · ${part.name}`,
+    activity: "GARAGE",
+    details: `Imputé sur OR ${entry.orNumber || entry.immatriculation} (x${quantity})`,
+  });
 
   revalidatePath("/parts");
   revalidatePath("/workshop");

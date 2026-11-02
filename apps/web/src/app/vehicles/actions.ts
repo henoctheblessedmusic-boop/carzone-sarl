@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { normalizeBrandName } from "@/lib/brand-logos";
+import { logAudit } from "@/lib/audit";
 
 const VEHICLE_MANAGERS = [
   "PDG",
@@ -18,7 +19,7 @@ const VEHICLE_MANAGERS = [
 ] as const;
 
 export async function createVehicle(formData: FormData) {
-  await requireUser([...VEHICLE_MANAGERS]);
+  const user = await requireUser([...VEHICLE_MANAGERS]);
   const siteIdInput = String(formData.get("siteId") || "").trim() || null;
   const site = siteIdInput
     ? await prisma.site.findUnique({ where: { id: siteIdInput } })
@@ -76,6 +77,14 @@ export async function createVehicle(formData: FormData) {
   // Background auto-generation & translation of official French tech sheet
   generateAndSaveVehicleTechSheet(vehicle.id).catch((err) => {
     console.error("Auto tech sheet generation error:", err);
+  });
+
+  await logAudit({
+    user,
+    action: "vehicle.create",
+    entityType: "Vehicle",
+    entityId: vehicle.id,
+    entityLabel: `${vehicle.brand} ${vehicle.model}`,
   });
 
   revalidatePath("/vehicles");
@@ -162,14 +171,23 @@ export async function regenerateVehicleTechSheetAction(vehicleId: string) {
 }
 
 export async function quickChangeVehicleStatus(formData: FormData) {
-  await requireUser([...VEHICLE_MANAGERS]);
+  const user = await requireUser([...VEHICLE_MANAGERS]);
   const id = String(formData.get("id") || "").trim();
   const status = String(formData.get("status") || "EN_MAGASIN").trim();
   if (!id) throw new Error("ID véhicule requis");
 
-  await prisma.vehicle.update({
+  const vehicle = await prisma.vehicle.update({
     where: { id },
     data: { status },
+  });
+
+  await logAudit({
+    user,
+    action: "vehicle.status_change",
+    entityType: "Vehicle",
+    entityId: vehicle.id,
+    entityLabel: `${vehicle.brand} ${vehicle.model}`,
+    details: `Statut -> ${status}`,
   });
 
   revalidatePath("/vehicles");
@@ -177,7 +195,7 @@ export async function quickChangeVehicleStatus(formData: FormData) {
 }
 
 export async function updateVehicle(formData: FormData) {
-  await requireUser([...VEHICLE_MANAGERS]);
+  const user = await requireUser([...VEHICLE_MANAGERS]);
   const id = String(formData.get("id") || "").trim();
   if (!id) throw new Error("Identifiant véhicule requis");
 
@@ -199,7 +217,7 @@ export async function updateVehicle(formData: FormData) {
   const orderReference = String(formData.get("orderReference") || "").trim() || null;
   const productionWeek = String(formData.get("productionWeek") || "").trim() || null;
 
-  await prisma.vehicle.update({
+  const updated = await prisma.vehicle.update({
     where: { id },
     data: {
       vin,
@@ -226,6 +244,14 @@ export async function updateVehicle(formData: FormData) {
     console.error("Update tech sheet error:", err);
   });
 
+  await logAudit({
+    user,
+    action: "vehicle.update",
+    entityType: "Vehicle",
+    entityId: updated.id,
+    entityLabel: `${updated.brand} ${updated.model}`,
+  });
+
   revalidatePath("/vehicles");
   revalidatePath("/catalog");
 }
@@ -233,7 +259,7 @@ export async function updateVehicle(formData: FormData) {
 const VEHICLE_DELETERS = ["DEVELOPER", "PDG", "SG", "DG", "DC", "ADMIN"] as const;
 
 export async function deleteVehicle(formData: FormData) {
-  await requireUser([...VEHICLE_DELETERS]);
+  const user = await requireUser([...VEHICLE_DELETERS]);
   const id = String(formData.get("id") || "").trim();
   if (!id) throw new Error("Identifiant véhicule requis");
 
@@ -271,8 +297,16 @@ export async function deleteVehicle(formData: FormData) {
   });
 
   // Suppression définitive de l'article en stock
-  await prisma.vehicle.delete({
+  const deleted = await prisma.vehicle.delete({
     where: { id },
+  });
+
+  await logAudit({
+    user,
+    action: "vehicle.delete",
+    entityType: "Vehicle",
+    entityId: deleted.id,
+    entityLabel: `${deleted.brand} ${deleted.model}`,
   });
 
   revalidatePath("/vehicles");
@@ -287,11 +321,11 @@ export async function deleteVehicle(formData: FormData) {
  * facture normalisée, un paiement ou un contrat de location (intégrité métier).
  */
 export async function forceDeleteVehicle(formData: FormData) {
-  await requireUser([...VEHICLE_DELETERS]);
+  const user = await requireUser([...VEHICLE_DELETERS]);
   const id = String(formData.get("id") || "").trim();
   if (!id) throw new Error("Identifiant véhicule requis");
 
-  const vehicle = await prisma.vehicle.findUnique({ where: { id }, select: { id: true } });
+  const vehicle = await prisma.vehicle.findUnique({ where: { id }, select: { id: true, brand: true, model: true } });
   if (!vehicle) throw new Error("Véhicule introuvable.");
 
   const rentalCount = await prisma.rental.count({ where: { vehicleId: id } });
@@ -333,6 +367,14 @@ export async function forceDeleteVehicle(formData: FormData) {
     prisma.fleetVehicle.deleteMany({ where: { vehicleId: id } }),
     prisma.vehicle.delete({ where: { id } }),
   ]);
+
+  await logAudit({
+    user,
+    action: "vehicle.force_delete",
+    entityType: "Vehicle",
+    entityId: id,
+    entityLabel: `${vehicle.brand} ${vehicle.model}`,
+  });
 
   revalidatePath("/vehicles");
   revalidatePath("/catalog");

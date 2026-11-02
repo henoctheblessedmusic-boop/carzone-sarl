@@ -885,6 +885,29 @@ model Expense {
   updatedAt        DateTime  @updatedAt
 }
 
+/// Journal d'audit : qui a fait quoi, sur quelle entité, à quel moment.
+/// Le compte DEVELOPER est invisible : lib/audit.ts n'écrit jamais de ligne pour ce rôle.
+model AuditLog {
+  id          String    @id @default(cuid())
+  actorId     String?
+  actorName   String
+  actorEmail  String
+  actorRole   String
+  action      String
+  entityType  String
+  entityId    String?
+  entityLabel String?
+  /// SHOWROOM | GARAGE | null (actions hors périmètre comptable, ex: clients, utilisateurs)
+  activity    String?
+  details     String?
+  createdAt   DateTime  @default(now())
+
+  @@index([createdAt])
+  @@index([entityType, entityId])
+  @@index([actorRole])
+  @@index([activity])
+}
+
 model SystemSetting {
   id        String   @id @default(cuid())
   key       String   @unique

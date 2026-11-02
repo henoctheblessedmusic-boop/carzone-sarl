@@ -7,6 +7,8 @@ import { z } from "zod";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { parseWorkshopExcel } from "@/lib/excel-workshop";
+import { logAudit } from "@/lib/audit";
+import { ACTIVITY } from "@/lib/permissions";
 import {
   CHECKLIST_STATUSES,
   MAINTENANCE_TIERS,
@@ -31,7 +33,7 @@ const WORKSHOP_ALLOWED_ROLES = [
 ] as const;
 
 export async function importWorkshopExcel(formData: FormData) {
-  await requireUser([...WORKSHOP_ALLOWED_ROLES]);
+  const user = await requireUser([...WORKSHOP_ALLOWED_ROLES]);
 
   const file = formData.get("file") as File | null;
   if (!file || file.size === 0) {
@@ -115,6 +117,14 @@ export async function importWorkshopExcel(formData: FormData) {
     importedCount++;
   }
 
+  await logAudit({
+    user,
+    action: "workshop.import_excel",
+    entityType: "WorkshopEntry",
+    activity: ACTIVITY.GARAGE,
+    details: `${importedCount} ligne(s) importée(s) depuis ${sheetName}`,
+  });
+
   revalidatePath("/workshop");
   revalidatePath("/clients");
   revalidatePath("/vehicles");
@@ -123,7 +133,7 @@ export async function importWorkshopExcel(formData: FormData) {
 }
 
 export async function createWorkshopEntry(formData: FormData) {
-  await requireUser([...WORKSHOP_ALLOWED_ROLES]);
+  const user = await requireUser([...WORKSHOP_ALLOWED_ROLES]);
 
   const immatriculation = String(formData.get("immatriculation") || "").trim().toUpperCase();
   const clientName = String(formData.get("clientName") || "").trim();
@@ -199,7 +209,7 @@ export async function createWorkshopEntry(formData: FormData) {
   }
   // Règle Métier : les voitures clients immatriculées sont des réparations atelier, pas du stock.
 
-  await prisma.workshopEntry.create({
+  const created = await prisma.workshopEntry.create({
     data: {
       entryDate: String(formData.get("entryDate") || "").trim() || null,
       entryTime: String(formData.get("entryTime") || "").trim() || null,
@@ -230,13 +240,22 @@ export async function createWorkshopEntry(formData: FormData) {
     },
   });
 
+  await logAudit({
+    user,
+    action: "workshop.create_entry",
+    entityType: "WorkshopEntry",
+    entityId: created.id,
+    entityLabel: `${immatriculation} · ${clientName}`,
+    activity: ACTIVITY.GARAGE,
+  });
+
   revalidatePath("/workshop");
   revalidatePath("/clients");
   revalidatePath("/vehicles");
 }
 
 export async function updateWorkshopEntry(formData: FormData) {
-  await requireUser([...WORKSHOP_ALLOWED_ROLES]);
+  const user = await requireUser([...WORKSHOP_ALLOWED_ROLES]);
 
   const id = String(formData.get("id") || "").trim();
   if (!id) throw new Error("ID d'entrée atelier requis");
@@ -250,7 +269,7 @@ export async function updateWorkshopEntry(formData: FormData) {
     orNumber = existing?.orNumber || "";
   }
 
-  await prisma.workshopEntry.update({
+  const updated = await prisma.workshopEntry.update({
     where: { id },
     data: {
       entryDate: String(formData.get("entryDate") || "").trim() || null,
@@ -280,16 +299,38 @@ export async function updateWorkshopEntry(formData: FormData) {
     },
   });
 
+  await logAudit({
+    user,
+    action: "workshop.update_entry",
+    entityType: "WorkshopEntry",
+    entityId: updated.id,
+    entityLabel: `${updated.immatriculation} · ${updated.clientName}`,
+    activity: ACTIVITY.GARAGE,
+  });
+
   revalidatePath("/workshop");
   revalidatePath("/clients");
   revalidatePath("/vehicles");
 }
 
 export async function deleteWorkshopEntry(id: string) {
-  await requireUser([...WORKSHOP_ALLOWED_ROLES]);
+  const user = await requireUser([...WORKSHOP_ALLOWED_ROLES]);
+  const existing = await prisma.workshopEntry.findUnique({
+    where: { id },
+    select: { immatriculation: true, clientName: true },
+  });
 
   await prisma.workshopEntry.delete({
     where: { id },
+  });
+
+  await logAudit({
+    user,
+    action: "workshop.delete_entry",
+    entityType: "WorkshopEntry",
+    entityId: id,
+    entityLabel: existing ? `${existing.immatriculation} · ${existing.clientName}` : id,
+    activity: ACTIVITY.GARAGE,
   });
 
   revalidatePath("/workshop");

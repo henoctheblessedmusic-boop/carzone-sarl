@@ -26,6 +26,8 @@ export default async function FicheEntretienPage({
     "CHEF_ATELIER",
     "ATELIER",
     "COMPTA",
+    "COMPTA_GARAGE",
+    "ASSISTANTE_COMPTABLE",
     "ADMIN",
     "COMMERCIAL",
   ]);

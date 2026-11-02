@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { nextDeliveryNoteNumber } from "@/lib/format";
 import { ACTIVITY, peutGererBL, type Activity } from "@/lib/permissions";
+import { logAudit } from "@/lib/audit";
 
 const DELIVERY_NOTE_ROLES = [
   "PDG",
@@ -159,6 +160,15 @@ export async function createAndIssueDeliveryNote(payload: CreateDeliveryNoteInpu
     return created;
   });
 
+  await logAudit({
+    user,
+    action: "delivery_note.create",
+    entityType: "DeliveryNote",
+    entityId: note.id,
+    entityLabel: note.number,
+    activity,
+  });
+
   revalidatePath("/delivery-notes");
   revalidatePath("/parts");
   revalidatePath("/vehicles");
@@ -238,6 +248,16 @@ export async function cancelDeliveryNote(formData: FormData) {
         });
       }
     }
+  });
+
+  await logAudit({
+    user,
+    action: "delivery_note.cancel",
+    entityType: "DeliveryNote",
+    entityId: note.id,
+    entityLabel: note.number,
+    activity: note.activity as Activity,
+    details: reason,
   });
 
   revalidatePath("/delivery-notes");

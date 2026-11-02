@@ -7,9 +7,10 @@ import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { getServerMessages } from "@/lib/i18n/server";
 import { invoicesCopy } from "@/lib/i18n/messages/invoices";
-import { ACTIVITY } from "@/lib/permissions";
+import { ACTIVITY, type Activity } from "@/lib/permissions";
 import { formatXof } from "@/lib/format";
 import { SITE_WEBSITE, SITE_EMAILS } from "@/lib/site-constants";
+import { logAudit } from "@/lib/audit";
 
 export async function addPayment(formData: FormData) {
   const user = await requireUser([
@@ -83,6 +84,16 @@ export async function addPayment(formData: FormData) {
     },
   });
 
+  await logAudit({
+    user,
+    action: "invoice.add_payment",
+    entityType: "Invoice",
+    entityId: invoice.id,
+    entityLabel: invoice.number,
+    activity: invoice.activity as Activity,
+    details: `${amountXof.toLocaleString("fr-BJ")} FCFA (${method})`,
+  });
+
   revalidatePath("/invoices");
   revalidatePath("/dashboard");
   revalidatePath(`/clients/${invoice.customerId}`);
@@ -118,6 +129,16 @@ export async function voidInvoice(formData: FormData) {
     },
   });
 
+  await logAudit({
+    user,
+    action: "invoice.void",
+    entityType: "Invoice",
+    entityId: inv.id,
+    entityLabel: inv.number,
+    activity: inv.activity as Activity,
+    details: reason,
+  });
+
   revalidatePath("/invoices");
   revalidatePath("/dashboard");
 }
@@ -127,14 +148,20 @@ export async function certifyInvoiceDgi(formData: FormData): Promise<void> {
   const invoiceId = String(formData.get("invoiceId") || "");
   if (!invoiceId) throw new Error("Facture requise");
 
-  if (user.role === "COMPTA_GARAGE") {
-    const invoice = await prisma.invoice.findUniqueOrThrow({ where: { id: invoiceId } });
-    if (invoice.activity !== ACTIVITY.GARAGE) {
-      throw new Error("La Comptable Garage ne peut certifier que des factures du périmètre GARAGE.");
-    }
+  const invoice = await prisma.invoice.findUniqueOrThrow({ where: { id: invoiceId } });
+  if (user.role === "COMPTA_GARAGE" && invoice.activity !== ACTIVITY.GARAGE) {
+    throw new Error("La Comptable Garage ne peut certifier que des factures du périmètre GARAGE.");
   }
 
   await certifyInvoiceWithMecef(invoiceId);
+  await logAudit({
+    user,
+    action: "invoice.certify_dgi",
+    entityType: "Invoice",
+    entityId: invoice.id,
+    entityLabel: invoice.number,
+    activity: invoice.activity as Activity,
+  });
   revalidatePath("/invoices");
   revalidatePath(`/invoices/${invoiceId}/print`);
 }
@@ -228,6 +255,16 @@ Showroom Zone Maro-Militaire, Gbèdomidji · Cotonou, Bénin`;
         .filter(Boolean)
         .join("\n"),
     },
+  });
+
+  await logAudit({
+    user,
+    action: "invoice.send_email",
+    entityType: "Invoice",
+    entityId: invoice.id,
+    entityLabel: invoice.number,
+    activity: invoice.activity as Activity,
+    details: `Envoi vers ${emailTo}`,
   });
 
   revalidatePath("/invoices");

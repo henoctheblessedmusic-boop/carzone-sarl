@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { userHasCapability } from "@/lib/permissions-config";
+import { logAudit } from "@/lib/audit";
 import {
   CLIENT_IMPORT_MAX_ROWS,
   EMAIL_REGEX,
@@ -32,7 +33,7 @@ const CLIENT_MANAGERS = [
 ] as const;
 
 export async function createCustomer(formData: FormData) {
-  await requireUser([...CLIENT_MANAGERS]);
+  const user = await requireUser([...CLIENT_MANAGERS]);
 
   const contactName = String(formData.get("contactName") || "").trim();
   if (!contactName) {
@@ -65,13 +66,21 @@ export async function createCustomer(formData: FormData) {
     },
   });
 
+  await logAudit({
+    user,
+    action: "customer.create",
+    entityType: "Customer",
+    entityId: customer.id,
+    entityLabel: customer.contactName,
+  });
+
   revalidatePath("/clients");
   revalidatePath("/quotes");
   return customer;
 }
 
 export async function updateCustomer(formData: FormData) {
-  await requireUser([...CLIENT_MANAGERS]);
+  const user = await requireUser([...CLIENT_MANAGERS]);
 
   const id = String(formData.get("id") || "").trim();
   const contactName = String(formData.get("contactName") || "").trim();
@@ -110,6 +119,14 @@ export async function updateCustomer(formData: FormData) {
     },
   });
 
+  await logAudit({
+    user,
+    action: "customer.update",
+    entityType: "Customer",
+    entityId: updated.id,
+    entityLabel: updated.contactName,
+  });
+
   revalidatePath("/clients");
   revalidatePath(`/clients/${id}`);
   revalidatePath("/quotes");
@@ -128,7 +145,7 @@ export async function toggleCustomerActive(id: string, active: boolean) {
 }
 
 export async function deleteCustomer(id: string) {
-  await requireUser(["PDG", "SG", "DG", "ADV", "RF", "COMPTA", "ADMIN"]);
+  const user = await requireUser(["PDG", "SG", "DG", "ADV", "RF", "COMPTA", "ADMIN"]);
 
   const customer = await prisma.customer.findUnique({
     where: { id },
@@ -146,6 +163,7 @@ export async function deleteCustomer(id: string) {
 
   if (!customer) return;
 
+  let action = "customer.delete";
   if (
     customer._count.quotes > 0 ||
     customer._count.invoices > 0 ||
@@ -156,11 +174,20 @@ export async function deleteCustomer(id: string) {
       where: { id },
       data: { active: false },
     });
+    action = "customer.deactivate";
   } else {
     await prisma.customer.delete({
       where: { id },
     });
   }
+
+  await logAudit({
+    user,
+    action,
+    entityType: "Customer",
+    entityId: id,
+    entityLabel: customer.contactName,
+  });
 
   revalidatePath("/clients");
 }
@@ -329,6 +356,13 @@ export async function importClients(input: {
     const result = await prisma.customer.createMany({ data: rowsToCreate });
     created = result.count;
   }
+
+  await logAudit({
+    user,
+    action: "customer.import",
+    entityType: "Customer",
+    details: `${created} créé(s), ${skippedDuplicates} doublon(s) ignoré(s), ${errors.length} erreur(s)`,
+  });
 
   revalidatePath("/clients");
   revalidatePath("/quotes");

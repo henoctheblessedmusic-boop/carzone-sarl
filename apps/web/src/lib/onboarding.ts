@@ -115,7 +115,7 @@ export const ONBOARDING_STEPS: Record<Role, OnboardingStep[]> = {
   COMPTA: [
     { id: "invoices", label: "Facturation normalisée DGI & conformité TVA", href: "/invoices", hint: "Certification et archivage des écritures de vente" },
     { id: "payments", label: "Journal des encaissements & rapprochement bancaire", href: "/invoices", hint: "Affectation des règlements par facture" },
-    { id: "reports", label: "Extraction Excel du bilan financier", href: "/reports", hint: "Grand livre consolidé des ventes et encaissements" },
+    { id: "reports", label: "Extraction Excel du bilan financier", href: "/invoices?tab=bilan", hint: "Onglet Bilan financier des factures : grand livre consolidé des ventes et encaissements" },
     { id: "expenses", label: "Dépenses d'entreprise, bons de commande & prestataires", href: "/expenses", hint: "Pointage des charges d'exploitation" },
     { id: "workshop", label: "Ordres de réparation atelier facturables", href: "/workshop", hint: "Main-d'œuvre et pièces détachées facturées" },
     { id: "hr", label: "Contrôle de la masse salariale", href: "/hr", hint: "Paiements des salaires et régularisations" },

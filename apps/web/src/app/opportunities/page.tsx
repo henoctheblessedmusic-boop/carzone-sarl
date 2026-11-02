@@ -46,7 +46,7 @@ async function setStage(formData: FormData) {
 }
 
 export default async function OpportunitiesPage() {
-  const user = await requireUser(["DG", "COMMERCIAL", "COMPTA", "ADMIN"]);
+  const user = await requireUser(["DG", "COMMERCIAL", "COMPTA", "ADMIN", "DC"]);
   const { locale } = await getServerMessages();
   const copy = crmCopy[locale];
   const oppsCopy = copy.opportunities;

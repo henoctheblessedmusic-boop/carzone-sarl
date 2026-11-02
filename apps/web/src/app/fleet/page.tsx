@@ -8,7 +8,7 @@ import { crmCopy } from "@/lib/i18n/messages/crm";
 
 async function createFleet(formData: FormData) {
   "use server";
-  await requireUser(["DG", "COMMERCIAL", "BORNES_OPS"]);
+  await requireUser(["DG", "COMMERCIAL", "BORNES_OPS", "ADMIN"]);
   await prisma.fleetAccount.create({
     data: {
       name: String(formData.get("name") || ""),
@@ -20,7 +20,7 @@ async function createFleet(formData: FormData) {
 
 async function addFleetVehicle(formData: FormData) {
   "use server";
-  await requireUser(["DG", "COMMERCIAL", "BORNES_OPS"]);
+  await requireUser(["DG", "COMMERCIAL", "BORNES_OPS", "ADMIN"]);
   await prisma.fleetVehicle.create({
     data: {
       fleetAccountId: String(formData.get("fleetAccountId")),
@@ -34,7 +34,7 @@ async function addFleetVehicle(formData: FormData) {
 }
 
 export default async function FleetPage() {
-  const user = await requireUser(["DG", "COMMERCIAL", "BORNES_OPS"]);
+  const user = await requireUser(["DG", "COMMERCIAL", "BORNES_OPS", "ADMIN"]);
   const { locale } = await getServerMessages();
   const copy = crmCopy[locale];
   const fleetCopy = copy.fleet;

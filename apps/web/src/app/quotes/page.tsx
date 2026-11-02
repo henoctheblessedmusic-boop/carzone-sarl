@@ -6,7 +6,20 @@ import { ACTIVITY } from "@/lib/permissions";
 import { QuotesView, type QuoteItem } from "./QuotesView";
 
 export default async function QuotesPage() {
-  const user = await requireUser(["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE", "ADMIN"]);
+  const user = await requireUser([
+    "DG",
+    "COMMERCIAL",
+    "COMPTA",
+    "COMPTA_GARAGE",
+    "ADMIN",
+    "ADV",
+    "RF",
+    "RTA",
+    "DC",
+    "CHEF_ATELIER",
+    "HOTESSE",
+    "ASSISTANTE_COMPTABLE",
+  ]);
 
   const [rawQuotes, customers, articles, vehicles, opps] = await Promise.all([
     prisma.quote.findMany({

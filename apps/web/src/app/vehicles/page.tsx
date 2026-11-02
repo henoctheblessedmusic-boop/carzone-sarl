@@ -23,6 +23,7 @@ export default async function VehiclesPage({
     "STOCK",
     "COMPTA",
     "ADMIN",
+    "ATELIER",
   ]);
   const params = await searchParams;
   const [rawVehicles, brands, suppliers, sites] = await Promise.all([

@@ -13,6 +13,7 @@ import { fr } from "./messages/fr";
 import { en } from "./messages/en";
 import { zh } from "./messages/zh";
 import { ONBOARDING_STEPS, type OnboardingStep } from "@/lib/onboarding";
+import { RoleService } from "@/lib/role-service";
 
 export type { Messages, StepCopy };
 
@@ -37,10 +38,12 @@ export function roleLabel(messages: Messages, role: Role): string {
 export function localizedOnboardingSteps(role: Role, messages: Messages): OnboardingStep[] {
   const base = ONBOARDING_STEPS[role] ?? ONBOARDING_STEPS.DG;
   const copy = messages.onboarding.steps[role] ?? messages.onboarding.steps.DG;
-  return base.map((step) => {
-    const t = copy[step.id];
-    return t ? { ...step, label: t.label, hint: t.hint } : step;
-  });
+  return base
+    .filter((step) => RoleService.isRouteAllowedForUser({ id: "", role }, step.href))
+    .map((step) => {
+      const t = copy[step.id];
+      return t ? { ...step, label: t.label, hint: t.hint } : step;
+    });
 }
 
 export type NavKey = keyof Messages["nav"];

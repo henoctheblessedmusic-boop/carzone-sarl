@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   FileText,
   Search,
@@ -132,7 +133,10 @@ export function InvoicesView({
   useEffect(() => {
     setMounted(true);
   }, []);
-  const [activeTab, setActiveTab] = useState<"INVOICES" | "PAYMENTS" | "BILAN">("INVOICES");
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState<"INVOICES" | "PAYMENTS" | "BILAN">(
+    searchParams.get("tab") === "bilan" ? "BILAN" : "INVOICES"
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [activityFilter, setActivityFilter] = useState<"ALL" | "SHOWROOM" | "GARAGE">("ALL");

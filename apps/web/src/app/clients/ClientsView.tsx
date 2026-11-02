@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Search,
   Plus,
@@ -36,6 +37,7 @@ import {
   deleteCustomerDocument,
   updateCustomerDocumentStatus,
 } from "./actions";
+import { ClientImportModal } from "./ClientImportModal";
 
 export type CustomerDocumentItem = {
   id: string;
@@ -78,19 +80,27 @@ export type CustomerItem = {
 export function ClientsView({
   initialCustomers,
   canManage,
+  canImport,
 }: {
   initialCustomers: CustomerItem[];
   canManage: boolean;
+  canImport: boolean;
 }) {
   const { locale } = usePrefs();
+  const router = useRouter();
   const copy = clientsCopy[locale];
   const [customers, setCustomers] = useState(initialCustomers);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL");
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<CustomerItem | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    setCustomers(initialCustomers);
+  }, [initialCustomers]);
 
   // Documents & Immatriculation (KYC ANaTT) modal states
   const [selectedDocCustomer, setSelectedDocCustomer] = useState<CustomerItem | null>(null);
@@ -489,6 +499,19 @@ export function ClientsView({
             <Download size={15} style={{ marginRight: 6 }} />
             {copy.toolbar.exportCsv}
           </button>
+
+          {canImport && (
+            <button
+              type="button"
+              onClick={() => setIsImportModalOpen(true)}
+              className="ox-btn ox-btn-ghost"
+              style={{ height: 38, padding: "0 0.9rem", fontSize: "0.88rem" }}
+              title="Importer une base de clients depuis un fichier Excel"
+            >
+              <Upload size={15} style={{ marginRight: 6 }} />
+              Importer Excel
+            </button>
+          )}
 
           {canManage && (
             <button
@@ -1569,6 +1592,15 @@ export function ClientsView({
             </div>
           </div>
         </div>
+      )}
+
+      {isImportModalOpen && canImport && (
+        <ClientImportModal
+          onClose={() => setIsImportModalOpen(false)}
+          onImported={() => {
+            router.refresh();
+          }}
+        />
       )}
     </div>
   );

@@ -1,8 +1,18 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
+import { userHasCapability } from "@/lib/permissions-config";
+import {
+  CLIENT_IMPORT_MAX_ROWS,
+  EMAIL_REGEX,
+  normalizeEmail,
+  normalizePhone,
+  type ClientImportPayloadRow,
+  type ClientImportResult,
+} from "@/lib/client-import";
 
 const CLIENT_MANAGERS = [
   "PDG",
@@ -17,6 +27,7 @@ const CLIENT_MANAGERS = [
   "CHEF_ATELIER",
   "ASSISTANTE_COMPTABLE",
   "COMPTA",
+  "COMPTA_GARAGE",
   "ADMIN",
 ] as const;
 
@@ -214,4 +225,120 @@ export async function updateCustomerDocumentStatus(
 
   revalidatePath("/clients");
   revalidatePath(`/clients/${customerId}`);
+}
+
+/**
+ * Import Excel de clients : reçoit des lignes déjà mappées/normalisées côté navigateur,
+ * valide chaque ligne, ignore les doublons (e-mail/téléphone) et crée les clients.
+ */
+const importRowSchema = z.object({
+  contactName: z.string().max(200).optional().default(""),
+  companyName: z.string().max(200).optional().default(""),
+  email: z.string().max(200).optional().default(""),
+  phone: z.string().max(60).optional().default(""),
+  city: z.string().max(120).optional().default(""),
+  address: z.string().max(300).optional().default(""),
+  ifu: z.string().max(60).optional().default(""),
+  category: z.string().max(80).optional().default(""),
+  notes: z.string().max(2000).optional().default(""),
+});
+
+const importPayloadSchema = z.object({
+  rows: z.array(importRowSchema).min(1).max(CLIENT_IMPORT_MAX_ROWS),
+});
+
+export async function importClients(input: {
+  rows: ClientImportPayloadRow[];
+}): Promise<ClientImportResult> {
+  const user = await requireUser([...CLIENT_MANAGERS]);
+  if (!userHasCapability(user.role, "customers:create", user.customPermissions)) {
+    throw new Error("Vous n'êtes pas autorisé à importer des clients.");
+  }
+
+  const parsed = importPayloadSchema.parse(input);
+  const existing = await prisma.customer.findMany({ select: { email: true, phone: true } });
+
+  const existingEmails = new Set(
+    existing.map((c) => normalizeEmail(c.email)).filter((v): v is string => Boolean(v))
+  );
+  const existingPhones = new Set(
+    existing.map((c) => normalizePhone(c.phone)).filter((v): v is string => Boolean(v))
+  );
+  const batchEmails = new Set<string>();
+  const batchPhones = new Set<string>();
+
+  const rowsToCreate: {
+    contactName: string;
+    companyName: string | null;
+    email: string | null;
+    phone: string | null;
+    city: string;
+    address: string | null;
+    ifu: string | null;
+    category: string;
+    notes: string | null;
+    active: boolean;
+  }[] = [];
+  const errors: { row: number; message: string }[] = [];
+  let skippedDuplicates = 0;
+
+  parsed.rows.forEach((row, index) => {
+    const excelRow = index + 2; // ligne 1 = en-têtes
+    const contactName = row.contactName.trim();
+    if (!contactName) {
+      errors.push({ row: excelRow, message: "Nom du contact obligatoire" });
+      return;
+    }
+    const email = normalizeEmail(row.email);
+    if (email && !EMAIL_REGEX.test(email)) {
+      errors.push({ row: excelRow, message: `E-mail invalide : ${row.email}` });
+      return;
+    }
+    const phone = normalizePhone(row.phone);
+
+    const duplicateEmail = email
+      ? existingEmails.has(email) || batchEmails.has(email)
+      : false;
+    const duplicatePhone = phone
+      ? existingPhones.has(phone) || batchPhones.has(phone)
+      : false;
+    if (duplicateEmail || duplicatePhone) {
+      skippedDuplicates += 1;
+      return;
+    }
+
+    if (email) batchEmails.add(email);
+    if (phone) batchPhones.add(phone);
+
+    rowsToCreate.push({
+      contactName,
+      companyName: row.companyName.trim() || null,
+      email,
+      phone,
+      city: row.city.trim() || "Cotonou",
+      address: row.address.trim() || null,
+      ifu: row.ifu.trim() || null,
+      category: row.category.trim() || "Particulier",
+      notes: row.notes.trim() || null,
+      active: true,
+    });
+  });
+
+  let created = 0;
+  if (rowsToCreate.length > 0) {
+    const result = await prisma.customer.createMany({ data: rowsToCreate });
+    created = result.count;
+  }
+
+  revalidatePath("/clients");
+  revalidatePath("/quotes");
+  revalidatePath("/dashboard");
+
+  return {
+    created,
+    skippedDuplicates,
+    invalid: errors.length,
+    total: parsed.rows.length,
+    errors: errors.slice(0, 50),
+  };
 }

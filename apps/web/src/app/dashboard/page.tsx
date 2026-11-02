@@ -29,6 +29,9 @@ import {
 import { ExecutiveDashboardCharts } from "@/components/ExecutiveDashboardCharts";
 import { buildRealDashboardAnalytics } from "@/lib/dashboard-analytics";
 import { ACTIVITY } from "@/lib/permissions";
+import { RoleDashboard } from "./RoleDashboard";
+
+const DIRECTION_ROLES: Role[] = ["DEVELOPER", "PDG", "SG", "DG"];
 
 // CSS custom properties (ex. --kpi-accent) ne font pas partie du type CSSProperties ;
 // ce helper évite de répéter l'assertion de type à chaque usage.
@@ -40,6 +43,13 @@ export default async function DashboardPage() {
   const user = await requireUser();
   const { locale, messages } = await getServerMessages();
   const copy = dashboardPageCopy[locale];
+
+  // Chaque rôle non-direction dispose d'un tableau de bord dédié à son périmètre.
+  // La vue consolidée complète reste réservée à la direction.
+  if (!DIRECTION_ROLES.includes(user.role as Role)) {
+    return <RoleDashboard user={user} />;
+  }
+
   // La Comptable Garage ne doit voir que le périmètre GARAGE (comptabilité séparée).
   const garageOnly = user.role === "COMPTA_GARAGE";
   const invoiceScope = garageOnly ? { activity: ACTIVITY.GARAGE } : undefined;

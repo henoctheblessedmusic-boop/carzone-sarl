@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/ui";
@@ -28,6 +29,12 @@ import {
 import { ExecutiveDashboardCharts } from "@/components/ExecutiveDashboardCharts";
 import { buildRealDashboardAnalytics } from "@/lib/dashboard-analytics";
 import { ACTIVITY } from "@/lib/permissions";
+
+// CSS custom properties (ex. --kpi-accent) ne font pas partie du type CSSProperties ;
+// ce helper évite de répéter l'assertion de type à chaque usage.
+function cssVars(vars: Record<string, string>): CSSProperties {
+  return vars as CSSProperties;
+}
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -274,226 +281,74 @@ export default async function DashboardPage() {
           </div>
 
           {/* Quick Shortcuts */}
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+          <div className="ox-quick-actions">
             {user.role === "ADMIN" ? (
               <>
-                <Link
-                  href="/vehicles"
-                  className="ox-btn"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    background: "linear-gradient(135deg, var(--gold) 0%, #b89130 100%)",
-                    color: "#0a1622",
-                    fontWeight: 700,
-                    fontSize: "0.85rem",
-                    padding: "0.55rem 1rem",
-                    borderRadius: 8,
-                  }}
-                >
+                <Link href="/vehicles" className="ox-btn ox-btn-gold ox-quick-btn">
                   <Car size={16} />
                   {copy.shortcuts.adminVehiclesInOut}
                 </Link>
 
-                <Link
-                  href="/mailbox"
-                  className="ox-btn ox-btn-ghost"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    fontSize: "0.85rem",
-                    padding: "0.55rem 1rem",
-                    borderRadius: 8,
-                  }}
-                >
+                <Link href="/mailbox" className="ox-btn ox-btn-ghost ox-quick-btn">
                   <Mail size={16} color="var(--brand)" />
                   {copy.shortcuts.adminClientMessages}
                 </Link>
 
-                <Link
-                  href="/clients"
-                  className="ox-btn ox-btn-ghost"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    fontSize: "0.85rem",
-                    padding: "0.55rem 1rem",
-                    borderRadius: 8,
-                  }}
-                >
+                <Link href="/clients" className="ox-btn ox-btn-ghost ox-quick-btn">
                   <Users size={16} color="#10b981" />
                   {copy.shortcuts.adminClientDirectory}
                 </Link>
 
-                <Link
-                  href="/fleet"
-                  className="ox-btn ox-btn-ghost"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    fontSize: "0.85rem",
-                    padding: "0.55rem 1rem",
-                    borderRadius: 8,
-                  }}
-                >
+                <Link href="/fleet" className="ox-btn ox-btn-ghost ox-quick-btn">
                   <Car size={16} color="#38bdf8" />
                   {copy.shortcuts.adminFleet}
                 </Link>
               </>
             ) : user.role === "DEVELOPER" ? (
               <>
-                <Link
-                  href="/vehicles"
-                  className="ox-btn"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    background: "linear-gradient(135deg, var(--gold) 0%, #b89130 100%)",
-                    color: "#0a1622",
-                    fontWeight: 700,
-                    fontSize: "0.85rem",
-                    padding: "0.55rem 1rem",
-                    borderRadius: 8,
-                  }}
-                >
+                <Link href="/vehicles" className="ox-btn ox-btn-gold ox-quick-btn">
                   <Car size={16} />
                   {copy.shortcuts.devVehicleStock}
                 </Link>
 
-                <Link
-                  href="/users"
-                  className="ox-btn ox-btn-ghost"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    fontSize: "0.85rem",
-                    padding: "0.55rem 1rem",
-                    borderRadius: 8,
-                  }}
-                >
+                <Link href="/users" className="ox-btn ox-btn-ghost ox-quick-btn">
                   <Users size={16} color="var(--brand)" />
                   {copy.shortcuts.devUsersRoles}
                 </Link>
 
-                <Link
-                  href="/invoices"
-                  className="ox-btn ox-btn-ghost"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    fontSize: "0.85rem",
-                    padding: "0.55rem 1rem",
-                    borderRadius: 8,
-                  }}
-                >
+                <Link href="/invoices" className="ox-btn ox-btn-ghost ox-quick-btn">
                   <CreditCard size={16} color="#10b981" />
                   {copy.shortcuts.devBillingFinance}
                 </Link>
 
-                <Link
-                  href="/workshop"
-                  className="ox-btn ox-btn-ghost"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    fontSize: "0.85rem",
-                    padding: "0.55rem 1rem",
-                    borderRadius: 8,
-                  }}
-                >
+                <Link href="/workshop" className="ox-btn ox-btn-ghost ox-quick-btn">
                   <Wrench size={16} color="#f59e0b" />
                   {copy.shortcuts.devWorkshop}
                 </Link>
 
-                <Link
-                  href="/mailbox"
-                  className="ox-btn ox-btn-ghost"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    fontSize: "0.85rem",
-                    padding: "0.55rem 1rem",
-                    borderRadius: 8,
-                  }}
-                >
+                <Link href="/mailbox" className="ox-btn ox-btn-ghost ox-quick-btn">
                   <Mail size={16} color="var(--brand)" />
                   {copy.shortcuts.devMailbox}
                 </Link>
               </>
             ) : (
               <>
-                <Link
-                  href="/quotes"
-                  className="ox-btn"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    background: "linear-gradient(135deg, var(--gold) 0%, #b89130 100%)",
-                    color: "#0a1622",
-                    fontWeight: 700,
-                    fontSize: "0.85rem",
-                    padding: "0.55rem 1rem",
-                    borderRadius: 8,
-                  }}
-                >
+                <Link href="/quotes" className="ox-btn ox-btn-gold ox-quick-btn">
                   <Plus size={16} />
                   {copy.shortcuts.salesNewQuote}
                 </Link>
 
-                <Link
-                  href="/invoices"
-                  className="ox-btn ox-btn-ghost"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    fontSize: "0.85rem",
-                    padding: "0.55rem 1rem",
-                    borderRadius: 8,
-                  }}
-                >
+                <Link href="/invoices" className="ox-btn ox-btn-ghost ox-quick-btn">
                   <CreditCard size={16} color="#10b981" />
                   {copy.shortcuts.salesPaymentsInvoices}
                 </Link>
 
-                <Link
-                  href="/terminal"
-                  className="ox-btn ox-btn-ghost"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    fontSize: "0.85rem",
-                    padding: "0.55rem 1rem",
-                    borderRadius: 8,
-                  }}
-                >
+                <Link href="/terminal" className="ox-btn ox-btn-ghost ox-quick-btn">
                   <Zap size={16} color="#38bdf8" />
                   {copy.shortcuts.salesTerminal}
                 </Link>
 
-                <Link
-                  href="/mailbox"
-                  className="ox-btn ox-btn-ghost"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    fontSize: "0.85rem",
-                    padding: "0.55rem 1rem",
-                    borderRadius: 8,
-                  }}
-                >
+                <Link href="/mailbox" className="ox-btn ox-btn-ghost ox-quick-btn">
                   <Mail size={16} color="var(--brand)" />
                   {copy.shortcuts.salesMailbox}
                 </Link>
@@ -503,136 +358,66 @@ export default async function DashboardPage() {
         </div>
 
         {/* 4 Indicateurs Financiers Clés */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))",
-            gap: "1rem",
-          }}
-        >
-          <div
-            className="ox-glass"
-            style={{
-              padding: "1.2rem 1.35rem",
-              borderRadius: 12,
-              borderLeft: "4px solid #38bdf8",
-              display: "flex",
-              flexDirection: "column",
-              gap: 6,
-            }}
-          >
-            <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", textTransform: "uppercase", fontWeight: 600 }}>
-              {copy.kpi.totalInvoiced}
-            </div>
-            <div className="ox-metric-val" style={{ fontSize: "1.7rem" }}>
-              {formatXof(totalInvoicedTtc)}
-            </div>
-            <div style={{ fontSize: "0.75rem", color: "var(--ice-text-muted)" }}>
-              {copy.kpi.invoicedHint(activeInvoices.length)}
-            </div>
+        <div className="ox-kpi-grid">
+          <div className="ox-glass ox-kpi-card" style={cssVars({ "--kpi-accent": "#38bdf8" })}>
+            <div className="ox-kpi-label">{copy.kpi.totalInvoiced}</div>
+            <div className="ox-kpi-value">{formatXof(totalInvoicedTtc)}</div>
+            <div className="ox-kpi-hint">{copy.kpi.invoicedHint(activeInvoices.length)}</div>
           </div>
 
           <div
-            className="ox-glass"
-            style={{
-              padding: "1.2rem 1.35rem",
-              borderRadius: 12,
-              borderLeft: "4px solid #10b981",
-              display: "flex",
-              flexDirection: "column",
-              gap: 6,
-            }}
+            className="ox-glass ox-kpi-card"
+            style={cssVars({
+              "--kpi-accent": "#10b981",
+              "--kpi-value-color": "#10b981",
+              "--kpi-hint-color": "#10b981",
+            })}
           >
-            <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", textTransform: "uppercase", fontWeight: 600 }}>
-              {copy.kpi.totalCollected}
-            </div>
-            <div style={{ fontSize: "1.7rem", fontWeight: 800, color: "#10b981" }}>
-              {formatXof(totalCollected)}
-            </div>
-            <div style={{ fontSize: "0.75rem", color: "#10b981", fontWeight: 600 }}>
+            <div className="ox-kpi-label">{copy.kpi.totalCollected}</div>
+            <div className="ox-kpi-value">{formatXof(totalCollected)}</div>
+            <div className="ox-kpi-hint" style={{ fontWeight: 600 }}>
               {copy.kpi.collectedHint}
             </div>
           </div>
 
           <div
-            className="ox-glass"
-            style={{
-              padding: "1.2rem 1.35rem",
-              borderRadius: 12,
-              borderLeft: "4px solid var(--gold)",
-              display: "flex",
-              flexDirection: "column",
-              gap: 6,
-            }}
+            className="ox-glass ox-kpi-card"
+            style={cssVars({
+              "--kpi-accent": "var(--gold)",
+              "--kpi-value-color": totalOutstanding > 0 ? "var(--gold)" : "#10b981",
+            })}
           >
-            <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", textTransform: "uppercase", fontWeight: 600 }}>
-              {copy.kpi.outstanding}
-            </div>
-            <div style={{ fontSize: "1.7rem", fontWeight: 800, color: totalOutstanding > 0 ? "var(--gold)" : "#10b981" }}>
-              {formatXof(totalOutstanding)}
-            </div>
-            <div style={{ fontSize: "0.75rem", color: "var(--ice-text-muted)" }}>
-              {copy.kpi.outstandingHint(overdueCount)}
-            </div>
+            <div className="ox-kpi-label">{copy.kpi.outstanding}</div>
+            <div className="ox-kpi-value">{formatXof(totalOutstanding)}</div>
+            <div className="ox-kpi-hint">{copy.kpi.outstandingHint(overdueCount)}</div>
           </div>
 
           <div
-            className="ox-glass"
-            style={{
-              padding: "1.2rem 1.35rem",
-              borderRadius: 12,
-              borderLeft: "4px solid #a855f7",
-              display: "flex",
-              flexDirection: "column",
-              gap: 6,
-            }}
+            className="ox-glass ox-kpi-card"
+            style={cssVars({
+              "--kpi-accent": "#a855f7",
+              "--kpi-value-color": "#a855f7",
+              "--kpi-hint-color": "var(--gold)",
+            })}
           >
-            <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", textTransform: "uppercase", fontWeight: 600 }}>
-              {copy.kpi.quotesPipeline}
-            </div>
-            <div style={{ fontSize: "1.7rem", fontWeight: 800, color: "#a855f7" }}>
-              {formatXof(potentialRevenue)}
-            </div>
-            <div style={{ fontSize: "0.75rem", color: "var(--gold)", fontWeight: 600 }}>
+            <div className="ox-kpi-label">{copy.kpi.quotesPipeline}</div>
+            <div className="ox-kpi-value">{formatXof(potentialRevenue)}</div>
+            <div className="ox-kpi-hint" style={{ fontWeight: 600 }}>
               {copy.kpi.confirmedRevenue(formatXof(confirmedRevenue))}
             </div>
           </div>
         </div>
 
         {/* Stock Général CARZONE — Pipeline Logistique & Magasin */}
-        <div
-          className="ox-glass"
-          style={{
-            padding: "1.1rem 1.35rem",
-            borderRadius: 14,
-            border: "1px solid rgba(255, 255, 255, 0.08)",
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.85rem",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 34,
-                  height: 34,
-                  borderRadius: 8,
-                  background: "linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(56, 189, 248, 0.05) 100%)",
-                  border: "1px solid rgba(56, 189, 248, 0.3)",
-                  color: "#38bdf8",
-                }}
-              >
+        <div className="ox-glass ox-stock-card">
+          <div className="ox-stock-header">
+            <div className="ox-stock-header-left">
+              <span className="ox-stock-icon">
                 <Layers size={18} />
               </span>
-              <div>
-                <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 750, color: "var(--ice-text-strong)" }}>
-                  {copy.stock.title}
-                </h3>
-                <div style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", marginTop: 2 }}>
+              <div className="ox-stock-title-block">
+                <h3 className="ox-stock-title">{copy.stock.title}</h3>
+                <div className="ox-stock-meta">
                   {copy.stock.inventoryLabel}{" "}
                   <strong style={{ color: "#fff" }}>{copy.stock.vehicleCount(totalStockCount)}</strong>
                   {" · "}
@@ -642,32 +427,14 @@ export default async function DashboardPage() {
               </div>
             </div>
 
-            <Link
-              href="/vehicles"
-              className="ox-btn ox-btn-ghost"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: "0.8rem",
-                padding: "0.45rem 0.85rem",
-                borderRadius: 8,
-                color: "var(--brand)",
-              }}
-            >
+            <Link href="/vehicles" className="ox-btn ox-btn-ghost ox-stock-view-btn">
               {copy.stock.viewInventory}
               <ArrowRight size={14} />
             </Link>
           </div>
 
           {/* 5 Stages Grid */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 180px), 1fr))",
-              gap: "0.75rem",
-            }}
-          >
+          <div className="ox-stock-stages-grid">
             {STOCK_PIPELINE_STAGES.map((stg) => {
               const Icon = stg.icon;
               const stats = stockStageStats[stg.key] || { count: 0, totalXof: 0 };
@@ -677,50 +444,27 @@ export default async function DashboardPage() {
                 <Link
                   key={stg.key}
                   href={`/vehicles?stage=${stg.key}`}
-                  style={{
-                    textDecoration: "none",
-                    color: "inherit",
-                    background: stg.bg,
-                    border: `1px solid ${stg.border}`,
-                    borderRadius: 10,
-                    padding: "0.85rem 1rem",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 6,
-                    transition: "transform 0.15s ease, border-color 0.15s ease",
-                  }}
+                  className="ox-stock-stage"
+                  style={cssVars({
+                    "--stage-bg": stg.bg,
+                    "--stage-border": stg.border,
+                    "--stage-color": stg.color,
+                  })}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.8rem", fontWeight: 650, color: stg.color }}>
+                  <div className="ox-stock-stage-top">
+                    <div className="ox-stock-stage-label">
                       <Icon size={15} />
                       <span>{stg.label}</span>
                     </div>
-                    <span
-                      style={{
-                        fontSize: "0.7rem",
-                        fontWeight: 700,
-                        padding: "1px 6px",
-                        borderRadius: 999,
-                        background: "rgba(0,0,0,0.3)",
-                        color: stg.color,
-                      }}
-                    >
-                      {percent}%
-                    </span>
+                    <span className="ox-stock-stage-badge">{percent}%</span>
                   </div>
 
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                    <div style={{ fontSize: "1.35rem", fontWeight: 800, color: "#fff" }}>
-                      {stats.count}
-                    </div>
-                    <span style={{ fontSize: "0.75rem", color: "var(--ice-text-muted)" }}>
-                      {copy.stock.vehicleUnit(stats.count)}
-                    </span>
+                  <div className="ox-stock-stage-count-row">
+                    <div className="ox-stock-stage-count">{stats.count}</div>
+                    <span className="ox-stock-stage-unit">{copy.stock.vehicleUnit(stats.count)}</span>
                   </div>
 
-                  <div style={{ fontSize: "0.76rem", fontWeight: 650, color: "var(--gold)" }}>
-                    {formatXof(stats.totalXof)}
-                  </div>
+                  <div className="ox-stock-stage-value">{formatXof(stats.totalXof)}</div>
                 </Link>
               );
             })}
@@ -731,81 +475,67 @@ export default async function DashboardPage() {
         <ExecutiveDashboardCharts analytics={analytics} />
 
         {/* 5 Indicateurs Opérationnels (Stock, Clients, Bornes, SAV, Chantiers) */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))",
-            gap: "0.85rem",
-          }}
-        >
-          <div className="ox-glass" style={{ padding: "0.9rem 1.1rem", borderRadius: 10 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 550 }}>
+        <div className="ox-ops-grid">
+          <div className="ox-glass ox-ops-card">
+            <div className="ox-ops-label">
               <Car size={16} color="var(--brand)" />
               <span>{copy.ops.evInStock}</span>
             </div>
-            <div className="ox-metric-val" style={{ fontSize: "1.35rem", marginTop: 4 }}>
+            <div className="ox-metric-val ox-ops-value">
               {vehiclesInStock}{" "}
-              <span style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", fontWeight: 400 }}>
-                {copy.ops.atSea(vehiclesInTransit)}
-              </span>
+              <span className="ox-ops-value-hint">{copy.ops.atSea(vehiclesInTransit)}</span>
             </div>
           </div>
 
-          <div className="ox-glass" style={{ padding: "0.9rem 1.1rem", borderRadius: 10 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 550 }}>
+          <div className="ox-glass ox-ops-card">
+            <div className="ox-ops-label">
               <Users size={16} color="var(--gold)" />
               <span>{copy.ops.clientsLeads}</span>
             </div>
-            <div className="ox-metric-val" style={{ fontSize: "1.35rem", marginTop: 4 }}>
+            <div className="ox-metric-val ox-ops-value">
               {customersCount}{" "}
-              <span style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", fontWeight: 400 }}>
-                {copy.ops.leadsHint(leadsCount)}
-              </span>
+              <span className="ox-ops-value-hint">{copy.ops.leadsHint(leadsCount)}</span>
             </div>
           </div>
 
-          <div className="ox-glass" style={{ padding: "0.9rem 1.1rem", borderRadius: 10 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 550 }}>
+          <div className="ox-glass ox-ops-card">
+            <div className="ox-ops-label">
               <Zap size={16} color="#10b981" />
               <span>{copy.ops.publicCharging}</span>
             </div>
-            <div className="ox-metric-val" style={{ fontSize: "1.35rem", marginTop: 4 }}>
+            <div className="ox-metric-val ox-ops-value">
               {chargingStats._count.id}{" "}
-              <span style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", fontWeight: 400 }}>
+              <span className="ox-ops-value-hint">
                 ({Math.round(chargingStats._sum.kwhDelivered || 0)} kWh)
               </span>
             </div>
           </div>
 
-          <div className="ox-glass" style={{ padding: "0.9rem 1.1rem", borderRadius: 10 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 550 }}>
+          <div className="ox-glass ox-ops-card">
+            <div className="ox-ops-label">
               <ShieldCheck size={16} color="#38bdf8" />
               <span>{copy.ops.chargerSites}</span>
             </div>
-            <div className="ox-metric-val" style={{ fontSize: "1.35rem", marginTop: 4 }}>
+            <div className="ox-metric-val ox-ops-value">
               {chargeRequestsCount}{" "}
-              <span style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", fontWeight: 400 }}>
-                {copy.ops.inProgress}
-              </span>
+              <span className="ox-ops-value-hint">{copy.ops.inProgress}</span>
             </div>
           </div>
 
-          <div className="ox-glass" style={{ padding: "0.9rem 1.1rem", borderRadius: 10 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 550 }}>
+          <div className="ox-glass ox-ops-card">
+            <div className="ox-ops-label">
               <Wrench size={16} color="#f59e0b" />
               <span>{copy.ops.workshop}</span>
             </div>
-            <div className="ox-metric-val" style={{ fontSize: "1.35rem", marginTop: 4 }}>
+            <div className="ox-metric-val ox-ops-value">
               {openTasksCount}{" "}
-              <span style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", fontWeight: 400 }}>
-                {copy.ops.openOrders}
-              </span>
+              <span className="ox-ops-value-hint">{copy.ops.openOrders}</span>
             </div>
           </div>
         </div>
 
         {/* 2 Colonnes Compactes : Derniers Règlements Encaissés & Factures Récentes */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))", gap: "1rem" }}>
+        <div className="ox-two-col-grid">
           {/* Colonne 1 : Derniers Règlements Encaissés (Taille Réduite) */}
           <div
             className="ox-glass"
@@ -817,14 +547,14 @@ export default async function DashboardPage() {
               gap: "0.6rem",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0 }}>
                 <CreditCard size={16} color="#10b981" />
                 <h3 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "var(--ice-text-strong)" }}>
                   {copy.payments.title}
                 </h3>
               </div>
-              <Link href="/invoices" style={{ fontSize: "0.78rem", color: "var(--brand)", textDecoration: "none", fontWeight: 600 }}>
+              <Link href="/invoices" style={{ fontSize: "0.78rem", color: "var(--brand)", textDecoration: "none", fontWeight: 600, flexShrink: 0 }}>
                 {copy.payments.viewAll} →
               </Link>
             </div>
@@ -837,15 +567,15 @@ export default async function DashboardPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {recentPayments.map((p) => (
                   <div key={p.id} className="ox-card-row" style={{ padding: "0.45rem 0.65rem" }}>
-                    <div>
-                      <div style={{ fontWeight: 650, fontSize: "0.84rem", color: "var(--ice-text-strong)" }}>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontWeight: 650, fontSize: "0.84rem", color: "var(--ice-text-strong)", overflowWrap: "anywhere" }}>
                         {p.invoice.customer.contactName}
                       </div>
-                      <div style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)", marginTop: 1 }}>
+                      <div style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)", marginTop: 1, overflowWrap: "anywhere" }}>
                         {copy.formatDate(p.paidAt)} · {copy.invoices.invoiceWord} {p.invoice.number} · {p.method}
                       </div>
                     </div>
-                    <div style={{ textAlign: "right" }}>
+                    <div className="ox-card-row-amount">
                       <div style={{ fontWeight: 800, color: "#10b981", fontSize: "0.88rem" }}>
                         +{formatXof(p.amountXof)}
                       </div>
@@ -874,14 +604,14 @@ export default async function DashboardPage() {
               gap: "0.6rem",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0 }}>
                 <FileCheck size={16} color="var(--brand)" />
                 <h3 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "var(--ice-text-strong)" }}>
                   {copy.invoices.title}
                 </h3>
               </div>
-              <Link href="/invoices" style={{ fontSize: "0.78rem", color: "var(--brand)", textDecoration: "none", fontWeight: 600 }}>
+              <Link href="/invoices" style={{ fontSize: "0.78rem", color: "var(--brand)", textDecoration: "none", fontWeight: 600, flexShrink: 0 }}>
                 {copy.invoices.manage} →
               </Link>
             </div>
@@ -897,7 +627,7 @@ export default async function DashboardPage() {
 
                   return (
                     <div key={inv.id} className="ox-card-row" style={{ padding: "0.45rem 0.65rem" }}>
-                      <div>
+                      <div style={{ minWidth: 0 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                           <span style={{ fontWeight: 700, fontSize: "0.84rem", color: "var(--ice-text-strong)" }}>
                             {inv.number}
@@ -917,11 +647,11 @@ export default async function DashboardPage() {
                             {copy.invoiceStatus(inv.status)}
                           </Badge>
                         </div>
-                        <div style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)", marginTop: 1 }}>
+                        <div style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)", marginTop: 1, overflowWrap: "anywhere" }}>
                           {copy.formatDate(inv.createdAt)} · {copy.invoices.dueLabel} {copy.formatDate(inv.dueDate)}
                         </div>
                       </div>
-                      <div style={{ textAlign: "right" }}>
+                      <div className="ox-card-row-amount">
                         <div style={{ fontWeight: 750, fontSize: "0.88rem", color: "var(--ice-text-strong)" }}>
                           {formatXof(inv.totalXof)}
                         </div>

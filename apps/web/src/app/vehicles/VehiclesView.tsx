@@ -863,6 +863,26 @@ export function VehiclesView({
                             >
                               <Edit2 size={13} />
                             </button>
+                            {canDelete && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setDeleteError(null);
+                                  setForceDeleteText("");
+                                  setDeletingVehicle(v);
+                                }}
+                                title={copy.table.deleteTitle}
+                                style={{
+                                  background: "none",
+                                  border: "none",
+                                  color: "#f87171",
+                                  cursor: "pointer",
+                                  padding: "2px",
+                                }}
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            )}
                             <Link
                               href={`/vehicles/${v.id}/fiche-technique`}
                               title={

@@ -23,6 +23,10 @@ type EditLine = {
   quantity: number;
   unitPriceXof: number;
   vehicleId?: string | null;
+  lineType?: string | null;
+  partItemId?: string | null;
+  laborHours?: number | null;
+  unitLabel?: string | null;
 };
 
 export function QuoteEditorModal({
@@ -76,6 +80,10 @@ export function QuoteEditorModal({
       quantity: l.quantity,
       unitPriceXof: l.unitPriceXof,
       vehicleId: l.vehicleId || null,
+      lineType: l.lineType || null,
+      partItemId: l.partItemId || null,
+      laborHours: l.laborHours ?? null,
+      unitLabel: l.unitLabel || null,
     }))
   );
 
@@ -241,6 +249,10 @@ export function QuoteEditorModal({
             quantity: Number(l.quantity) || 1,
             unitPriceXof: Number(l.unitPriceXof) || 0,
             vehicleId: l.vehicleId || null,
+            lineType: l.lineType || (l.vehicleId ? "VEHICLE" : "FREE"),
+            partItemId: l.partItemId || null,
+            laborHours: l.laborHours ?? null,
+            unitLabel: l.unitLabel || null,
           })),
         });
         onClose();

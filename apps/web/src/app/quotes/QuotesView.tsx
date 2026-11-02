@@ -77,6 +77,10 @@ export type QuoteItem = {
     quantity: number;
     unitPriceXof: number;
     vehicleId?: string | null;
+    lineType?: string | null;
+    partItemId?: string | null;
+    laborHours?: number | null;
+    unitLabel?: string | null;
     vehicle?: {
       brand: string;
       model: string;

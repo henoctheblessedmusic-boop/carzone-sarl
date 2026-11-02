@@ -163,6 +163,10 @@ export default async function QuotesPage() {
       quantity: l.quantity,
       unitPriceXof: l.unitPriceXof,
       vehicleId: l.vehicleId,
+      lineType: l.lineType,
+      partItemId: l.partItemId,
+      laborHours: l.laborHours,
+      unitLabel: l.unitLabel,
       vehicle: l.vehicle
         ? {
             brand: l.vehicle.brand,

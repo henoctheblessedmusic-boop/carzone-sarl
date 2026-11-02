@@ -71,6 +71,12 @@ export type PartOption = {
   taxRatePct: number;
 };
 
+export type VehicleBrandOption = {
+  id: string;
+  name: string;
+  models: Array<{ id: string; name: string }>;
+};
+
 export type OpportunityOption = {
   id: string;
   title: string;
@@ -94,6 +100,7 @@ export function QuoteCreator({
   articles,
   vehicles,
   parts = [],
+  vehicleBrands = [],
   opportunities,
   scope = "SHOWROOM",
   onCreated,
@@ -102,6 +109,7 @@ export function QuoteCreator({
   articles: ArticleOption[];
   vehicles: VehicleOption[];
   parts?: PartOption[];
+  vehicleBrands?: VehicleBrandOption[];
   opportunities: OpportunityOption[];
   scope?: "SHOWROOM" | "GARAGE";
   onCreated?: () => void;
@@ -495,6 +503,11 @@ export function QuoteCreator({
       return;
     }
 
+    if (isGarageScope && !vehicleImmatriculation.trim()) {
+      setError("Renseignez l'immatriculation du véhicule client avant de créer la proforma garage.");
+      return;
+    }
+
     const validLines = lines.filter((l) => l.description.trim().length > 0 && l.unitPriceXof >= 0);
     if (validLines.length === 0) {
       setError(copy.creator.errors.lineRequired);
@@ -816,21 +829,47 @@ export function QuoteCreator({
                     </label>
                     <label style={{ display: "grid", gap: 3, fontSize: "0.76rem" }}>
                       Marque
-                      <input
-                        className="ox-input"
+                      <select
+                        className="ox-select"
                         value={vehicleBrand}
-                        onChange={(e) => setVehicleBrand(e.target.value)}
-                        placeholder="Toyota, Changan…"
-                      />
+                        onChange={(e) => {
+                          setVehicleBrand(e.target.value);
+                          setVehicleModel("");
+                        }}
+                      >
+                        <option value="">— Choisir une marque —</option>
+                        {vehicleBrand &&
+                          !vehicleBrands.some((brand) => brand.name === vehicleBrand) && (
+                            <option value={vehicleBrand}>{vehicleBrand}</option>
+                          )}
+                        {vehicleBrands.map((brand) => (
+                          <option key={brand.id} value={brand.name}>
+                            {brand.name}
+                          </option>
+                        ))}
+                      </select>
                     </label>
                     <label style={{ display: "grid", gap: 3, fontSize: "0.76rem" }}>
                       Modèle
-                      <input
-                        className="ox-input"
+                      <select
+                        className="ox-select"
                         value={vehicleModel}
                         onChange={(e) => setVehicleModel(e.target.value)}
-                        placeholder="Corolla, CS35…"
-                      />
+                        disabled={!vehicleBrand}
+                      >
+                        <option value="">— Choisir un modèle —</option>
+                        {vehicleModel &&
+                          !(vehicleBrands.find((brand) => brand.name === vehicleBrand)?.models ?? []).some(
+                            (model) => model.name === vehicleModel
+                          ) && <option value={vehicleModel}>{vehicleModel}</option>}
+                        {(vehicleBrands.find((brand) => brand.name === vehicleBrand)?.models ?? []).map(
+                          (model) => (
+                            <option key={model.id} value={model.name}>
+                              {model.name}
+                            </option>
+                          )
+                        )}
+                      </select>
                     </label>
                     <label style={{ display: "grid", gap: 3, fontSize: "0.76rem" }}>
                       VIN / Châssis

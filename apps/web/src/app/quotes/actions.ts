@@ -35,11 +35,23 @@ export async function createProformaWithLines(payload: {
   customCgv?: string | null;
   discountType?: DiscountType;
   discountValue?: number;
+  garageVehicle?: {
+    immatriculation?: string | null;
+    vin?: string | null;
+    brand?: string | null;
+    model?: string | null;
+    mileage?: number | null;
+    diagnostic?: string | null;
+  } | null;
   lines: Array<{
     description: string;
     quantity: number;
     unitPriceXof: number;
     vehicleId?: string | null;
+    lineType?: string | null;
+    partItemId?: string | null;
+    laborHours?: number | null;
+    unitLabel?: string | null;
   }>;
 }) {
   const user = await requireUser([
@@ -71,6 +83,7 @@ export async function createProformaWithLines(payload: {
     customCgv,
     discountType = "NONE",
     discountValue = 0,
+    garageVehicle = null,
     lines,
   } = payload;
   const copy = quotesCopy[await getLocale()];
@@ -83,6 +96,31 @@ export async function createProformaWithLines(payload: {
     }
     if (opportunityId) {
       throw new Error("Une proforma garage ne peut pas être liée à une opportunité commerciale showroom.");
+    }
+    if (!garageVehicle?.immatriculation?.trim()) {
+      throw new Error("L'immatriculation du véhicule client est obligatoire pour une proforma garage.");
+    }
+  }
+  if (
+    activity === ACTIVITY.SHOWROOM &&
+    lines.some((l) => l.lineType === "LABOR" || l.lineType === "PART")
+  ) {
+    throw new Error("Les lignes main-d'œuvre et pièces détachées sont réservées aux proformas garage.");
+  }
+  const allowedLineTypes = new Set(["ARTICLE", "LABOR", "PART", "VEHICLE", "FREE"]);
+  for (const line of lines) {
+    if (line.lineType && !allowedLineTypes.has(line.lineType)) {
+      throw new Error("Type de ligne de devis invalide.");
+    }
+    if (line.partItemId) {
+      const part = await prisma.partItem.findUnique({
+        where: { id: line.partItemId },
+        select: { id: true, active: true },
+      });
+      if (!part || !part.active) throw new Error("Pièce détachée introuvable ou inactive.");
+    }
+    if (line.laborHours != null && (!Number.isFinite(line.laborHours) || line.laborHours <= 0)) {
+      throw new Error("Nombre d'heures de main-d'œuvre invalide.");
     }
   }
 
@@ -123,6 +161,15 @@ export async function createProformaWithLines(payload: {
       status: "BROUILLON",
       docKind: "PROFORMA",
       activity,
+      vehicleImmatriculation: garageVehicle?.immatriculation?.trim() || null,
+      vehicleVin: garageVehicle?.vin?.trim() || null,
+      vehicleBrand: garageVehicle?.brand?.trim() || null,
+      vehicleModel: garageVehicle?.model?.trim() || null,
+      vehicleMileage:
+        garageVehicle?.mileage != null && Number.isFinite(garageVehicle.mileage)
+          ? Math.max(0, Math.trunc(garageVehicle.mileage))
+          : null,
+      vehicleDiagnostic: garageVehicle?.diagnostic?.trim() || null,
       taxMode,
       taxRatePct,
       subtotalHtXof: totals.subtotalHtXof,
@@ -138,6 +185,10 @@ export async function createProformaWithLines(payload: {
           quantity: l.quantity,
           unitPriceXof: l.unitPriceXof,
           vehicleId: l.vehicleId || null,
+          lineType: l.lineType || (l.vehicleId ? "VEHICLE" : "FREE"),
+          partItemId: l.partItemId || null,
+          laborHours: l.laborHours ?? null,
+          unitLabel: l.unitLabel || null,
         })),
       },
     },
@@ -460,6 +511,10 @@ export async function updateProformaWithLines(payload: {
     quantity: number;
     unitPriceXof: number;
     vehicleId?: string | null;
+    lineType?: string | null;
+    partItemId?: string | null;
+    laborHours?: number | null;
+    unitLabel?: string | null;
   }>;
 }) {
   const user = await requireUser([
@@ -572,6 +627,10 @@ export async function updateProformaWithLines(payload: {
           quantity: l.quantity,
           unitPriceXof: l.unitPriceXof,
           vehicleId: l.vehicleId || null,
+          lineType: l.lineType || (l.vehicleId ? "VEHICLE" : "FREE"),
+          partItemId: l.partItemId || null,
+          laborHours: l.laborHours ?? null,
+          unitLabel: l.unitLabel || null,
         })),
       },
     },

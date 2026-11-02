@@ -59,6 +59,18 @@ export type VehicleOption = {
   status?: string | null;
 };
 
+export type PartOption = {
+  id: string;
+  partNumber: string;
+  oemNumber?: string | null;
+  name: string;
+  category?: string | null;
+  unit?: string | null;
+  stockQuantity: number;
+  sellingPriceXof: number;
+  taxRatePct: number;
+};
+
 export type OpportunityOption = {
   id: string;
   title: string;
@@ -71,12 +83,17 @@ type FormLine = {
   quantity: number;
   unitPriceXof: number;
   vehicleId?: string | null;
+  lineType?: "ARTICLE" | "LABOR" | "PART" | "VEHICLE" | "FREE";
+  partItemId?: string | null;
+  laborHours?: number | null;
+  unitLabel?: string | null;
 };
 
 export function QuoteCreator({
   customers,
   articles,
   vehicles,
+  parts = [],
   opportunities,
   scope = "SHOWROOM",
   onCreated,
@@ -84,6 +101,7 @@ export function QuoteCreator({
   customers: CustomerOption[];
   articles: ArticleOption[];
   vehicles: VehicleOption[];
+  parts?: PartOption[];
   opportunities: OpportunityOption[];
   scope?: "SHOWROOM" | "GARAGE";
   onCreated?: () => void;
@@ -135,6 +153,19 @@ export function QuoteCreator({
   // Stratégie Commerciale / Remise
   const [discountType, setDiscountType] = useState<DiscountType>("NONE");
   const [discountValue, setDiscountValue] = useState<number>(0);
+
+  // Garage / atelier : véhicule client et estimateur main-d'œuvre + pièces
+  const [vehicleImmatriculation, setVehicleImmatriculation] = useState("");
+  const [vehicleVin, setVehicleVin] = useState("");
+  const [vehicleBrand, setVehicleBrand] = useState("");
+  const [vehicleModel, setVehicleModel] = useState("");
+  const [vehicleMileage, setVehicleMileage] = useState("");
+  const [vehicleDiagnostic, setVehicleDiagnostic] = useState("");
+  const [selectedPartId, setSelectedPartId] = useState("");
+  const [showLaborForm, setShowLaborForm] = useState(false);
+  const [laborDescription, setLaborDescription] = useState("");
+  const [laborHours, setLaborHours] = useState("1");
+  const [laborRate, setLaborRate] = useState("10000");
 
   // Staged item for customizing quantity and unit price before insertion
   type StagedItem = {
@@ -269,8 +300,12 @@ export function QuoteCreator({
     unitPriceXof: number;
     vehicleId?: string | null;
     title?: string;
+    lineType?: FormLine["lineType"];
+    partItemId?: string | null;
+    laborHours?: number | null;
+    unitLabel?: string | null;
   }) {
-    const { description, quantity, unitPriceXof, vehicleId, title } = params;
+    const { description, quantity, unitPriceXof, vehicleId, title, lineType, partItemId, laborHours, unitLabel } = params;
     const cleanDesc = description.trim();
 
     setLines((prev) => {
@@ -310,10 +345,64 @@ export function QuoteCreator({
             quantity: quantity || 1,
             unitPriceXof: unitPriceXof || 0,
             vehicleId: vehicleId || null,
+            lineType: lineType || (vehicleId ? "VEHICLE" : "FREE"),
+            partItemId: partItemId || null,
+            laborHours: laborHours ?? null,
+            unitLabel: unitLabel || null,
           },
         ];
       }
     });
+  }
+
+  function handleSelectPart(partId: string) {
+    if (!partId) return;
+    const part = parts.find((p) => p.id === partId);
+    if (!part) return;
+    const description = `[${part.partNumber}] ${part.name}${
+      part.oemNumber ? ` · OEM ${part.oemNumber}` : ""
+    }`;
+    addOrIncrementLine({
+      description,
+      quantity: 1,
+      unitPriceXof: part.sellingPriceXof,
+      title: part.name,
+      lineType: "PART",
+      partItemId: part.id,
+      unitLabel: part.unit || "PIECE",
+    });
+    setSelectedPartId("");
+  }
+
+  function handleAddLabor() {
+    const hours = Number(laborHours);
+    const rate = Number(laborRate);
+    if (!laborDescription.trim()) {
+      setError("Décrivez l'opération de main-d'œuvre (ex. remplacement plaquettes avant).");
+      return;
+    }
+    if (!Number.isFinite(hours) || hours <= 0) {
+      setError("Le nombre d'heures de main-d'œuvre doit être supérieur à 0.");
+      return;
+    }
+    if (!Number.isFinite(rate) || rate < 0) {
+      setError("Le taux horaire est invalide.");
+      return;
+    }
+    const total = Math.round(hours * rate);
+    addOrIncrementLine({
+      description: `Main-d'œuvre — ${laborDescription.trim()} (${hours} h × ${formatXof(rate)}/h)`,
+      quantity: 1,
+      unitPriceXof: total,
+      title: "Main-d'œuvre",
+      lineType: "LABOR",
+      laborHours: hours,
+      unitLabel: "h",
+    });
+    setLaborDescription("");
+    setLaborHours("1");
+    setShowLaborForm(false);
+    setError(null);
   }
 
   function handleSelectArticle(articleId: string) {
@@ -426,11 +515,25 @@ export function QuoteCreator({
           customCgv: isCgvCustomized ? customCgvText : null,
           discountType,
           discountValue,
+          garageVehicle: isGarageScope
+            ? {
+                immatriculation: vehicleImmatriculation.trim() || null,
+                vin: vehicleVin.trim() || null,
+                brand: vehicleBrand.trim() || null,
+                model: vehicleModel.trim() || null,
+                mileage: vehicleMileage ? Number(vehicleMileage) : null,
+                diagnostic: vehicleDiagnostic.trim() || null,
+              }
+            : null,
           lines: validLines.map((l) => ({
             description: l.description.trim(),
             quantity: Number(l.quantity) || 1,
             unitPriceXof: Number(l.unitPriceXof) || 0,
             vehicleId: l.vehicleId || null,
+            lineType: l.lineType || (l.vehicleId ? "VEHICLE" : "FREE"),
+            partItemId: l.partItemId || null,
+            laborHours: l.laborHours ?? null,
+            unitLabel: l.unitLabel || null,
           })),
         });
         resetForm();
@@ -680,6 +783,88 @@ export function QuoteCreator({
                 </div>
               )}
 
+              {isGarageScope && (
+                <div
+                  style={{
+                    padding: "0.75rem 0.9rem",
+                    borderRadius: 10,
+                    border: "1px solid rgba(56, 189, 248, 0.3)",
+                    background: "rgba(56, 189, 248, 0.06)",
+                    display: "grid",
+                    gap: 10,
+                  }}
+                >
+                  <strong style={{ fontSize: "0.86rem", color: "#7dd3fc" }}>
+                    Véhicule client — dossier atelier
+                  </strong>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))",
+                      gap: 8,
+                    }}
+                  >
+                    <label style={{ display: "grid", gap: 3, fontSize: "0.76rem" }}>
+                      Immatriculation *
+                      <input
+                        className="ox-input"
+                        value={vehicleImmatriculation}
+                        onChange={(e) => setVehicleImmatriculation(e.target.value)}
+                        placeholder="Ex. AB 1234 RB"
+                        required={isGarageScope}
+                      />
+                    </label>
+                    <label style={{ display: "grid", gap: 3, fontSize: "0.76rem" }}>
+                      Marque
+                      <input
+                        className="ox-input"
+                        value={vehicleBrand}
+                        onChange={(e) => setVehicleBrand(e.target.value)}
+                        placeholder="Toyota, Changan…"
+                      />
+                    </label>
+                    <label style={{ display: "grid", gap: 3, fontSize: "0.76rem" }}>
+                      Modèle
+                      <input
+                        className="ox-input"
+                        value={vehicleModel}
+                        onChange={(e) => setVehicleModel(e.target.value)}
+                        placeholder="Corolla, CS35…"
+                      />
+                    </label>
+                    <label style={{ display: "grid", gap: 3, fontSize: "0.76rem" }}>
+                      VIN / Châssis
+                      <input
+                        className="ox-input"
+                        value={vehicleVin}
+                        onChange={(e) => setVehicleVin(e.target.value)}
+                        placeholder="Numéro de châssis"
+                      />
+                    </label>
+                    <label style={{ display: "grid", gap: 3, fontSize: "0.76rem" }}>
+                      Kilométrage
+                      <input
+                        type="number"
+                        min={0}
+                        className="ox-input"
+                        value={vehicleMileage}
+                        onChange={(e) => setVehicleMileage(e.target.value)}
+                        placeholder="Ex. 45000"
+                      />
+                    </label>
+                    <label style={{ display: "grid", gap: 3, fontSize: "0.76rem" }}>
+                      Panne / motif
+                      <input
+                        className="ox-input"
+                        value={vehicleDiagnostic}
+                        onChange={(e) => setVehicleDiagnostic(e.target.value)}
+                        placeholder="Ex. bruit freinage avant"
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
+
               {/* Ligne 2 : Base fiscale, TVA, Validité */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 140px), 1fr))", gap: "0.75rem" }}>
                 <div>
@@ -780,6 +965,37 @@ export function QuoteCreator({
                   ))}
                 </select>
 
+                {isGarageScope && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setShowLaborForm((prev) => !prev)}
+                      className="ox-btn ox-btn-ghost"
+                      style={{ width: "100%", fontSize: "0.83rem", border: "1px dashed rgba(52,211,153,0.5)" }}
+                      disabled={isPending}
+                    >
+                      + Main-d&apos;œuvre (heures × taux)
+                    </button>
+                    <select
+                      className="ox-select"
+                      style={{ width: "100%", fontSize: "0.83rem" }}
+                      value={selectedPartId}
+                      onChange={(e) => {
+                        setSelectedPartId(e.target.value);
+                        if (e.target.value) handleSelectPart(e.target.value);
+                      }}
+                      disabled={isPending}
+                    >
+                      <option value="">+ Pièce détachée du stock…</option>
+                      {parts.map((part) => (
+                        <option key={part.id} value={part.id}>
+                          [{part.partNumber}] {part.name} · {formatXof(part.sellingPriceXof)} · stock {part.stockQuantity}
+                        </option>
+                      ))}
+                    </select>
+                  </>
+                )}
+
                 {!isGarageScope && (
                   <select
                     className="ox-select"
@@ -817,6 +1033,73 @@ export function QuoteCreator({
                   </select>
                 )}
               </div>
+
+              {isGarageScope && showLaborForm && (
+                <div
+                  style={{
+                    background: "rgba(16, 185, 129, 0.06)",
+                    border: "1px solid rgba(52, 211, 153, 0.35)",
+                    borderRadius: 8,
+                    padding: "0.8rem 1rem",
+                    display: "grid",
+                    gap: 8,
+                  }}
+                >
+                  <strong style={{ fontSize: "0.84rem", color: "#6ee7b7" }}>
+                    Ligne de main-d&apos;œuvre
+                  </strong>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,160px),1fr))", gap: 8 }}>
+                    <label style={{ display: "grid", gap: 3, fontSize: "0.76rem" }}>
+                      Opération / prestation
+                      <input
+                        className="ox-input"
+                        value={laborDescription}
+                        onChange={(e) => setLaborDescription(e.target.value)}
+                        placeholder="Ex. Remplacement plaquettes avant"
+                      />
+                    </label>
+                    <label style={{ display: "grid", gap: 3, fontSize: "0.76rem" }}>
+                      Heures
+                      <input
+                        type="number"
+                        min={0.25}
+                        step={0.25}
+                        className="ox-input"
+                        value={laborHours}
+                        onChange={(e) => setLaborHours(e.target.value)}
+                      />
+                    </label>
+                    <label style={{ display: "grid", gap: 3, fontSize: "0.76rem" }}>
+                      Taux horaire (FCFA)
+                      <input
+                        type="number"
+                        min={0}
+                        step={500}
+                        className="ox-input"
+                        value={laborRate}
+                        onChange={(e) => setLaborRate(e.target.value)}
+                      />
+                    </label>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: "0.8rem", opacity: 0.8 }}>
+                      Total main-d&apos;œuvre :{" "}
+                      <strong style={{ color: "#6ee7b7" }}>
+                        {formatXof(Math.round((Number(laborHours) || 0) * (Number(laborRate) || 0)))}
+                      </strong>
+                    </span>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button type="button" className="ox-btn ox-btn-ghost" onClick={() => setShowLaborForm(false)}>
+                        Annuler
+                      </button>
+                      <button type="button" className="ox-btn" onClick={handleAddLabor}>
+                        <Check size={14} style={{ marginRight: 4 }} />
+                        Ajouter la main-d&apos;œuvre
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Panneau de Personnalisation Immédiate (Quantité & Prix Négocié) */}
               {stagedItem && (

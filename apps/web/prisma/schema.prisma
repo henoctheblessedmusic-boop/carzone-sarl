@@ -254,6 +254,13 @@ model Quote {
   docKind          String       @default("PROFORMA")
   /// SHOWROOM | GARAGE — périmètre comptable (comptabilité séparée)
   activity         String       @default("SHOWROOM")
+  /// Véhicule client pour une proforma garage/atelier (le garage ne vend pas le stock showroom).
+  vehicleImmatriculation String?
+  vehicleVin       String?
+  vehicleBrand     String?
+  vehicleModel     String?
+  vehicleMileage   Int?
+  vehicleDiagnostic String?
   customerId       String
   customer         Customer     @relation(fields: [customerId], references: [id])
   opportunityId    String?
@@ -295,8 +302,14 @@ model QuoteLine {
   description  String
   quantity     Int      @default(1)
   unitPriceXof Int
+  /// ARTICLE | LABOR | PART | VEHICLE | FREE — nature de la ligne (estimateur garage).
+  lineType     String   @default("ARTICLE")
+  laborHours   Float?
+  unitLabel    String?
   vehicleId    String?
   vehicle      Vehicle? @relation(fields: [vehicleId], references: [id])
+  partItemId   String?
+  partItem     PartItem? @relation(fields: [partItemId], references: [id])
 }
 
 model Invoice {
@@ -962,6 +975,7 @@ model PartItem {
   movements        PartStockMovement[]
   workOrderUsages  WorkOrderPartUsage[]
   deliveryNoteLines DeliveryNoteLine[]
+  quoteLines       QuoteLine[]
 }
 
 /// Références croisées (cross-references) : correspondances entre constructeurs et équipementiers

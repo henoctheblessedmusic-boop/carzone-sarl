@@ -42,6 +42,7 @@ import {
   type CustomerOption,
   type ArticleOption,
   type VehicleOption,
+  type PartOption,
   type OpportunityOption,
 } from "./QuoteCreator";
 import { QuoteEditorModal } from "./QuoteEditorModal";
@@ -97,6 +98,7 @@ export function QuotesView({
   customers,
   articles,
   vehicles,
+  parts = [],
   opportunities,
   userRole,
   scope,
@@ -105,6 +107,7 @@ export function QuotesView({
   customers: CustomerOption[];
   articles: ArticleOption[];
   vehicles: VehicleOption[];
+  parts?: PartOption[];
   opportunities: OpportunityOption[];
   userRole: string;
   scope: "SHOWROOM" | "GARAGE";
@@ -458,6 +461,7 @@ export function QuotesView({
           customers={customers}
           articles={articles}
           vehicles={vehicles}
+          parts={parts}
           opportunities={opportunities}
           scope={scope}
         />

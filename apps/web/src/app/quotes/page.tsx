@@ -25,7 +25,7 @@ export default async function QuotesPage() {
   const isGarageScope = scope === ACTIVITY.GARAGE;
   const customerScopeFilter = customerScopeFilterForRole(user.role);
 
-  const [rawQuotes, customers, articles, vehicles, opps] = await Promise.all([
+  const [rawQuotes, customers, articles, vehicles, opps, parts] = await Promise.all([
     prisma.quote.findMany({
       where: user.role === "COMPTA_GARAGE" ? { activity: ACTIVITY.GARAGE } : undefined,
       include: {
@@ -98,6 +98,23 @@ export default async function QuotesPage() {
             customerId: true,
           },
         }),
+    isGarageScope
+      ? prisma.partItem.findMany({
+          where: { active: true },
+          orderBy: [{ category: "asc" }, { name: "asc" }],
+          select: {
+            id: true,
+            partNumber: true,
+            oemNumber: true,
+            name: true,
+            category: true,
+            unit: true,
+            stockQuantity: true,
+            sellingPriceXof: true,
+            taxRatePct: true,
+          },
+        })
+      : Promise.resolve([]),
   ]);
 
   // Trier les véhicules pour que le Stock Showroom apparaisse en premier, puis Au Port, En Transit, etc.
@@ -174,6 +191,7 @@ export default async function QuotesPage() {
         customers={customers}
         articles={articles}
         vehicles={sortedVehicles}
+        parts={parts}
         opportunities={opps}
         userRole={user.role}
         scope={scope}

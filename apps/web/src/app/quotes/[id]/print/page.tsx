@@ -178,6 +178,46 @@ export default async function QuotePrintPage({
           </div>
         </div>
 
+        {quote.activity === "GARAGE" &&
+          (quote.vehicleImmatriculation ||
+            quote.vehicleBrand ||
+            quote.vehicleModel ||
+            quote.vehicleVin) && (
+            <div
+              style={{
+                border: "1px solid #c5d8e4",
+                borderRadius: 8,
+                padding: "0.75rem 1rem",
+                marginBottom: "1.25rem",
+                background: "#f4f8fb",
+                fontSize: "0.9rem",
+              }}
+            >
+              <strong style={{ display: "block", marginBottom: 4 }}>
+                Véhicule client — dossier atelier
+              </strong>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem 1.5rem" }}>
+                {quote.vehicleImmatriculation && (
+                  <span><strong>Immatriculation :</strong> {quote.vehicleImmatriculation}</span>
+                )}
+                {(quote.vehicleBrand || quote.vehicleModel) && (
+                  <span>
+                    <strong>Véhicule :</strong> {quote.vehicleBrand || ""} {quote.vehicleModel || ""}
+                  </span>
+                )}
+                {quote.vehicleVin && <span><strong>VIN / Châssis :</strong> {quote.vehicleVin}</span>}
+                {quote.vehicleMileage != null && (
+                  <span><strong>Kilométrage :</strong> {quote.vehicleMileage.toLocaleString("fr-FR")} km</span>
+                )}
+              </div>
+              {quote.vehicleDiagnostic && (
+                <div style={{ marginTop: 4 }}>
+                  <strong>Panne / motif :</strong> {quote.vehicleDiagnostic}
+                </div>
+              )}
+            </div>
+          )}
+
         <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "1.25rem" }}>
           <thead>
             <tr style={{ background: "#eef5f9" }}>

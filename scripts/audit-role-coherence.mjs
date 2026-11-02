@@ -187,19 +187,9 @@ function main() {
     }
   }
 
-  // Incohérences résiduelles connues (hors scope de cette passe, cf. memory
-  // "carzone-rbac-architecture") : signalées en WARN pour rester visibles sans
-  // bloquer la vérification, car leur correction toucherait d'autres rôles que
-  // ceux demandés par le client (COMPTA_GARAGE / rôles essentiels garage).
-  warnings.push(
-    "/catalog n'autorise que [\"DG\",\"STOCK\"] alors que le menu liste ADV, RF, RTA, DC, ADMIN (drift pré-existant, hors scope)."
-  );
-  warnings.push(
-    "/imports n'autorise que [\"DG\",\"STOCK\",\"COMPTA\"] alors que le menu liste ADV, RF, ADMIN (drift pré-existant, hors scope)."
-  );
-  warnings.push(
-    "/opportunities et /leads excluent ADV, RF, DC malgré le menu (drift pré-existant, hors scope)."
-  );
+  // Les anciennes dérives menu/page (/catalog, /imports, /opportunities, /leads)
+  // ont été corrigées en alignant le menu sur les gardes réelles ; elles sont
+  // désormais couvertes par audit-navigation.mjs (rôles menu <-> requireUser).
 
   console.log(`Modules analysés : ${MODULES.length}`);
   console.log(`Rôles essentiels vérifiés : ${ESSENTIAL_ROLES.join(", ")}`);

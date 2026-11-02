@@ -28,6 +28,7 @@ export const fr: Messages = {
     rentals: "Location",
     fleet: "Flotte",
     workshop: "Atelier",
+    garageSupervision: "Supervision garage",
     parts: "Pièces & Références",
     imports: "Import",
     installers: "Installateurs bornes",

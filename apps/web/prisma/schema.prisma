@@ -642,6 +642,16 @@ model WorkshopEntry {
   technicianName         String?    // Nom du technicien assigné
   workshopManagerName    String?    // Responsable Atelier
 
+  // Supervision garage / coûts d'intervention (validés par la Comptable Garage)
+  interventionType       String?    @default("REPARATION") // ENTRETIEN | REPARATION | DIAGNOSTIC | CARROSSERIE | MOTEUR | AUTRE
+  laborCostXof           Int        @default(0) // Main-d'œuvre interne
+  partsCostXof           Int        @default(0) // Pièces détachées
+  otherCostXof           Int        @default(0) // Sous-traitance / divers
+  costNotes              String?
+  costStatus             String     @default("BROUILLON") // BROUILLON | A_VALIDER | VALIDE
+  costApprovedBy         String?
+  costApprovedAt         DateTime?
+
   customerId             String?
   customer               Customer?  @relation(fields: [customerId], references: [id])
   vehicleId              String?

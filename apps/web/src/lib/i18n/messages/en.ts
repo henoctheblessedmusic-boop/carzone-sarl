@@ -28,6 +28,7 @@ export const en: Messages = {
     rentals: "Rentals",
     fleet: "Fleet",
     workshop: "Workshop",
+    garageSupervision: "Garage supervision",
     parts: "Parts & cross-ref",
     imports: "Imports",
     installers: "Charger installers",

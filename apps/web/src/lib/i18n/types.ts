@@ -20,6 +20,7 @@ export type Messages = {
     rentals: string;
     fleet: string;
     workshop: string;
+    garageSupervision?: string;
     parts?: string;
     imports: string;
     installers: string;

@@ -447,6 +447,14 @@ export class RoleService {
     if (pathname.startsWith("/expenses")) {
       return role === "COMPTA" || role === "ASSISTANTE_COMPTABLE" || role === "RH" || role === "ADMIN" || this.hasPermission(role, "expenses:read");
     }
+    if (pathname.startsWith("/garage-supervision")) {
+      return (
+        role === "COMPTA_GARAGE" ||
+        role === "COMPTA" ||
+        role === "CHEF_ATELIER" ||
+        role === "ADMIN"
+      );
+    }
     if (pathname.startsWith("/delivery-notes")) {
       return role === "COMPTA" || role === "COMPTA_GARAGE" || role === "ADMIN";
     }

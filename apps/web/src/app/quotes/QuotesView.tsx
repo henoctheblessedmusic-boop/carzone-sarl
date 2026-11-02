@@ -17,6 +17,8 @@ import {
   Lock,
   Tag,
   Trash2,
+  ArrowRightLeft,
+  Truck,
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
 import {
@@ -43,6 +45,7 @@ import {
   type OpportunityOption,
 } from "./QuoteCreator";
 import { QuoteEditorModal } from "./QuoteEditorModal";
+import { TranscribeQuoteModal } from "./TranscribeQuoteModal";
 
 export type QuoteItem = {
   id: string;
@@ -84,6 +87,9 @@ export type QuoteItem = {
     number: string;
     status: string;
   } | null;
+  transcribedAt?: string | null;
+  transcriptionMode?: string | null;
+  deliveryNotes?: Array<{ id: string; number: string; status: string }>;
 };
 
 export function QuotesView({
@@ -124,6 +130,7 @@ export function QuotesView({
   const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [transcribeTarget, setTranscribeTarget] = useState<QuoteItem | null>(null);
 
   async function handleDeleteQuote(id: string, number: string) {
     if (!window.confirm(copy.list.actions.deleteConfirm(number))) {
@@ -183,6 +190,26 @@ export function QuotesView({
     userRole === "ASSISTANTE_COMPTABLE" ||
     userRole === "COMMERCIAL" ||
     userRole === "ADMIN";
+
+  // Transcription (BL interne / facture normalisée) : réservée aux rôles qui gèrent les BL
+  // (cf. lib/permissions.ts peutGererBL). La Comptable Garage ne transcrit que le périmètre GARAGE.
+  // Doit rester le reflet exact de peutGererBL() dans lib/permissions.ts : ADMIN n'y figure
+  // pas (seuls les super-admins DEVELOPER/DG/PDG/SG et la Comptabilité ont des droits BL).
+  const canTranscribeRole =
+    userRole === "DEVELOPER" ||
+    userRole === "DG" ||
+    userRole === "PDG" ||
+    userRole === "SG" ||
+    userRole === "COMPTA" ||
+    userRole === "COMPTA_GARAGE";
+
+  function canTranscribeQuote(q: QuoteItem): boolean {
+    if (!canTranscribeRole) return false;
+    if (userRole === "COMPTA_GARAGE" && q.activity !== "GARAGE") return false;
+    if (q.status === "ANNULEE_INTERNE" || q.status === "FACTURE_NORMALISEE") return false;
+    if (q.invoice || q.transcribedAt) return false;
+    return true;
+  }
 
   // KPIs
   const totalCount = quotes.length;
@@ -776,6 +803,41 @@ export function QuotesView({
                             </form>
                           )}
 
+                          {/* Transcription en BL interne ou facture normalisée */}
+                          {canTranscribeQuote(q) && (
+                            <button
+                              type="button"
+                              onClick={() => setTranscribeTarget(q)}
+                              className="ox-btn ox-btn-sm"
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: 4,
+                                background: "rgba(56, 189, 248, 0.15)",
+                                color: "#38bdf8",
+                                border: "1px solid rgba(56, 189, 248, 0.35)",
+                              }}
+                              title="Transcrire en BL interne ou en facture normalisée"
+                            >
+                              <ArrowRightLeft size={13} />
+                              Transcrire
+                            </button>
+                          )}
+
+                          {/* BL interne issu d'une transcription */}
+                          {q.transcriptionMode === "BL_INTERNE" && q.deliveryNotes && q.deliveryNotes[0] && (
+                            <Link
+                              href={`/delivery-notes/${q.deliveryNotes[0].id}/print`}
+                              target="_blank"
+                              className="ox-btn ox-btn-ghost ox-btn-sm"
+                              style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
+                              title="Imprimer le BL interne"
+                            >
+                              <Truck size={13} />
+                              BL
+                            </Link>
+                          )}
+
                           {/* Annulation interne pour DG/Compta */}
                           {canVoid && canStaffVoid(q.status) && (
                             <button
@@ -1145,6 +1207,14 @@ export function QuotesView({
           </div>
         </div>,
         document.body
+      )}
+
+      {/* Modale de transcription en BL interne / facture normalisée */}
+      {transcribeTarget && mounted && (
+        <TranscribeQuoteModal
+          quote={transcribeTarget}
+          onClose={() => setTranscribeTarget(null)}
+        />
       )}
 
       {/* Modal d'édition d'une proforma */}

@@ -73,3 +73,35 @@ Tout différend n'ayant pu trouver de solution amiable sera porté devant le Tri
 export function getDefaultCgv(type: CgvType = "VEHICULE"): string {
   return type === "ATELIER" ? DEFAULT_CGV_ATELIER : DEFAULT_CGV_VEHICULE;
 }
+
+/**
+ * Contrat de garantie adossé à la facture normalisée (remplace les CGV sur ce document).
+ * Ne fixe aucune durée ni couverture chiffrée : la garantie effective reste celle du
+ * constructeur / des CGV CARZONE en vigueur, référencées sans être réécrites ici.
+ */
+export function getDefaultWarrantyContract(type: CgvType = "VEHICULE"): string {
+  const scope =
+    type === "ATELIER"
+      ? "les prestations réalisées et les pièces remplacées lors de l'intervention à l'Atelier SAV CARZONE SARL"
+      : "le véhicule neuf ou garanti livré par CARZONE SARL";
+
+  return `CONTRAT DE GARANTIE · CARZONE SARL (COTONOU, BÉNIN)
+
+ARTICLE 1 : OBJET
+Le présent contrat de garantie s'applique à ${scope} et complète la facture normalisée à laquelle il est adossé. Il se substitue, sur ce document, aux fiches techniques et annexes de la proforma, déjà communiquées au client lors de l'établissement du devis.
+
+ARTICLE 2 : ÉTENDUE ET DURÉE DE LA GARANTIE
+L'étendue et la durée de la garantie (kilométrage, pièces et composants couverts) sont celles prévues par les conditions constructeur en vigueur pour le véhicule ou la prestation concernée, telles que communiquées au client dans la documentation constructeur, le carnet d'entretien ou les Conditions Générales de Vente CARZONE SARL applicables à la date de facturation. CARZONE SARL ne délivre, par le présent contrat, aucune garantie d'une durée ou d'une couverture supérieure à celle fixée par le constructeur ou par ses propres conditions générales en vigueur.
+
+ARTICLE 3 : OBLIGATIONS DU CLIENT
+Le client s'engage à respecter les préconisations d'entretien, de recharge (pour les véhicules électriques ou hybrides) et d'utilisation normale du bien, et à faire réaliser tout entretien périodique auprès d'un réseau agréé CARZONE SARL ou constructeur. Le carnet d'entretien et les factures d'entretien correspondantes doivent être conservés et présentés à l'appui de toute demande de prise en charge sous garantie.
+
+ARTICLE 4 : EXCLUSIONS
+Sont exclus de la présente garantie : les dommages résultant d'un accident, d'une mauvaise utilisation, d'une modification non agréée, d'une intervention par un tiers non certifié, l'usure normale des pièces d'usure (plaquettes, pneumatiques, balais d'essuie-glace, batterie 12V, filtres), ainsi que tout défaut d'entretien aux échéances prévues par le constructeur.
+
+ARTICLE 5 : MISE EN ŒUVRE ET CONTACT SAV
+Toute demande de prise en charge sous garantie doit être adressée à l'Atelier SAV CARZONE SARL (Zone Maro-Militaire, Gbèdomidji, Cotonou · +229 01 92 61 61 61 · contact@topcarzone.com), accompagnée de la facture normalisée et du carnet d'entretien. CARZONE SARL statue sur la recevabilité de la demande après diagnostic contradictoire.
+
+ARTICLE 6 : JURIDICTION COMPÉTENTE
+Le présent contrat est régi par le droit béninois. Tout litige relatif à son interprétation ou à son exécution sera soumis, à défaut d'accord amiable, au Tribunal de Commerce de Cotonou.`;
+}

@@ -8,6 +8,8 @@ import { prisma } from "@/lib/prisma";
 import { getServerMessages } from "@/lib/i18n/server";
 import { invoicesCopy } from "@/lib/i18n/messages/invoices";
 import { ACTIVITY } from "@/lib/permissions";
+import { formatXof } from "@/lib/format";
+import { SITE_WEBSITE, SITE_EMAILS } from "@/lib/site-constants";
 
 export async function addPayment(formData: FormData) {
   const user = await requireUser([
@@ -135,4 +137,99 @@ export async function certifyInvoiceDgi(formData: FormData): Promise<void> {
   await certifyInvoiceWithMecef(invoiceId);
   revalidatePath("/invoices");
   revalidatePath(`/invoices/${invoiceId}/print`);
+}
+
+/**
+ * Enregistre l'envoi de la facture (et du BL interne lié, si présent) comme un message
+ * dans la boîte Mail de l'application. Le logiciel n'a pas de SMTP réel : rien n'est
+ * transmis à un serveur de messagerie externe, le message reste consultable dans /mailbox.
+ */
+export async function sendInvoiceEmail(formData: FormData) {
+  const user = await requireUser([
+    "PDG",
+    "SG",
+    "DG",
+    "ADV",
+    "RF",
+    "COMMERCIAL",
+    "HOTESSE",
+    "CHEF_ATELIER",
+    "ASSISTANTE_COMPTABLE",
+    "COMPTA",
+    "COMPTA_GARAGE",
+    "ADMIN",
+  ]);
+
+  const invoiceId = String(formData.get("invoiceId") || "");
+  if (!invoiceId) throw new Error("Facture requise.");
+
+  const invoice = await prisma.invoice.findUniqueOrThrow({
+    where: { id: invoiceId },
+    include: { customer: true, deliveryNotes: { where: { status: "EMIS" }, take: 1 } },
+  });
+
+  if (user.role === "COMPTA_GARAGE" && invoice.activity !== ACTIVITY.GARAGE) {
+    throw new Error("La Comptable Garage ne peut envoyer que des factures du périmètre GARAGE.");
+  }
+
+  const emailTo = String(formData.get("emailTo") || "").trim() || invoice.customer.email || null;
+  if (!emailTo) throw new Error("Aucune adresse e-mail de destination.");
+
+  const customSubject = String(formData.get("subject") || "").trim();
+  const customBody = String(formData.get("body") || "").trim();
+  const now = new Date();
+
+  const deliveryNote = invoice.deliveryNotes[0] || null;
+  const invoiceUrl = `${SITE_WEBSITE}/invoices/${invoice.id}/print`;
+  const deliveryNoteUrl = deliveryNote ? `${SITE_WEBSITE}/delivery-notes/${deliveryNote.id}/print` : null;
+
+  const finalSubject =
+    customSubject ||
+    `Facture ${invoice.number}${deliveryNote ? ` et bon de livraison ${deliveryNote.number}` : ""} · CARZONE SARL`;
+
+  const deliveryNoteLine =
+    deliveryNote && deliveryNoteUrl
+      ? `Lien d'impression du bon de livraison interne ${deliveryNote.number} : ${deliveryNoteUrl}\n`
+      : "";
+
+  const defaultBody = `Bonjour ${invoice.customer.contactName},
+
+Veuillez trouver ci-joint votre facture normalisée ${invoice.number}, d'un montant total de ${formatXof(invoice.totalXof)}.
+
+Lien d'impression de la facture : ${invoiceUrl}
+${deliveryNoteLine}
+Restant à votre entière disposition,
+L'équipe CARZONE SARL
+Showroom Zone Maro-Militaire, Gbèdomidji · Cotonou, Bénin`;
+
+  const finalBody = customBody || defaultBody;
+
+  await prisma.mailMessage.create({
+    data: {
+      folder: "SENT",
+      from: SITE_EMAILS.contact,
+      to: emailTo,
+      subject: finalSubject,
+      snippet: finalBody.slice(0, 120).replace(/\n/g, " ") + "...",
+      body: finalBody,
+      isRead: true,
+      customerId: invoice.customerId,
+      invoiceId: invoice.id,
+    },
+  });
+
+  await prisma.invoice.update({
+    where: { id: invoiceId },
+    data: {
+      notes: [
+        invoice.notes,
+        `${now.toISOString()} · Envoi facture par e-mail vers ${emailTo} par ${user.fullName}`,
+      ]
+        .filter(Boolean)
+        .join("\n"),
+    },
+  });
+
+  revalidatePath("/invoices");
+  revalidatePath("/mailbox");
 }

@@ -271,6 +271,10 @@ model Quote {
   cancelledAt      DateTime?
   cancelledByName  String?
   auditNotes       String?
+  /// Date de transcription en BL interne ou facture normalisée (flux de transcription proforma).
+  transcribedAt      DateTime?
+  /// BL_INTERNE | FACTURE_NORMALISEE — mode de transcription choisi.
+  transcriptionMode  String?
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
   lines            QuoteLine[]

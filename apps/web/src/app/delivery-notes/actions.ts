@@ -21,17 +21,15 @@ const DELIVERY_NOTE_ROLES = [
 /** Statuts véhicule qui interdisent tout nouveau déstockage (déjà sorti du parc vendable). */
 const VEHICLE_NON_VENDABLE_STATUSES = ["VENDU", "ARCHIVE"] as const;
 
-const lineSchema = z
-  .object({
-    description: z.string().min(1, "Description requise"),
-    quantity: z.number().int().min(1).default(1),
-    unitPriceXof: z.number().int().min(0).nullish(),
-    vehicleId: z.string().nullish(),
-    partItemId: z.string().nullish(),
-  })
-  .refine((l) => Boolean(l.vehicleId) || Boolean(l.partItemId), {
-    message: "Chaque ligne doit référencer un véhicule ou une pièce.",
-  });
+// Une ligne sans vehicleId ni partItemId est acceptée : c'est une ligne informative
+// (prestation, service) transcrite depuis un devis, sans mouvement de stock associé.
+const lineSchema = z.object({
+  description: z.string().min(1, "Description requise"),
+  quantity: z.number().int().min(1).default(1),
+  unitPriceXof: z.number().int().min(0).nullish(),
+  vehicleId: z.string().nullish(),
+  partItemId: z.string().nullish(),
+});
 
 const createSchema = z.object({
   activity: z.enum([ACTIVITY.SHOWROOM, ACTIVITY.GARAGE]),

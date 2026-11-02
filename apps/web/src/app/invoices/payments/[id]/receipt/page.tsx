@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/require-user";
+import { ACTIVITY } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { formatXof } from "@/lib/format";
 import { getServerMessages } from "@/lib/i18n/server";
@@ -16,7 +17,7 @@ export default async function PaymentReceiptPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireUser(["DG", "COMMERCIAL", "COMPTA"]);
+  const user = await requireUser(["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE"]);
   const { locale } = await getServerMessages();
   const copy = invoicesCopy[locale];
   const { id } = await params;
@@ -34,6 +35,7 @@ export default async function PaymentReceiptPage({
   });
 
   if (!payment) notFound();
+  if (user.role === "COMPTA_GARAGE" && payment.invoice.activity !== ACTIVITY.GARAGE) notFound();
 
   const invoice = payment.invoice;
   const regNumber = `REG-${new Date(payment.paidAt).getFullYear()}-${payment.id.slice(-4).toUpperCase()}`;

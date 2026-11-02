@@ -262,6 +262,21 @@ export type InvoicesCopy = {
       readApproved: string;
       signStamp: string;
     };
+    warranty: {
+      title: string;
+      subtitle: (number: string) => string;
+      company: string;
+      companyAddress: string;
+      vehicleBlockTitle: string;
+      vehicleUnknown: string;
+      invoiceRefLabel: string;
+      forCompany: string;
+      salesDirection: string;
+      forClient: string;
+      readApproved: string;
+      signStamp: string;
+      placeDateLabel: string;
+    };
   };
   receipt: {
     back: string;
@@ -572,6 +587,21 @@ const fr: InvoicesCopy = {
       forClient: "Pour le client :",
       readApproved: "« Lu et approuvé, bon pour accord »",
       signStamp: "Signature et cachet du client",
+    },
+    warranty: {
+      title: "CONTRAT DE GARANTIE",
+      subtitle: (number) => `Adossé à la facture normalisée n° ${number}`,
+      company: "CARZONE SARL (showroom et mobilité)",
+      companyAddress: "Zone Maro-Militaire, quartier Gbèdomidji · Cotonou",
+      vehicleBlockTitle: "Véhicule concerné",
+      vehicleUnknown: "Non applicable (prestation sans véhicule identifié)",
+      invoiceRefLabel: "Facture n°",
+      forCompany: "Pour CARZONE SARL Bénin :",
+      salesDirection: "Atelier SAV / Direction commerciale, signature et cachet",
+      forClient: "Pour le client :",
+      readApproved: "« Lu et approuvé, bon pour accord »",
+      signStamp: "Signature et cachet du client",
+      placeDateLabel: "Fait à Cotonou, le",
     },
   },
   receipt: {
@@ -896,6 +926,21 @@ const en: InvoicesCopy = {
       readApproved: "“Read and approved, good for agreement”",
       signStamp: "Client signature and stamp",
     },
+    warranty: {
+      title: "WARRANTY CONTRACT",
+      subtitle: (number) => `Attached to normalised invoice no. ${number}`,
+      company: "CARZONE SARL (showroom and mobility)",
+      companyAddress: "Zone Maro-Militaire, Gbèdomidji district · Cotonou",
+      vehicleBlockTitle: "Vehicle concerned",
+      vehicleUnknown: "Not applicable (service with no identified vehicle)",
+      invoiceRefLabel: "Invoice no.",
+      forCompany: "For CARZONE SARL Benin:",
+      salesDirection: "Aftersales workshop / Sales management, signature and stamp",
+      forClient: "For the client:",
+      readApproved: "“Read and approved, good for agreement”",
+      signStamp: "Client signature and stamp",
+      placeDateLabel: "Done in Cotonou, on",
+    },
   },
   receipt: {
     back: "← Back to invoices and payments",
@@ -1208,6 +1253,21 @@ const zh: InvoicesCopy = {
       forClient: "客户方:",
       readApproved: "「已阅读并同意,确认成交」",
       signStamp: "客户签字与盖章",
+    },
+    warranty: {
+      title: "质保合同",
+      subtitle: (number) => `附于正式发票 ${number}`,
+      company: "CARZONE SARL(展厅与出行)",
+      companyAddress: "Zone Maro-Militaire,Gbèdomidji 区 · 科托努",
+      vehicleBlockTitle: "相关车辆",
+      vehicleUnknown: "不适用(无关联车辆的服务)",
+      invoiceRefLabel: "发票号",
+      forCompany: "CARZONE SARL 贝宁:",
+      salesDirection: "售后维修部 / 销售部,签字与盖章",
+      forClient: "客户方:",
+      readApproved: "「已阅读并同意,确认成交」",
+      signStamp: "客户签字与盖章",
+      placeDateLabel: "订立于科托努,日期:",
     },
   },
   receipt: {

@@ -19,7 +19,9 @@ import {
   encodeDiscountInNotes,
   type DiscountType,
 } from "@/lib/quote-discount";
-import { ACTIVITY } from "@/lib/permissions";
+import { ACTIVITY, peutGererBL, type Activity } from "@/lib/permissions";
+import { certifyInvoiceWithMecef } from "@/lib/dgi-emecef";
+import { createAndIssueDeliveryNote } from "../delivery-notes/actions";
 
 export async function createProformaWithLines(payload: {
   customerId: string;
@@ -473,5 +475,205 @@ export async function updateProformaWithLines(payload: {
   revalidatePath("/quotes");
   revalidatePath(`/clients/${customerId}`);
   return updated.id;
+}
+
+export type TranscribeQuoteResult = {
+  mode: "BL_INTERNE" | "FACTURE_NORMALISEE";
+  invoiceId?: string;
+  invoiceNumber?: string;
+  certificationFailed?: boolean;
+  certificationMessage?: string;
+  deliveryNoteId: string | null;
+  deliveryNoteNumber: string | null;
+  deliveryNoteError: string | null;
+};
+
+/**
+ * Transcrit une proforma en BL interne (déstockage non fiscal) ou en facture normalisée
+ * (certification e-MECeF + BL interne lié créés automatiquement). Opération unique par
+ * devis : bloquée si une facture ou un BL existe déjà, ou si le devis est déjà transcrit.
+ */
+export async function transcribeQuote(formData: FormData): Promise<TranscribeQuoteResult> {
+  const user = await requireUser([
+    "PDG",
+    "SG",
+    "DG",
+    "ADV",
+    "RF",
+    "RTA",
+    "DC",
+    "COMMERCIAL",
+    "HOTESSE",
+    "CHEF_ATELIER",
+    "ASSISTANTE_COMPTABLE",
+    "COMPTA",
+    "COMPTA_GARAGE",
+    "ADMIN",
+  ]);
+
+  const id = String(formData.get("id") || "");
+  const mode = String(formData.get("mode") || "");
+  if (mode !== "BL_INTERNE" && mode !== "FACTURE_NORMALISEE") {
+    throw new Error("Mode de transcription invalide.");
+  }
+
+  const quote = await prisma.quote.findUniqueOrThrow({
+    where: { id },
+    include: { lines: true, invoice: true },
+  });
+
+  const activity = quote.activity as Activity;
+
+  if (user.role === "COMPTA_GARAGE" && activity !== ACTIVITY.GARAGE) {
+    throw new Error("La Comptable Garage ne peut transcrire que des proformas du périmètre GARAGE.");
+  }
+  if (!peutGererBL(user.role, activity)) {
+    throw new Error(
+      activity === ACTIVITY.GARAGE
+        ? "Seules la Comptable Garage, la Comptabilité ou la direction peuvent transcrire une proforma garage."
+        : "Seule la Comptabilité ou la direction peuvent transcrire une proforma showroom.",
+    );
+  }
+  if (quote.status === "ANNULEE_INTERNE") {
+    throw new Error("Cette proforma est annulée en interne : transcription impossible.");
+  }
+  if (quote.transcribedAt || quote.invoice) {
+    throw new Error("Cette proforma a déjà été transcrite.");
+  }
+  const existingNote = await prisma.deliveryNote.findFirst({ where: { quoteId: id } });
+  if (existingNote) {
+    throw new Error("Un bon de livraison existe déjà pour cette proforma.");
+  }
+
+  const deliveryLines = quote.lines.map((l) => ({
+    description: l.description,
+    quantity: l.quantity,
+    unitPriceXof: l.unitPriceXof as number | null,
+    vehicleId: l.vehicleId,
+    partItemId: null as string | null,
+  }));
+
+  const now = new Date();
+
+  if (mode === "BL_INTERNE") {
+    const note = await createAndIssueDeliveryNote({
+      activity,
+      customerId: quote.customerId,
+      quoteId: quote.id,
+      notes: `Transcription BL interne de la proforma ${quote.number}`,
+      lines: deliveryLines,
+    });
+
+    await prisma.quote.update({
+      where: { id },
+      data: {
+        transcribedAt: now,
+        transcriptionMode: "BL_INTERNE",
+        auditNotes: [
+          quote.auditNotes,
+          `${now.toISOString()} · Transcrite en BL interne ${note.number} par ${user.fullName}`,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      },
+    });
+
+    revalidatePath("/quotes");
+    revalidatePath("/delivery-notes");
+
+    return {
+      mode: "BL_INTERNE",
+      deliveryNoteId: note.id,
+      deliveryNoteNumber: note.number,
+      deliveryNoteError: null,
+    };
+  }
+
+  // Mode FACTURE_NORMALISEE
+  const invoiceCount = await prisma.invoice.count();
+  const invoice = await prisma.invoice.create({
+    data: {
+      number: nextDocNumber(activity === ACTIVITY.GARAGE ? "FAC-GAR" : "FAC", invoiceCount),
+      status: "ENVOYEE",
+      kind: "NORMALISEE",
+      activity,
+      isDemo: process.env.DGI_EMECEF_MODE === "DEMO",
+      certificationMode: process.env.DGI_EMECEF_MODE === "DEMO" ? "DEMO" : null,
+      customerId: quote.customerId,
+      quoteId: quote.id,
+      taxMode: quote.taxMode,
+      taxRatePct: quote.taxRatePct,
+      subtotalHtXof: quote.subtotalHtXof,
+      taxXof: quote.taxXof,
+      totalXof: quote.totalXof,
+      cgvType: quote.cgvType,
+      customCgv: quote.customCgv,
+      dueDate: new Date(Date.now() + 7 * 86400000),
+    },
+  });
+
+  let certificationFailed = false;
+  let certificationMessage = "Facture certifiée auprès de la DGI.";
+  try {
+    const result = await certifyInvoiceWithMecef(invoice.id);
+    certificationMessage = result.message;
+  } catch (err) {
+    certificationFailed = true;
+    certificationMessage =
+      err instanceof Error
+        ? err.message
+        : "La certification DGI a échoué. Réessayez depuis la page Factures.";
+  }
+
+  let deliveryNoteId: string | null = null;
+  let deliveryNoteNumber: string | null = null;
+  let deliveryNoteError: string | null = null;
+  try {
+    const note = await createAndIssueDeliveryNote({
+      activity,
+      customerId: quote.customerId,
+      quoteId: quote.id,
+      invoiceId: invoice.id,
+      notes: `BL interne généré automatiquement avec la facture ${invoice.number}`,
+      lines: deliveryLines,
+    });
+    deliveryNoteId = note.id;
+    deliveryNoteNumber = note.number;
+  } catch (err) {
+    deliveryNoteError =
+      err instanceof Error ? err.message : "La création du bon de livraison interne a échoué.";
+  }
+
+  await prisma.quote.update({
+    where: { id },
+    data: {
+      status: "FACTURE_NORMALISEE",
+      transcribedAt: now,
+      transcriptionMode: "FACTURE_NORMALISEE",
+      auditNotes: [
+        quote.auditNotes,
+        `${now.toISOString()} · Transcrite en facture normalisée ${invoice.number} par ${user.fullName}` +
+          (certificationFailed ? " (certification DGI en attente)" : "") +
+          (deliveryNoteError ? ` (BL interne non créé : ${deliveryNoteError})` : ""),
+      ]
+        .filter(Boolean)
+        .join("\n"),
+    },
+  });
+
+  revalidatePath("/quotes");
+  revalidatePath("/invoices");
+  revalidatePath("/delivery-notes");
+
+  return {
+    mode: "FACTURE_NORMALISEE",
+    invoiceId: invoice.id,
+    invoiceNumber: invoice.number,
+    certificationFailed,
+    certificationMessage,
+    deliveryNoteId,
+    deliveryNoteNumber,
+    deliveryNoteError,
+  };
 }
 

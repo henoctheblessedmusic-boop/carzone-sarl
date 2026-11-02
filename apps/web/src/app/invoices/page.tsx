@@ -41,6 +41,12 @@ export default async function InvoicesPage() {
           orderBy: { paidAt: "asc" },
         },
         quote: true,
+        deliveryNotes: {
+          where: { status: "EMIS" },
+          select: { id: true, number: true },
+          orderBy: { createdAt: "asc" },
+          take: 1,
+        },
       },
       orderBy: { createdAt: "desc" },
     }),
@@ -121,6 +127,9 @@ export default async function InvoicesPage() {
           id: inv.quote.id,
           number: inv.quote.number,
         }
+      : null,
+    deliveryNote: inv.deliveryNotes[0]
+      ? { id: inv.deliveryNotes[0].id, number: inv.deliveryNotes[0].number }
       : null,
     payments: inv.payments.map((p) => ({
       id: p.id,

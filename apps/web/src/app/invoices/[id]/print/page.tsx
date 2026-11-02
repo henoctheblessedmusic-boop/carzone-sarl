@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/require-user";
+import { ACTIVITY } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { formatXof } from "@/lib/format";
 import { getServerMessages } from "@/lib/i18n/server";
@@ -11,7 +12,7 @@ import {
   formatInvoiceDate,
 } from "@/lib/i18n/messages/invoices";
 import { PrintButton } from "@/components/PrintButton";
-import { getDefaultCgv, type CgvType } from "@/lib/cgv";
+import { getDefaultWarrantyContract, type CgvType } from "@/lib/cgv";
 import { formatLegalAmountNotice } from "@/lib/number-to-words-fr";
 
 export default async function InvoicePrintPage({
@@ -19,7 +20,7 @@ export default async function InvoicePrintPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireUser(["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE", "ADMIN"]);
+  const user = await requireUser(["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE", "ADMIN"]);
   const { locale } = await getServerMessages();
   const copy = invoicesCopy[locale];
   const { id } = await params;
@@ -40,11 +41,16 @@ export default async function InvoicePrintPage({
   });
 
   if (!invoice) notFound();
+  if (user.role === "COMPTA_GARAGE" && invoice.activity !== ACTIVITY.GARAGE) notFound();
 
   const totalPaid = invoice.payments.reduce((s, p) => s + p.amountXof, 0);
   const balanceDue = Math.max(0, invoice.totalXof - totalPaid);
   const cgvType = ((invoice.cgvType || invoice.quote?.cgvType || "VEHICULE") as CgvType);
-  const cgvContent = invoice.customCgv || invoice.quote?.customCgv || getDefaultCgv(cgvType);
+  // Le contrat de garantie remplace les CGV sur la facture normalisée : s'il existe un texte
+  // personnalisé (customCgv) saisi côté devis/facture, on le réutilise tel quel ; sinon on
+  // structure un contrat générique sans durée ni couverture chiffrée (voir lib/cgv.ts).
+  const warrantyContent = invoice.customCgv || invoice.quote?.customCgv || getDefaultWarrantyContract(cgvType);
+  const warrantyVehicle = invoice.quote?.lines.find((l) => l.vehicle)?.vehicle || null;
 
   return (
     <div
@@ -505,7 +511,7 @@ export default async function InvoicePrintPage({
         </footer>
       </article>
 
-      {/* PAGE 2 : CONDITIONS GÉNÉRALES DE VENTE ADOSSÉES */}
+      {/* PAGE 2 : CONTRAT DE GARANTIE (remplace les CGV et les fiches techniques sur la facture) */}
       <article
         style={{
           maxWidth: 820,
@@ -529,20 +535,57 @@ export default async function InvoicePrintPage({
         >
           <div>
             <div style={{ fontSize: "1.1rem", fontWeight: 700, letterSpacing: "0.02em" }}>
-              {copy.print.cgv.title}
+              {copy.print.warranty.title}
             </div>
             <div style={{ fontSize: "0.82rem", opacity: 0.7, marginTop: 2 }}>
-              {copy.print.cgv.subtitle(
-                invoice.number,
-                cgvType === "ATELIER" ? copy.print.cgv.kindWorkshop : copy.print.cgv.kindVehicle,
-              )}
+              {copy.print.warranty.subtitle(invoice.number)}
             </div>
           </div>
           <div style={{ textAlign: "right", fontSize: "0.82rem", opacity: 0.75 }}>
-            <strong>{copy.print.cgv.company}</strong><br />
-            {copy.print.cgv.companyAddress}
+            <strong>{copy.print.warranty.company}</strong><br />
+            {copy.print.warranty.companyAddress}
           </div>
         </header>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1.5rem",
+            marginBottom: "1.5rem",
+            padding: "0.85rem 1.1rem",
+            background: "#f8fafc",
+            borderRadius: 6,
+            border: "1px solid #e2e8f0",
+            fontSize: "0.85rem",
+          }}
+        >
+          <div>
+            <div style={{ fontSize: "0.76rem", textTransform: "uppercase", opacity: 0.6, fontWeight: 700 }}>
+              {copy.print.billedTo}
+            </div>
+            <div style={{ fontWeight: 700 }}>{invoice.customer.contactName}</div>
+            {invoice.customer.companyName && <div style={{ fontWeight: 600 }}>{invoice.customer.companyName}</div>}
+          </div>
+          <div>
+            <div style={{ fontSize: "0.76rem", textTransform: "uppercase", opacity: 0.6, fontWeight: 700 }}>
+              {copy.print.warranty.vehicleBlockTitle}
+            </div>
+            {warrantyVehicle ? (
+              <div style={{ fontWeight: 600 }}>
+                {warrantyVehicle.brand} {warrantyVehicle.model}{warrantyVehicle.variant ? ` ${warrantyVehicle.variant}` : ""}
+                <div style={{ fontSize: "0.78rem", opacity: 0.75, marginTop: 2 }}>
+                  {copy.print.vin(warrantyVehicle.vin || copy.print.vinUnassigned)}
+                </div>
+              </div>
+            ) : (
+              <div style={{ opacity: 0.7, fontStyle: "italic" }}>{copy.print.warranty.vehicleUnknown}</div>
+            )}
+            <div style={{ fontSize: "0.78rem", opacity: 0.75, marginTop: 4 }}>
+              {copy.print.warranty.invoiceRefLabel} {invoice.number} · {formatInvoiceDate(copy, invoice.createdAt)}
+            </div>
+          </div>
+        </div>
 
         <div
           style={{
@@ -554,7 +597,11 @@ export default async function InvoicePrintPage({
             marginBottom: "2rem",
           }}
         >
-          {cgvContent}
+          {warrantyContent}
+        </div>
+
+        <div style={{ fontSize: "0.85rem", marginBottom: "1rem" }}>
+          {copy.print.warranty.placeDateLabel} {formatInvoiceDate(copy, invoice.createdAt)}
         </div>
 
         <div
@@ -568,15 +615,15 @@ export default async function InvoicePrintPage({
           }}
         >
           <div>
-            <strong>{copy.print.cgv.forCompany}</strong>
-            <div style={{ height: 60, marginTop: 6, opacity: 0.6 }}>{copy.print.cgv.salesDirection}</div>
+            <strong>{copy.print.warranty.forCompany}</strong>
+            <div style={{ height: 60, marginTop: 6, opacity: 0.6 }}>{copy.print.warranty.salesDirection}</div>
           </div>
           <div style={{ textAlign: "right" }}>
-            <strong>{copy.print.cgv.forClient}</strong>
+            <strong>{copy.print.warranty.forClient}</strong>
             <div style={{ fontStyle: "italic", fontSize: "0.8rem", opacity: 0.8, marginTop: 2 }}>
-              {copy.print.cgv.readApproved}
+              {copy.print.warranty.readApproved}
             </div>
-            <div style={{ height: 60, marginTop: 6, opacity: 0.6 }}>{copy.print.cgv.signStamp}</div>
+            <div style={{ height: 60, marginTop: 6, opacity: 0.6 }}>{copy.print.warranty.signStamp}</div>
           </div>
         </div>
       </article>

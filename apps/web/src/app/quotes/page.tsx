@@ -19,6 +19,10 @@ export default async function QuotesPage() {
           },
         },
         invoice: true,
+        deliveryNotes: {
+          select: { id: true, number: true, status: true },
+          orderBy: { createdAt: "asc" },
+        },
       },
       orderBy: { createdAt: "desc" },
     }),
@@ -136,6 +140,9 @@ export default async function QuotesPage() {
           status: q.invoice.status,
         }
       : null,
+    transcribedAt: q.transcribedAt ? q.transcribedAt.toISOString() : null,
+    transcriptionMode: q.transcriptionMode,
+    deliveryNotes: q.deliveryNotes.map((n) => ({ id: n.id, number: n.number, status: n.status })),
   }));
 
   return (

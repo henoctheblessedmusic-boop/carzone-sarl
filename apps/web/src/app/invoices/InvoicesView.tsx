@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   FileText,
@@ -14,6 +14,8 @@ import {
   FileCheck,
   Download,
   TrendingUp,
+  Truck,
+  Mail,
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
 import { usePrefs } from "@/components/PrefsProvider";
@@ -25,6 +27,7 @@ import {
 } from "@/lib/i18n/messages/invoices";
 import { voidInvoice, certifyInvoiceDgi } from "./actions";
 import { PaymentModal, type InvoiceOption } from "./PaymentModal";
+import { InvoiceEmailModal, type InvoiceEmailTarget } from "./InvoiceEmailModal";
 import {
   FinancialBilanTab,
   type ExpenseItem,
@@ -63,6 +66,7 @@ export type InvoiceItem = {
     id: string;
     number: string;
   } | null;
+  deliveryNote?: { id: string; number: string } | null;
   payments: Array<{
     id: string;
     amountXof: number;
@@ -124,11 +128,26 @@ export function InvoicesView({
 }) {
   const { locale } = usePrefs();
   const copy = invoicesCopy[locale];
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [activeTab, setActiveTab] = useState<"INVOICES" | "PAYMENTS" | "BILAN">("INVOICES");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [activityFilter, setActivityFilter] = useState<"ALL" | "SHOWROOM" | "GARAGE">("ALL");
   const [methodFilter, setMethodFilter] = useState("ALL");
+  const [emailTarget, setEmailTarget] = useState<InvoiceEmailTarget | null>(null);
+
+  function openEmailModal(inv: InvoiceItem) {
+    setEmailTarget({
+      id: inv.id,
+      number: inv.number,
+      totalXof: inv.totalXof,
+      customer: inv.customer,
+      deliveryNoteNumber: inv.deliveryNote?.number || null,
+    });
+  }
 
   // Payment modal state
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
@@ -817,6 +836,33 @@ export function InvoicesView({
                               {copy.invoiceTable.rowActions.printLabel}
                             </Link>
 
+                            {/* Imprimer le BL interne lié (BL émis automatiquement avec la facture) */}
+                            {inv.deliveryNote && (
+                              <Link
+                                href={`/delivery-notes/${inv.deliveryNote.id}/print`}
+                                target="_blank"
+                                className="ox-btn ox-btn-ghost ox-btn-sm"
+                                style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
+                                title="Imprimer le bon de livraison interne lié"
+                              >
+                                <Truck size={13} />
+                                BL
+                              </Link>
+                            )}
+
+                            {/* Envoyer la facture par e-mail (boîte Mail interne) */}
+                            {inv.status !== "ANNULEE" && (
+                              <button
+                                type="button"
+                                onClick={() => openEmailModal(inv)}
+                                className="ox-btn ox-btn-ghost ox-btn-sm"
+                                style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
+                                title="Envoyer la facture par e-mail"
+                              >
+                                <Mail size={13} />
+                              </button>
+                            )}
+
                             {/* Certification DGI e-MECeF */}
                             {inv.isFiscalCertified ? (
                               <span
@@ -1078,6 +1124,11 @@ export function InvoicesView({
           setTargetInvoiceId(null);
         }}
       />
+
+      {/* Modale d'envoi de la facture par e-mail */}
+      {emailTarget && mounted && (
+        <InvoiceEmailModal invoice={emailTarget} onClose={() => setEmailTarget(null)} />
+      )}
 
       {/* Modal d'annulation interne (DG / Compta) */}
       {voidModalInvoiceId && (

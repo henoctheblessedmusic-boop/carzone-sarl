@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/require-user";
+import { ACTIVITY } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { formatXof } from "@/lib/format";
 import { getServerMessages } from "@/lib/i18n/server";
@@ -21,7 +22,7 @@ export default async function QuotePrintPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireUser(["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE", "ADMIN"]);
+  const user = await requireUser(["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE", "ADMIN"]);
   const { locale } = await getServerMessages();
   const copy = quotesCopy[locale];
   const { id } = await params;
@@ -30,6 +31,7 @@ export default async function QuotePrintPage({
     include: { customer: true, lines: { include: { vehicle: true } } },
   });
   if (!quote) notFound();
+  if (user.role === "COMPTA_GARAGE" && quote.activity !== ACTIVITY.GARAGE) notFound();
 
   const { discount, cleanNotes } = decodeDiscountFromNotes(quote.notes);
   const grossTotal = quote.lines.reduce((s, l) => s + l.quantity * l.unitPriceXof, 0);

@@ -230,7 +230,7 @@ export async function updateVehicle(formData: FormData) {
   revalidatePath("/catalog");
 }
 
-const VEHICLE_DELETERS = ["PDG", "SG", "DG", "DC", "ADMIN"] as const;
+const VEHICLE_DELETERS = ["DEVELOPER", "PDG", "SG", "DG", "DC", "ADMIN"] as const;
 
 export async function deleteVehicle(formData: FormData) {
   await requireUser([...VEHICLE_DELETERS]);
@@ -274,6 +274,65 @@ export async function deleteVehicle(formData: FormData) {
   await prisma.vehicle.delete({
     where: { id },
   });
+
+  revalidatePath("/vehicles");
+  revalidatePath("/catalog");
+  revalidatePath("/dashboard");
+}
+
+/**
+ * Suppression définitive d'un véhicule de démonstration.
+ * Réservée aux rôles suppresseurs (Développeur, Direction, Administrateur).
+ * Détache les références non fiscales mais refuse toute suppression liée à une
+ * facture normalisée, un paiement ou un contrat de location (intégrité métier).
+ */
+export async function forceDeleteVehicle(formData: FormData) {
+  await requireUser([...VEHICLE_DELETERS]);
+  const id = String(formData.get("id") || "").trim();
+  if (!id) throw new Error("Identifiant véhicule requis");
+
+  const vehicle = await prisma.vehicle.findUnique({ where: { id }, select: { id: true } });
+  if (!vehicle) throw new Error("Véhicule introuvable.");
+
+  const rentalCount = await prisma.rental.count({ where: { vehicleId: id } });
+  if (rentalCount > 0) {
+    throw new Error(
+      "Suppression forcée refusée : ce véhicule est lié à un contrat de location. Clôturez d'abord la location."
+    );
+  }
+
+  const invoiceCount = await prisma.invoice.count({
+    where: { quote: { lines: { some: { vehicleId: id } } } },
+  });
+  if (invoiceCount > 0) {
+    throw new Error(
+      "Suppression forcée refusée : ce véhicule est lié à une facture normalisée. Utilisez un avoir justifié (DGI) ou conservez l'historique."
+    );
+  }
+
+  const [workOrderInvoiceCount, deliveryNoteInvoiceCount] = await Promise.all([
+    prisma.workOrder.count({ where: { vehicleId: id, invoiceId: { not: null } } }),
+    prisma.deliveryNote.count({ where: { vehicleId: id, invoiceId: { not: null } } }),
+  ]);
+  if (workOrderInvoiceCount > 0 || deliveryNoteInvoiceCount > 0) {
+    throw new Error(
+      "Suppression forcée refusée : ce véhicule est rattaché à une facture via un ordre de réparation ou un bon de livraison."
+    );
+  }
+
+  await prisma.$transaction([
+    // Détache les lignes de devis/proforma (les documents commerciaux restent intacts).
+    prisma.quoteLine.updateMany({ where: { vehicleId: id }, data: { vehicleId: null } }),
+    // Détache les bons de livraison internes (non fiscaux).
+    prisma.deliveryNoteLine.updateMany({ where: { vehicleId: id }, data: { vehicleId: null } }),
+    prisma.deliveryNote.updateMany({ where: { vehicleId: id }, data: { vehicleId: null } }),
+    // Détache les autres rattachements métier.
+    prisma.opportunity.updateMany({ where: { vehicleId: id }, data: { vehicleId: null } }),
+    prisma.workOrder.updateMany({ where: { vehicleId: id }, data: { vehicleId: null } }),
+    prisma.workshopEntry.updateMany({ where: { vehicleId: id }, data: { vehicleId: null } }),
+    prisma.fleetVehicle.deleteMany({ where: { vehicleId: id } }),
+    prisma.vehicle.delete({ where: { id } }),
+  ]);
 
   revalidatePath("/vehicles");
   revalidatePath("/catalog");

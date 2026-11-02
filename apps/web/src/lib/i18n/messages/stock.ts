@@ -143,6 +143,11 @@ export type StockCopy = {
     cancel: string;
     deleting: string;
     confirm: string;
+    forceTitle: string;
+    forceWarning: string;
+    forcePlaceholder: string;
+    forceConfirm: string;
+    forceDeleting: string;
   };
   errors: {
     deleteFailed: string;
@@ -373,7 +378,7 @@ const fr: StockCopy = {
   },
   deleteModal: {
     title: "Supprimer cet article du stock ?",
-    warning: "Action réservée aux rôles Direction (PDG, DG, DC, SG) et à l'Administration.",
+    warning: "Action réservée aux rôles Développeur, Direction (PDG, DG, DC, SG) et à l'Administration.",
     vehicleLabel: "Véhicule :",
     vinLabel: "VIN :",
     siteLabel: "Showroom :",
@@ -382,6 +387,12 @@ const fr: StockCopy = {
     cancel: "Annuler",
     deleting: "Suppression en cours...",
     confirm: "Confirmer la suppression",
+    forceTitle: "Suppression définitive (démo)",
+    forceWarning:
+      "Ce véhicule est lié à des documents. La suppression forcée détache ses références (devis, BL, atelier, flotte) mais ne supprime aucune facture ni paiement. Saisissez SUPPRIMER pour confirmer.",
+    forcePlaceholder: "Saisir SUPPRIMER",
+    forceConfirm: "Supprimer définitivement",
+    forceDeleting: "Suppression définitive...",
   },
   errors: {
     deleteFailed: "La suppression a échoué. Réessayez.",
@@ -558,7 +569,7 @@ const en: StockCopy = {
   },
   deleteModal: {
     title: "Delete this stock item?",
-    warning: "Reserved for Management roles (PDG, DG, DC, SG) and Admin.",
+    warning: "Reserved for Developer, Management (PDG, DG, DC, SG) and Admin roles.",
     vehicleLabel: "Vehicle:",
     vinLabel: "VIN:",
     siteLabel: "Showroom:",
@@ -567,6 +578,12 @@ const en: StockCopy = {
     cancel: "Cancel",
     deleting: "Deleting...",
     confirm: "Confirm deletion",
+    forceTitle: "Permanent deletion (demo)",
+    forceWarning:
+      "This vehicle is linked to documents. Forced deletion detaches references (quotes, delivery notes, workshop, fleet) but never deletes an invoice or payment. Type DELETE to confirm.",
+    forcePlaceholder: "Type DELETE",
+    forceConfirm: "Permanently delete",
+    forceDeleting: "Permanently deleting...",
   },
   errors: {
     deleteFailed: "Deletion failed. Please try again.",
@@ -741,7 +758,7 @@ const zh: StockCopy = {
   },
   deleteModal: {
     title: "确定删除这条库存？",
-    warning: "仅限管理层(PDG、DG、DC、SG)和管理员操作。",
+    warning: "仅限开发者、管理层(PDG、DG、DC、SG)和管理员操作。",
     vehicleLabel: "车辆:",
     vinLabel: "VIN:",
     siteLabel: "展厅:",
@@ -750,6 +767,12 @@ const zh: StockCopy = {
     cancel: "取消",
     deleting: "正在删除...",
     confirm: "确认删除",
+    forceTitle: "永久删除（演示）",
+    forceWarning:
+      "此车辆已关联单据。强制删除会解除引用（报价、交货单、车间、车队），但不会删除任何发票或付款。请输入 SUPPRIMER 确认。",
+    forcePlaceholder: "输入 SUPPRIMER",
+    forceConfirm: "永久删除",
+    forceDeleting: "正在永久删除...",
   },
   errors: {
     deleteFailed: "删除失败,请重试。",

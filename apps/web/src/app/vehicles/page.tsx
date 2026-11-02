@@ -78,6 +78,7 @@ export default async function VehiclesPage({
   ].includes(user.role);
 
   const canDelete = [
+    "DEVELOPER",
     "PDG",
     "SG",
     "DG",

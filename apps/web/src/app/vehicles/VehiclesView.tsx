@@ -33,7 +33,7 @@ import {
   stockCopy,
   vehicleTypeLabel,
 } from "@/lib/i18n/messages/stock";
-import { createVehicle, updateVehicle, deleteVehicle, quickChangeVehicleStatus } from "./actions";
+import { createVehicle, updateVehicle, deleteVehicle, forceDeleteVehicle, quickChangeVehicleStatus } from "./actions";
 
 export type VehicleItem = {
   id: string;
@@ -128,6 +128,10 @@ export function VehiclesView({
   const [deletingVehicle, setDeletingVehicle] = useState<VehicleItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [forceDeleteText, setForceDeleteText] = useState("");
+  const [isForceDeleting, setIsForceDeleting] = useState(false);
+  const forceWord = forceDeleteText.trim().toUpperCase();
+  const isForceConfirmed = forceWord === "SUPPRIMER" || forceWord === "DELETE";
 
   // Normalisation du statut (EN_STOCK = EN_MAGASIN)
   const normalizedVehicles = useMemo(() => {
@@ -1069,6 +1073,7 @@ export function VehiclesView({
                   type="button"
                   onClick={() => {
                     setDeleteError(null);
+                    setForceDeleteText("");
                     setDeletingVehicle(v);
                   }}
                   style={{
@@ -1366,6 +1371,7 @@ export function VehiclesView({
                       const v = editingVehicle;
                       setEditingVehicle(null);
                       setDeleteError(null);
+                      setForceDeleteText("");
                       setDeletingVehicle(v);
                     }}
                     style={{
@@ -1484,6 +1490,7 @@ export function VehiclesView({
                   if (!isDeleting) {
                     setDeletingVehicle(null);
                     setDeleteError(null);
+                    setForceDeleteText("");
                   }
                 }}
                 disabled={isDeleting}
@@ -1544,12 +1551,81 @@ export function VehiclesView({
               </div>
             )}
 
+            {deleteError && (
+              <div
+                style={{
+                  border: "1px solid rgba(245, 158, 11, 0.45)",
+                  background: "rgba(245, 158, 11, 0.08)",
+                  borderRadius: 10,
+                  padding: "12px 14px",
+                  marginBottom: 16,
+                  display: "grid",
+                  gap: 10,
+                }}
+              >
+                <strong style={{ color: "#fbbf24", fontSize: "0.88rem" }}>
+                  {copy.deleteModal.forceTitle}
+                </strong>
+                <p style={{ margin: 0, fontSize: "0.78rem", opacity: 0.8 }}>
+                  {copy.deleteModal.forceWarning}
+                </p>
+                <input
+                  type="text"
+                  className="ox-input"
+                  value={forceDeleteText}
+                  onChange={(event) => setForceDeleteText(event.target.value)}
+                  placeholder={copy.deleteModal.forcePlaceholder}
+                  disabled={isForceDeleting}
+                />
+                <button
+                  type="button"
+                  disabled={isForceDeleting || !isForceConfirmed}
+                  onClick={async () => {
+                    try {
+                      setIsForceDeleting(true);
+                      setDeleteError(null);
+                      const fd = new FormData();
+                      fd.set("id", deletingVehicle.id);
+                      await forceDeleteVehicle(fd);
+                      setDeletingVehicle(null);
+                      setForceDeleteText("");
+                    } catch (err: unknown) {
+                      setDeleteError(
+                        err instanceof Error ? err.message : copy.errors.deleteFailed
+                      );
+                    } finally {
+                      setIsForceDeleting(false);
+                    }
+                  }}
+                  style={{
+                    justifySelf: "end",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "8px 16px",
+                    borderRadius: 8,
+                    border: "none",
+                    background: "linear-gradient(135deg, #b45309, #92400e)",
+                    color: "#fff",
+                    fontWeight: 700,
+                    fontSize: "0.8rem",
+                    cursor: isForceConfirmed && !isForceDeleting ? "pointer" : "not-allowed",
+                    opacity: isForceConfirmed ? 1 : 0.55,
+                  }}
+                >
+                  {isForceDeleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                  {isForceDeleting ? copy.deleteModal.forceDeleting : copy.deleteModal.forceConfirm}
+                </button>
+              </div>
+            )}
+
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
               <button
                 type="button"
                 onClick={() => {
                   setDeletingVehicle(null);
                   setDeleteError(null);
+                  setForceDeleteText("");
                 }}
                 disabled={isDeleting}
                 style={{

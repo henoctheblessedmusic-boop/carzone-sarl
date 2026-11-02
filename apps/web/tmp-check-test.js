@@ -1,2 +1,0 @@
-﻿const {PrismaClient}=require("@prisma/client");const p=new PrismaClient();
-(async()=>{const u=await p.user.findUnique({where:{email:"test-dev@carzone.bj"},select:{id:true,email:true,role:true,active:true}});console.log(u);const v=await p.vehicle.findFirst({where:{brand:"TEST-DEMO"},select:{id:true,brand:true,model:true,status:true}});console.log(v);await p.$disconnect();})().catch(e=>{console.error(e.message);process.exit(1)});

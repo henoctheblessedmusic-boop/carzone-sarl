@@ -170,11 +170,15 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
   ],
 
   // 7. Commercial : Enregistrer clients, devis, factures, mails, stock, documents clients, services
+  // "fleet:read" / "installers:read" : déjà autorisés par les pages /fleet, /rentals, /installers,
+  // /charge-requests (requireUser) et par le menu ; manquaient ici, provoquant un blocage middleware.
   COMMERCIAL: [
     "services:manage",
     "quotes:read", "quotes:write",
     "invoices:read", "invoices:write",
     "vehicles:read",
+    "fleet:read",
+    "installers:read",
     "clients:read", "clients:write",
     "mailbox:read", "mailbox:write",
   ],
@@ -241,6 +245,8 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     "hr:read", "hr:write",
     "expenses:read", "expenses:write",
   ],
+  // "invoices:read/write" : déjà autorisés par /invoices (menu + requireUser) ; manquaient ici,
+  // provoquant un blocage middleware malgré un accès page légitime.
   ADMIN: [
     "roles:manage",
     "users:manage",
@@ -251,17 +257,18 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     "workshop:read", "workshop:write",
     "clients:read", "clients:write",
     "quotes:read", "quotes:write",
+    "invoices:read", "invoices:write",
     "hr:read", "hr:write",
     "expenses:read", "expenses:write",
   ],
   // COMPTA : union fonctionnelle Comptabilité + RAF (ex-RF) + RH (ex-RH), cohérente avec
-  // DEFAULT_ROLE_CAPABILITIES.COMPTA. N'inclut pas "admin:all" / vehicles:write / fleet:*
-  // / installers:* / charging:write / mailbox:write que RF porte par ailleurs : ces permissions
-  // dépassent le périmètre Comptabilité+RAF+RH et ne correspondent à aucune capacité UI de COMPTA.
+  // DEFAULT_ROLE_CAPABILITIES.COMPTA. N'inclut pas "admin:all" / vehicles:write / installers:*
+  // / charging:write / mailbox:write que RF porte par ailleurs : ces permissions dépassent le
+  // périmètre Comptabilité+RAF+RH et ne correspondent à aucune capacité UI de COMPTA.
+  // Exigence client : PAS de "roles:manage" / "users:manage" (gestion comptes/rôles retirée).
+  // "fleet:read" conservé : nécessaire pour /rentals, déjà autorisé par la page (requireUser).
   COMPTA: [
     "financial_report:export",
-    "roles:manage",
-    "users:manage",
     "services:manage",
     "quotes:delete",
     "invoices:read", "invoices:write",
@@ -269,6 +276,7 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     "vehicles:read",
     "workshop:read",
     "charging:read",
+    "fleet:read",
     "mailbox:read",
     "clients:read", "clients:write",
     "hr:read", "hr:write",
@@ -293,9 +301,13 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     "workshop:read", "workshop:write",
     "vehicles:read",
   ],
+  // "mailbox:read" / "fleet:read" : déjà autorisés par /mailbox et /fleet (menu + requireUser) ;
+  // manquaient ici, provoquant un blocage middleware malgré un accès page légitime.
   BORNES_OPS: [
     "charging:read", "charging:write",
     "installers:read", "installers:write",
+    "mailbox:read",
+    "fleet:read",
   ],
   INSTALLATEUR: [
     "installers:read",

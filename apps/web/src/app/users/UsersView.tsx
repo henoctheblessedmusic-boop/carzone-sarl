@@ -49,11 +49,21 @@ export function UsersView({
   initialUsers,
   currentUserId,
   currentUserRole,
+  canCreateUsers,
+  canAssignRole,
+  canCustomPermissions,
+  canDeleteUsers,
 }: {
   initialUsers: UserItem[];
   currentUserId: string;
   currentUserRole: string;
+  canCreateUsers: boolean;
+  canAssignRole: boolean;
+  canCustomPermissions: boolean;
+  canDeleteUsers: boolean;
 }) {
+  // Rien à gérer (ni rôle, ni capacités) : le bouton "Capacités et rôle" est masqué.
+  const canManageCapabilities = canAssignRole || canCustomPermissions;
   const [users, setUsers] = useState<UserItem[]>(initialUsers);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("ALL");
@@ -418,28 +428,30 @@ export function UsersView({
         </div>
 
         {/* Primary Action Button */}
-        <button
-          onClick={handleOpenAddModal}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "10px 18px",
-            borderRadius: 10,
-            border: "1px solid rgba(212, 175, 55, 0.5)",
-            background:
-              "linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(180, 140, 30, 0.35))",
-            color: "var(--gold, #d4af37)",
-            fontWeight: 700,
-            fontSize: "0.9rem",
-            cursor: "pointer",
-            boxShadow: "0 4px 14px rgba(212, 175, 55, 0.18)",
-            transition: "all 0.2s ease",
-          }}
-        >
-          <UserPlus size={18} />
-          {teamCopy.newUser}
-        </button>
+        {canCreateUsers && (
+          <button
+            onClick={handleOpenAddModal}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "10px 18px",
+              borderRadius: 10,
+              border: "1px solid rgba(212, 175, 55, 0.5)",
+              background:
+                "linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(180, 140, 30, 0.35))",
+              color: "var(--gold, #d4af37)",
+              fontWeight: 700,
+              fontSize: "0.9rem",
+              cursor: "pointer",
+              boxShadow: "0 4px 14px rgba(212, 175, 55, 0.18)",
+              transition: "all 0.2s ease",
+            }}
+          >
+            <UserPlus size={18} />
+            {teamCopy.newUser}
+          </button>
+        )}
       </div>
 
       {/* KPI Stats Bar */}
@@ -958,28 +970,30 @@ export function UsersView({
                         }}
                       >
                         {/* Manage Capabilities & Role */}
-                        <button
-                          onClick={() => handleOpenEditModal(u)}
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: 6,
-                            padding: "6px 12px",
-                            borderRadius: 8,
-                            border: "1px solid rgba(212, 175, 55, 0.35)",
-                            background: "rgba(212, 175, 55, 0.1)",
-                            color: "var(--gold, #d4af37)",
-                            fontSize: "0.8rem",
-                            fontWeight: 650,
-                            cursor: "pointer",
-                          }}
-                        >
-                          <Sliders size={14} />
-                          {teamCopy.manageButton}
-                        </button>
+                        {canManageCapabilities && (
+                          <button
+                            onClick={() => handleOpenEditModal(u)}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 6,
+                              padding: "6px 12px",
+                              borderRadius: 8,
+                              border: "1px solid rgba(212, 175, 55, 0.35)",
+                              background: "rgba(212, 175, 55, 0.1)",
+                              color: "var(--gold, #d4af37)",
+                              fontSize: "0.8rem",
+                              fontWeight: 650,
+                              cursor: "pointer",
+                            }}
+                          >
+                            <Sliders size={14} />
+                            {teamCopy.manageButton}
+                          </button>
+                        )}
 
                         {/* Delete Button */}
-                        {!isSelf && (
+                        {!isSelf && canDeleteUsers && (
                           <button
                             onClick={() => handleDelete(u.id, u.fullName)}
                             disabled={isPending}
@@ -1494,6 +1508,7 @@ export function UsersView({
                   <select
                     value={editRole}
                     onChange={(e) => handleEditRoleChange(e.target.value as Role)}
+                    disabled={!canAssignRole}
                     style={{
                       width: "100%",
                       padding: "8px 12px",
@@ -1504,7 +1519,8 @@ export function UsersView({
                       fontSize: "0.875rem",
                       fontWeight: 650,
                       boxSizing: "border-box",
-                      cursor: "pointer",
+                      cursor: canAssignRole ? "pointer" : "not-allowed",
+                      opacity: canAssignRole ? 1 : 0.6,
                     }}
                   >
                     {availableRoleEntries.map(([k, label]) => (
@@ -1546,31 +1562,34 @@ export function UsersView({
                     </span>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => handleResetToRoleDefault(editRole, setEditPermissions)}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 6,
-                      background: "rgba(255, 255, 255, 0.05)",
-                      border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                      color: "var(--ice-text)",
-                      padding: "5px 10px",
-                      borderRadius: 6,
-                      fontSize: "0.75rem",
-                      cursor: "pointer",
-                      fontWeight: 600,
-                    }}
-                  >
-                    <RotateCcw size={12} />
-                    {teamCopy.editModal.resetToRole(ROLE_LABELS[editRole])}
-                  </button>
+                  {canCustomPermissions && (
+                    <button
+                      type="button"
+                      onClick={() => handleResetToRoleDefault(editRole, setEditPermissions)}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                        background: "rgba(255, 255, 255, 0.05)",
+                        border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+                        color: "var(--ice-text)",
+                        padding: "5px 10px",
+                        borderRadius: 6,
+                        fontSize: "0.75rem",
+                        cursor: "pointer",
+                        fontWeight: 600,
+                      }}
+                    >
+                      <RotateCcw size={12} />
+                      {teamCopy.editModal.resetToRole(ROLE_LABELS[editRole])}
+                    </button>
+                  )}
                 </div>
 
                 <CapabilitiesTable
                   copy={copy}
                   currentPermissions={editPermissions}
+                  readOnly={!canCustomPermissions}
                   onTogglePermission={(id) =>
                     togglePermission(id, editPermissions, setEditPermissions)
                   }
@@ -1847,11 +1866,13 @@ function CapabilitiesTable({
   currentPermissions,
   onTogglePermission,
   onToggleGroup,
+  readOnly = false,
 }: {
   copy: AdminCopy;
   currentPermissions: string[];
   onTogglePermission: (id: string) => void;
   onToggleGroup: (groupId: string) => void;
+  readOnly?: boolean;
 }) {
   return (
     <div
@@ -1933,27 +1954,29 @@ function CapabilitiesTable({
                     {copy.team.capabilities.groups[group.id] ?? group.nameFr}
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => onToggleGroup(group.id)}
-                    style={{
-                      marginTop: 8,
-                      fontSize: "0.72rem",
-                      padding: "2px 8px",
-                      borderRadius: 4,
-                      border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                      background: allChecked
-                        ? "rgba(239, 68, 68, 0.1)"
-                        : "rgba(34, 197, 94, 0.1)",
-                      color: allChecked ? "#f87171" : "#4ade80",
-                      cursor: "pointer",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {allChecked
-                      ? copy.team.capabilitiesTable.uncheckAll
-                      : copy.team.capabilitiesTable.checkAll}
-                  </button>
+                  {!readOnly && (
+                    <button
+                      type="button"
+                      onClick={() => onToggleGroup(group.id)}
+                      style={{
+                        marginTop: 8,
+                        fontSize: "0.72rem",
+                        padding: "2px 8px",
+                        borderRadius: 4,
+                        border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+                        background: allChecked
+                          ? "rgba(239, 68, 68, 0.1)"
+                          : "rgba(34, 197, 94, 0.1)",
+                        color: allChecked ? "#f87171" : "#4ade80",
+                        cursor: "pointer",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {allChecked
+                        ? copy.team.capabilitiesTable.uncheckAll
+                        : copy.team.capabilitiesTable.checkAll}
+                    </button>
+                  )}
                 </td>
 
                 {/* Column 2: Checkboxes */}
@@ -1974,7 +1997,7 @@ function CapabilitiesTable({
                             display: "inline-flex",
                             alignItems: "center",
                             gap: 10,
-                            cursor: "pointer",
+                            cursor: readOnly ? "not-allowed" : "pointer",
                             userSelect: "none",
                             fontSize: "0.85rem",
                             color: isChecked ? "var(--ice-text)" : "rgba(255, 255, 255, 0.55)",
@@ -1983,11 +2006,12 @@ function CapabilitiesTable({
                           <input
                             type="checkbox"
                             checked={isChecked}
+                            disabled={readOnly}
                             onChange={() => onTogglePermission(cap.id)}
                             style={{
                               width: 17,
                               height: 17,
-                              cursor: "pointer",
+                              cursor: readOnly ? "not-allowed" : "pointer",
                               accentColor: "#d4af37",
                               borderRadius: 4,
                             }}

@@ -9,7 +9,7 @@ import { DEFAULT_ROLE_CAPABILITIES } from "@/lib/permissions-config";
 import { getLocale } from "@/lib/i18n/server";
 import { adminCopy } from "@/lib/i18n/messages/admin";
 
-const CAN_MANAGE_USERS_ROLES = ["DEVELOPER", "PDG", "SG", "DG", "ADV", "RTA", "DC", "ADMIN", "RH", "COMPTA"] as const;
+const CAN_MANAGE_USERS_ROLES = ["DEVELOPER", "PDG", "SG", "DG", "ADV", "RTA", "DC", "ADMIN", "RH"] as const;
 const PRIVILEGED_PASSWORD_ROLES = ["DEVELOPER", "PDG", "SG", "DG", "ADMIN"] as const;
 
 export async function createUser(formData: FormData) {

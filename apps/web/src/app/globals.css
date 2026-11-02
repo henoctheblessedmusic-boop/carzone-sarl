@@ -215,6 +215,10 @@ body {
   min-height: 100%;
   background: var(--ice-bg-deep);
   color: var(--ice-text);
+  /* Garde-fou toutes largeurs : les conteneurs scrollables (.ox-content, .ox-table-wrap)
+     absorbent déjà leur propre débordement horizontal ; ceci évite qu'un enfant mal contenu
+     ne fasse défiler le body entier (desktop large et mobile). */
+  overflow-x: hidden;
 }
 
 button {

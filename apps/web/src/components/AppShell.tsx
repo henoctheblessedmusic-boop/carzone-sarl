@@ -19,7 +19,7 @@ const navDefs = [
   { href: "/expenses", roles: ["PDG", "SG", "DG", "ADV", "RF", "COMPTA", "ASSISTANTE_COMPTABLE", "RH", "ADMIN"] },
   { href: "/services", roles: ["PDG", "SG", "DG", "ADV", "RF", "RTA", "DC", "COMMERCIAL", "HOTESSE", "ASSISTANTE_COMPTABLE", "CHEF_ATELIER", "STOCK", "COMPTA", "ADMIN"] },
   { href: "/hr", roles: ["PDG", "SG", "DG", "RH", "COMPTA", "RF", "ASSISTANTE_COMPTABLE", "ADMIN"] },
-  { href: "/users", roles: ["PDG", "SG", "DG", "ADV", "RTA", "DC", "ADMIN", "RH", "COMPTA"] },
+  { href: "/users", roles: ["PDG", "SG", "DG", "ADV", "RTA", "DC", "ADMIN", "RH"] },
   { href: "/opportunities", roles: ["PDG", "SG", "DG", "ADV", "RF", "DC", "COMMERCIAL", "COMPTA", "ADMIN"] },
   { href: "/leads", roles: ["PDG", "SG", "DG", "ADV", "RF", "DC", "COMMERCIAL", "COMPTA", "ADMIN"] },
   { href: "/catalog", roles: ["PDG", "SG", "DG", "ADV", "RF", "RTA", "DC", "STOCK", "ADMIN"] },
@@ -53,12 +53,14 @@ export async function AppShell({
     user.role === "PDG" ||
     user.role === "SG";
 
+  // Un lien de menu n'est affiché que s'il est à la fois dans la liste de rôles attendue
+  // ET effectivement autorisé par le moteur de permissions (RoleService). Cette intersection
+  // évite les menus visibles puis refusés (middleware/garde de page) pour tous les rôles.
   const items = navDefs
     .filter((n) => {
       if (!n.roles) return true;
       if (isSuperAdmin) return true;
-      if (RoleService.isRouteAllowedForUser(user, n.href)) return true;
-      return n.roles.includes(user.role);
+      return n.roles.includes(user.role) && RoleService.isRouteAllowedForUser(user, n.href);
     })
     .map((n) => {
       const key = NAV_KEYS_BY_HREF[n.href];

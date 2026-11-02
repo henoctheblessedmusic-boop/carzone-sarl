@@ -260,6 +260,8 @@ export const DEFAULT_ROLE_CAPABILITIES: Record<Role, string[]> = {
   // COMPTA : Comptable principale = Comptabilité + RAF (ex-RF) + RH (ex-RH), union sans doublon.
   // RF et RH restent des rôles séparés dans le référentiel pour une éventuelle scission future ;
   // cette préconfiguration ne fait que cumuler leurs capacités sur le rôle historique COMPTA.
+  // Exigence client : la Comptable principale NE gère PAS les comptes/rôles (pas de users:*) ;
+  // RH reste limité au périmètre personnel/congés/paie (hr:*), hors administration des accès.
   COMPTA: [
     "customers:view_own", "customers:view_global", "customers:create", "customers:edit", "customers:documents",
     "invoices:view_own", "invoices:view_global", "invoices:create", "invoices:edit", "invoices:delete", "invoices:financial_export",
@@ -268,7 +270,6 @@ export const DEFAULT_ROLE_CAPABILITIES: Record<Role, string[]> = {
     "workshop:view_global",
     "stock:view",
     "services:view", "services:create", "services:edit",
-    "users:view", "users:create", "users:assign_role", "users:custom_permissions",
     "hr:view", "hr:manage_employees", "hr:manage_leaves", "hr:setup",
   ],
 

@@ -217,8 +217,10 @@ body {
   color: var(--ice-text);
   /* Garde-fou toutes largeurs : les conteneurs scrollables (.ox-content, .ox-table-wrap)
      absorbent déjà leur propre débordement horizontal ; ceci évite qu'un enfant mal contenu
-     ne fasse défiler le body entier (desktop large et mobile). */
-  overflow-x: hidden;
+     ne fasse défiler le body entier (desktop large et mobile).
+     Important : "clip" et non "hidden", sinon le body devient un conteneur de défilement
+     et la barre latérale sticky se met à défiler avec la page. */
+  overflow-x: clip;
 }
 
 button {

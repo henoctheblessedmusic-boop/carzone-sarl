@@ -30,7 +30,7 @@ import type {
 type ChartMode = "sales" | "expenses" | "activity" | "profit" | "all";
 
 /** Ordre d'affichage des onglets de graphes. */
-const CHART_TAB_KEYS: ChartMode[] = ["profit", "sales", "expenses", "activity", "all"];
+const CHART_TAB_KEYS: ChartMode[] = ["all", "profit", "sales", "expenses", "activity"];
 
 export function ExecutiveDashboardCharts({
   analytics,
@@ -40,7 +40,7 @@ export function ExecutiveDashboardCharts({
   const { locale } = usePrefs();
   const exec = sharedCopy[locale].exec;
   const [period, setPeriod] = useState<PeriodKey>("1Y");
-  const [activeTab, setActiveTab] = useState<ChartMode>("profit");
+  const [activeTab, setActiveTab] = useState<ChartMode>("all");
   const [hoveredMonthKey, setHoveredMonthKey] = useState<string | null>(null);
 
   const currentPeriodData = analytics.periods[period] || analytics.periods["1Y"];

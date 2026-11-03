@@ -8,9 +8,9 @@ import {
   SITE_FISCAL,
   SITE_MAPS_URL,
   SITE_PHONES,
-  SITE_SOCIAL,
   telHref,
 } from "@/lib/site-constants";
+import { SiteSocialLinks } from "./SiteSocialLinks";
 
 interface SiteFooterProps {
   copy: SiteCopy;
@@ -89,13 +89,10 @@ export function SiteFooter({ copy }: SiteFooterProps) {
               </a>
             </li>
           </ul>
-          <p className="site-footer-social">
+          <div className="site-footer-social-block">
             <span className="site-footer-col-title">{copy.footer.socialTitle}</span>
-            <a href={SITE_SOCIAL.instagramUrl} target="_blank" rel="noopener noreferrer">
-              Instagram {SITE_SOCIAL.instagram}
-            </a>
-            <span>Facebook {SITE_SOCIAL.facebook}</span>
-          </p>
+            <SiteSocialLinks />
+          </div>
         </div>
       </div>
 

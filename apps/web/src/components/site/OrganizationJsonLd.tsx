@@ -25,7 +25,7 @@ export function OrganizationJsonLd() {
       addressCountry: "BJ",
     },
     hasMap: SITE_MAPS_URL,
-    sameAs: [SITE_SOCIAL.instagramUrl],
+    sameAs: [SITE_SOCIAL.facebook.url, SITE_SOCIAL.tiktok.url, SITE_SOCIAL.youtube.url],
     vatID: SITE_FISCAL.ifu,
     taxID: SITE_FISCAL.ifu,
     description:

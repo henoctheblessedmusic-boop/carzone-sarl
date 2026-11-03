@@ -51,6 +51,10 @@ export default async function HRPage() {
     }
   }
 
+  // Confidentialité de la paie : seules la comptable principale et la direction
+  // peuvent consulter les salaires et fiches de paie.
+  const canViewPayroll = ["COMPTA", "DG", "PDG", "SG"].includes(user.role);
+
   // Fetch all HR & Payroll data
   const [employees, departments, leaveTypes, leaveRequests, users, salaryPayments] = await Promise.all([
     prisma.employee.findMany({
@@ -87,13 +91,15 @@ export default async function HRPage() {
       select: { id: true, email: true, fullName: true, role: true },
       orderBy: { fullName: "asc" },
     }),
-    prisma.salaryPayment.findMany({
-      where: { year: currentYear },
-      include: {
-        employee: { select: { id: true, firstName: true, lastName: true, employeeNumber: true, jobTitle: true } },
-      },
-      orderBy: { paymentDate: "desc" },
-    }),
+    canViewPayroll
+      ? prisma.salaryPayment.findMany({
+          where: { year: currentYear },
+          include: {
+            employee: { select: { id: true, firstName: true, lastName: true, employeeNumber: true, jobTitle: true } },
+          },
+          orderBy: { paymentDate: "desc" },
+        })
+      : Promise.resolve([]),
   ]);
 
   // Serialize dates for client component
@@ -145,6 +151,7 @@ export default async function HRPage() {
         initialLeaveTypes={serializedLeaveTypes}
         initialLeaveRequests={serializedLeaveRequests}
         initialSalaryPayments={serializedSalaryPayments}
+        canViewPayroll={canViewPayroll}
         availableUsers={users}
         currentYear={currentYear}
       />

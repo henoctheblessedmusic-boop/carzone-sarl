@@ -105,6 +105,10 @@ export const ONBOARDING_STEPS: Record<Role, OnboardingStep[]> = {
     { id: "expenses", label: "Saisie des dépenses & factures fournisseurs", href: "/expenses", hint: "Enregistrement des bons de commande BC" },
     { id: "clients", label: "Comptes clients & relances d'impayés", href: "/clients", hint: "Solde des créances et justificatifs" },
   ],
+  GESTIONNAIRE_LOCATION: [
+    { id: "rentals", label: "Parc de location & contrats", href: "/rentals", hint: "Véhicules à louer, clients, dates, tarifs, caution et retours" },
+    { id: "clients", label: "Clients de la location", href: "/clients", hint: "Créer et consulter les clients des contrats de location" },
+  ],
   ADMIN: [
     { id: "stock", label: "Référencer entrées / sorties de véhicules", href: "/vehicles", hint: "Gestion du parc, numéros de châssis VIN et fiches" },
     { id: "mailbox", label: "Gestion des messages & boîtes de réception", href: "/mailbox", hint: "Courriers entrants et réponses aux demandes" },

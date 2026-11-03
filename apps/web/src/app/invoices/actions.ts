@@ -13,19 +13,16 @@ import { SITE_WEBSITE, SITE_EMAILS } from "@/lib/site-constants";
 import { logAudit } from "@/lib/audit";
 
 export async function addPayment(formData: FormData) {
+  // Encaissements clients : direction, comptabilité, assistante comptable et responsable
+  // des ventes. Les autres rôles n'enregistrent pas de règlement.
   const user = await requireUser([
     "PDG",
     "SG",
     "DG",
-    "ADV",
-    "RF",
     "COMMERCIAL",
-    "HOTESSE",
-    "CHEF_ATELIER",
     "ASSISTANTE_COMPTABLE",
     "COMPTA",
     "COMPTA_GARAGE",
-    "ADMIN",
   ]);
   const { locale } = await getServerMessages();
   const copy = invoicesCopy[locale];
@@ -52,6 +49,12 @@ export async function addPayment(formData: FormData) {
   if (invoice.isDemo) {
     throw new Error("Facture de démonstration : aucun encaissement réel ne peut être enregistré.");
   }
+  if (invoice.kind !== "NORMALISEE") {
+    throw new Error("Un encaissement doit être rattaché à une facture normalisée.");
+  }
+  if (["BROUILLON", "ANNULEE"].includes(invoice.status) || invoice.cancelledAt) {
+    throw new Error("Cette facture n'est pas encaissable (brouillon ou annulée).");
+  }
   const payment = await prisma.payment.create({
     data: {
       invoiceId,
@@ -60,6 +63,7 @@ export async function addPayment(formData: FormData) {
       reference,
       notes,
       paidAt,
+      createdByName: user.fullName,
     },
   });
 

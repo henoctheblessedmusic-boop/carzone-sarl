@@ -137,6 +137,10 @@ const QUICK_ACTIONS: Partial<Record<Role, QuickAction[]>> = {
     { href: "/charge-requests", label: "Demandes d'installation", icon: Wrench },
     { href: "/installers", label: "Mon profil installateur", icon: Users },
   ],
+  GESTIONNAIRE_LOCATION: [
+    { href: "/rentals", label: "Parc de location & contrats", icon: Car },
+    { href: "/clients", label: "Clients location", icon: Users },
+  ],
 };
 
 const DEFAULT_ACTIONS: QuickAction[] = [
@@ -295,6 +299,21 @@ async function buildMetrics(role: Role): Promise<Metric[]> {
   if (role === "INSTALLATEUR") {
     const requests = await prisma.chargeInstallRequest.count().catch(() => 0);
     return [kpi("Demandes d'installation", String(requests), "#38bdf8", "À consulter")];
+  }
+
+  if (role === "GESTIONNAIRE_LOCATION") {
+    const [fleet, available, activeRentals, customers] = await Promise.all([
+      prisma.vehicle.count({ where: { fleetType: "RENTAL" } }),
+      prisma.vehicle.count({ where: { fleetType: "RENTAL", rentalStatus: "DISPONIBLE" } }),
+      prisma.rental.count({ where: { status: "ACTIF" } }),
+      prisma.customer.count({ where: { active: true } }),
+    ]);
+    return [
+      kpi("Parc de location", String(fleet), "#38bdf8", "Véhicules à louer"),
+      kpi("Disponibles", String(available), "#34d399", "Prêts à louer"),
+      kpi("Locations actives", String(activeRentals), "#fbbf24", "Contrats en cours"),
+      kpi("Clients", String(customers), "#a78bfa", "Base clients location"),
+    ];
   }
 
   const customers = await prisma.customer.count({ where: { active: true } });

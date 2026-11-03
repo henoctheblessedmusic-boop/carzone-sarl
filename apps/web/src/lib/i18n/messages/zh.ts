@@ -124,6 +124,7 @@ export const zh: Messages = {
     COMMERCIAL: "销售代表",
     HOTESSE: "前台接待",
     ASSISTANTE_COMPTABLE: "会计助理",
+    GESTIONNAIRE_LOCATION: "车辆租赁经理",
     ADMIN: "管理员（车辆与消息）",
     COMPTA: "财务",
     COMPTA_GARAGE: "车间会计",

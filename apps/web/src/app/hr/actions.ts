@@ -17,6 +17,10 @@ const CAN_MANAGE_HR = [
   "ASSISTANTE_COMPTABLE",
 ] as const;
 
+// Confidentialité de la paie : seuls la comptable principale et la direction
+// peuvent enregistrer, supprimer ou payer des salaires.
+const CAN_MANAGE_PAYROLL = ["PDG", "SG", "DG", "COMPTA"] as const;
+
 // Helper to generate a unique employee number
 async function generateEmployeeNumber(): Promise<string> {
   const currentYear = new Date().getFullYear();
@@ -699,7 +703,7 @@ export async function recordSalaryPayment(data: {
   reference?: string;
   notes?: string;
 }) {
-  const user = await requireUser([...CAN_MANAGE_HR]);
+  const user = await requireUser([...CAN_MANAGE_PAYROLL]);
 
   if (!data.employeeId || !data.month || !data.year || data.amountXof <= 0) {
     throw new Error(adminCopy[await getLocale()].server.hr.invalidPaymentInfo);
@@ -742,7 +746,7 @@ export async function recordSalaryPayment(data: {
 }
 
 export async function deleteSalaryPayment(id: string) {
-  await requireUser([...CAN_MANAGE_HR]);
+  await requireUser([...CAN_MANAGE_PAYROLL]);
 
   await prisma.salaryPayment.delete({
     where: { id },
@@ -759,7 +763,7 @@ export async function markAllMonthlySalariesPaid(data: {
   paymentMethod: string;
   reference?: string;
 }) {
-  const user = await requireUser([...CAN_MANAGE_HR]);
+  const user = await requireUser([...CAN_MANAGE_PAYROLL]);
 
   const activeEmployees = await prisma.employee.findMany({
     where: { status: "ACTIF", baseSalaryXof: { gt: 0 } },

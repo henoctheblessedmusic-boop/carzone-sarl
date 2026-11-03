@@ -180,6 +180,10 @@ model Vehicle {
   priceXof      Int
   costXof       Int?
   status        String         @default("EN_STOCK")
+  /// SHOWROOM = stock de vente ; RENTAL = parc de location distinct.
+  fleetType     String         @default("SHOWROOM")
+  /// DISPONIBLE | LOUE | MAINTENANCE | HORS_SERVICE (pertinent si fleetType = RENTAL)
+  rentalStatus  String?        @default("DISPONIBLE")
   siteId        String?
   site          Site?          @relation(fields: [siteId], references: [id])
   supplierId    String?
@@ -364,6 +368,7 @@ model Payment {
   reference String?
   paidAt    DateTime @default(now())
   notes     String?
+  createdByName String?
   createdAt DateTime @default(now())
 }
 
@@ -394,6 +399,10 @@ model Rental {
   invoiceId  String?   @unique
   invoice    Invoice?  @relation(fields: [invoiceId], references: [id])
   notes      String?
+  departureCondition String?
+  returnCondition    String?
+  returnedAt         DateTime?
+  createdByName      String?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 }

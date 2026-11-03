@@ -338,21 +338,15 @@ export async function confirmOrder(formData: FormData) {
 }
 
 export async function normalizeInvoice(formData: FormData) {
+  // Séparation des tâches : seuls la comptabilité (principale / assistante / garage)
+  // et la direction peuvent transformer une proforma en facture normalisée.
   const user = await requireUser([
     "PDG",
     "SG",
     "DG",
-    "ADV",
-    "RF",
-    "RTA",
-    "DC",
-    "COMMERCIAL",
-    "HOTESSE",
-    "CHEF_ATELIER",
     "ASSISTANTE_COMPTABLE",
     "COMPTA",
     "COMPTA_GARAGE",
-    "ADMIN",
   ]);
   const id = String(formData.get("id"));
   const quote = await prisma.quote.findUniqueOrThrow({ where: { id } });

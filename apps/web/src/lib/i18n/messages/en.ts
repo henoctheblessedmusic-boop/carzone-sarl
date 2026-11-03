@@ -124,6 +124,7 @@ export const en: Messages = {
     COMMERCIAL: "Sales representative",
     HOTESSE: "Front desk hostess",
     ASSISTANTE_COMPTABLE: "Accounting assistant",
+    GESTIONNAIRE_LOCATION: "Vehicle rental manager",
     ADMIN: "Administrator (vehicles & inquiries)",
     COMPTA: "Accounting",
     COMPTA_GARAGE: "Workshop Accountant",

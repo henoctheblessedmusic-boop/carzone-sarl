@@ -245,6 +245,13 @@ export const DEFAULT_ROLE_CAPABILITIES: Record<Role, string[]> = {
     "services:view", "services:create", "services:edit",
   ],
 
+  // Gestionnaire de la location : uniquement le parc de location, les contrats et les clients liés.
+  GESTIONNAIRE_LOCATION: [
+    "customers:view_global", "customers:create", "customers:edit", "customers:documents",
+    "stock:view",
+    "services:view",
+  ],
+
   ADMIN: [
     "customers:view_global", "customers:create", "customers:edit", "customers:delete", "customers:documents",
     "invoices:view_global", "invoices:create", "invoices:edit",

@@ -216,6 +216,14 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     "expenses:read", "expenses:write",
   ],
 
+  // 10bis. Gestionnaire de la location : parc de location et contrats uniquement.
+  GESTIONNAIRE_LOCATION: [
+    "fleet:read", "fleet:write",
+    "vehicles:read",
+    "clients:read", "clients:write",
+    "mailbox:read",
+  ],
+
   // 11. RH : Responsable Ressources Humaines (Personnel, Congés, Structure RH)
   RH: [
     "users:manage",
@@ -408,6 +416,17 @@ export class RoleService {
   static isRouteAllowed(role: Role, pathname: string): boolean {
     if (role === "DEVELOPER" || role === "DG" || role === "PDG" || role === "SG" || role === "ADV" || role === "RF") return true;
 
+    // Gestionnaire de la location : uniquement son tableau de bord, le parc de location,
+    // les contrats et les clients nécessaires à la location.
+    if (role === "GESTIONNAIRE_LOCATION") {
+      return (
+        pathname.startsWith("/rentals") ||
+        pathname.startsWith("/clients") ||
+        pathname.startsWith("/dashboard") ||
+        pathname.startsWith("/login")
+      );
+    }
+
     if (pathname.startsWith("/users")) {
       return this.hasPermission(role, "roles:manage") || this.hasPermission(role, "users:manage");
     }
@@ -478,6 +497,15 @@ export class RoleService {
       user.role === "RF"
     ) {
       return true;
+    }
+
+    if (user.role === "GESTIONNAIRE_LOCATION") {
+      return (
+        pathname.startsWith("/rentals") ||
+        pathname.startsWith("/clients") ||
+        pathname.startsWith("/dashboard") ||
+        pathname.startsWith("/login")
+      );
     }
 
     if (

@@ -19,6 +19,7 @@ export const Role = {
   COMMERCIAL: "COMMERCIAL",
   HOTESSE: "HOTESSE",
   ASSISTANTE_COMPTABLE: "ASSISTANTE_COMPTABLE",
+  GESTIONNAIRE_LOCATION: "GESTIONNAIRE_LOCATION",
 
   // Compatibilité & Technique
   ADMIN: "ADMIN",
@@ -46,6 +47,7 @@ export const ROLE_LABELS: Record<Role, string> = {
   COMMERCIAL: "Commercial(e)",
   HOTESSE: "Hôtesse d'Accueil",
   ASSISTANTE_COMPTABLE: "Assistante Comptable",
+  GESTIONNAIRE_LOCATION: "Gestionnaire de la location de véhicules",
   ADMIN: "Administrateur (Véhicules & Messages)",
   COMPTA: "Comptable principale - Comptabilité, RAF & RH",
   COMPTA_GARAGE: "Comptable Garage",

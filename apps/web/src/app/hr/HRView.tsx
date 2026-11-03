@@ -123,6 +123,7 @@ export function HRView({
   initialLeaveTypes,
   initialLeaveRequests,
   initialSalaryPayments = [],
+  canViewPayroll = false,
   availableUsers,
   currentYear,
 }: {
@@ -133,6 +134,7 @@ export function HRView({
   initialLeaveTypes: LeaveTypeData[];
   initialLeaveRequests: LeaveRequestData[];
   initialSalaryPayments?: SalaryPaymentData[];
+  canViewPayroll?: boolean;
   availableUsers: Array<{ id: string; email: string; fullName: string; role: string }>;
   currentYear: number;
 }) {
@@ -731,24 +733,26 @@ export function HRView({
           )}
         </button>
 
-        <button
-          onClick={() => setActiveTab("paie")}
-          style={{
-            background: "none",
-            border: "none",
-            borderBottom: activeTab === "paie" ? "2px solid var(--brand)" : "2px solid transparent",
-            padding: "0.6rem 0.2rem",
-            color: activeTab === "paie" ? "var(--brand)" : "inherit",
-            fontWeight: activeTab === "paie" ? 600 : 500,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.4rem",
-            fontSize: "0.95rem",
-          }}
-        >
-          <Wallet size={16} /> {hrCopy.tabs.payroll}
-        </button>
+        {canViewPayroll && (
+          <button
+            onClick={() => setActiveTab("paie")}
+            style={{
+              background: "none",
+              border: "none",
+              borderBottom: activeTab === "paie" ? "2px solid var(--brand)" : "2px solid transparent",
+              padding: "0.6rem 0.2rem",
+              color: activeTab === "paie" ? "var(--brand)" : "inherit",
+              fontWeight: activeTab === "paie" ? 600 : 500,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.4rem",
+              fontSize: "0.95rem",
+            }}
+          >
+            <Wallet size={16} /> {hrCopy.tabs.payroll}
+          </button>
+        )}
 
         <button
           onClick={() => setActiveTab("config")}
@@ -1419,7 +1423,7 @@ export function HRView({
       {/* ========================================================================= */}
       {/* TAB 4: SUIVI PAIE & SALAIRES (COMPTABILITÉ & DIRECTION) */}
       {/* ========================================================================= */}
-      {activeTab === "paie" && (
+      {canViewPayroll && activeTab === "paie" && (
         <PayrollTab
           employees={employees}
           initialSalaryPayments={salaryPayments}

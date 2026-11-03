@@ -310,6 +310,40 @@
   gap: 0.6rem;
 }
 
+.site-header-socials {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.site-header-social-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  color: #ffffff;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: filter 0.16s ease, transform 0.16s ease;
+}
+
+.site-header-social-btn:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+.site-header-social-btn--facebook {
+  background: #1877f2;
+  border-color: #1877f2;
+}
+
+.site-header-social-btn--tiktok {
+  background: #010101;
+  border-color: #25f4ee;
+}
+
 .site-header-pro-link {
   min-height: 40px;
   padding: 0.55rem 1.1rem;
@@ -1065,25 +1099,49 @@
   gap: 0.4rem;
   min-height: 32px;
   padding: 0.3rem 0.6rem;
-  border: 1px solid var(--site-border);
+  border: 1px solid transparent;
   border-radius: 999px;
-  color: var(--site-muted);
-  background: rgba(255, 255, 255, 0.02);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
   text-decoration: none;
   font-size: 0.78rem;
-  font-weight: 600;
-  transition: color 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+  font-weight: 700;
+  transition: filter 0.16s ease, transform 0.16s ease;
 }
 
 .site-footer-social-link:hover {
-  color: var(--site-text-strong);
-  border-color: rgba(201, 148, 0, 0.55);
-  background: rgba(201, 148, 0, 0.08);
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.site-footer-social-link--facebook {
+  background: #1877f2;
+  border-color: #1877f2;
+}
+
+.site-footer-social-link--instagram {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  border-color: transparent;
+}
+
+.site-footer-social-link--tiktok {
+  background: #010101;
+  border-color: #25f4ee;
+}
+
+.site-footer-social-link--youtube {
+  background: #ff0033;
+  border-color: #ff0033;
 }
 
 .site-footer-social-link.is-disabled {
-  opacity: 0.62;
+  opacity: 0.92;
   cursor: default;
+}
+
+.site-footer-social-link.is-disabled:hover {
+  filter: none;
+  transform: none;
 }
 
 .site-footer-social-link .site-social-icon {

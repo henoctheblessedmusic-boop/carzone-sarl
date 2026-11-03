@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { SiteLogo } from "./SiteLogo";
+import { SiteSocialIcon } from "./SiteSocialIcon";
+import { SITE_SOCIAL } from "@/lib/site-constants";
 import type { SiteCopy } from "@/lib/i18n/site";
 import type { SiteLocale } from "@/lib/site-prefs";
 
@@ -109,6 +111,28 @@ export function SiteHeader({ locale, copy }: SiteHeaderProps) {
         </nav>
 
         <div className="site-header-actions">
+          <div className="site-header-socials" aria-label="Réseaux sociaux CARZONE">
+            <a
+              href={SITE_SOCIAL.facebook.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="site-header-social-btn site-header-social-btn--facebook"
+              aria-label="Facebook CARZONE"
+              title="Facebook CARZONE"
+            >
+              <SiteSocialIcon network="facebook" size={17} />
+            </a>
+            <a
+              href={SITE_SOCIAL.tiktok.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="site-header-social-btn site-header-social-btn--tiktok"
+              aria-label="TikTok CARZONE"
+              title="TikTok CARZONE"
+            >
+              <SiteSocialIcon network="tiktok" size={17} />
+            </a>
+          </div>
           <LanguageSwitcher
             locale={locale}
             label={copy.nav.languageLabel}

@@ -105,30 +105,60 @@ export function PurchaseOrderDocument({ expense }: { expense: PurchaseOrderExpen
       `}</style>
 
       {/* EN-TÊTE */}
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 20, paddingBottom: 14, borderBottom: `3px solid ${RED}` }}>
-        <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-          <CarzoneLogo size="md" />
-          <div style={{ paddingTop: 2 }}>
-            <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: "-0.02em" }}>CARZONE SARL</div>
-            <div style={{ fontSize: 10.5, color: MUTED, marginTop: 2 }}>Concessionnaire automobile multimarques</div>
-            <div style={{ fontSize: 10.5, color: MUTED, marginTop: 5, lineHeight: 1.45 }}>
+      <header style={{ textAlign: "center", paddingBottom: 16, borderBottom: `3px solid ${RED}` }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#0B0F19",
+              borderRadius: 10,
+              padding: "10px 18px",
+              boxShadow: "0 2px 8px rgba(11,15,25,0.18)",
+            }}
+          >
+            <CarzoneLogo size="md" />
+          </div>
+
+          <div style={{ textAlign: "center", lineHeight: 1.55 }}>
+            <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "0.01em" }}>CARZONE SARL</div>
+            <div style={{ fontSize: 10.5, color: MUTED }}>Concessionnaire automobile multimarques</div>
+            <div style={{ fontSize: 10.5, color: MUTED, marginTop: 3 }}>
               {SITE_ADDRESS.line1}, {SITE_ADDRESS.line2}<br />
-              {SITE_ADDRESS.city}, {SITE_ADDRESS.country}<br />
-              Tél. : {phone}<br />
+              {SITE_ADDRESS.city}, {SITE_ADDRESS.country}
+            </div>
+            <div style={{ fontSize: 10.5, color: MUTED, marginTop: 3 }}>Tél. : {phone}</div>
+            <div style={{ fontSize: 10.5, color: MUTED }}>
               {SITE_EMAILS.contact} · {SITE_WEBSITE}
             </div>
-            <div style={{ fontSize: 10, color: MUTED, marginTop: 4 }}>
+            <div style={{ fontSize: 10, color: MUTED, marginTop: 2 }}>
               IFU : {SITE_FISCAL.ifu} · RCCM : {SITE_FISCAL.rccm}
             </div>
           </div>
         </div>
-        <div style={{ textAlign: "right", minWidth: 230 }}>
-          <div style={{ display: "inline-block", background: RED, color: "#fff", fontWeight: 800, fontSize: 16, letterSpacing: "0.10em", padding: "7px 14px" }}>
+
+        <div style={{ marginTop: 14 }}>
+          <div
+            style={{
+              display: "inline-block",
+              background: RED,
+              color: "#fff",
+              fontWeight: 800,
+              fontSize: 16,
+              letterSpacing: "0.10em",
+              padding: "7px 22px",
+              borderRadius: 3,
+            }}
+          >
             BON DE COMMANDE
           </div>
-          <div style={{ fontSize: 20, fontWeight: 800, marginTop: 8, fontFamily: "Consolas, monospace", color: INK }}>{number}</div>
-          <div style={{ fontSize: 10.5, color: MUTED, marginTop: 2 }}>Date d&apos;émission : {formatDate(expense.serviceDate)}</div>
-          <div style={{ fontSize: 10.5, color: MUTED }}>Réf. interne : {expense.expenseNumber}</div>
+          <div style={{ fontSize: 20, fontWeight: 800, marginTop: 8, fontFamily: "Consolas, monospace", color: INK }}>
+            {number}
+          </div>
+          <div style={{ fontSize: 10.5, color: MUTED, marginTop: 2 }}>
+            Date d&apos;émission : {formatDate(expense.serviceDate)} · Réf. interne : {expense.expenseNumber}
+          </div>
         </div>
       </header>
 

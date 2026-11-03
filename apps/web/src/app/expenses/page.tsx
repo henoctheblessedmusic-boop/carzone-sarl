@@ -17,18 +17,21 @@ export default async function ExpensesPage() {
   ]);
 
   const currentYear = new Date().getFullYear();
+  const canViewPayroll = ["COMPTA", "DG", "PDG", "SG"].includes(user.role);
 
   const [rawExpenses, rawSalaries] = await Promise.all([
     prisma.expense.findMany({
       orderBy: { serviceDate: "desc" },
     }),
-    prisma.salaryPayment.findMany({
-      where: { year: currentYear },
-      include: {
-        employee: { select: { firstName: true, lastName: true, employeeNumber: true } },
-      },
-      orderBy: { paymentDate: "desc" },
-    }),
+    canViewPayroll
+      ? prisma.salaryPayment.findMany({
+          where: { year: currentYear },
+          include: {
+            employee: { select: { firstName: true, lastName: true, employeeNumber: true } },
+          },
+          orderBy: { paymentDate: "desc" },
+        })
+      : Promise.resolve([]),
   ]);
 
   const expenses = rawExpenses.map((exp) => ({
@@ -75,6 +78,7 @@ export default async function ExpensesPage() {
         currentUserRole={user.role}
         initialExpenses={expenses}
         initialSalaryPayments={salaryPayments}
+        canViewPayroll={canViewPayroll}
         currentYear={currentYear}
       />
     </AppShell>

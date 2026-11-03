@@ -98,11 +98,13 @@ const EXPENSE_PAYMENT_METHODS = ["VIREMENT", "CHEQUE", "MOBILE_MONEY", "ESPECES"
 export function ExpensesView({
   initialExpenses,
   initialSalaryPayments,
+  canViewPayroll = false,
   currentYear,
 }: {
   currentUserRole?: string;
   initialExpenses: ExpenseData[];
   initialSalaryPayments: SalaryPaymentRow[];
+  canViewPayroll?: boolean;
   currentYear: number;
 }) {
   const [expenses, setExpenses] = useState<ExpenseData[]>(initialExpenses);
@@ -413,17 +415,19 @@ export function ExpensesView({
           </div>
         </div>
 
-        <div className="ox-card" style={{ padding: "1.2rem", borderLeft: "4px solid #0078d4" }}>
-          <div style={{ fontSize: "0.8rem", opacity: 0.7, marginBottom: "0.4rem" }}>
-            {expensesCopy.kpi.payroll(currentYear)}
+        {canViewPayroll && (
+          <div className="ox-card" style={{ padding: "1.2rem", borderLeft: "4px solid #0078d4" }}>
+            <div style={{ fontSize: "0.8rem", opacity: 0.7, marginBottom: "0.4rem" }}>
+              {expensesCopy.kpi.payroll(currentYear)}
+            </div>
+            <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "var(--brand)" }}>
+              {formatXof(totalSalariesPaidYear)}
+            </div>
+            <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: "0.2rem" }}>
+              {expensesCopy.kpi.payrollHint}
+            </div>
           </div>
-          <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "var(--brand)" }}>
-            {formatXof(totalSalariesPaidYear)}
-          </div>
-          <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: "0.2rem" }}>
-            {expensesCopy.kpi.payrollHint}
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Filter Toolbar */}

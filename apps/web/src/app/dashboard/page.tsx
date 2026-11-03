@@ -30,8 +30,9 @@ import { ExecutiveDashboardCharts } from "@/components/ExecutiveDashboardCharts"
 import { buildRealDashboardAnalytics } from "@/lib/dashboard-analytics";
 import { ACTIVITY } from "@/lib/permissions";
 import { RoleDashboard } from "./RoleDashboard";
+import { DashboardAutoRefresh } from "@/components/DashboardAutoRefresh";
 
-const DIRECTION_ROLES: Role[] = ["DEVELOPER", "PDG", "SG", "DG"];
+const DIRECTION_ROLES: Role[] = ["DEVELOPER", "PDG", "SG", "DG", "COMPTA"];
 
 // CSS custom properties (ex. --kpi-accent) ne font pas partie du type CSSProperties ;
 // ce helper évite de répéter l'assertion de type à chaque usage.
@@ -289,6 +290,9 @@ export default async function DashboardPage() {
               {" · "}
               {copy.hqLine}
             </div>
+            <div style={{ marginTop: 6 }}>
+              <DashboardAutoRefresh />
+            </div>
           </div>
 
           {/* Quick Shortcuts */}
@@ -340,6 +344,37 @@ export default async function DashboardPage() {
                 <Link href="/mailbox" className="ox-btn ox-btn-ghost ox-quick-btn">
                   <Mail size={16} color="var(--brand)" />
                   {copy.shortcuts.devMailbox}
+                </Link>
+              </>
+            ) : user.role === "COMPTA" ? (
+              <>
+                <Link href="/invoices" className="ox-btn ox-btn-gold ox-quick-btn">
+                  <CreditCard size={16} />
+                  Factures & encaissements
+                </Link>
+                <Link href="/quotes" className="ox-btn ox-btn-ghost ox-quick-btn">
+                  <FileCheck size={16} color="#a78bfa" />
+                  Devis & proformas
+                </Link>
+                <Link href="/expenses" className="ox-btn ox-btn-ghost ox-quick-btn">
+                  <Users size={16} color="#f59e0b" />
+                  Dépenses & prestataires
+                </Link>
+                <Link href="/hr" className="ox-btn ox-btn-ghost ox-quick-btn">
+                  <Users size={16} color="#10b981" />
+                  RH & paie
+                </Link>
+                <Link href="/imports" className="ox-btn ox-btn-ghost ox-quick-btn">
+                  <Ship size={16} color="#38bdf8" />
+                  Imports & logistique
+                </Link>
+                <Link href="/rentals" className="ox-btn ox-btn-ghost ox-quick-btn">
+                  <Car size={16} color="#f472b6" />
+                  Location
+                </Link>
+                <Link href="/audit" className="ox-btn ox-btn-ghost ox-quick-btn">
+                  <ShieldCheck size={16} color="#fbbf24" />
+                  Journal d'audit
                 </Link>
               </>
             ) : (

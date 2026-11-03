@@ -916,11 +916,39 @@ model Expense {
   invoiceFileUrl   String?   // Pièce jointe / Facture ou Proforma du prestataire
   serviceDate      DateTime  @default(now()) // Date de réalisation de la prestation
   dueDate          DateTime?
+  /// Métadonnées professionnelles du bon de commande
+  taxRatePct            Float     @default(0)
+  deliveryAddress       String?
+  deliveryDate          DateTime?
+  paymentTerms          String?
+  budgetLine            String?
+  fundingSource         String?
+  authorizedByName      String?
+  authorizedTitle       String?
+  authorizedAt          DateTime?
+  supplierAcceptedByName String?
+  supplierAcceptedAt     DateTime?
+  lines                 ExpenseLine[]
   siteId           String?
   site             Site?     @relation(fields: [siteId], references: [id])
   registeredBy     String?   // Utilisateur qui a saisi la dépense
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
+}
+
+/// Lignes détaillées d'un bon de commande Carzone.
+model ExpenseLine {
+  id           String  @id @default(cuid())
+  expenseId    String
+  expense      Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  description  String
+  quantity     Float   @default(1)
+  unit         String? @default("U")
+  unitPriceXof Int
+  totalXof     Int
+  sortOrder    Int     @default(0)
+
+  @@index([expenseId, sortOrder])
 }
 
 /// Journal d'audit : qui a fait quoi, sur quelle entité, à quel moment.

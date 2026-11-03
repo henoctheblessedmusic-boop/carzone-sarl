@@ -21,6 +21,7 @@ export default async function ExpensesPage() {
 
   const [rawExpenses, rawSalaries] = await Promise.all([
     prisma.expense.findMany({
+      include: { lines: { orderBy: { sortOrder: "asc" } } },
       orderBy: { serviceDate: "desc" },
     }),
     canViewPayroll
@@ -55,6 +56,25 @@ export default async function ExpensesPage() {
     invoiceFileUrl: exp.invoiceFileUrl,
     serviceDate: exp.serviceDate.toISOString(),
     dueDate: exp.dueDate ? exp.dueDate.toISOString() : null,
+    deliveryAddress: exp.deliveryAddress,
+    deliveryDate: exp.deliveryDate ? exp.deliveryDate.toISOString() : null,
+    paymentTerms: exp.paymentTerms,
+    budgetLine: exp.budgetLine,
+    fundingSource: exp.fundingSource,
+    taxRatePct: exp.taxRatePct,
+    authorizedByName: exp.authorizedByName,
+    authorizedTitle: exp.authorizedTitle,
+    authorizedAt: exp.authorizedAt ? exp.authorizedAt.toISOString() : null,
+    supplierAcceptedByName: exp.supplierAcceptedByName,
+    supplierAcceptedAt: exp.supplierAcceptedAt ? exp.supplierAcceptedAt.toISOString() : null,
+    lines: exp.lines.map((line) => ({
+      id: line.id,
+      description: line.description,
+      quantity: line.quantity,
+      unit: line.unit,
+      unitPriceXof: line.unitPriceXof,
+      totalXof: line.totalXof,
+    })),
     registeredBy: exp.registeredBy,
     createdAt: exp.createdAt.toISOString(),
   }));
@@ -76,6 +96,7 @@ export default async function ExpensesPage() {
     <AppShell user={user} titleKey="expenses">
       <ExpensesView
         currentUserRole={user.role}
+        currentUserName={user.fullName}
         initialExpenses={expenses}
         initialSalaryPayments={salaryPayments}
         canViewPayroll={canViewPayroll}

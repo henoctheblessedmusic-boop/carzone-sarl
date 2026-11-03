@@ -34,6 +34,7 @@ import {
   deleteExpense,
   generatePurchaseOrderNumber,
 } from "./actions";
+import { PurchaseOrderDocument } from "./PurchaseOrderDocument";
 
 export type ExpenseData = {
   id: string;
@@ -56,6 +57,25 @@ export type ExpenseData = {
   invoiceFileUrl: string | null;
   serviceDate: string;
   dueDate: string | null;
+  deliveryAddress: string | null;
+  deliveryDate: string | null;
+  paymentTerms: string | null;
+  budgetLine: string | null;
+  fundingSource: string | null;
+  taxRatePct: number;
+  authorizedByName: string | null;
+  authorizedTitle: string | null;
+  authorizedAt: string | null;
+  supplierAcceptedByName: string | null;
+  supplierAcceptedAt: string | null;
+  lines: Array<{
+    id: string;
+    description: string;
+    quantity: number;
+    unit: string | null;
+    unitPriceXof: number;
+    totalXof: number;
+  }>;
   registeredBy: string | null;
   createdAt: string;
 };
@@ -95,13 +115,30 @@ const CATEGORY_STYLE: Record<
 
 const EXPENSE_PAYMENT_METHODS = ["VIREMENT", "CHEQUE", "MOBILE_MONEY", "ESPECES"] as const;
 
+type PurchaseOrderLineDraft = {
+  description: string;
+  quantity: string;
+  unit: string;
+  unitPriceXof: string;
+};
+
+const emptyPurchaseOrderLine = (): PurchaseOrderLineDraft => ({
+  description: "",
+  quantity: "1",
+  unit: "U",
+  unitPriceXof: "",
+});
+
 export function ExpensesView({
   initialExpenses,
   initialSalaryPayments,
   canViewPayroll = false,
+  currentUserRole,
+  currentUserName,
   currentYear,
 }: {
   currentUserRole?: string;
+  currentUserName?: string;
   initialExpenses: ExpenseData[];
   initialSalaryPayments: SalaryPaymentRow[];
   canViewPayroll?: boolean;
@@ -151,7 +188,15 @@ export function ExpensesView({
     status: "A_PAYER",
     serviceDate: new Date().toISOString().split("T")[0],
     dueDate: new Date(Date.now() + 15 * 86400000).toISOString().split("T")[0],
+    taxRatePct: "0",
+    paymentTerms: "Paiement à 30 jours après réception de la facture",
+    deliveryAddress: "CARZONE SARL, Zone Maro-Militaire, Gbèdomidji, Cotonou, Bénin",
+    deliveryDate: "",
+    budgetLine: "",
+    fundingSource: "",
+    authorizedTitle: "",
   });
+  const [poLines, setPoLines] = useState<PurchaseOrderLineDraft[]>([emptyPurchaseOrderLine()]);
 
   const [paymentForm, setPaymentForm] = useState({
     paymentMethod: "VIREMENT",
@@ -199,8 +244,23 @@ export function ExpensesView({
     return initialSalaryPayments.reduce((sum, s) => sum + s.amountXof, 0);
   }, [initialSalaryPayments]);
 
+  const poSubtotal = useMemo(
+    () =>
+      poLines.reduce(
+        (sum, line) => sum + (Number(line.quantity) || 0) * (Number(line.unitPriceXof) || 0),
+        0
+      ),
+    [poLines]
+  );
+  const poTax = useMemo(
+    () => Math.round((poSubtotal * (Number(formData.taxRatePct) || 0)) / 100),
+    [poSubtotal, formData.taxRatePct]
+  );
+  const poTotal = poSubtotal + poTax;
+
   const handleOpenCreateModal = async (mode: "PO" | "EXPENSE" = "PO") => {
     setCreateMode(mode);
+    setPoLines([emptyPurchaseOrderLine()]);
     setFormData({
       category: mode === "PO" ? "PRESTATAIRE_SERVICE" : "AUTRE_CHARGE",
       title: "",
@@ -216,6 +276,13 @@ export function ExpensesView({
       status: "A_PAYER",
       serviceDate: new Date().toISOString().split("T")[0],
       dueDate: new Date(Date.now() + 15 * 86400000).toISOString().split("T")[0],
+      taxRatePct: "0",
+      paymentTerms: "Paiement à 30 jours après réception de la facture",
+      deliveryAddress: "CARZONE SARL, Zone Maro-Militaire, Gbèdomidji, Cotonou, Bénin",
+      deliveryDate: "",
+      budgetLine: "",
+      fundingSource: "",
+      authorizedTitle: "",
     });
     setShowCreateModal(true);
   };
@@ -224,8 +291,9 @@ export function ExpensesView({
     e.preventDefault();
     startTransition(async () => {
       try {
+        const isPurchaseOrder = formData.withPurchaseOrder;
         let poNo: string | undefined = undefined;
-        if (formData.withPurchaseOrder) {
+        if (isPurchaseOrder) {
           poNo = await generatePurchaseOrderNumber();
         }
 
@@ -238,12 +306,30 @@ export function ExpensesView({
           supplierEmail: formData.supplierEmail,
           proformaRef: formData.proformaRef,
           purchaseOrderNo: poNo,
-          amountHtXof: Number(formData.amountHtXof) || Number(formData.amountTtcXof),
-          taxXof: Number(formData.taxXof) || 0,
-          amountTtcXof: Number(formData.amountTtcXof),
+          amountHtXof: isPurchaseOrder ? poSubtotal : Number(formData.amountHtXof) || Number(formData.amountTtcXof),
+          taxXof: isPurchaseOrder ? poTax : Number(formData.taxXof) || 0,
+          amountTtcXof: isPurchaseOrder ? poTotal : Number(formData.amountTtcXof),
           status: formData.status,
           serviceDate: formData.serviceDate,
           dueDate: formData.dueDate,
+          taxRatePct: Number(formData.taxRatePct) || 0,
+          deliveryAddress: formData.deliveryAddress,
+          deliveryDate: formData.deliveryDate,
+          paymentTerms: formData.paymentTerms,
+          budgetLine: formData.budgetLine,
+          fundingSource: formData.fundingSource,
+          authorizedByName: currentUserName,
+          authorizedTitle: formData.authorizedTitle,
+          lines: isPurchaseOrder
+            ? poLines
+                .filter((line) => line.description.trim() && Number(line.quantity) > 0)
+                .map((line) => ({
+                  description: line.description,
+                  quantity: Number(line.quantity) || 0,
+                  unit: line.unit,
+                  unitPriceXof: Number(line.unitPriceXof) || 0,
+                }))
+            : undefined,
         });
 
         setExpenses((prev) => [
@@ -252,6 +338,17 @@ export function ExpensesView({
             serviceDate: created.serviceDate.toISOString(),
             dueDate: created.dueDate ? created.dueDate.toISOString() : null,
             paymentDate: created.paymentDate ? created.paymentDate.toISOString() : null,
+            deliveryDate: created.deliveryDate ? created.deliveryDate.toISOString() : null,
+            authorizedAt: created.authorizedAt ? created.authorizedAt.toISOString() : null,
+            supplierAcceptedAt: created.supplierAcceptedAt ? created.supplierAcceptedAt.toISOString() : null,
+            lines: created.lines.map((line) => ({
+              id: line.id,
+              description: line.description,
+              quantity: line.quantity,
+              unit: line.unit,
+              unitPriceXof: line.unitPriceXof,
+              totalXof: line.totalXof,
+            })),
             createdAt: created.createdAt.toISOString(),
           },
           ...prev,
@@ -908,56 +1005,192 @@ export function ExpensesView({
                 />
               </div>
 
-              {/* Amounts & Financials */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.8rem" }}>
-                <div>
-                  <label className="ox-label">{expensesCopy.createModal.amountHt}</label>
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder={expensesCopy.createModal.amountHtPlaceholder}
-                    value={formData.amountHtXof}
-                    onChange={(e) => {
-                      const ht = e.target.value;
-                      const tax = formData.taxXof || "0";
-                      const ttc = ht ? String(Number(ht) + Number(tax)) : "";
-                      setFormData({ ...formData, amountHtXof: ht, amountTtcXof: ttc });
-                    }}
-                    className="ox-input"
-                  />
-                </div>
+              {formData.withPurchaseOrder ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
+                  <div style={{ fontSize: "0.8rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--brand)" }}>
+                    Détail des biens et services commandés
+                  </div>
 
-                <div>
-                  <label className="ox-label">{expensesCopy.createModal.tax}</label>
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder={expensesCopy.createModal.taxPlaceholder}
-                    value={formData.taxXof}
-                    onChange={(e) => {
-                      const tax = e.target.value;
-                      const ht = formData.amountHtXof || "0";
-                      const ttc = String(Number(ht) + Number(tax));
-                      setFormData({ ...formData, taxXof: tax, amountTtcXof: ttc });
-                    }}
-                    className="ox-input"
-                  />
-                </div>
+                  <div style={{ border: "1px solid var(--ice-border)", borderRadius: 10, overflow: "hidden" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "2.4fr 0.7fr 0.7fr 1fr 1fr 32px", gap: 0, background: "rgba(148,163,184,0.12)", padding: "0.5rem 0.6rem", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase" }}>
+                      <span>Désignation</span>
+                      <span>Qté</span>
+                      <span>Unité</span>
+                      <span>P.U. FCFA</span>
+                      <span style={{ textAlign: "right" }}>Total</span>
+                      <span />
+                    </div>
+                    {poLines.map((line, index) => {
+                      const lineTotal = (Number(line.quantity) || 0) * (Number(line.unitPriceXof) || 0);
+                      return (
+                        <div key={index} style={{ display: "grid", gridTemplateColumns: "2.4fr 0.7fr 0.7fr 1fr 1fr 32px", gap: 6, alignItems: "center", padding: "0.45rem 0.6rem", borderTop: "1px solid var(--ice-border)" }}>
+                          <input
+                            className="ox-input"
+                            value={line.description}
+                            onChange={(e) => setPoLines((prev) => prev.map((item, i) => i === index ? { ...item, description: e.target.value } : item))}
+                            placeholder="Description de l'article ou du service"
+                            required
+                          />
+                          <input
+                            className="ox-input"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={line.quantity}
+                            onChange={(e) => setPoLines((prev) => prev.map((item, i) => i === index ? { ...item, quantity: e.target.value } : item))}
+                          />
+                          <input
+                            className="ox-input"
+                            value={line.unit}
+                            onChange={(e) => setPoLines((prev) => prev.map((item, i) => i === index ? { ...item, unit: e.target.value } : item))}
+                          />
+                          <input
+                            className="ox-input"
+                            type="number"
+                            min="0"
+                            value={line.unitPriceXof}
+                            onChange={(e) => setPoLines((prev) => prev.map((item, i) => i === index ? { ...item, unitPriceXof: e.target.value } : item))}
+                            placeholder="0"
+                          />
+                          <span style={{ textAlign: "right", fontWeight: 700, fontSize: "0.82rem" }}>{formatXof(lineTotal)}</span>
+                          <button
+                            type="button"
+                            className="ox-btn ox-btn-ghost"
+                            style={{ padding: 2, color: "#f87171" }}
+                            onClick={() => setPoLines((prev) => prev.length > 1 ? prev.filter((_, i) => i !== index) : prev)}
+                            aria-label="Supprimer la ligne"
+                          >
+                            <XCircle size={16} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
 
-                <div>
-                  <label className="ox-label">{expensesCopy.createModal.amountTtc}</label>
-                  <input
-                    type="number"
-                    min="1"
-                    required
-                    placeholder={expensesCopy.createModal.amountTtcPlaceholder}
-                    value={formData.amountTtcXof}
-                    onChange={(e) => setFormData({ ...formData, amountTtcXof: e.target.value })}
-                    className="ox-input"
-                    style={{ fontWeight: 700 }}
-                  />
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem", flexWrap: "wrap" }}>
+                    <button
+                      type="button"
+                      className="ox-btn ox-btn-ghost"
+                      style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "0.8rem" }}
+                      onClick={() => setPoLines((prev) => [...prev, emptyPurchaseOrderLine()])}
+                    >
+                      <Plus size={14} /> Ajouter une ligne
+                    </button>
+
+                    <div style={{ minWidth: 250, display: "flex", flexDirection: "column", gap: 4, fontSize: "0.85rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span>Sous-total HT</span>
+                        <strong>{formatXof(poSubtotal)}</strong>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                        <span>TVA (%)</span>
+                        <input
+                          className="ox-input"
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.1"
+                          value={formData.taxRatePct}
+                          onChange={(e) => setFormData({ ...formData, taxRatePct: e.target.value })}
+                          style={{ width: 80, height: 30, textAlign: "right" }}
+                        />
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span>TVA</span>
+                        <strong>{formatXof(poTax)}</strong>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid var(--ice-border)", paddingTop: 6, color: "var(--brand)", fontSize: "1rem" }}>
+                        <strong>Total TTC</strong>
+                        <strong>{formatXof(poTotal)}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem" }}>
+                    <div>
+                      <label className="ox-label">Conditions de paiement</label>
+                      <input className="ox-input" value={formData.paymentTerms} onChange={(e) => setFormData({ ...formData, paymentTerms: e.target.value })} placeholder="Ex. Paiement à 30 jours après réception de la facture" />
+                    </div>
+                    <div>
+                      <label className="ox-label">Date de livraison prévue</label>
+                      <input className="ox-input" type="date" value={formData.deliveryDate} onChange={(e) => setFormData({ ...formData, deliveryDate: e.target.value })} />
+                    </div>
+                    <div style={{ gridColumn: "1 / -1" }}>
+                      <label className="ox-label">Adresse de livraison</label>
+                      <input className="ox-input" value={formData.deliveryAddress} onChange={(e) => setFormData({ ...formData, deliveryAddress: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="ox-label">Ligne budgétaire</label>
+                      <input className="ox-input" value={formData.budgetLine} onChange={(e) => setFormData({ ...formData, budgetLine: e.target.value })} placeholder="Ex. 1.1.10 - Petits achats" />
+                    </div>
+                    <div>
+                      <label className="ox-label">Source de financement</label>
+                      <input className="ox-input" value={formData.fundingSource} onChange={(e) => setFormData({ ...formData, fundingSource: e.target.value })} placeholder="Ex. Projet PAMVERC" />
+                    </div>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", background: "rgba(0,120,212,0.08)", border: "1px solid rgba(0,120,212,0.2)", borderRadius: 10, padding: "0.8rem" }}>
+                    <div>
+                      <div style={{ fontSize: "0.72rem", textTransform: "uppercase", color: "#94a3b8", fontWeight: 700 }}>Autorisé par</div>
+                      <div style={{ fontWeight: 700, marginTop: 2 }}>{currentUserName || "-"}</div>
+                    </div>
+                    <div>
+                      <label className="ox-label" style={{ marginTop: 0 }}>Fonction du signataire</label>
+                      <input className="ox-input" value={formData.authorizedTitle} onChange={(e) => setFormData({ ...formData, authorizedTitle: e.target.value })} placeholder="Ex. Comptable principale" />
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.8rem" }}>
+                  <div>
+                    <label className="ox-label">{expensesCopy.createModal.amountHt}</label>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder={expensesCopy.createModal.amountHtPlaceholder}
+                      value={formData.amountHtXof}
+                      onChange={(e) => {
+                        const ht = e.target.value;
+                        const tax = formData.taxXof || "0";
+                        const ttc = ht ? String(Number(ht) + Number(tax)) : "";
+                        setFormData({ ...formData, amountHtXof: ht, amountTtcXof: ttc });
+                      }}
+                      className="ox-input"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="ox-label">{expensesCopy.createModal.tax}</label>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder={expensesCopy.createModal.taxPlaceholder}
+                      value={formData.taxXof}
+                      onChange={(e) => {
+                        const tax = e.target.value;
+                        const ht = formData.amountHtXof || "0";
+                        const ttc = String(Number(ht) + Number(tax));
+                        setFormData({ ...formData, taxXof: tax, amountTtcXof: ttc });
+                      }}
+                      className="ox-input"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="ox-label">{expensesCopy.createModal.amountTtc}</label>
+                    <input
+                      type="number"
+                      min="1"
+                      required
+                      placeholder={expensesCopy.createModal.amountTtcPlaceholder}
+                      value={formData.amountTtcXof}
+                      onChange={(e) => setFormData({ ...formData, amountTtcXof: e.target.value })}
+                      className="ox-input"
+                      style={{ fontWeight: 700 }}
+                    />
+                  </div>
+                </div>
+              )}
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem" }}>
                 <div>
@@ -1111,7 +1344,7 @@ export function ExpensesView({
             backdropFilter: "blur(8px)",
             WebkitBackdropFilter: "blur(8px)",
             display: "flex",
-            alignItems: "center",
+            alignItems: "flex-start",
             justifyContent: "center",
             zIndex: 99999,
             padding: "1rem",
@@ -1125,32 +1358,42 @@ export function ExpensesView({
             className="ox-modal"
             style={{
               position: "relative",
-              background: "#ffffff",
-              color: "#0f172a",
+              background: "#e5e7eb",
               border: "1px solid rgba(0,0,0,0.15)",
               borderRadius: 14,
               boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85)",
-              maxWidth: 720,
-              width: "95%",
-              maxHeight: "90vh",
+              maxWidth: 920,
+              width: "96%",
+              maxHeight: "94vh",
               overflowY: "auto",
-              padding: "2rem",
+              padding: 12,
             }}
           >
-            {/* Top Toolbar */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-              <div style={{ fontSize: "0.85rem", color: "#64748b" }}>
+            <div
+              className="no-print"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 10,
+                padding: "6px 4px 12px",
+              }}
+            >
+              <div style={{ fontSize: "0.85rem", color: "#334155", fontWeight: 600 }}>
                 {expensesCopy.purchaseOrder.preview}
               </div>
               <div style={{ display: "flex", gap: "0.5rem" }}>
-                <button
-                  onClick={() => window.print()}
+                <a
+                  href={`/expenses/${viewingPO.id}/purchase-order/print`}
+                  target="_blank"
+                  rel="noreferrer"
                   className="ox-btn ox-btn-primary"
-                  style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "0.82rem" }}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "0.82rem", textDecoration: "none" }}
                 >
-                  <Printer size={15} /> {expensesCopy.purchaseOrder.print}
-                </button>
+                  <Printer size={15} /> Imprimer / PDF
+                </a>
                 <button
+                  type="button"
                   onClick={() => setViewingPO(null)}
                   className="ox-btn ox-btn-ghost"
                   style={{ color: "#0f172a" }}
@@ -1159,170 +1402,7 @@ export function ExpensesView({
                 </button>
               </div>
             </div>
-
-            {/* Document Header */}
-            <div
-              style={{
-                borderBottom: "2px solid #0078d4",
-                paddingBottom: "1rem",
-                marginBottom: "1.5rem",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-              }}
-            >
-              <div>
-                <h1 style={{ margin: 0, fontSize: "1.6rem", color: "#0078d4", fontWeight: 800 }}>
-                  CARZONE SARL
-                </h1>
-                <p style={{ margin: "2px 0 0", fontSize: "0.82rem", color: "#475569" }}>
-                  {expensesCopy.purchaseOrder.tagline}
-                  <br />
-                  {expensesCopy.purchaseOrder.address}
-                </p>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div
-                  style={{
-                    background: "rgba(0, 120, 212, 0.1)",
-                    color: "#0078d4",
-                    padding: "4px 10px",
-                    borderRadius: 6,
-                    fontWeight: 700,
-                    fontSize: "0.95rem",
-                  }}
-                >
-                  {expensesCopy.purchaseOrder.title}
-                </div>
-                <div style={{ fontSize: "1.1rem", fontWeight: 800, marginTop: 4, fontFamily: "monospace" }}>
-                  {viewingPO.purchaseOrderNo || viewingPO.expenseNumber}
-                </div>
-                <div style={{ fontSize: "0.8rem", color: "#64748b", marginTop: 2 }}>
-                  {expensesCopy.purchaseOrder.dateLabel} : {formatLocalDate(viewingPO.serviceDate)}
-                </div>
-              </div>
-            </div>
-
-            {/* Provider Box */}
-            <div
-              style={{
-                background: "#f8fafc",
-                border: "1px solid #e2e8f0",
-                borderRadius: 8,
-                padding: "1rem",
-                marginBottom: "1.5rem",
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "1rem",
-              }}
-            >
-              <div>
-                <div style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "#64748b", fontWeight: 700 }}>
-                  {expensesCopy.purchaseOrder.recipient}
-                </div>
-                <div style={{ fontSize: "1rem", fontWeight: 700, marginTop: 2 }}>
-                  {viewingPO.supplierName}
-                </div>
-                {viewingPO.supplierPhone && (
-                  <div style={{ fontSize: "0.82rem", color: "#475569" }}>{expensesCopy.phone(viewingPO.supplierPhone)}</div>
-                )}
-                {viewingPO.supplierEmail && (
-                  <div style={{ fontSize: "0.82rem", color: "#475569" }}>Email : {viewingPO.supplierEmail}</div>
-                )}
-              </div>
-
-              <div>
-                <div style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "#64748b", fontWeight: 700 }}>
-                  {expensesCopy.purchaseOrder.references}
-                </div>
-                {viewingPO.proformaRef && (
-                  <div style={{ fontSize: "0.85rem", marginTop: 2 }}>
-                    <strong>{expensesCopy.purchaseOrder.proformaRef} :</strong> {viewingPO.proformaRef}
-                  </div>
-                )}
-                <div style={{ fontSize: "0.85rem", marginTop: 2 }}>
-                  <strong>{expensesCopy.purchaseOrder.internalRef} :</strong> {viewingPO.expenseNumber}
-                </div>
-                {viewingPO.dueDate && (
-                  <div style={{ fontSize: "0.85rem", marginTop: 2 }}>
-                    <strong>{expensesCopy.purchaseOrder.dueDate} :</strong> {formatLocalDate(viewingPO.dueDate)}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Item Table */}
-            <div style={{ marginBottom: "1.5rem" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
-                <thead>
-                  <tr style={{ background: "#f1f5f9", textAlign: "left", color: "#334155" }}>
-                    <th style={{ padding: "8px 12px", border: "1px solid #cbd5e1" }}>{expensesCopy.purchaseOrder.designationColumn}</th>
-                    <th style={{ padding: "8px 12px", border: "1px solid #cbd5e1", width: 140, textAlign: "right" }}>{expensesCopy.purchaseOrder.amountHtColumn}</th>
-                    <th style={{ padding: "8px 12px", border: "1px solid #cbd5e1", width: 110, textAlign: "right" }}>{expensesCopy.purchaseOrder.taxColumn}</th>
-                    <th style={{ padding: "8px 12px", border: "1px solid #cbd5e1", width: 150, textAlign: "right" }}>{expensesCopy.purchaseOrder.amountTtcColumn}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td style={{ padding: "10px 12px", border: "1px solid #e2e8f0" }}>
-                      <div style={{ fontWeight: 600 }}>{viewingPO.title}</div>
-                      {viewingPO.description && (
-                        <div style={{ fontSize: "0.8rem", color: "#64748b", marginTop: 4 }}>
-                          {viewingPO.description}
-                        </div>
-                      )}
-                    </td>
-                    <td style={{ padding: "10px 12px", border: "1px solid #e2e8f0", textAlign: "right" }}>
-                      {formatXof(viewingPO.amountHtXof)}
-                    </td>
-                    <td style={{ padding: "10px 12px", border: "1px solid #e2e8f0", textAlign: "right" }}>
-                      {formatXof(viewingPO.taxXof)}
-                    </td>
-                    <td style={{ padding: "10px 12px", border: "1px solid #e2e8f0", textAlign: "right", fontWeight: 700 }}>
-                      {formatXof(viewingPO.amountTtcXof)}
-                    </td>
-                  </tr>
-                </tbody>
-                <tfoot>
-                  <tr style={{ background: "#f8fafc", fontWeight: 700 }}>
-                    <td colSpan={3} style={{ padding: "10px 12px", border: "1px solid #cbd5e1", textAlign: "right" }}>
-                      {expensesCopy.purchaseOrder.netToPay} :
-                    </td>
-                    <td style={{ padding: "10px 12px", border: "1px solid #cbd5e1", textAlign: "right", color: "#0078d4", fontSize: "1.05rem" }}>
-                      {formatXof(viewingPO.amountTtcXof)}
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-
-            {/* Signatures */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "2rem",
-                marginTop: "2.5rem",
-                paddingTop: "1rem",
-                borderTop: "1px dashed #cbd5e1",
-              }}
-            >
-              <div style={{ textAlign: "center", border: "1px dashed #cbd5e1", borderRadius: 8, padding: "1.5rem" }}>
-                <div style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 600, textTransform: "uppercase" }}>
-                  {expensesCopy.purchaseOrder.supplierSignature}
-                </div>
-                <div style={{ height: 60 }}></div>
-                <div style={{ fontSize: "0.75rem", color: "#94a3b8" }}>{expensesCopy.purchaseOrder.signatureStamp}</div>
-              </div>
-
-              <div style={{ textAlign: "center", border: "1px dashed #cbd5e1", borderRadius: 8, padding: "1.5rem" }}>
-                <div style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 600, textTransform: "uppercase" }}>
-                  {expensesCopy.purchaseOrder.companySignature}
-                </div>
-                <div style={{ height: 60 }}></div>
-                <div style={{ fontSize: "0.75rem", color: "#94a3b8" }}>{expensesCopy.purchaseOrder.authorizedSignature}</div>
-              </div>
-            </div>
+            <PurchaseOrderDocument expense={viewingPO} />
           </div>
         </div>
       )}

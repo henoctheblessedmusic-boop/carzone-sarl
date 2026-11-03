@@ -54,10 +54,45 @@ export async function createExpense(data: {
   invoiceFileUrl?: string;
   serviceDate?: string;
   dueDate?: string;
+  lines?: Array<{ description: string; quantity: number; unit?: string; unitPriceXof: number }>;
+  taxRatePct?: number;
+  deliveryAddress?: string;
+  deliveryDate?: string;
+  paymentTerms?: string;
+  budgetLine?: string;
+  fundingSource?: string;
+  authorizedByName?: string;
+  authorizedTitle?: string;
 }) {
   const user = await requireUser([...CAN_MANAGE_EXPENSES]);
 
-  if (!data.title.trim() || !data.supplierName.trim() || data.amountTtcXof <= 0) {
+  const normalizedLines = (data.lines ?? [])
+    .map((line, index) => {
+      const description = String(line.description || "").trim();
+      const quantity = Number(line.quantity) || 0;
+      const unitPriceXof = Math.max(0, Math.round(Number(line.unitPriceXof) || 0));
+      return {
+        description,
+        quantity,
+        unit: String(line.unit || "U").trim() || "U",
+        unitPriceXof,
+        totalXof: Math.round(quantity * unitPriceXof),
+        sortOrder: index,
+      };
+    })
+    .filter((line) => line.description && line.quantity > 0 && line.unitPriceXof >= 0);
+
+  const computedHt = normalizedLines.length
+    ? normalizedLines.reduce((sum, line) => sum + line.totalXof, 0)
+    : Number(data.amountHtXof) || Number(data.amountTtcXof);
+  const taxRatePct = Math.max(0, Number(data.taxRatePct) || 0);
+  const taxXof = Math.max(
+    0,
+    Math.round(Number(data.taxXof) || 0) || Math.round((computedHt * taxRatePct) / 100)
+  );
+  const amountTtcXof = computedHt + taxXof;
+
+  if (!data.title.trim() || !data.supplierName.trim() || amountTtcXof <= 0) {
     throw new Error(adminCopy[await getLocale()].server.expenses.requiredExpenseFields);
   }
 
@@ -74,9 +109,10 @@ export async function createExpense(data: {
       supplierEmail: data.supplierEmail?.trim() || null,
       proformaRef: data.proformaRef?.trim() || null,
       purchaseOrderNo: data.purchaseOrderNo?.trim() || null,
-      amountHtXof: Number(data.amountHtXof) || Number(data.amountTtcXof),
-      taxXof: Number(data.taxXof) || 0,
-      amountTtcXof: Number(data.amountTtcXof),
+      amountHtXof: computedHt,
+      taxXof,
+      amountTtcXof,
+      taxRatePct,
       status: data.status || "A_PAYER",
       paymentMethod: data.paymentMethod || null,
       paymentDate: data.paymentDate ? new Date(data.paymentDate) : (data.status === "PAYE" ? new Date() : null),
@@ -84,8 +120,18 @@ export async function createExpense(data: {
       invoiceFileUrl: data.invoiceFileUrl?.trim() || null,
       serviceDate: data.serviceDate ? new Date(data.serviceDate) : new Date(),
       dueDate: data.dueDate ? new Date(data.dueDate) : null,
+      deliveryAddress: data.deliveryAddress?.trim() || null,
+      deliveryDate: data.deliveryDate ? new Date(data.deliveryDate) : null,
+      paymentTerms: data.paymentTerms?.trim() || null,
+      budgetLine: data.budgetLine?.trim() || null,
+      fundingSource: data.fundingSource?.trim() || null,
+      authorizedByName: data.authorizedByName?.trim() || user.fullName || null,
+      authorizedTitle: data.authorizedTitle?.trim() || null,
+      authorizedAt: data.purchaseOrderNo ? new Date() : null,
       registeredBy: user.fullName || user.role,
+      lines: normalizedLines.length ? { create: normalizedLines } : undefined,
     },
+    include: { lines: { orderBy: { sortOrder: "asc" } } },
   });
 
   revalidatePath("/expenses");

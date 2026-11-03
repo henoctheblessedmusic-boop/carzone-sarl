@@ -75,8 +75,8 @@ export default async function DashboardPage() {
   ] = await Promise.all([
     prisma.customer.count({ where: { active: true } }),
     prisma.lead.count(),
-    prisma.vehicle.count({ where: { status: { in: ["EN_STOCK", "EN_MAGASIN"] } } }),
-    prisma.vehicle.count({ where: { status: { in: ["COMMANDE", "EN_COMMANDE", "EN_PRODUCTION", "EN_TRANSIT", "AU_PORT"] } } }),
+    prisma.vehicle.count({ where: { fleetType: "SHOWROOM", status: { in: ["EN_STOCK", "EN_MAGASIN"] } } }),
+    prisma.vehicle.count({ where: { fleetType: "SHOWROOM", status: { in: ["COMMANDE", "EN_COMMANDE", "EN_PRODUCTION", "EN_TRANSIT", "AU_PORT"] } } }),
     prisma.quote.findMany({
       where: quoteScope,
       select: {
@@ -109,6 +109,7 @@ export default async function DashboardPage() {
     prisma.task.count({ where: { done: false } }),
     prisma.chargeInstallRequest.count({ where: { status: { not: "TERMINEE" } } }),
     prisma.vehicle.findMany({
+      where: { fleetType: "SHOWROOM" },
       select: {
         id: true,
         brand: true,

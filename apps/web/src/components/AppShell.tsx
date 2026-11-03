@@ -60,7 +60,7 @@ export async function AppShell({
   // évite les menus visibles puis refusés (middleware/garde de page) pour tous les rôles.
   const items = navDefs
     .filter((n) => {
-      if (!n.roles) return true;
+      if (!n.roles) return isSuperAdmin || RoleService.isRouteAllowedForUser(user, n.href);
       if (isSuperAdmin) return true;
       return n.roles.includes(user.role) && RoleService.isRouteAllowedForUser(user, n.href);
     })

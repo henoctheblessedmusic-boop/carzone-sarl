@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
+import { normalizePhone } from "@/lib/client-import";
 
 export async function createLead(formData: FormData) {
   const user = await requireUser(["DG", "COMMERCIAL", "ADMIN", "PDG", "SG"]);
@@ -11,7 +12,7 @@ export async function createLead(formData: FormData) {
     data: {
       contactName: String(formData.get("contactName") || "").trim(),
       email: String(formData.get("email") || "").trim() || null,
-      phone: String(formData.get("phone") || "").trim() || null,
+      phone: normalizePhone(String(formData.get("phone") || "")),
       source: String(formData.get("source") || "showroom"),
       interest: String(formData.get("interest") || "").trim() || null,
       energyPref: energy || null,
@@ -29,7 +30,7 @@ export async function updateLead(formData: FormData) {
 
   const contactName = String(formData.get("contactName") || "").trim();
   const email = String(formData.get("email") || "").trim() || null;
-  const phone = String(formData.get("phone") || "").trim() || null;
+  const phone = normalizePhone(String(formData.get("phone") || ""));
   const source = String(formData.get("source") || "showroom");
   const interest = String(formData.get("interest") || "").trim() || null;
   const energyPref = String(formData.get("energyPref") || "").trim() || null;

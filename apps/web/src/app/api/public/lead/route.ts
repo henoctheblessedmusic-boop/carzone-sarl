@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { normalizePhone } from "@/lib/client-import";
 
 /** Capture publique d'une demande de cotation depuis la vitrine (leads). */
 const quoteRequestSchema = z.object({
@@ -65,7 +66,7 @@ export async function POST(request: Request) {
     const lead = await prisma.lead.create({
       data: {
         contactName,
-        phone: phone.trim() || null,
+        phone: normalizePhone(phone),
         email: email.trim() || null,
         interest,
         energyPref: energyPref.trim() || null,

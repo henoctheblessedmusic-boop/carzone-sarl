@@ -406,7 +406,7 @@ export default function TerminalPage() {
                 {ussdStep === "PUSH_SENT" ? t.pushTitle : t.pinTitle}
               </h2>
               <p style={{ margin: "6px 0 0", fontSize: "0.88rem", opacity: 0.8 }}>
-                {t.pushBody(formatXof(totalXof), phone || "+229 ...")}
+                {t.pushBody(formatXof(totalXof), phone || "+229 01 ...")}
               </p>
             </div>
 

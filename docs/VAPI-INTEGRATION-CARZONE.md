@@ -47,7 +47,7 @@ Règles de communication :
 - Les prix sont toujours exprimés en Francs CFA (FCFA ou XOF).
 - Adresse du Showroom : Zone Maro-Militaire, Quartier Gbèdomidji, Cotonou.
 - Atelier SAV : En cours de confirmation de localisation dédiée.
-- Téléphone standard : +229 21 33 00 00.
+- Téléphone standard : +229 01 21 33 00 00.
 ```
 
 ---
@@ -77,7 +77,7 @@ Déclarez les outils suivants dans le tableau de bord VAPI (**Assistant > Tools*
   "type": "object",
   "properties": {
     "customerName": { "type": "string", "description": "Nom et prénom du client" },
-    "phone": { "type": "string", "description": "Numéro de téléphone portable du client (ex: +229 97 00 00 00)" },
+    "phone": { "type": "string", "description": "Numéro de téléphone portable du client (ex: +229 01 97 00 00 00)" },
     "vehicleModel": { "type": "string", "description": "Modèle de véhicule ou prestation souhaitée" }
   },
   "required": ["customerName", "phone"]

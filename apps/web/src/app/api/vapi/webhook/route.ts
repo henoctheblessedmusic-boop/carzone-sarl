@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { formatXof, nextDocNumber } from "@/lib/format";
+import { normalizePhone } from "@/lib/client-import";
 
 /**
  * Endpoint Webhook pour l'Assistant Vocal IA (VAPI.ai)
@@ -92,7 +93,7 @@ export async function POST(req: NextRequest) {
             customer = await prisma.customer.create({
               data: {
                 contactName,
-                phone: phone || null,
+                phone: normalizePhone(phone),
                 category: "PROSPECT_VOCAL_VAPI",
                 city: "Cotonou",
               },
@@ -163,7 +164,7 @@ export async function POST(req: NextRequest) {
             customer = await prisma.customer.create({
               data: {
                 contactName,
-                phone: phone || null,
+                phone: normalizePhone(phone),
                 category: "PROSPECT_ESSAI",
               },
             });
@@ -228,7 +229,7 @@ export async function POST(req: NextRequest) {
           if (!workOrder) {
             result = {
               found: false,
-              message: "Aucun ordre de réparation en cours n'a été trouvé avec ces références. Veuillez vérifier le numéro ou contacter directement l'Atelier SAV Carzone au +229 21 33 00 00.",
+              message: "Aucun ordre de réparation en cours n'a été trouvé avec ces références. Veuillez vérifier le numéro ou contacter directement l'Atelier SAV Carzone au +229 01 21 33 00 00.",
             };
           } else {
             result = {

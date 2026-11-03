@@ -135,10 +135,23 @@ export function normalizeEmail(value: string | null | undefined): string | null 
 export function normalizePhone(value: string | null | undefined): string | null {
   const raw = (value ?? "").trim();
   if (!raw) return null;
-  // Conserve un éventuel + initial, retire tout le reste.
-  const plus = raw.startsWith("+") ? "+" : "";
   const digits = raw.replace(/\D/g, "");
-  return digits ? `${plus}${digits}` : null;
+  if (!digits) return null;
+
+  // Bénin : les numéros locaux sont désormais à 10 chiffres et commencent par 01.
+  // Les anciens numéros à 8 chiffres sont automatiquement préfixés par 01.
+  let local: string | null = digits.startsWith("229") ? digits.slice(3) : null;
+  if (local === null && digits.length === 8) local = digits;
+  if (local !== null) {
+    if (local.length === 8) local = `01${local}`;
+    if (local.length === 10 && local.startsWith("01")) {
+      return `+229 ${local.match(/.{1,2}/g)?.join(" ")}`;
+    }
+  }
+
+  // Conserve un éventuel + initial pour les numéros internationaux.
+  const plus = raw.startsWith("+") ? "+" : "";
+  return `${plus}${digits}`;
 }
 
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

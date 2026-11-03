@@ -235,7 +235,7 @@ https://sygmef.impots.bj/emcf
 | Téléphone court | **133** | Page Registration |
 | E-mail (formulaire enregistrement) | **cdgi@finances.bj** | Page Registration |
 | E-mail e-MECeF / tests | **emecefbenin@finances.bj** | Plaquette PDF |
-| Téléphone (plaquette) | **(+229) 90 19 00 00** | Plaquette PDF |
+| Téléphone (plaquette) | **(+229) 01 90 19 00 00** | Plaquette PDF |
 | Mise à jour IFU | [https://ifu.impots.bj/mise-a-jour-ifu](https://ifu.impots.bj/mise-a-jour-ifu) | Formulaire Registration |
 | Site Impôts | [https://www.impots.finances.gouv.bj](https://www.impots.finances.gouv.bj) | Contact OpenAPI |
 

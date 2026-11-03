@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/require-user";
 import { getLocale } from "@/lib/i18n/server";
 import { adminCopy } from "@/lib/i18n/messages/admin";
+import { normalizePhone } from "@/lib/client-import";
 
 const CAN_MANAGE_HR = [
   "PDG",
@@ -81,7 +82,7 @@ export async function createEmployee(data: {
       lastName: data.lastName.trim(),
       gender: data.gender || "M",
       email: data.email?.trim() ? data.email.trim().toLowerCase() : null,
-      phone: data.phone?.trim() || null,
+      phone: normalizePhone(data.phone),
       address: data.address?.trim() || null,
       city: data.city || "Cotonou",
       emergencyContact: data.emergencyContact?.trim() || null,
@@ -178,7 +179,7 @@ export async function updateEmployee(
       lastName: data.lastName.trim(),
       gender: data.gender || "M",
       email: data.email?.trim() ? data.email.trim().toLowerCase() : null,
-      phone: data.phone?.trim() || null,
+      phone: normalizePhone(data.phone),
       address: data.address?.trim() || null,
       city: data.city || "Cotonou",
       emergencyContact: data.emergencyContact?.trim() || null,

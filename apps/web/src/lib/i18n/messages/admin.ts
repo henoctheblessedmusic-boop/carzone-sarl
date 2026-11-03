@@ -492,6 +492,7 @@ export type AdminCopy = {
     title: string;
     subtitle: string;
     printRegister: string;
+    newPurchaseOrder: string;
     newExpense: string;
     kpi: {
       total: (count: number) => string;
@@ -778,7 +779,7 @@ const fr: AdminCopy = {
       salaryPlaceholder: "ex. 250000",
       status: "Statut",
       phone: "Téléphone",
-      phonePlaceholder: "ex. +229 97 00 00 00",
+      phonePlaceholder: "ex. +229 01 97 00 00 00",
       email: "Email professionnel ou personnel",
       emailPlaceholder: "ex. prenom.nom@topcarzone.com",
       cnss: "Numéro CNSS (Bénin)",
@@ -790,7 +791,7 @@ const fr: AdminCopy = {
       bankAccount: "Compte bancaire / RIB",
       bankAccountPlaceholder: "ex. 01001 00000000000 00",
       emergency: "Contact d'urgence (nom et téléphone)",
-      emergencyPlaceholder: "ex. conjoint(e), +229 95 00 00 00",
+      emergencyPlaceholder: "ex. conjoint(e), +229 01 95 00 00 00",
       userAccount: "Compte système lié",
       noUserAccount: "Aucun compte lié",
       create: "Créer le salarié",
@@ -1160,7 +1161,8 @@ const fr: AdminCopy = {
     subtitle:
       "Bons de commande (BC), proformas de sous-traitance (clim, atelier), charges fixes (SBEE, SONEB) et compta.",
     printRegister: "Imprimer le registre",
-    newExpense: "Nouveau bon de commande ou dépense",
+    newPurchaseOrder: "Bon de commande prestataire",
+    newExpense: "Nouvelle dépense",
     kpi: {
       total: (count) => `Total des dépenses saisies (${count})`,
       totalHint: "Toutes les charges d'exploitation confondues",
@@ -1261,7 +1263,7 @@ const fr: AdminCopy = {
       preview: "Aperçu avant impression",
       print: "Imprimer le bon de commande",
       tagline: "Showroom automobile et atelier SAV",
-      address: "Cotonou, République du Bénin | Tél. : (+229) 01 00 00 00",
+      address: "Cotonou, République du Bénin | Tél. : (+229) 01 00 00 00 00",
       title: "BON DE COMMANDE",
       dateLabel: "Date",
       recipient: "Destinataire / prestataire",
@@ -1460,7 +1462,7 @@ const en: AdminCopy = {
       salaryPlaceholder: "e.g. 250000",
       status: "Status",
       phone: "Phone",
-      phonePlaceholder: "e.g. +229 97 00 00 00",
+      phonePlaceholder: "e.g. +229 01 97 00 00 00",
       email: "Work or personal email",
       emailPlaceholder: "e.g. first.last@topcarzone.com",
       cnss: "CNSS number (Benin)",
@@ -1472,7 +1474,7 @@ const en: AdminCopy = {
       bankAccount: "Bank account / IBAN",
       bankAccountPlaceholder: "e.g. 01001 00000000000 00",
       emergency: "Emergency contact (name and phone)",
-      emergencyPlaceholder: "e.g. spouse, +229 95 00 00 00",
+      emergencyPlaceholder: "e.g. spouse, +229 01 95 00 00 00",
       userAccount: "Linked system account",
       noUserAccount: "No linked account",
       create: "Create employee",
@@ -1834,7 +1836,8 @@ const en: AdminCopy = {
     subtitle:
       "Purchase orders (PO), subcontractor proformas (aircon, workshop), fixed charges (SBEE, SONEB) and the books.",
     printRegister: "Print the register",
-    newExpense: "New purchase order or expense",
+    newPurchaseOrder: "Supplier purchase order",
+    newExpense: "New expense",
     kpi: {
       total: (count) => `Total expenses logged (${count})`,
       totalHint: "All operating costs combined",
@@ -1934,7 +1937,7 @@ const en: AdminCopy = {
       preview: "Preview before printing",
       print: "Print the purchase order",
       tagline: "Car showroom and after-sales workshop",
-      address: "Cotonou, Republic of Benin | Phone: (+229) 01 00 00 00",
+      address: "Cotonou, Republic of Benin | Phone: (+229) 01 00 00 00 00",
       title: "PURCHASE ORDER",
       dateLabel: "Date",
       recipient: "Recipient / supplier",
@@ -2127,7 +2130,7 @@ const zh: AdminCopy = {
       salaryPlaceholder: "例如 250000",
       status: "状态",
       phone: "电话",
-      phonePlaceholder: "例如 +229 97 00 00 00",
+      phonePlaceholder: "例如 +229 01 97 00 00 00",
       email: "工作或个人邮箱",
       emailPlaceholder: "例如 first.last@topcarzone.com",
       cnss: "CNSS 编号（贝宁）",
@@ -2139,7 +2142,7 @@ const zh: AdminCopy = {
       bankAccount: "银行账号",
       bankAccountPlaceholder: "例如 01001 00000000000 00",
       emergency: "紧急联系人（姓名与电话）",
-      emergencyPlaceholder: "例如 配偶，+229 95 00 00 00",
+      emergencyPlaceholder: "例如 配偶，+229 01 95 00 00 00",
       userAccount: "关联系统账号",
       noUserAccount: "不关联账号",
       create: "创建员工",
@@ -2494,7 +2497,8 @@ const zh: AdminCopy = {
     title: "成本、支出与供应商",
     subtitle: "采购单（BC）、外包报价（空调、车间）、固定费用（SBEE、SONEB）与账务。",
     printRegister: "打印台账",
-    newExpense: "新建采购单或支出",
+    newPurchaseOrder: "供应商采购单",
+    newExpense: "新建支出",
     kpi: {
       total: (count) => `已录支出合计（${count}）`,
       totalHint: "全部经营费用",
@@ -2591,7 +2595,7 @@ const zh: AdminCopy = {
       preview: "打印前预览",
       print: "打印采购单",
       tagline: "汽车展厅与售后车间",
-      address: "贝宁科托努 | 电话：(+229) 01 00 00 00",
+      address: "贝宁科托努 | 电话：(+229) 01 00 00 00 00",
       title: "采购单",
       dateLabel: "日期",
       recipient: "收件方 / 供应商",

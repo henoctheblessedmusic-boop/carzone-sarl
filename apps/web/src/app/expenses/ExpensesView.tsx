@@ -131,6 +131,7 @@ export function ExpensesView({
 
   // Modals
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createMode, setCreateMode] = useState<"PO" | "EXPENSE">("PO");
   const [payingExpense, setPayingExpense] = useState<ExpenseData | null>(null);
   const [viewingPO, setViewingPO] = useState<ExpenseData | null>(null);
 
@@ -198,16 +199,17 @@ export function ExpensesView({
     return initialSalaryPayments.reduce((sum, s) => sum + s.amountXof, 0);
   }, [initialSalaryPayments]);
 
-  const handleOpenCreateModal = async () => {
+  const handleOpenCreateModal = async (mode: "PO" | "EXPENSE" = "PO") => {
+    setCreateMode(mode);
     setFormData({
-      category: "PRESTATAIRE_SERVICE",
+      category: mode === "PO" ? "PRESTATAIRE_SERVICE" : "AUTRE_CHARGE",
       title: "",
       description: "",
       supplierName: "",
       supplierPhone: "",
       supplierEmail: "",
       proformaRef: "",
-      withPurchaseOrder: true,
+      withPurchaseOrder: mode === "PO",
       amountHtXof: "",
       taxXof: "0",
       amountTtcXof: "",
@@ -349,7 +351,14 @@ export function ExpensesView({
             <Printer size={16} /> {expensesCopy.printRegister}
           </button>
           <button
-            onClick={handleOpenCreateModal}
+            onClick={() => handleOpenCreateModal("PO")}
+            className="ox-btn ox-btn-ghost"
+            style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}
+          >
+            <FileText size={16} /> {expensesCopy.newPurchaseOrder}
+          </button>
+          <button
+            onClick={() => handleOpenCreateModal("EXPENSE")}
             className="ox-btn ox-btn-primary"
             style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}
           >
@@ -754,7 +763,7 @@ export function ExpensesView({
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
               <div>
                 <h2 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700 }}>
-                  {expensesCopy.createModal.title}
+                  {createMode === "PO" ? expensesCopy.newPurchaseOrder : expensesCopy.newExpense}
                 </h2>
                 <p style={{ margin: "2px 0 0", fontSize: "0.8rem", opacity: 0.7 }}>
                   {expensesCopy.createModal.subtitle}
@@ -842,7 +851,7 @@ export function ExpensesView({
                     <label className="ox-label">{expensesCopy.createModal.supplierPhone}</label>
                     <input
                       type="tel"
-                      placeholder="+229 97 00 00 00"
+                      placeholder="+229 01 97 00 00 00"
                       value={formData.supplierPhone}
                       onChange={(e) => setFormData({ ...formData, supplierPhone: e.target.value })}
                       className="ox-input"

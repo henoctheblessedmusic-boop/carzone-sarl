@@ -7,6 +7,7 @@ import { z } from "zod";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { parseWorkshopExcel } from "@/lib/excel-workshop";
+import { normalizePhone } from "@/lib/client-import";
 import { logAudit } from "@/lib/audit";
 import { ACTIVITY } from "@/lib/permissions";
 import {
@@ -163,7 +164,7 @@ export async function createWorkshopEntry(formData: FormData) {
   }
 
   // Création / liaison du client
-  const phone = String(formData.get("phone") || "").trim() || null;
+  const phone = normalizePhone(String(formData.get("phone") || ""));
   const customerIdRaw = String(formData.get("customerId") || "").trim();
   let customer = null;
 
@@ -287,7 +288,7 @@ export async function updateWorkshopEntry(formData: FormData) {
       clientName: String(formData.get("clientName") || "").trim(),
       clientType: String(formData.get("clientType") || "Client").trim() || "Client",
       fuelLevel: String(formData.get("fuelLevel") || "").trim() || null,
-      phone: String(formData.get("phone") || "").trim() || null,
+      phone: normalizePhone(String(formData.get("phone") || "")),
       receptionist: String(formData.get("receptionist") || "").trim() || null,
       immobilizationDuration: String(formData.get("immobilizationDuration") || "").trim() || null,
       observations: String(formData.get("observations") || "").trim() || null,

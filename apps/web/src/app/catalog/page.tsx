@@ -4,6 +4,7 @@ import { AppShell } from "@/components/AppShell";
 import { Badge, DataTable } from "@/components/ui";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
+import { normalizePhone } from "@/lib/client-import";
 import { getServerMessages } from "@/lib/i18n/server";
 import {
   energyCopy,
@@ -81,7 +82,7 @@ async function createSupplier(formData: FormData) {
       city: String(formData.get("city") || "") || null,
       contact: String(formData.get("contact") || "") || null,
       email: String(formData.get("email") || "") || null,
-      phone: String(formData.get("phone") || "") || null,
+      phone: normalizePhone(String(formData.get("phone") || "")),
       notes: String(formData.get("notes") || "") || null,
       type: String(formData.get("type") || "OTHER"),
       active: true,

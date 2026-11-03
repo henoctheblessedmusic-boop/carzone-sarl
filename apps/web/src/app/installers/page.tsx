@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { getServerMessages } from "@/lib/i18n/server";
 import { energyCopy } from "@/lib/i18n/messages/energy";
+import { normalizePhone } from "@/lib/client-import";
 
 async function createInstaller(formData: FormData) {
   "use server";
@@ -14,7 +15,7 @@ async function createInstaller(formData: FormData) {
       companyName: String(formData.get("companyName") || ""),
       contactName: String(formData.get("contactName") || ""),
       email: String(formData.get("email") || "") || null,
-      phone: String(formData.get("phone") || "") || null,
+      phone: normalizePhone(String(formData.get("phone") || "")),
       specialties: String(formData.get("specialties") || "") || null,
     },
   });

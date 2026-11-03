@@ -477,8 +477,8 @@ export default async function InvoicePrintPage({
             </div>
             <div>
               <strong>{copy.print.mobileMoney}</strong><br />
-              • {copy.print.mtnMerchant} *880*41*CARZONE# (+229 97 00 00 00)<br />
-              • {copy.print.moovMerchant} *855*1*CARZONE# (+229 95 00 00 00)<br />
+              • {copy.print.mtnMerchant} *880*41*CARZONE# (+229 01 97 00 00 00)<br />
+              • {copy.print.moovMerchant} *855*1*CARZONE# (+229 01 95 00 00 00)<br />
               • {copy.print.cashDesk}
             </div>
           </div>

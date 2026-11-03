@@ -58,7 +58,7 @@ export async function createCustomer(formData: FormData) {
 
   const companyName = String(formData.get("companyName") || "").trim() || null;
   const email = String(formData.get("email") || "").trim() || null;
-  const phone = String(formData.get("phone") || "").trim() || null;
+  const phone = normalizePhone(String(formData.get("phone") || ""));
   const city = String(formData.get("city") || "Cotonou").trim();
   const address = String(formData.get("address") || "").trim() || null;
   const ifu = String(formData.get("ifu") || "").trim() || null;
@@ -110,7 +110,7 @@ export async function updateCustomer(formData: FormData) {
 
   const companyName = String(formData.get("companyName") || "").trim() || null;
   const email = String(formData.get("email") || "").trim() || null;
-  const phone = String(formData.get("phone") || "").trim() || null;
+  const phone = normalizePhone(String(formData.get("phone") || ""));
   const city = String(formData.get("city") || "Cotonou").trim();
   const address = String(formData.get("address") || "").trim() || null;
   const ifu = String(formData.get("ifu") || "").trim() || null;

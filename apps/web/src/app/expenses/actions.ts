@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/require-user";
 import { getLocale } from "@/lib/i18n/server";
 import { adminCopy } from "@/lib/i18n/messages/admin";
+import { normalizePhone } from "@/lib/client-import";
 
 const CAN_MANAGE_EXPENSES = [
   "PDG",
@@ -69,7 +70,7 @@ export async function createExpense(data: {
       title: data.title.trim(),
       description: data.description?.trim() || null,
       supplierName: data.supplierName.trim(),
-      supplierPhone: data.supplierPhone?.trim() || null,
+      supplierPhone: normalizePhone(data.supplierPhone),
       supplierEmail: data.supplierEmail?.trim() || null,
       proformaRef: data.proformaRef?.trim() || null,
       purchaseOrderNo: data.purchaseOrderNo?.trim() || null,

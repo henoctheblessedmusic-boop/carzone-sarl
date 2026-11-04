@@ -9,18 +9,11 @@ import { CtaLink } from "./CtaLink";
 import type { SiteCopy } from "@/lib/i18n/site/types";
 import { QuoteActions } from "./QuoteActions";
 import type { SiteLocale } from "@/lib/site-prefs";
+import { VehicleDetailModal, type CatalogVehicle } from "./VehicleDetailModal";
 
-export interface SlideshowVehicle {
-  id: string;
-  brand: string;
-  model: string;
-  variant: string | null;
-  year: number | null;
-  energy: string;
-  status: string;
-  priceXof: number;
+export type SlideshowVehicle = CatalogVehicle & {
   mainPhotoUrl: string;
-}
+};
 
 interface HomeHeroSlideshowCopy {
   eyebrow: string;
@@ -45,6 +38,7 @@ interface HomeHeroSlideshowProps {
   energyLabels: Record<string, string>;
   copy: HomeHeroSlideshowCopy;
   quoteCopy: SiteCopy["quote"];
+  vehicleCopy: SiteCopy["vehicules"];
 }
 
 const AUTOPLAY_FIRST_DELAY_MS = 2600;
@@ -73,11 +67,12 @@ function vehicleTitle(vehicle: SlideshowVehicle): string {
   return [vehicle.brand, vehicle.model, vehicle.variant].filter(Boolean).join(" ");
 }
 
-export function HomeHeroSlideshow({ vehicles, statusLabels, energyLabels, copy, quoteCopy }: HomeHeroSlideshowProps) {
+export function HomeHeroSlideshow({ vehicles, locale, statusLabels, energyLabels, copy, quoteCopy, vehicleCopy }: HomeHeroSlideshowProps) {
   const total = vehicles.length;
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isUserPaused, setIsUserPaused] = useState(false);
+  const [galleryVehicle, setGalleryVehicle] = useState<SlideshowVehicle | null>(null);
   const prefersReducedMotion = useReducedMotionPreference();
   const touchStartX = useRef<number | null>(null);
 
@@ -165,6 +160,7 @@ export function HomeHeroSlideshow({ vehicles, statusLabels, energyLabels, copy, 
     .replace("{total}", String(total));
 
   return (
+    <>
     <section
       className="site-hero-slideshow"
       aria-roledescription="carousel"
@@ -199,6 +195,20 @@ export function HomeHeroSlideshow({ vehicles, statusLabels, energyLabels, copy, 
           </div>
         ))}
         <div className="site-hero-slide-overlay" aria-hidden="true" />
+        <button
+          type="button"
+          className="site-hero-slide-gallery-trigger"
+          onClick={() => setGalleryVehicle(activeVehicle)}
+          aria-label={`Voir la galerie photos de ${title}`}
+        />
+        <div className="site-hero-slide-caption">
+          <p className="site-eyebrow">{copy.eyebrow}</p>
+          <h2 className="site-hero-slide-caption-title">{title}</h2>
+          <div className="site-hero-slide-caption-meta">
+            <span>{[activeVehicle.year, energyLabel].filter(Boolean).join(" · ")}</span>
+            <span className="site-hero-slide-gallery-hint">Voir la galerie photos</span>
+          </div>
+        </div>
       </div>
 
       <div className="site-hero-slide-content">
@@ -270,5 +280,16 @@ export function HomeHeroSlideshow({ vehicles, statusLabels, energyLabels, copy, 
         {liveText}
       </p>
     </section>
+
+    {galleryVehicle ? (
+      <VehicleDetailModal
+        vehicle={galleryVehicle}
+        copy={vehicleCopy}
+        locale={locale}
+        quoteCopy={quoteCopy}
+        onClose={() => setGalleryVehicle(null)}
+      />
+    ) : null}
+    </>
   );
 }

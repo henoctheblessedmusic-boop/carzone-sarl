@@ -87,6 +87,7 @@ export function SiteHeader({ locale, copy }: SiteHeaderProps) {
   }, [isOpen]);
 
   return (
+    <>
     <header className="site-header">
       <div className="site-container site-header-inner">
         <SiteLogo />
@@ -154,6 +155,7 @@ export function SiteHeader({ locale, copy }: SiteHeaderProps) {
           </button>
         </div>
       </div>
+    </header>
 
       <div
         className={isOpen ? "site-drawer-backdrop is-open" : "site-drawer-backdrop"}
@@ -199,6 +201,6 @@ export function SiteHeader({ locale, copy }: SiteHeaderProps) {
           {copy.nav.proSpace}
         </Link>
       </div>
-    </header>
+    </>
   );
 }

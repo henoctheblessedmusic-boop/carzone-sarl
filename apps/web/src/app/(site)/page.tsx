@@ -27,6 +27,11 @@ const HIGHLIGHT_LIMIT = 6;
 /** Marques chinoises mises en avant dans le diaporama d'accueil (Toyota exclu). */
 const CHINESE_BRANDS = ["CHANGAN", "JETOUR", "BYD", "GEELY", "BAIC", "FORTHING", "CHERY", "DEEPAL"];
 
+function toSeatsPhotoUrl(interiorPhotoUrl: string | null): string | null {
+  if (!interiorPhotoUrl || !interiorPhotoUrl.includes("-interior.")) return null;
+  return interiorPhotoUrl.replace("-interior.", "-seats.");
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getSiteLocale();
   const copy = siteCopy[locale];
@@ -63,6 +68,13 @@ async function getHighlightVehicles(): Promise<SlideshowVehicle[]> {
         status: true,
         priceXof: true,
         mainPhotoUrl: true,
+        vehicleType: true,
+        transmission: true,
+        color: true,
+        mileage: true,
+        interiorPhotoUrl: true,
+        exteriorPhotoUrl: true,
+        rearPhotoUrl: true,
       },
       orderBy: [{ createdAt: "desc" }],
       take: 20,
@@ -80,7 +92,11 @@ async function getHighlightVehicles(): Promise<SlideshowVehicle[]> {
     return ordered
       .filter((vehicle) => vehicle.mainPhotoUrl !== null)
       .slice(0, HIGHLIGHT_LIMIT)
-      .map((vehicle) => ({ ...vehicle, mainPhotoUrl: vehicle.mainPhotoUrl as string }));
+      .map((vehicle) => ({
+        ...vehicle,
+        mainPhotoUrl: vehicle.mainPhotoUrl as string,
+        seatsPhotoUrl: toSeatsPhotoUrl(vehicle.interiorPhotoUrl),
+      }));
   } catch (error) {
     console.error("Erreur chargement des véhicules à la une (accueil vitrine) :", error);
     return [];
@@ -118,6 +134,7 @@ export default async function HomePage() {
         energyLabels={copy.vehicules.energyLabels}
         copy={copy.home.slideshow}
         quoteCopy={copy.quote}
+        vehicleCopy={copy.vehicules}
       />
 
       <section className="site-section site-section--muted site-intro" aria-labelledby="intro-heading">
@@ -165,8 +182,10 @@ export default async function HomePage() {
                 <VehicleCard
                   key={vehicle.id}
                   vehicle={vehicle}
+                  locale={locale}
                   newBadgeLabel={copy.home.vehicles.newBadge}
                   quoteCopy={copy.quote}
+                  vehicleCopy={copy.vehicules}
                   statusLabels={copy.vehicules.statusLabels}
                   energyLabels={copy.vehicules.energyLabels}
                 />

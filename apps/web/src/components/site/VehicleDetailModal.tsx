@@ -116,7 +116,9 @@ export function VehicleDetailModal({ vehicle, copy, locale, quoteCopy, onClose }
 
   // Portail vers document.body : le modal reste fixe et centré même s'il est déclenché
   // depuis une carte avec transform/overflow, ce qui évite le rendu déformé dans la carte.
+  // Le conteneur .site-shell réapplique les variables de thème du site au modal.
   return createPortal(
+    <div className="site-shell site-modal-shell">
     <div className="site-modal-backdrop" onMouseDown={onClose}>
       <div
         className="site-modal"
@@ -228,6 +230,7 @@ export function VehicleDetailModal({ vehicle, copy, locale, quoteCopy, onClose }
           />
         </div>
       </div>
+    </div>
     </div>,
     document.body
   );

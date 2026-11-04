@@ -3484,3 +3484,7 @@
     gap: 0.7rem;
   }
 }
+
+.site-modal-shell {
+  display: contents;
+}

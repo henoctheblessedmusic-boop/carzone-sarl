@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { X } from "lucide-react";
 import type { SiteCopy } from "@/lib/i18n/site";
@@ -63,6 +64,7 @@ export function VehicleDetailModal({ vehicle, copy, locale, quoteCopy, onClose }
   const dialogRef = useRef<HTMLDivElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
   const title = [vehicle.brand, vehicle.model, vehicle.variant].filter(Boolean).join(" ");
   const photos = buildGallery(vehicle, copy);
@@ -70,6 +72,10 @@ export function VehicleDetailModal({ vehicle, copy, locale, quoteCopy, onClose }
 
   const energyLabel = copy.energyLabels[vehicle.energy] ?? vehicle.energy;
   const typeLabel = vehicle.vehicleType ? copy.typeLabels[vehicle.vehicleType] ?? vehicle.vehicleType : null;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     previouslyFocused.current = document.activeElement as HTMLElement;
@@ -106,7 +112,11 @@ export function VehicleDetailModal({ vehicle, copy, locale, quoteCopy, onClose }
     };
   }, [onClose]);
 
-  return (
+  if (!mounted) return null;
+
+  // Portail vers document.body : le modal reste fixe et centré même s'il est déclenché
+  // depuis une carte avec transform/overflow, ce qui évite le rendu déformé dans la carte.
+  return createPortal(
     <div className="site-modal-backdrop" onMouseDown={onClose}>
       <div
         className="site-modal"
@@ -218,6 +228,7 @@ export function VehicleDetailModal({ vehicle, copy, locale, quoteCopy, onClose }
           />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

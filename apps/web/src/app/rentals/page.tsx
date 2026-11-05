@@ -1,5 +1,7 @@
 import { AppShell } from "@/components/AppShell";
 import { DashboardAutoRefresh } from "@/components/DashboardAutoRefresh";
+import { Badge, DataTable } from "@/components/ui";
+import { BrandLogoSvg } from "@/lib/brand-logos";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { formatXof } from "@/lib/format";
@@ -40,6 +42,29 @@ const FIELD_STYLE = {
   fontSize: "0.88rem",
 } as const;
 
+const ENERGY_LABELS: Record<string, string> = {
+  ESSENCE: "Essence",
+  DIESEL: "Diesel",
+  HYBRIDE: "Hybride",
+  HYBRIDE_RECHARGEABLE: "Hybride rechargeable",
+  PHEV: "Hybride rechargeable",
+  ELECTRIQUE: "Électrique",
+};
+
+const VEHICLE_TYPE_LABELS: Record<string, string> = {
+  BERLINE: "Berline",
+  SUV: "SUV",
+  PICKUP: "Pick-up",
+  VAN: "Van",
+};
+
+const RENTAL_STATUS_TONES: Record<string, "ok" | "warn" | "bad" | "ice" | "neutral"> = {
+  DISPONIBLE: "ok",
+  LOUE: "ice",
+  MAINTENANCE: "warn",
+  HORS_SERVICE: "bad",
+};
+
 export default async function RentalsPage() {
   const user = await requireUser([...RENTAL_ROLES]);
   const canManage = (MANAGE_ROLES as readonly string[]).includes(user.role);
@@ -58,6 +83,7 @@ export default async function RentalsPage() {
     }),
     prisma.vehicle.findMany({
       where: { fleetType: "RENTAL" },
+      include: { supplier: true, site: true },
       orderBy: [{ brand: "asc" }, { model: "asc" }],
     }),
     prisma.vehicle.findMany({
@@ -234,58 +260,131 @@ export default async function RentalsPage() {
           </div>
         </div>
 
-        {canManage && (
+        {(canManage || canFinance) && (
           <div className="ox-glass" style={{ padding: "1rem 1.2rem", display: "grid", gap: 12 }}>
-            <strong>Gestion du parc de location</strong>
-            <p style={{ margin: 0, opacity: 0.7, fontSize: "0.84rem" }}>
-              Les véhicules du stock showroom peuvent être transférés vers le parc de location, et inversement
-              lorsqu'aucun contrat n'est actif.
-            </p>
-            <form action={transferVehicleToRental} style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <select name="vehicleId" className="ox-select" style={{ ...FIELD_STYLE, flex: "1 1 260px" }} required defaultValue="">
-                <option value="" disabled>Ajouter un véhicule showroom au parc de location</option>
-                {showroomVehicles.map((vehicle) => (
-                  <option key={vehicle.id} value={vehicle.id}>
-                    {vehicle.brand} {vehicle.model} {vehicle.vin ? `- ${vehicle.vin}` : ""}
-                  </option>
-                ))}
-              </select>
-              <button type="submit" className="ox-btn ox-btn-ghost" style={FIELD_STYLE}>Ajouter au parc location</button>
-            </form>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {rentalVehicles.map((vehicle) => {
-                const hasActive = activeRentals.some((rental) => rental.vehicleId === vehicle.id);
-                return (
-                  <form
-                    key={vehicle.id}
-                    action={transferVehicleToShowroom}
-                    style={{
-                      display: "inline-flex",
-                      gap: 6,
-                      alignItems: "center",
-                      border: "1px solid var(--ice-border)",
-                      borderRadius: 8,
-                      padding: "4px 8px",
-                    }}
-                  >
-                    <input type="hidden" name="vehicleId" value={vehicle.id} />
-                    <span style={{ fontSize: "0.82rem" }}>
-                      {vehicle.brand} {vehicle.model}
-                      {vehicle.registrationNumber ? ` - ${vehicle.registrationNumber}` : ""} - {STATUS_LABEL[vehicle.rentalStatus || "DISPONIBLE"] || vehicle.rentalStatus}
-                    </span>
-                    <a
-                      href={`/rentals/${vehicle.id}/fiche-technique`}
-                      className="ox-btn ox-btn-ghost ox-btn-sm"
-                    >
-                      Fiche technique
-                    </a>
-                    <button type="submit" className="ox-btn ox-btn-ghost ox-btn-sm" disabled={hasActive}>
-                      Retirer du parc
-                    </button>
-                  </form>
-                );
-              })}
+            <div>
+              <strong>Gestion du parc de location</strong>
+              <p style={{ margin: "4px 0 0", opacity: 0.7, fontSize: "0.84rem" }}>
+                Vue détaillée de la flotte de location, avec l&apos;état de chaque véhicule, ses tarifs et sa fiche technique.
+              </p>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8, fontSize: "0.78rem", opacity: 0.85 }}>
+                <span>{rentalVehicles.length} véhicule(s) au parc</span>
+                <span>·</span>
+                <span>{rentalVehicles.filter((vehicle) => vehicle.rentalStatus === "DISPONIBLE").length} disponible(s)</span>
+                <span>·</span>
+                <span>{rentalVehicles.filter((vehicle) => vehicle.rentalStatus === "LOUE").length} loué(s)</span>
+                <span>·</span>
+                <span>{rentalVehicles.filter((vehicle) => vehicle.rentalStatus === "MAINTENANCE").length} en maintenance</span>
+              </div>
             </div>
+
+            {canManage && (
+              <form action={transferVehicleToRental} style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <select name="vehicleId" className="ox-select" style={{ ...FIELD_STYLE, flex: "1 1 260px" }} required defaultValue="">
+                  <option value="" disabled>Ajouter un véhicule showroom au parc de location</option>
+                  {showroomVehicles.map((vehicle) => (
+                    <option key={vehicle.id} value={vehicle.id}>
+                      {vehicle.brand} {vehicle.model} {vehicle.vin ? `- ${vehicle.vin}` : ""}
+                    </option>
+                  ))}
+                </select>
+                <button type="submit" className="ox-btn ox-btn-ghost" style={FIELD_STYLE}>Ajouter au parc location</button>
+              </form>
+            )}
+
+            {rentalVehicles.length === 0 ? (
+              <div style={{ padding: "1.5rem", textAlign: "center", opacity: 0.65, fontSize: "0.86rem" }}>
+                Aucun véhicule dans le parc de location. Ajoutez un véhicule du showroom ou enregistrez un nouveau véhicule.
+              </div>
+            ) : (
+              <DataTable
+                headers={[
+                  "VIN / Immatriculation",
+                  "Véhicule",
+                  "Gamme",
+                  "Énergie",
+                  "Fournisseur",
+                  "Showroom",
+                  "Valeur",
+                  "Tarif location",
+                  "Statut location",
+                  "Action",
+                ]}
+                rows={rentalVehicles.map((vehicle) => {
+                  const activeContract = activeRentals.find((rental) => rental.vehicleId === vehicle.id);
+                  const hasActive = Boolean(activeContract);
+                  return [
+                    <div key={`ident-${vehicle.id}`} style={{ fontSize: "0.8rem" }}>
+                      <div style={{ fontFamily: "monospace" }}>{vehicle.vin || "-"}</div>
+                      <div style={{ opacity: 0.6, fontSize: "0.74rem" }}>{vehicle.registrationNumber || "Sans plaque"}</div>
+                    </div>,
+                    <div key={`vehicle-${vehicle.id}`} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      {vehicle.mainPhotoUrl ? (
+                        <div
+                          style={{
+                            width: 58,
+                            height: 38,
+                            borderRadius: 6,
+                            background: "radial-gradient(ellipse at center, #1e293b 0%, #0f172a 100%)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            overflow: "hidden",
+                            border: "1px solid rgba(0,0,0,0.15)",
+                            flexShrink: 0,
+                            padding: 2,
+                          }}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={vehicle.mainPhotoUrl} alt={`${vehicle.brand} ${vehicle.model}`} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                        </div>
+                      ) : null}
+                      <div>
+                        <div style={{ fontWeight: 650, display: "flex", alignItems: "center", gap: 6 }}>
+                          <BrandLogoSvg brand={vehicle.brand} size={15} />
+                          <span>{vehicle.brand} {vehicle.model}</span>
+                        </div>
+                        <div style={{ fontSize: "0.78rem", opacity: 0.7 }}>
+                          {[vehicle.variant, vehicle.year].filter(Boolean).join(" · ") || "Version non précisée"}
+                        </div>
+                      </div>
+                    </div>,
+                    VEHICLE_TYPE_LABELS[vehicle.vehicleType || ""] || vehicle.vehicleType || "-",
+                    ENERGY_LABELS[vehicle.energy] || vehicle.energy || "-",
+                    vehicle.supplier?.name || "Constructeurs partenaires",
+                    <span key={`site-${vehicle.id}`} style={{ color: vehicle.site?.code === "ATELIER_SAV" ? "#f59e0b" : "var(--brand, #0078d4)", fontWeight: 600 }}>
+                      📍 {vehicle.site?.name || "Showroom CARZONE SARL"}
+                    </span>,
+                    formatXof(vehicle.priceXof),
+                    <div key={`rate-${vehicle.id}`} style={{ fontSize: "0.8rem" }}>
+                      <div>{vehicle.rentalDailyXof ? `${formatXof(vehicle.rentalDailyXof)} / jour` : "-"}</div>
+                      <div style={{ opacity: 0.65 }}>{vehicle.rentalMonthlyXof ? `${formatXof(vehicle.rentalMonthlyXof)} / mois` : ""}</div>
+                    </div>,
+                    <Badge key={`status-${vehicle.id}`} tone={RENTAL_STATUS_TONES[vehicle.rentalStatus || "DISPONIBLE"] || "neutral"}>
+                      {STATUS_LABEL[vehicle.rentalStatus || "DISPONIBLE"] || vehicle.rentalStatus || "Disponible"}
+                    </Badge>,
+                    <div key={`actions-${vehicle.id}`} style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+                      <a href={`/rentals/${vehicle.id}/fiche-technique`} className="ox-btn ox-btn-ghost ox-btn-sm">
+                        Fiche technique
+                      </a>
+                      {activeContract && (
+                        <a href={`/rentals/${activeContract.id}/contrat`} className="ox-btn ox-btn-ghost ox-btn-sm">
+                          Contrat
+                        </a>
+                      )}
+                      {canManage && (
+                        <form action={transferVehicleToShowroom}>
+                          <input type="hidden" name="vehicleId" value={vehicle.id} />
+                          <button type="submit" className="ox-btn ox-btn-ghost ox-btn-sm" disabled={hasActive} title={hasActive ? "Retournez d'abord le contrat actif." : "Retirer du parc de location"}>
+                            Retirer du parc
+                          </button>
+                        </form>
+                      )}
+                    </div>,
+                  ];
+                })}
+              />
+            )}
           </div>
         )}
 

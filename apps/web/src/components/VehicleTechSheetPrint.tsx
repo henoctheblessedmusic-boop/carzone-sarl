@@ -21,6 +21,20 @@ export function VehicleTechSheetPrint({
     badgeTextColor: "#0f172a",
   };
 
+  const ENERGY_LABELS: Record<string, string> = {
+    ESSENCE: "Essence",
+    DIESEL: "Diesel",
+    HYBRIDE: "Hybride",
+    HYBRIDE_RECHARGEABLE: "Hybride rechargeable",
+    PHEV: "Hybride rechargeable",
+    ELECTRIQUE: "Électrique",
+  };
+  const energyLabel =
+    ENERGY_LABELS[(sheet.energy || "").toUpperCase()] ||
+    sheet.motorisation.fuelType ||
+    sheet.energy ||
+    "Non précisé";
+
   // Détection si la variante correspond à une immatriculation béninoise (ex: "CJ 0291 RB")
   const isBeninPlate = sheet.variant && /\b[A-Z]{2}\s*\d{4}\s*RB\b/i.test(sheet.variant);
 
@@ -224,6 +238,81 @@ export function VehicleTechSheetPrint({
           </div>
         </div>
 
+        {/* BANDEAU ÉNERGIE : visible dès la première page de la fiche */}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: "6px",
+            margin: "1mm 0 2mm",
+          }}
+        >
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "5px 11px",
+              borderRadius: "999px",
+              border: `1.5px solid ${brandMeta.primaryColor}40`,
+              background: `${brandMeta.primaryColor}0d`,
+              color: brandMeta.primaryColor,
+              fontSize: "0.72rem",
+              fontWeight: 900,
+              letterSpacing: "0.04em",
+            }}
+          >
+            ÉNERGIE
+            <strong style={{ color: "#0f172a", fontSize: "0.78rem" }}>{energyLabel}</strong>
+          </span>
+          {sheet.motorisation.fuelType && (
+            <span
+              style={{
+                padding: "5px 10px",
+                borderRadius: "999px",
+                border: "1px solid #e2e8f0",
+                background: "#ffffff",
+                color: "#475569",
+                fontSize: "0.68rem",
+                fontWeight: 700,
+              }}
+            >
+              Carburant / énergie : <strong style={{ color: "#0f172a" }}>{sheet.motorisation.fuelType}</strong>
+            </span>
+          )}
+          {sheet.dimensions.tankOrBattery && (
+            <span
+              style={{
+                padding: "5px 10px",
+                borderRadius: "999px",
+                border: "1px solid #e2e8f0",
+                background: "#ffffff",
+                color: "#475569",
+                fontSize: "0.68rem",
+                fontWeight: 700,
+              }}
+            >
+              Réservoir / batterie : <strong style={{ color: "#0f172a" }}>{sheet.dimensions.tankOrBattery}</strong>
+            </span>
+          )}
+          {sheet.motorisation.rangeKm && (
+            <span
+              style={{
+                padding: "5px 10px",
+                borderRadius: "999px",
+                border: "1px solid #e2e8f0",
+                background: "#ffffff",
+                color: "#475569",
+                fontSize: "0.68rem",
+                fontWeight: 700,
+              }}
+            >
+              Autonomie : <strong style={{ color: "#0f172a" }}>{sheet.motorisation.rangeKm}</strong>
+            </span>
+          )}
+        </div>
+
         {/* 3. HERO VEHICLE SHOWCASE : STUDIO CYCLORAMA ENTIER (OBJECT-FIT CONTAIN · SANS ROGNAGE NI ZOOM) */}
         <div
           style={{
@@ -312,7 +401,7 @@ export function VehicleTechSheetPrint({
                 marginBottom: "3px",
               }}
             >
-              Motorisation
+              Énergie / Motorisation
             </div>
             <div
               style={{
@@ -323,7 +412,10 @@ export function VehicleTechSheetPrint({
                 wordBreak: "break-word",
               }}
             >
-              {motorSummary}
+              {energyLabel}
+              <div style={{ fontSize: "0.62rem", fontWeight: 650, color: "#64748b", marginTop: "2px" }}>
+                {motorSummary}
+              </div>
             </div>
           </div>
 

@@ -47,6 +47,7 @@ const COPY = {
     day: "jour",
     month: "mois",
     onRequest: "Sur devis",
+    energyLabel: "Énergie",
     details: "Détails & fiche technique",
     quote: "Demander une cotation",
     gallery: "Galerie photos",
@@ -86,6 +87,7 @@ const COPY = {
     day: "day",
     month: "month",
     onRequest: "On request",
+    energyLabel: "Energy",
     details: "Details & technical sheet",
     quote: "Request a quote",
     gallery: "Photo gallery",
@@ -125,6 +127,7 @@ const COPY = {
     day: "día",
     month: "mes",
     onRequest: "A consulta",
+    energyLabel: "Energía",
     details: "Detalles y ficha técnica",
     quote: "Solicitar cotización",
     gallery: "Galería de fotos",
@@ -163,6 +166,7 @@ const COPY = {
     day: "天",
     month: "月",
     onRequest: "面议",
+    energyLabel: "能源",
     details: "详情与技术参数",
     quote: "申请报价",
     gallery: "照片图库",
@@ -212,14 +216,17 @@ function titleOf(vehicle: RentalPublicVehicle) {
 export function RentalVehiclesCatalog({
   vehicles,
   locale,
+  energyLabels,
 }: {
   vehicles: RentalPublicVehicle[];
   locale: SiteLocale;
+  energyLabels: Record<string, string>;
 }) {
   const copy = COPY[locale] ?? COPY.fr;
   const [detailVehicle, setDetailVehicle] = useState<RentalPublicVehicle | null>(null);
   const [requestVehicle, setRequestVehicle] = useState<RentalPublicVehicle | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState(0);
+  const energyLabelFor = (energy: string) => energyLabels[energy] ?? energy;
 
   return (
     <>
@@ -251,7 +258,10 @@ export function RentalVehiclesCatalog({
                   <span className="site-rental-card-badge"><Car size={13} /> {copy.gallery}</span>
                 </button>
                 <div className="site-rental-card-body">
-                  <div className="site-rental-card-energy">{vehicle.energy}</div>
+                  <div className="site-rental-card-energy">
+                    <span>{copy.energyLabel}</span>
+                    <strong>{energyLabelFor(vehicle.energy)}</strong>
+                  </div>
                   <h2 className="site-rental-card-title">{titleOf(vehicle)}</h2>
                   <div className="site-rental-card-meta">
                     {[vehicle.year, vehicle.vehicleType, vehicle.transmission].filter(Boolean).join(" · ")}
@@ -318,6 +328,16 @@ export function RentalVehiclesCatalog({
                 <div className="site-rental-sheet">
                   <h3>{copy.specs}</h3>
                   <div className="site-rental-sheet-grid">
+                    <div>
+                      <span>{copy.energyLabel}</span>
+                      <strong>{energyLabelFor(detailVehicle.energy)}</strong>
+                      <small>
+                        {[
+                          detailVehicle.technicalSheet.motorisation.fuelType,
+                          detailVehicle.technicalSheet.motorisation.rangeKm ? `Autonomie ${detailVehicle.technicalSheet.motorisation.rangeKm}` : null,
+                        ].filter(Boolean).join(" · ")}
+                      </small>
+                    </div>
                     <div><span>{copy.dimensions}</span><strong>{detailVehicle.technicalSheet.dimensions.lengthWidthHeight} mm</strong><small>Empattement {detailVehicle.technicalSheet.dimensions.wheelbase} mm · {detailVehicle.technicalSheet.dimensions.seats} places</small></div>
                     <div><span>{copy.motor}</span><strong>{detailVehicle.technicalSheet.motorisation.displacementOrMotor}</strong><small>{detailVehicle.technicalSheet.motorisation.maxPower} · {detailVehicle.technicalSheet.motorisation.transmission}</small></div>
                   </div>

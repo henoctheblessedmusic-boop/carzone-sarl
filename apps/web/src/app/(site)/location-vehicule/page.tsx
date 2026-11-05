@@ -97,7 +97,7 @@ export default async function RentalVehiclesPage() {
 
       <section className="site-section site-section--tight-top">
         <div className="site-container">
-          <RentalVehiclesCatalog vehicles={vehicles} locale={locale} />
+          <RentalVehiclesCatalog vehicles={vehicles} locale={locale} energyLabels={copy.vehicules.energyLabels} />
         </div>
       </section>
     </main>

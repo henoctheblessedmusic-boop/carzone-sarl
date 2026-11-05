@@ -33,6 +33,7 @@ export function VehicleCard({
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const title = [vehicle.brand, vehicle.model, vehicle.variant].filter(Boolean).join(" ");
   const isRecent = vehicle.year !== null && vehicle.year >= CURRENT_YEAR - 1;
+  const energyLabel = energyLabels?.[vehicle.energy] ?? vehicle.energy;
 
   return (
     <article className="site-vehicle-card">
@@ -59,7 +60,10 @@ export function VehicleCard({
         </button>
       </div>
       <div className="site-vehicle-card-body">
-        <p className="site-vehicle-card-energy">{vehicle.energy}</p>
+        <p className="site-vehicle-card-energy">
+          <span>{vehicleCopy.modal.energyLabel}</span>
+          <strong>{energyLabel}</strong>
+        </p>
         <h3 className="site-vehicle-card-title">
           <button
             type="button"

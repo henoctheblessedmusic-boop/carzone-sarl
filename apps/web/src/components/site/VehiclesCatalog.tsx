@@ -211,7 +211,10 @@ function CatalogCard({ vehicle, copy, locale, quoteCopy, onOpen }: CatalogCardPr
           )}
         </div>
         <div className="site-vehicle-card-body">
-          <p className="site-vehicle-card-energy">{energyLabel}</p>
+          <p className="site-vehicle-card-energy">
+            <span>{copy.modal.energyLabel}</span>
+            <strong>{energyLabel}</strong>
+          </p>
           <h3 className="site-vehicle-card-title">{title}</h3>
           {vehicle.year ? <p className="site-vehicle-card-year">{vehicle.year}</p> : null}
           <span className="site-catalog-card-cta">{copy.card.viewDetails}</span>

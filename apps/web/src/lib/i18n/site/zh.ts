@@ -325,6 +325,7 @@ export const zh: SiteCopy = {
       DIESEL: "柴油",
       HYBRIDE: "混合动力",
       PHEV: "插电式混合动力",
+      HYBRIDE_RECHARGEABLE: "插电式混合动力",
       ELECTRIQUE: "纯电动",
     },
     typeLabels: {

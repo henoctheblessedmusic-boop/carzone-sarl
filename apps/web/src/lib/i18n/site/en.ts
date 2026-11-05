@@ -340,6 +340,7 @@ export const en: SiteCopy = {
       DIESEL: "Diesel",
       HYBRIDE: "Hybrid",
       PHEV: "Plug-in hybrid",
+      HYBRIDE_RECHARGEABLE: "Plug-in hybrid",
       ELECTRIQUE: "Electric",
     },
     typeLabels: {

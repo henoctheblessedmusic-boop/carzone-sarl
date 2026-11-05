@@ -6,12 +6,235 @@ import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
 
 const MANAGE_ROLES = ["GESTIONNAIRE_LOCATION", "DG", "PDG", "SG"] as const;
+const FINANCE_ROLES = ["GESTIONNAIRE_LOCATION", "COMPTA", "DG", "PDG", "SG"] as const;
 
 function requireManager(role: string) {
   if (!(MANAGE_ROLES as readonly string[]).includes(role)) {
     throw new Error("Seul le gestionnaire de la location peut modifier le parc et les contrats.");
   }
 }
+
+function requireFinance(role: string) {
+  if (!(FINANCE_ROLES as readonly string[]).includes(role)) {
+    throw new Error("Seuls le gestionnaire de la location et la comptabilité peuvent enregistrer un encaissement.");
+  }
+}
+
+export async function recordRentalPayment(formData: FormData) {
+  const user = await requireUser([...FINANCE_ROLES]);
+  requireFinance(user.role);
+
+  const rentalId = String(formData.get("rentalId") || "").trim();
+  const amountXof = Math.round(Number(formData.get("amountXof") || 0));
+  const method = String(formData.get("method") || "VIREMENT").trim().toUpperCase();
+  const reference = String(formData.get("reference") || "").trim() || null;
+  const notes = String(formData.get("notes") || "").trim() || null;
+  const paidRaw = String(formData.get("paidAt") || "");
+  const paidAt = paidRaw ? new Date(paidRaw) : new Date();
+
+  if (!rentalId) throw new Error("Contrat de location introuvable.");
+  if (!Number.isFinite(amountXof) || amountXof <= 0) throw new Error("Le montant encaissé doit être supérieur à zéro.");
+  if (Number.isNaN(paidAt.getTime())) throw new Error("Date d'encaissement invalide.");
+
+  const rental = await prisma.rental.findUnique({
+    where: { id: rentalId },
+    include: { customer: true, vehicle: true },
+  });
+  if (!rental) throw new Error("Contrat de location introuvable.");
+
+  const payment = await prisma.rentalPayment.create({
+    data: { rentalId, amountXof, method, reference, notes, paidAt, createdByName: user.fullName },
+    select: { id: true },
+  });
+
+  await logAudit({
+    user,
+    action: "rental.payment",
+    entityType: "Rental",
+    entityId: rental.id,
+    entityLabel: `${rental.vehicle.brand} ${rental.vehicle.model} - ${rental.customer.contactName}`,
+    details: `${amountXof.toLocaleString("fr-BJ")} FCFA (${method})`,
+  });
+
+  revalidatePath("/rentals");
+  revalidatePath("/dashboard");
+}
+
+export async function createRentalMaintenance(formData: FormData) {
+  const user = await requireUser([...MANAGE_ROLES]);
+  requireManager(user.role);
+
+  const vehicleId = String(formData.get("vehicleId") || "").trim();
+  const type = String(formData.get("type") || "ENTRETIEN").trim().toUpperCase();
+  const status = String(formData.get("status") || "PLANIFIE").trim().toUpperCase();
+  const description = String(formData.get("description") || "").trim();
+  const costXof = Math.max(0, Math.round(Number(formData.get("costXof") || 0)));
+  const garageName = String(formData.get("garageName") || "").trim() || null;
+  const mileage = Math.round(Number(formData.get("mileage") || 0)) || null;
+  const scheduledRaw = String(formData.get("scheduledAt") || "");
+  const rentalId = String(formData.get("rentalId") || "").trim() || null;
+  const scheduledAt = scheduledRaw ? new Date(scheduledRaw) : null;
+
+  if (!vehicleId) throw new Error("Véhicule requis.");
+  if (!description) throw new Error("Décrivez l'entretien ou la réparation.");
+  if (!["PLANIFIE", "EN_COURS", "TERMINE", "ANNULE"].includes(status)) {
+    throw new Error("Statut de maintenance invalide.");
+  }
+
+  const vehicle = await prisma.vehicle.findUnique({
+    where: { id: vehicleId },
+    select: { id: true, brand: true, model: true, fleetType: true, rentalStatus: true },
+  });
+  if (!vehicle || vehicle.fleetType !== "RENTAL") throw new Error("Ce véhicule n'appartient pas au parc de location.");
+
+  const maintenance = await prisma.rentalMaintenance.create({
+    data: {
+      vehicleId,
+      rentalId,
+      type,
+      status,
+      description,
+      costXof,
+      garageName,
+      mileage,
+      scheduledAt,
+      startedAt: status === "EN_COURS" ? new Date() : null,
+      completedAt: status === "TERMINE" ? new Date() : null,
+      createdByName: user.fullName,
+    },
+    select: { id: true },
+  });
+
+  if (status === "PLANIFIE" || status === "EN_COURS") {
+    const activeRental = await prisma.rental.count({ where: { vehicleId, status: "ACTIF" } });
+    if (activeRental === 0) {
+      await prisma.vehicle.update({ where: { id: vehicleId }, data: { rentalStatus: "MAINTENANCE" } });
+    }
+  }
+
+  await logAudit({
+    user,
+    action: "rental.maintenance_create",
+    entityType: "Vehicle",
+    entityId: vehicleId,
+    entityLabel: `${vehicle.brand} ${vehicle.model}`,
+    details: `${type} - ${description} - ${costXof.toLocaleString("fr-BJ")} FCFA`,
+  });
+
+  revalidatePath("/rentals");
+  revalidatePath("/dashboard");
+}
+
+export async function updateRentalMaintenanceStatus(formData: FormData) {
+  const user = await requireUser([...MANAGE_ROLES]);
+  requireManager(user.role);
+
+  const id = String(formData.get("id") || "").trim();
+  const status = String(formData.get("status") || "").trim().toUpperCase();
+  if (!id || !["PLANIFIE", "EN_COURS", "TERMINE", "ANNULE"].includes(status)) {
+    throw new Error("Statut de maintenance invalide.");
+  }
+
+  const maintenance = await prisma.rentalMaintenance.update({
+    where: { id },
+    data: {
+      status,
+      startedAt: status === "EN_COURS" ? new Date() : undefined,
+      completedAt: status === "TERMINE" ? new Date() : status === "PLANIFIE" || status === "EN_COURS" ? null : undefined,
+    },
+    include: { vehicle: { select: { id: true, brand: true, model: true } } },
+  });
+
+  const activeRental = await prisma.rental.count({ where: { vehicleId: maintenance.vehicleId, status: "ACTIF" } });
+  if (activeRental === 0) {
+    await prisma.vehicle.update({
+      where: { id: maintenance.vehicleId },
+      data: { rentalStatus: status === "PLANIFIE" || status === "EN_COURS" ? "MAINTENANCE" : "DISPONIBLE" },
+    });
+  }
+
+  await logAudit({
+    user,
+    action: "rental.maintenance_status",
+    entityType: "RentalMaintenance",
+    entityId: maintenance.id,
+    entityLabel: `${maintenance.vehicle.brand} ${maintenance.vehicle.model}`,
+    details: `Statut ${status}`,
+  });
+
+  revalidatePath("/rentals");
+  revalidatePath("/dashboard");
+}
+
+export async function createRentalVehicle(formData: FormData) {
+  const user = await requireUser([...MANAGE_ROLES]);
+  requireManager(user.role);
+
+  const brand = String(formData.get("brand") || "").trim();
+  const model = String(formData.get("model") || "").trim();
+  const variant = String(formData.get("variant") || "").trim() || null;
+  const energy = String(formData.get("energy") || "").trim().toUpperCase();
+  const vin = String(formData.get("vin") || "").trim().toUpperCase();
+  const registrationNumber = String(formData.get("registrationNumber") || "").trim().toUpperCase();
+  const priceXof = Math.round(Number(formData.get("priceXof") || 0));
+  const yearRaw = Number(formData.get("year") || 0);
+  const mileage = Math.max(0, Math.round(Number(formData.get("mileage") || 0)));
+  const vehicleType = String(formData.get("vehicleType") || "").trim().toUpperCase() || null;
+  const color = String(formData.get("color") || "").trim() || null;
+  const transmission = String(formData.get("transmission") || "").trim() || null;
+  const description = String(formData.get("description") || "").trim() || null;
+  const year = Number.isFinite(yearRaw) && yearRaw > 1900 ? Math.round(yearRaw) : null;
+
+  if (!brand || !model || !energy || !vin || !registrationNumber || priceXof <= 0) {
+    throw new Error("Marque, modèle, énergie, prix, numéro de châssis et plaque sont obligatoires.");
+  }
+  if (vin.length < 5) throw new Error("Le numéro de châssis est trop court.");
+  if (registrationNumber.length < 4) throw new Error("La plaque d'immatriculation est trop courte.");
+
+  const duplicate = await prisma.vehicle.findFirst({
+    where: { OR: [{ vin }, { registrationNumber }] },
+    select: { id: true, brand: true, model: true },
+  });
+  if (duplicate) {
+    throw new Error("Un véhicule avec ce numéro de châssis ou cette plaque existe déjà.");
+  }
+
+  const vehicle = await prisma.vehicle.create({
+    data: {
+      brand,
+      model,
+      variant,
+      year,
+      energy,
+      priceXof,
+      status: "EN_STOCK",
+      fleetType: "RENTAL",
+      rentalStatus: "DISPONIBLE",
+      vin,
+      registrationNumber,
+      mileage,
+      vehicleType,
+      color,
+      transmission,
+      description,
+    },
+    select: { id: true, brand: true, model: true, registrationNumber: true },
+  });
+
+  await logAudit({
+    user,
+    action: "rental.vehicle_create",
+    entityType: "Vehicle",
+    entityId: vehicle.id,
+    entityLabel: `${vehicle.brand} ${vehicle.model} - ${vehicle.registrationNumber || ""}`,
+    details: "Création d'un véhicule du parc de location",
+  });
+
+  revalidatePath("/rentals");
+  revalidatePath("/vehicles");
+  revalidatePath("/dashboard");
+}
+
 
 export async function createRental(formData: FormData) {
   const user = await requireUser([...MANAGE_ROLES]);

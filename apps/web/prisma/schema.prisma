@@ -167,6 +167,8 @@ model Supplier {
 model Vehicle {
   id            String         @id @default(cuid())
   vin           String?        @unique
+  /// Plaque d'immatriculation du véhicule de location (Bénin)
+  registrationNumber String?   @unique
   brand         String
   model         String
   variant       String?
@@ -207,6 +209,7 @@ model Vehicle {
   opportunities Opportunity[]
   quoteLines    QuoteLine[]
   rentals       Rental[]
+  rentalMaintenances RentalMaintenance[]
   workOrders      WorkOrder[]
   fleetLinks      FleetVehicle[]
   importOrderId   String?
@@ -403,8 +406,50 @@ model Rental {
   returnCondition    String?
   returnedAt         DateTime?
   createdByName      String?
+  payments           RentalPayment[]
+  maintenances       RentalMaintenance[]
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+}
+
+/// Encaissements réels liés à un contrat de location (recettes de location).
+model RentalPayment {
+  id            String   @id @default(cuid())
+  rentalId      String
+  rental        Rental   @relation(fields: [rentalId], references: [id], onDelete: Cascade)
+  amountXof     Int
+  method        String   @default("VIREMENT")
+  reference     String?
+  paidAt        DateTime @default(now())
+  notes         String?
+  createdByName String?
+  createdAt     DateTime @default(now())
+
+  @@index([rentalId, paidAt])
+}
+
+/// Suivi des entretiens, réparations et passages au garage du parc de location.
+model RentalMaintenance {
+  id            String   @id @default(cuid())
+  vehicleId     String
+  vehicle       Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  rentalId      String?
+  rental        Rental?  @relation(fields: [rentalId], references: [id], onDelete: SetNull)
+  type          String   @default("ENTRETIEN")
+  status        String   @default("PLANIFIE")
+  description   String
+  costXof       Int      @default(0)
+  garageName    String?
+  scheduledAt   DateTime?
+  startedAt     DateTime?
+  completedAt   DateTime?
+  mileage       Int?
+  notes         String?
+  createdByName String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([vehicleId, status])
 }
 
 model FleetAccount {

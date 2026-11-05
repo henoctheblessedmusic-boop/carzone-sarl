@@ -9,6 +9,7 @@ export interface SiteCopy {
   meta: {
     home: SitePageMeta;
     vehicules: SitePageMeta;
+    location: SitePageMeta;
     surMesure: SitePageMeta;
     services: SitePageMeta;
     recharge: SitePageMeta;
@@ -19,6 +20,7 @@ export interface SiteCopy {
   nav: {
     home: string;
     vehicules: string;
+    location: string;
     surMesure: string;
     services: string;
     recharge: string;

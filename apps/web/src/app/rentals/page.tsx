@@ -9,6 +9,7 @@ import {
   transferVehicleToRental,
   transferVehicleToShowroom,
   updateRentalMaintenanceStatus,
+  updateRentalRequestStatus,
 } from "./actions";
 import { RentalActionModals } from "./RentalActionModals";
 
@@ -27,6 +28,10 @@ const STATUS_LABEL: Record<string, string> = {
   PLANIFIE: "Planifié",
   EN_COURS: "En cours",
   ANNULE: "Annulé",
+  NOUVELLE: "Nouvelle",
+  CONTACTEE: "Contactée",
+  CONFIRMEE: "Confirmée",
+  ANNULEE: "Annulée",
 };
 
 const FIELD_STYLE = {
@@ -41,7 +46,7 @@ export default async function RentalsPage() {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [rentals, rentalVehicles, showroomVehicles, customers, maintenances] = await Promise.all([
+  const [rentals, rentalVehicles, showroomVehicles, customers, maintenances, rentalRequests] = await Promise.all([
     prisma.rental.findMany({
       include: {
         customer: true,
@@ -67,6 +72,11 @@ export default async function RentalsPage() {
     prisma.rentalMaintenance.findMany({
       include: { vehicle: { select: { id: true, brand: true, model: true, registrationNumber: true } } },
       orderBy: [{ status: "asc" }, { scheduledAt: "desc" }, { createdAt: "desc" }],
+    }),
+    prisma.rentalRequest.findMany({
+      include: { vehicle: { select: { id: true, brand: true, model: true, registrationNumber: true } } },
+      orderBy: { createdAt: "desc" },
+      take: 20,
     }),
   ]);
 
@@ -250,6 +260,62 @@ export default async function RentalsPage() {
                   </form>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {(canManage || canFinance) && rentalRequests.length > 0 && (
+          <div className="ox-glass" style={{ padding: "1rem 1.2rem", display: "grid", gap: 12 }}>
+            <div>
+              <strong>Demandes de location reçues depuis la vitrine</strong>
+              <p style={{ margin: "4px 0 0", opacity: 0.7, fontSize: "0.84rem" }}>
+                Demandes de visite showroom ou de contrat à distance. L'acompte de réservation correspond à 50 % du montant estimé.
+              </p>
+            </div>
+            <div className="ox-table-wrap">
+              <table className="ox-table" style={{ fontSize: "0.82rem" }}>
+                <thead>
+                  <tr>
+                    <th>Référence</th>
+                    <th>Client</th>
+                    <th>Véhicule</th>
+                    <th>Période</th>
+                    <th>Formule</th>
+                    <th>Estimation / Acompte</th>
+                    <th>Statut</th>
+                    <th>Suivi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rentalRequests.map((request) => (
+                    <tr key={request.id}>
+                      <td style={{ fontFamily: "monospace" }}>LOC-{request.id.slice(-8).toUpperCase()}</td>
+                      <td>{request.customerName}<br /><span style={{ opacity: 0.65 }}>{request.phone}</span></td>
+                      <td>{request.vehicle.brand} {request.vehicle.model}{request.vehicle.registrationNumber ? ` (${request.vehicle.registrationNumber})` : ""}</td>
+                      <td>{request.startDate.toISOString().slice(0, 10)}<br /><span style={{ opacity: 0.65 }}>{request.days} jour(s)</span></td>
+                      <td>{request.mode === "CONTRAT_A_DISTANCE" ? "Contrat à distance" : "Visite showroom"}</td>
+                      <td>{request.estimatedTotalXof ? formatXof(request.estimatedTotalXof) : "Sur devis"}<br /><span style={{ opacity: 0.65 }}>Acompte : {request.depositRequiredXof ? formatXof(request.depositRequiredXof) : "-"}</span></td>
+                      <td>{STATUS_LABEL[request.status] || request.status}</td>
+                      <td>
+                        {canManage ? (
+                          <form action={updateRentalRequestStatus} style={{ display: "flex", gap: 5, alignItems: "center" }}>
+                            <input type="hidden" name="id" value={request.id} />
+                            <select name="status" className="ox-select" style={{ height: 30, fontSize: "0.76rem" }} defaultValue={request.status}>
+                              <option value="NOUVELLE">Nouvelle</option>
+                              <option value="CONTACTEE">Contactée</option>
+                              <option value="CONFIRMEE">Confirmée</option>
+                              <option value="ANNULEE">Annulée</option>
+                            </select>
+                            <button type="submit" className="ox-btn ox-btn-ghost ox-btn-sm">Mettre à jour</button>
+                          </form>
+                        ) : (
+                          <span style={{ opacity: 0.6 }}>Lecture</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}

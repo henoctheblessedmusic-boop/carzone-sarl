@@ -12,6 +12,11 @@ export const es: SiteCopy = {
       description:
         "Descubra los vehículos nuevos disponibles en nuestro showroom de Cotonú: SUV, sedanes, pickups y vehículos eléctricos de todas las marcas.",
     },
+    location: {
+      title: "Alquiler de vehículos en Cotonú | CARZONE SARL",
+      description:
+        "Alquile un vehículo reciente con CARZONE SARL en Cotonú: flota disponible, fichas técnicas, tarifas diarias o mensuales, visita al showroom y contrato a distancia.",
+    },
     surMesure: {
       title: "Pedido a medida e importación | CARZONE SARL",
       description:
@@ -42,6 +47,7 @@ export const es: SiteCopy = {
   nav: {
     home: "Inicio",
     vehicules: "Vehículos",
+    location: "Alquiler de vehículos",
     surMesure: "A medida",
     services: "Servicios",
     recharge: "Recarga",

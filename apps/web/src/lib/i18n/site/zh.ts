@@ -12,6 +12,11 @@ export const zh: SiteCopy = {
       description:
         "浏览科托努展厅现有的新车：SUV、轿车、皮卡及各品牌电动车型。",
     },
+    location: {
+      title: "科托努车辆租赁 | CARZONE SARL",
+      description:
+        "在科托努 CARZONE SARL 租赁近期车辆：现车车队、技术参数、日租或月租价格、展厅参观及远程合同。",
+    },
     surMesure: {
       title: "定制订购与进口 | CARZONE SARL",
       description:
@@ -42,6 +47,7 @@ export const zh: SiteCopy = {
   nav: {
     home: "首页",
     vehicules: "车辆",
+    location: "车辆租赁",
     surMesure: "定制订购",
     services: "服务",
     recharge: "充电",

@@ -186,6 +186,9 @@ model Vehicle {
   fleetType     String         @default("SHOWROOM")
   /// DISPONIBLE | LOUE | MAINTENANCE | HORS_SERVICE (pertinent si fleetType = RENTAL)
   rentalStatus  String?        @default("DISPONIBLE")
+  /// Tarifs publics du parc de location (FCFA)
+  rentalDailyXof   Int?
+  rentalMonthlyXof Int?
   siteId        String?
   site          Site?          @relation(fields: [siteId], references: [id])
   supplierId    String?
@@ -211,6 +214,7 @@ model Vehicle {
   opportunities Opportunity[]
   quoteLines    QuoteLine[]
   rentals       Rental[]
+  rentalRequests RentalRequest[]
   rentalMaintenances RentalMaintenance[]
   workOrders      WorkOrder[]
   fleetLinks      FleetVehicle[]
@@ -452,6 +456,28 @@ model RentalMaintenance {
   updatedAt     DateTime @updatedAt
 
   @@index([vehicleId, status])
+}
+
+/// Demande de location ou de réservation faite depuis la vitrine.
+model RentalRequest {
+  id                   String   @id @default(cuid())
+  vehicleId            String
+  vehicle              Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  customerName         String
+  phone                String
+  email                String?
+  startDate            DateTime
+  days                 Int
+  mode                 String   @default("VISITE_SHOWROOM") // VISITE_SHOWROOM | CONTRAT_A_DISTANCE
+  message              String?
+  estimatedTotalXof    Int?
+  depositRequiredXof   Int?
+  status               String   @default("NOUVELLE")
+  createdByName        String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([status, createdAt])
 }
 
 model FleetAccount {

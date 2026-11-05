@@ -203,6 +203,8 @@ export function RentalActionModals({
                   </select>
                 </Field>
                 <Field label="Prix du véhicule (FCFA) *"><input name="priceXof" type="number" min="1" className="ox-input" style={FIELD} required placeholder="Ex. 12000000" /></Field>
+                <Field label="Tarif location / jour (FCFA)"><input name="rentalDailyXof" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 35000" /></Field>
+                <Field label="Tarif location / mois (FCFA)"><input name="rentalMonthlyXof" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 750000" /></Field>
                 <Field label="Numéro de châssis (VIN) *"><input name="vin" className="ox-input" style={FIELD} required placeholder="Ex. JTDBR32E720123456" autoComplete="off" /></Field>
                 <Field label="Plaque d'immatriculation *"><input name="registrationNumber" className="ox-input" style={FIELD} required placeholder="Ex. AB 1234 RB" autoComplete="off" /></Field>
                 <Field label="Kilométrage"><input name="mileage" type="number" min="0" className="ox-input" style={FIELD} placeholder="0" /></Field>

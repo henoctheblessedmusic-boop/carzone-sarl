@@ -22,6 +22,7 @@ export function SiteFooter({ copy }: SiteFooterProps) {
   const navItems = [
     { href: "/", label: copy.nav.home },
     { href: "/vehicules", label: copy.nav.vehicules },
+    { href: "/location-vehicule", label: copy.nav.location },
     { href: "/sur-mesure", label: copy.nav.surMesure },
     { href: "/nos-services", label: copy.nav.services },
     { href: "/recharge", label: copy.nav.recharge },

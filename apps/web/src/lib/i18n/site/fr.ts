@@ -12,6 +12,11 @@ export const fr: SiteCopy = {
       description:
         "Découvrez les véhicules neufs disponibles en showroom à Cotonou : SUV, berlines, pick-up et véhicules électriques toutes marques.",
     },
+    location: {
+      title: "Location de véhicules à Cotonou | CARZONE SARL",
+      description:
+        "Louez un véhicule récent chez CARZONE SARL à Cotonou : flotte disponible, fiches techniques, tarifs à la journée ou au mois, visite showroom et contrat à distance.",
+    },
     surMesure: {
       title: "Commande sur mesure et import | CARZONE SARL",
       description:
@@ -42,6 +47,7 @@ export const fr: SiteCopy = {
   nav: {
     home: "Accueil",
     vehicules: "Véhicules",
+    location: "Location de véhicule",
     surMesure: "Sur-mesure",
     services: "Services",
     recharge: "Recharge",

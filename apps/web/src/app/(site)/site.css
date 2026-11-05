@@ -3488,3 +3488,555 @@
 .site-modal-shell {
   display: contents;
 }
+
+/* ===== Vitrine : location de véhicules ===== */
+.site-rental-hero {
+  background:
+    radial-gradient(900px 420px at 80% 0%, rgba(225, 29, 72, 0.16), transparent 60%),
+    radial-gradient(700px 360px at 0% 30%, rgba(245, 158, 11, 0.1), transparent 55%),
+    var(--site-bg);
+}
+
+.site-rental-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.site-rental-intro p {
+  max-width: 680px;
+  margin: 0;
+  color: var(--site-muted);
+  line-height: 1.6;
+}
+
+.site-rental-intro span {
+  color: var(--site-gold);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.site-rental-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+  gap: 22px;
+}
+
+.site-rental-card {
+  background: var(--site-card);
+  border: 1px solid var(--site-border);
+  border-radius: 16px;
+  overflow: hidden;
+  min-width: 0;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.site-rental-card:hover {
+  border-color: var(--site-border-strong);
+  transform: translateY(-2px);
+}
+
+.site-rental-card-media {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 0;
+  padding: 12px;
+  background: #eef1f5;
+  cursor: pointer;
+}
+
+.site-rental-card-img {
+  object-fit: contain;
+}
+
+.site-rental-card-badge {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(6, 11, 18, 0.8);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 650;
+}
+
+.site-rental-card-body {
+  padding: 1rem 1.1rem 1.2rem;
+}
+
+.site-rental-card-energy {
+  color: var(--site-gold);
+  font-size: 0.7rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.site-rental-card-title {
+  margin: 0.25rem 0 0;
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: var(--site-text-strong);
+  line-height: 1.2;
+}
+
+.site-rental-card-meta {
+  margin-top: 0.25rem;
+  color: var(--site-muted);
+  font-size: 0.78rem;
+}
+
+.site-rental-card-price {
+  margin-top: 0.7rem;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  color: var(--site-text-strong);
+}
+
+.site-rental-card-price strong {
+  font-size: 1.15rem;
+}
+
+.site-rental-card-price span {
+  color: var(--site-muted);
+  font-size: 0.82rem;
+}
+
+.site-rental-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 0.9rem;
+}
+
+.site-rental-card-actions .site-cta {
+  flex: 1 1 140px;
+  min-height: 40px;
+  font-size: 0.82rem;
+  justify-content: center;
+}
+
+.site-rental-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(3, 7, 12, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.site-rental-modal {
+  position: relative;
+  width: min(980px, 100%);
+  margin: auto;
+  background: var(--site-surface);
+  border: 1px solid var(--site-border-strong);
+  border-radius: 18px;
+  box-shadow: var(--site-shadow);
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 0;
+  overflow: hidden;
+}
+
+.site-rental-request-modal {
+  display: block;
+  width: min(720px, 100%);
+  padding: 1.4rem;
+  max-height: 92vh;
+  overflow-y: auto;
+}
+
+.site-rental-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--site-border);
+  background: var(--site-bg);
+  color: var(--site-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.site-rental-modal-gallery {
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.site-rental-modal-main {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eef1f5;
+}
+
+.site-rental-modal-img {
+  object-fit: contain;
+}
+
+.site-rental-modal-thumbs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.site-rental-modal-thumbs button {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid var(--site-border);
+  background: #eef1f5;
+  padding: 0;
+  cursor: pointer;
+}
+
+.site-rental-modal-thumbs button.is-active {
+  border-color: var(--site-gold);
+}
+
+.site-rental-modal-thumbs img {
+  object-fit: cover;
+}
+
+.site-rental-modal-body {
+  padding: 1.6rem 1.5rem 1.6rem 0.8rem;
+  min-width: 0;
+}
+
+.site-rental-modal-body h2 {
+  margin: 0.15rem 0 0;
+  font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+  line-height: 1.15;
+}
+
+.site-rental-modal-price {
+  margin-top: 0.5rem;
+  color: var(--site-gold);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.site-rental-modal-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.site-rental-modal-actions .site-cta {
+  flex: 1 1 150px;
+  min-height: 42px;
+  justify-content: center;
+}
+
+.site-rental-sheet {
+  margin-top: 1.3rem;
+  border-top: 1px solid var(--site-border);
+  padding-top: 1rem;
+}
+
+.site-rental-sheet h3 {
+  margin: 0 0 0.7rem;
+  font-size: 1rem;
+}
+
+.site-rental-sheet h4 {
+  margin: 1rem 0 0.4rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--site-muted);
+}
+
+.site-rental-sheet-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.site-rental-sheet-grid > div {
+  background: var(--site-card);
+  border: 1px solid var(--site-border);
+  border-radius: 10px;
+  padding: 0.7rem;
+  min-width: 0;
+}
+
+.site-rental-sheet-grid span {
+  display: block;
+  color: var(--site-muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.site-rental-sheet-grid strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.9rem;
+}
+
+.site-rental-sheet-grid small {
+  display: block;
+  margin-top: 3px;
+  color: var(--site-muted);
+  font-size: 0.72rem;
+}
+
+.site-rental-sheet ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+
+.site-rental-sheet li {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: var(--site-muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.site-rental-sheet li svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--site-gold);
+}
+
+.site-rental-request-head {
+  padding-right: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.site-rental-request-head h2 {
+  margin: 0.2rem 0 0;
+  font-size: 1.35rem;
+}
+
+.site-rental-request-modes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.site-rental-request-modes button {
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--site-border);
+  background: var(--site-card);
+  color: var(--site-muted);
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.82rem;
+}
+
+.site-rental-request-modes button.is-active {
+  border-color: var(--site-gold);
+  background: rgba(245, 158, 11, 0.13);
+  color: var(--site-text-strong);
+}
+
+.site-rental-request-help {
+  color: var(--site-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  margin: 0.65rem 0;
+}
+
+.site-rental-request-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.site-rental-request-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--site-text);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.site-rental-request-grid input,
+.site-rental-request-grid textarea {
+  width: 100%;
+  border: 1px solid var(--site-border);
+  border-radius: 9px;
+  background: var(--site-bg);
+  color: var(--site-text);
+  padding: 0.6rem 0.7rem;
+  font: inherit;
+  font-size: 0.86rem;
+}
+
+.site-rental-request-message {
+  grid-column: 1 / -1;
+}
+
+.site-rental-request-estimate {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 0.8rem;
+}
+
+.site-rental-request-estimate > div {
+  border: 1px solid var(--site-border);
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  background: var(--site-card);
+}
+
+.site-rental-request-estimate span {
+  display: block;
+  color: var(--site-muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.site-rental-request-estimate strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.95rem;
+}
+
+.site-rental-request-error {
+  color: #f87171;
+  font-size: 0.82rem;
+  margin: 0 0 0.6rem;
+}
+
+.site-rental-request-form > .site-cta {
+  width: 100%;
+  justify-content: center;
+  min-height: 44px;
+  margin-top: 0.75rem;
+}
+
+.site-rental-request-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.6rem;
+  padding: 1rem 0 0.5rem;
+}
+
+.site-rental-request-success > svg {
+  color: #10b981;
+}
+
+.site-rental-request-success h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.site-rental-request-summary {
+  display: grid;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--site-muted);
+  margin: 0.3rem 0;
+}
+
+.site-rental-request-success .site-cta {
+  min-width: 220px;
+  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .site-rental-modal {
+    grid-template-columns: 1fr;
+  }
+
+  .site-rental-modal-body {
+    padding: 0.5rem 1.1rem 1.4rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-rental-intro {
+    align-items: flex-start;
+  }
+
+  .site-rental-grid {
+    gap: 14px;
+  }
+
+  .site-rental-card-actions {
+    flex-direction: column;
+  }
+
+  .site-rental-card-actions .site-cta {
+    width: 100%;
+    flex-basis: auto;
+  }
+
+  .site-rental-modal-backdrop {
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .site-rental-modal {
+    border-radius: 0;
+    min-height: 100dvh;
+    width: 100%;
+    margin: 0;
+  }
+
+  .site-rental-modal-body {
+    padding: 0.5rem 1rem 1.5rem;
+  }
+
+  .site-rental-sheet-grid,
+  .site-rental-request-grid,
+  .site-rental-request-estimate {
+    grid-template-columns: 1fr;
+  }
+
+  .site-rental-request-modes {
+    grid-template-columns: 1fr;
+  }
+
+  .site-rental-request-modal {
+    border-radius: 0;
+    min-height: 100dvh;
+    max-height: none;
+  }
+}

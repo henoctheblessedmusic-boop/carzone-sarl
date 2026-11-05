@@ -11,6 +11,7 @@ import {
 const SITE_PATHS = [
   "/",
   "/vehicules",
+  "/location-vehicule",
   "/sur-mesure",
   "/nos-services",
   "/recharge",
@@ -38,6 +39,7 @@ const PUBLIC_PATHS = [
   // "/services" n'est volontairement PAS ajouté ici : il désigne la route CRM interne
   // protégée (src/app/services/page.tsx) ; la page vitrine équivalente vit sur "/nos-services".
   "/vehicules",
+  "/location-vehicule",
   "/sur-mesure",
   "/nos-services",
   "/recharge",

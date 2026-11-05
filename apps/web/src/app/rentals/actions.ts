@@ -225,6 +225,32 @@ export async function approveRentalVehicleTechSheet(formData: FormData) {
   revalidatePath("/rentals");
 }
 
+export async function updateRentalRequestStatus(formData: FormData) {
+  const user = await requireUser([...MANAGE_ROLES]);
+  requireManager(user.role);
+  const id = String(formData.get("id") || "").trim();
+  const status = String(formData.get("status") || "").trim().toUpperCase();
+  const allowed = ["NOUVELLE", "CONTACTEE", "CONFIRMEE", "ANNULEE"];
+  if (!id || !allowed.includes(status)) throw new Error("Statut de demande invalide.");
+
+  const requestRecord = await prisma.rentalRequest.update({
+    where: { id },
+    data: { status },
+    include: { vehicle: { select: { brand: true, model: true } } },
+  });
+
+  await logAudit({
+    user,
+    action: "rental.request_status",
+    entityType: "RentalRequest",
+    entityId: requestRecord.id,
+    entityLabel: `${requestRecord.vehicle.brand} ${requestRecord.vehicle.model} - ${requestRecord.customerName}`,
+    details: `Statut ${status}`,
+  });
+
+  revalidatePath("/rentals");
+}
+
 export async function createRentalVehicle(formData: FormData) {
   const user = await requireUser([...MANAGE_ROLES]);
   requireManager(user.role);
@@ -236,6 +262,8 @@ export async function createRentalVehicle(formData: FormData) {
   const vin = String(formData.get("vin") || "").trim().toUpperCase();
   const registrationNumber = String(formData.get("registrationNumber") || "").trim().toUpperCase();
   const priceXof = Math.round(Number(formData.get("priceXof") || 0));
+  const rentalDailyXof = Math.round(Number(formData.get("rentalDailyXof") || 0)) || null;
+  const rentalMonthlyXof = Math.round(Number(formData.get("rentalMonthlyXof") || 0)) || null;
   const yearRaw = Number(formData.get("year") || 0);
   const mileage = Math.max(0, Math.round(Number(formData.get("mileage") || 0)));
   const vehicleType = String(formData.get("vehicleType") || "").trim().toUpperCase() || null;
@@ -266,6 +294,8 @@ export async function createRentalVehicle(formData: FormData) {
       year,
       energy,
       priceXof,
+      rentalDailyXof,
+      rentalMonthlyXof,
       status: "EN_STOCK",
       fleetType: "RENTAL",
       rentalStatus: "DISPONIBLE",

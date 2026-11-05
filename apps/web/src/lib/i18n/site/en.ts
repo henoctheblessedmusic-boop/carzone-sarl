@@ -12,6 +12,11 @@ export const en: SiteCopy = {
       description:
         "Browse the new vehicles available at our Cotonou showroom: SUVs, sedans, pickups and electric vehicles, all brands.",
     },
+    location: {
+      title: "Vehicle rental in Cotonou | CARZONE SARL",
+      description:
+        "Rent a recent vehicle from CARZONE SARL in Cotonou: available fleet, technical sheets, daily or monthly rates, showroom visit and remote contract.",
+    },
     surMesure: {
       title: "Custom orders and import | CARZONE SARL",
       description:
@@ -42,6 +47,7 @@ export const en: SiteCopy = {
   nav: {
     home: "Home",
     vehicules: "Vehicles",
+    location: "Vehicle rental",
     surMesure: "Custom order",
     services: "Services",
     recharge: "Charging",

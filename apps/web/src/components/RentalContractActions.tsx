@@ -40,7 +40,7 @@ export function RentalContractActions({
       "CARZONE SARL",
     ].join("\n")
   );
-  const mailto = customerEmail ? `mailto:${customerEmail}?subject=${subject}&body=${body}` : null;
+  const mailto = `mailto:${customerEmail || ""}?subject=${subject}&body=${body}`;
   const digits = phoneDigits(customerPhone);
   const whatsapp = digits
     ? `https://wa.me/${digits}?text=${encodeURIComponent(
@@ -66,11 +66,9 @@ export function RentalContractActions({
       {!publicView && (
         <>
           <a
-            href={mailto || undefined}
+            href={mailto}
             className="ox-btn ox-btn-ghost ox-btn-sm"
-            aria-disabled={!mailto}
-            title={mailto ? "Envoyer le contrat par e-mail" : "Aucun e-mail client renseigné"}
-            style={!mailto ? { opacity: 0.5, pointerEvents: "none" } : undefined}
+            title={customerEmail ? "Envoyer le contrat par e-mail" : "Ouvrir un e-mail avec le lien du contrat"}
           >
             <Mail size={15} /> Envoyer par e-mail
           </a>

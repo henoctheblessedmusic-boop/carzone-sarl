@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/AppShell";
+import { DashboardAutoRefresh } from "@/components/DashboardAutoRefresh";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { formatXof } from "@/lib/format";
@@ -156,6 +157,7 @@ export default async function RentalsPage() {
               </p>
             </div>
             <span style={{ fontSize: "0.75rem", opacity: 0.65 }}>Hors cautions - données à jour à chaque encaissement</span>
+            <DashboardAutoRefresh />
           </div>
           <div className="ox-kpi-grid">
             <div className="ox-kpi-card" style={{ borderLeft: "4px solid #10b981" }}>

@@ -229,6 +229,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Destinataire introuvable" }, { status: 404 });
     }
 
+    // Le gestionnaire de location peut écrire au DG et au PDG, mais ne peut pas
+    // les appeler directement. Le blocage est appliqué côté serveur, pas seulement dans l'UI.
+    if (
+      session.role === "GESTIONNAIRE_LOCATION" &&
+      (receiver.role === "PDG" || receiver.role === "DG")
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Appel direct désactivé vers le Directeur Général ou le PDG. Utilisez la messagerie pour leur laisser un message.",
+        },
+        { status: 403 }
+      );
+    }
+
     // Terminer d'éventuels anciens appels pendants
     await prisma.callSession.updateMany({
       where: {

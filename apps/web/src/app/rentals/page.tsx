@@ -4,15 +4,13 @@ import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { formatXof } from "@/lib/format";
 import {
-  createRental,
-  createRentalVehicle,
-  createRentalMaintenance,
   recordRentalPayment,
   returnRental,
   transferVehicleToRental,
   transferVehicleToShowroom,
   updateRentalMaintenanceStatus,
 } from "./actions";
+import { RentalActionModals } from "./RentalActionModals";
 
 const RENTAL_ROLES = ["GESTIONNAIRE_LOCATION", "COMPTA", "DG", "PDG", "SG"] as const;
 const MANAGE_ROLES = ["GESTIONNAIRE_LOCATION", "DG", "PDG", "SG"] as const;
@@ -125,6 +123,19 @@ export default async function RentalsPage() {
           )}
         </div>
 
+        {canManage && (
+          <RentalActionModals
+            rentalVehicles={rentalVehicles}
+            availableVehicles={availableVehicles}
+            customers={customers}
+            activeRentals={activeRentals.map((rental) => ({
+              id: rental.id,
+              type: rental.type,
+              customerName: rental.customer.contactName,
+            }))}
+          />
+        )}
+
         <div className="ox-kpi-grid">
           <div className="ox-kpi-card" style={{ borderLeft: "4px solid #38bdf8" }}>
             <div className="ox-kpi-label">Parc de location</div>
@@ -190,138 +201,6 @@ export default async function RentalsPage() {
 
         {canManage && (
           <div className="ox-glass" style={{ padding: "1rem 1.2rem", display: "grid", gap: 12 }}>
-            <div>
-              <strong>Ajouter un véhicule au parc de location</strong>
-              <p style={{ margin: "4px 0 0", opacity: 0.7, fontSize: "0.84rem" }}>
-                Enregistrez un nouveau véhicule directement dans la base du parc de location : marque, modèle, nom/version,
-                prix, châssis et plaque d'immatriculation.
-              </p>
-            </div>
-            <form
-              action={createRentalVehicle}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,190px),1fr))",
-                gap: 10,
-              }}
-            >
-              <div style={{ display: "grid", gap: 4 }}>
-                <label className="ox-label" htmlFor="rental-brand">Marque *</label>
-                <input id="rental-brand" name="brand" className="ox-input" style={FIELD_STYLE} required placeholder="Ex. Toyota" />
-              </div>
-              <div style={{ display: "grid", gap: 4 }}>
-                <label className="ox-label" htmlFor="rental-model">Modèle *</label>
-                <input id="rental-model" name="model" className="ox-input" style={FIELD_STYLE} required placeholder="Ex. Corolla" />
-              </div>
-              <div style={{ display: "grid", gap: 4 }}>
-                <label className="ox-label" htmlFor="rental-variant">Nom / version</label>
-                <input id="rental-variant" name="variant" className="ox-input" style={FIELD_STYLE} placeholder="Ex. 1.8 Hybride" />
-              </div>
-              <div style={{ display: "grid", gap: 4 }}>
-                <label className="ox-label" htmlFor="rental-year">Année</label>
-                <input id="rental-year" name="year" type="number" min="1900" max="2100" className="ox-input" style={FIELD_STYLE} placeholder="Ex. 2026" />
-              </div>
-              <div style={{ display: "grid", gap: 4 }}>
-                <label className="ox-label" htmlFor="rental-energy">Énergie *</label>
-                <select id="rental-energy" name="energy" className="ox-select" style={FIELD_STYLE} required defaultValue="ESSENCE">
-                  <option value="ESSENCE">Essence</option>
-                  <option value="DIESEL">Diesel</option>
-                  <option value="HYBRIDE">Hybride</option>
-                  <option value="HYBRIDE_RECHARGEABLE">Hybride rechargeable</option>
-                  <option value="ELECTRIQUE">Électrique</option>
-                </select>
-              </div>
-              <div style={{ display: "grid", gap: 4 }}>
-                <label className="ox-label" htmlFor="rental-price">Prix du véhicule (FCFA) *</label>
-                <input id="rental-price" name="priceXof" type="number" min="1" className="ox-input" style={FIELD_STYLE} required placeholder="Ex. 12000000" />
-              </div>
-              <div style={{ display: "grid", gap: 4 }}>
-                <label className="ox-label" htmlFor="rental-vin">Numéro de châssis (VIN) *</label>
-                <input id="rental-vin" name="vin" className="ox-input" style={FIELD_STYLE} required placeholder="Ex. JTDBR32E720123456" autoComplete="off" />
-              </div>
-              <div style={{ display: "grid", gap: 4 }}>
-                <label className="ox-label" htmlFor="rental-plate">Plaque d'immatriculation *</label>
-                <input id="rental-plate" name="registrationNumber" className="ox-input" style={FIELD_STYLE} required placeholder="Ex. AB 1234 RB" autoComplete="off" />
-              </div>
-              <div style={{ display: "grid", gap: 4 }}>
-                <label className="ox-label" htmlFor="rental-mileage">Kilométrage</label>
-                <input id="rental-mileage" name="mileage" type="number" min="0" className="ox-input" style={FIELD_STYLE} placeholder="0" />
-              </div>
-              <div style={{ display: "grid", gap: 4 }}>
-                <label className="ox-label" htmlFor="rental-type">Type</label>
-                <select id="rental-type" name="vehicleType" className="ox-select" style={FIELD_STYLE} defaultValue="">
-                  <option value="">Non précisé</option>
-                  <option value="BERLINE">Berline</option>
-                  <option value="SUV">SUV</option>
-                  <option value="PICKUP">Pick-up</option>
-                  <option value="VAN">Van</option>
-                </select>
-              </div>
-              <div style={{ display: "grid", gap: 4 }}>
-                <label className="ox-label" htmlFor="rental-color">Couleur</label>
-                <input id="rental-color" name="color" className="ox-input" style={FIELD_STYLE} placeholder="Ex. Blanc" />
-              </div>
-              <div style={{ display: "grid", gap: 4 }}>
-                <label className="ox-label" htmlFor="rental-transmission">Transmission</label>
-                <input id="rental-transmission" name="transmission" className="ox-input" style={FIELD_STYLE} placeholder="Ex. Automatique" />
-              </div>
-              <div style={{ display: "grid", gap: 4, gridColumn: "1 / -1" }}>
-                <label className="ox-label" htmlFor="rental-description">Notes / description</label>
-                <input id="rental-description" name="description" className="ox-input" style={FIELD_STYLE} placeholder="Informations complémentaires sur le véhicule" />
-              </div>
-              <div style={{ gridColumn: "1 / -1", display: "flex", justifyContent: "flex-end" }}>
-                <button type="submit" className="ox-btn" style={FIELD_STYLE}>
-                  Enregistrer le véhicule
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-
-        {canManage && (
-          <div className="ox-glass" style={{ padding: "1rem 1.2rem", display: "grid", gap: 12 }}>
-            <strong>Nouveau contrat de location</strong>
-            <form
-              action={createRental}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,170px),1fr))",
-                gap: 10,
-              }}
-            >
-              <select name="type" className="ox-select" style={FIELD_STYLE} defaultValue="LCD">
-                <option value="LCD">Location courte durée</option>
-                <option value="LLD">Location longue durée</option>
-                <option value="LOA">Location avec option d'achat</option>
-              </select>
-              <select name="customerId" className="ox-select" style={FIELD_STYLE} required defaultValue="">
-                <option value="" disabled>Client</option>
-                {customers.map((customer) => (
-                  <option key={customer.id} value={customer.id}>
-                    {customer.contactName}{customer.companyName ? ` (${customer.companyName})` : ""}
-                  </option>
-                ))}
-              </select>
-              <select name="vehicleId" className="ox-select" style={FIELD_STYLE} required defaultValue="">
-                <option value="" disabled>Véhicule disponible</option>
-                {availableVehicles.map((vehicle) => (
-                  <option key={vehicle.id} value={vehicle.id}>
-                    {vehicle.brand} {vehicle.model} {vehicle.registrationNumber ? `- ${vehicle.registrationNumber}` : vehicle.vin ? `- ${vehicle.vin}` : ""}
-                  </option>
-                ))}
-              </select>
-              <input name="startDate" type="date" className="ox-input" style={FIELD_STYLE} required />
-              <input name="endDate" type="date" className="ox-input" style={FIELD_STYLE} />
-              <input name="monthlyXof" type="number" min={0} placeholder="Tarif mensuel (FCFA)" className="ox-input" style={FIELD_STYLE} />
-              <input name="depositXof" type="number" min={0} placeholder="Caution (FCFA)" className="ox-input" style={FIELD_STYLE} />
-              <input name="departureCondition" placeholder="État au départ" className="ox-input" style={FIELD_STYLE} />
-              <button type="submit" className="ox-btn" style={FIELD_STYLE}>Créer le contrat</button>
-            </form>
-          </div>
-        )}
-
-        {canManage && (
-          <div className="ox-glass" style={{ padding: "1rem 1.2rem", display: "grid", gap: 12 }}>
             <strong>Gestion du parc de location</strong>
             <p style={{ margin: 0, opacity: 0.7, fontSize: "0.84rem" }}>
               Les véhicules du stock showroom peuvent être transférés vers le parc de location, et inversement
@@ -384,53 +263,6 @@ export default async function RentalsPage() {
                 maintenance et n'est plus proposé à la location.
               </p>
             </div>
-            {canManage && (
-            <form
-              action={createRentalMaintenance}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,180px),1fr))",
-                gap: 10,
-              }}
-            >
-              <select name="vehicleId" className="ox-select" style={FIELD_STYLE} required defaultValue="">
-                <option value="" disabled>Véhicule du parc</option>
-                {rentalVehicles.map((vehicle) => (
-                  <option key={vehicle.id} value={vehicle.id}>
-                    {vehicle.brand} {vehicle.model}{vehicle.registrationNumber ? ` - ${vehicle.registrationNumber}` : ""}
-                  </option>
-                ))}
-              </select>
-              <select name="type" className="ox-select" style={FIELD_STYLE} defaultValue="ENTRETIEN">
-                <option value="ENTRETIEN">Entretien</option>
-                <option value="VIDANGE">Vidange</option>
-                <option value="REPARATION">Réparation</option>
-                <option value="PNEUMATIQUES">Pneumatiques</option>
-                <option value="CONTROLE_TECHNIQUE">Contrôle technique</option>
-                <option value="AUTRE">Autre</option>
-              </select>
-              <select name="status" className="ox-select" style={FIELD_STYLE} defaultValue="PLANIFIE">
-                <option value="PLANIFIE">Planifié</option>
-                <option value="EN_COURS">En cours</option>
-                <option value="TERMINE">Terminé</option>
-              </select>
-              <input name="description" className="ox-input" style={FIELD_STYLE} required placeholder="Description de l'intervention" />
-              <input name="costXof" type="number" min="0" className="ox-input" style={FIELD_STYLE} placeholder="Coût (FCFA)" />
-              <input name="garageName" className="ox-input" style={FIELD_STYLE} placeholder="Garage / prestataire" />
-              <input name="scheduledAt" type="date" className="ox-input" style={FIELD_STYLE} />
-              <input name="mileage" type="number" min="0" className="ox-input" style={FIELD_STYLE} placeholder="Kilométrage" />
-              <select name="rentalId" className="ox-select" style={FIELD_STYLE} defaultValue="">
-                <option value="">Sans contrat lié</option>
-                {activeRentals.map((rental) => (
-                  <option key={rental.id} value={rental.id}>
-                    Contrat {rental.type} - {rental.customer.contactName}
-                  </option>
-                ))}
-              </select>
-              <button type="submit" className="ox-btn" style={FIELD_STYLE}>Enregistrer l'entretien</button>
-            </form>
-            )}
-
             {maintenances.length > 0 && (
               <div className="ox-table-wrap">
                 <table className="ox-table" style={{ fontSize: "0.82rem" }}>

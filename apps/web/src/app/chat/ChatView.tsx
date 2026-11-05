@@ -220,6 +220,14 @@ export function ChatView({
     currentUser.role === "DG" ||
     currentUser.role === "ADMIN";
 
+  // Le gestionnaire de location peut discuter avec tout le monde, mais ne peut
+  // pas appeler directement le Directeur Général ni le PDG.
+  const canCallPeer = (peer: Pick<ChatUser, "role"> | null | undefined): boolean => {
+    if (!peer) return false;
+    if (currentUser.role !== "GESTIONNAIRE_LOCATION") return true;
+    return peer.role !== "PDG" && peer.role !== "DG";
+  };
+
   // Fetch colleagues presence
   const refreshPresence = useCallback(async () => {
     try {
@@ -337,6 +345,10 @@ export function ChatView({
 
   // Proceed with voice call helper
   const proceedWithCall = (peer: ChatUser) => {
+    if (!canCallPeer(peer)) {
+      alert("Vous ne pouvez pas appeler directement le Directeur Général ou le PDG. Vous pouvez toutefois leur laisser un message ici.");
+      return;
+    }
     if (typeof window !== "undefined" && window.startVoiceCall) {
       window.startVoiceCall(peer.id, peer.fullName);
     } else {
@@ -347,7 +359,15 @@ export function ChatView({
   // Trigger audio call with offline warning
   const handleStartCall = () => {
     if (!selectedPeer) return;
+    if (!canCallPeer(selectedPeer)) {
+      alert("Vous ne pouvez pas appeler directement le Directeur Général ou le PDG. Vous pouvez toutefois leur laisser un message ici.");
+      return;
+    }
     const current = colleagueList.find((c) => c.id === selectedPeer.id) || selectedPeer;
+    if (!canCallPeer(current)) {
+      alert("Vous ne pouvez pas appeler directement le Directeur Général ou le PDG. Vous pouvez toutefois leur laisser un message ici.");
+      return;
+    }
     if (current.status === "OFFLINE") {
       setOfflineCallPrompt(current);
       return;
@@ -913,6 +933,7 @@ export function ChatView({
               ? colleagueList.find((c) => c.id === selectedPeer.id) || selectedPeer
               : null;
             const peerStatus = activePeer?.status || "OFFLINE";
+            const canCallSelectedPeer = canCallPeer(selectedPeer);
             const peerStatusColor =
               peerStatus === "ONLINE"
                 ? "#4ade80"
@@ -1058,10 +1079,13 @@ export function ChatView({
                     <button
                       type="button"
                       onClick={handleStartCall}
+                      disabled={!canCallSelectedPeer}
                       title={
-                        peerStatus === "OFFLINE"
-                          ? copy.call.offlineTitle(selectedPeer.fullName)
-                          : copy.call.callTitle(selectedPeer.fullName)
+                        !canCallSelectedPeer
+                          ? "Appel direct désactivé. Vous pouvez laisser un message au Directeur Général ou au PDG."
+                          : peerStatus === "OFFLINE"
+                            ? copy.call.offlineTitle(selectedPeer.fullName)
+                            : copy.call.callTitle(selectedPeer.fullName)
                       }
                       style={{
                         display: "inline-flex",
@@ -1070,25 +1094,36 @@ export function ChatView({
                         padding: "7px 12px",
                         borderRadius: 8,
                         border:
-                          peerStatus === "OFFLINE"
-                            ? "1px solid rgba(239, 68, 68, 0.4)"
-                            : "1px solid rgba(34, 197, 94, 0.4)",
+                          !canCallSelectedPeer
+                            ? "1px solid rgba(148, 163, 184, 0.35)"
+                            : peerStatus === "OFFLINE"
+                              ? "1px solid rgba(239, 68, 68, 0.4)"
+                              : "1px solid rgba(34, 197, 94, 0.4)",
                         background:
-                          peerStatus === "OFFLINE"
-                            ? "rgba(239, 68, 68, 0.12)"
-                            : "linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(21, 128, 61, 0.3))",
-                        color: peerStatus === "OFFLINE" ? "#f87171" : "#4ade80",
+                          !canCallSelectedPeer
+                            ? "rgba(148, 163, 184, 0.12)"
+                            : peerStatus === "OFFLINE"
+                              ? "rgba(239, 68, 68, 0.12)"
+                              : "linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(21, 128, 61, 0.3))",
+                        color: !canCallSelectedPeer ? "#94a3b8" : peerStatus === "OFFLINE" ? "#f87171" : "#4ade80",
                         fontSize: "0.8rem",
                         fontWeight: 650,
-                        cursor: "pointer",
+                        cursor: !canCallSelectedPeer ? "not-allowed" : "pointer",
+                        opacity: !canCallSelectedPeer ? 0.8 : 1,
                         boxShadow:
-                          peerStatus === "ONLINE"
+                          canCallSelectedPeer && peerStatus === "ONLINE"
                             ? "0 2px 10px rgba(34, 197, 94, 0.15)"
                             : "none",
                       }}
                     >
-                      {peerStatus === "OFFLINE" ? <PhoneOff size={14} /> : <Phone size={14} />}
-                      <span>{peerStatus === "OFFLINE" ? copy.call.offline : copy.call.call}</span>
+                      {!canCallSelectedPeer ? <MessageSquare size={14} /> : peerStatus === "OFFLINE" ? <PhoneOff size={14} /> : <Phone size={14} />}
+                      <span>
+                        {!canCallSelectedPeer
+                          ? "Message seulement"
+                          : peerStatus === "OFFLINE"
+                            ? copy.call.offline
+                            : copy.call.call}
+                      </span>
                     </button>
                   </div>
                 )}

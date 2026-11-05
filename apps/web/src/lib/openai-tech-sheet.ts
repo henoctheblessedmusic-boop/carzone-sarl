@@ -110,7 +110,8 @@ export async function generateTechSheetWithAI(
     year?: number | null;
     energy?: string | null;
   },
-  customApiKey?: string
+  customApiKey?: string,
+  options?: { preferDeepSeek?: boolean }
 ): Promise<TechnicalSheet> {
   const normalizedBrand = normalizeBrandName(vehicle.brand);
   const catalogEntry = findCatalogSpecs(vehicle.brand, vehicle.model, vehicle.variant);
@@ -175,7 +176,7 @@ Année modèle : ${vehicle.year || 2026}
 
   const deepseekKey = await getDeepSeekApiKey();
   const openaiKey = customApiKey?.trim() || (await getOpenAIApiKey());
-  const useDeepSeekFirst = isChineseBrand(normalizedBrand) && !!deepseekKey;
+  const useDeepSeekFirst = !!deepseekKey && (options?.preferDeepSeek === true || isChineseBrand(normalizedBrand));
 
   let parsed: any = null;
   let usedEngine = "CATALOGUE_D_ORIGINE";

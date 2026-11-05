@@ -199,6 +199,8 @@ model Vehicle {
   hasTechSheet       Boolean        @default(false)
   techSheetConfirmed Boolean        @default(false)
   techSheetConfirmedAt DateTime?
+  techSheetModelId String?
+  techSheetModel VehicleModelTechSheet? @relation(fields: [techSheetModelId], references: [id])
   shippingOriginPort String?
   etaDate            DateTime?
   containerNumber    String?
@@ -994,6 +996,28 @@ model ExpenseLine {
   sortOrder    Int     @default(0)
 
   @@index([expenseId, sortOrder])
+}
+
+model VehicleModelTechSheet {
+  id          String   @id @default(cuid())
+  /// Clé normalisée marque|modèle|version|année|énergie : une seule fiche par modèle.
+  modelKey    String   @unique
+  brand       String
+  model       String
+  variant     String?
+  year        Int?
+  energy      String?
+  sheetJson   String
+  status      String   @default("GENERATED") // GENERATED | APPROVED
+  source      String?
+  generatedBy String?
+  approvedBy  String?
+  approvedAt  DateTime?
+  vehicles    Vehicle[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([brand, model])
 }
 
 /// Journal d'audit : qui a fait quoi, sur quelle entité, à quel moment.

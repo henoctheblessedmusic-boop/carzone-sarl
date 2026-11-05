@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
+import { ensureVehicleTechSheet, approveVehicleTechSheet } from "@/lib/vehicle-model-tech-sheet";
 
 const MANAGE_ROLES = ["GESTIONNAIRE_LOCATION", "DG", "PDG", "SG"] as const;
 const FINANCE_ROLES = ["GESTIONNAIRE_LOCATION", "COMPTA", "DG", "PDG", "SG"] as const;
@@ -166,6 +167,64 @@ export async function updateRentalMaintenanceStatus(formData: FormData) {
   revalidatePath("/dashboard");
 }
 
+export async function generateRentalVehicleTechSheet(formData: FormData) {
+  const user = await requireUser([...MANAGE_ROLES]);
+  requireManager(user.role);
+  const vehicleId = String(formData.get("vehicleId") || "").trim();
+  if (!vehicleId) throw new Error("Véhicule requis.");
+
+  const vehicle = await prisma.vehicle.findUnique({
+    where: { id: vehicleId },
+    select: { id: true, brand: true, model: true },
+  });
+  if (!vehicle) throw new Error("Véhicule introuvable.");
+
+  await ensureVehicleTechSheet(vehicleId, {
+    preferDeepSeek: true,
+    actorName: user.fullName,
+    force: true,
+  });
+
+  await logAudit({
+    user,
+    action: "rental.tech_sheet_generate",
+    entityType: "Vehicle",
+    entityId: vehicle.id,
+    entityLabel: `${vehicle.brand} ${vehicle.model}`,
+    details: "Génération de la fiche technique par l'agent DeepSeek",
+  });
+
+  revalidatePath(`/rentals/${vehicleId}/fiche-technique`);
+  revalidatePath("/rentals");
+}
+
+export async function approveRentalVehicleTechSheet(formData: FormData) {
+  const user = await requireUser([...MANAGE_ROLES]);
+  requireManager(user.role);
+  const vehicleId = String(formData.get("vehicleId") || "").trim();
+  if (!vehicleId) throw new Error("Véhicule requis.");
+
+  const vehicle = await prisma.vehicle.findUnique({
+    where: { id: vehicleId },
+    select: { id: true, brand: true, model: true },
+  });
+  if (!vehicle) throw new Error("Véhicule introuvable.");
+
+  await approveVehicleTechSheet(vehicleId, user.fullName);
+
+  await logAudit({
+    user,
+    action: "rental.tech_sheet_approve",
+    entityType: "Vehicle",
+    entityId: vehicle.id,
+    entityLabel: `${vehicle.brand} ${vehicle.model}`,
+    details: "Fiche technique approuvée et sauvegardée pour le modèle",
+  });
+
+  revalidatePath(`/rentals/${vehicleId}/fiche-technique`);
+  revalidatePath("/rentals");
+}
+
 export async function createRentalVehicle(formData: FormData) {
   const user = await requireUser([...MANAGE_ROLES]);
   requireManager(user.role);
@@ -228,6 +287,14 @@ export async function createRentalVehicle(formData: FormData) {
     entityId: vehicle.id,
     entityLabel: `${vehicle.brand} ${vehicle.model} - ${vehicle.registrationNumber || ""}`,
     details: "Création d'un véhicule du parc de location",
+  });
+
+  // La fiche technique est générée et sauvegardée dès l'entrée du véhicule en base.
+  await ensureVehicleTechSheet(vehicle.id, {
+    preferDeepSeek: true,
+    actorName: user.fullName,
+  }).catch((error) => {
+    console.error("Fiche technique location non générée automatiquement:", error);
   });
 
   revalidatePath("/rentals");
@@ -357,6 +424,15 @@ export async function transferVehicleToRental(formData: FormData) {
     where: { id: vehicleId },
     data: { fleetType: "RENTAL", rentalStatus: "DISPONIBLE" },
   });
+
+  // Réutilise la fiche existante du véhicule importé, sinon la génère pour le modèle.
+  await ensureVehicleTechSheet(vehicleId, {
+    preferDeepSeek: true,
+    actorName: user.fullName,
+  }).catch((error) => {
+    console.error("Fiche technique location non générée au transfert:", error);
+  });
+
   await logAudit({
     user,
     action: "rental.fleet_add",

@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { normalizeBrandName } from "@/lib/brand-logos";
 import { logAudit } from "@/lib/audit";
+import { ensureVehicleTechSheet } from "@/lib/vehicle-model-tech-sheet";
 
 const VEHICLE_MANAGERS = [
   "PDG",
@@ -74,8 +75,11 @@ export async function createVehicle(formData: FormData) {
     },
   });
 
-  // Background auto-generation & translation of official French tech sheet
-  generateAndSaveVehicleTechSheet(vehicle.id).catch((err) => {
+  // Fiche technique générée par l'agent DeepSeek et sauvegardée pour le modèle.
+  await ensureVehicleTechSheet(vehicle.id, {
+    preferDeepSeek: true,
+    actorName: user.fullName,
+  }).catch((err) => {
     console.error("Auto tech sheet generation error:", err);
   });
 

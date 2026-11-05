@@ -359,6 +359,12 @@ export default async function RentalsPage() {
                       {vehicle.brand} {vehicle.model}
                       {vehicle.registrationNumber ? ` - ${vehicle.registrationNumber}` : ""} - {STATUS_LABEL[vehicle.rentalStatus || "DISPONIBLE"] || vehicle.rentalStatus}
                     </span>
+                    <a
+                      href={`/rentals/${vehicle.id}/fiche-technique`}
+                      className="ox-btn ox-btn-ghost ox-btn-sm"
+                    >
+                      Fiche technique
+                    </a>
                     <button type="submit" className="ox-btn ox-btn-ghost ox-btn-sm" disabled={hasActive}>
                       Retirer du parc
                     </button>
@@ -503,7 +509,11 @@ export default async function RentalsPage() {
                   <tr key={rental.id}>
                     <td>{rental.type}</td>
                     <td>{rental.customer.contactName}</td>
-                    <td>{rental.vehicle.brand} {rental.vehicle.model}{rental.vehicle.registrationNumber ? ` (${rental.vehicle.registrationNumber})` : ""}</td>
+                    <td>
+                      <a href={`/rentals/${rental.vehicle.id}/fiche-technique`} style={{ color: "var(--brand)", textDecoration: "underline" }}>
+                        {rental.vehicle.brand} {rental.vehicle.model}{rental.vehicle.registrationNumber ? ` (${rental.vehicle.registrationNumber})` : ""}
+                      </a>
+                    </td>
                     <td>{rental.startDate.toISOString().slice(0, 10)}</td>
                     <td>
                       {rental.returnedAt

@@ -45,6 +45,45 @@ export function vehicleTechSheetModelKey(vehicle: {
   ].join("|");
 }
 
+/**
+ * Recherche une fiche déjà disponible pour le même modèle.
+ * L'égalité stricte (version / année / énergie) est prioritaire, puis on accepte
+ * une fiche du même couple marque + modèle pour éviter une nouvelle génération IA.
+ */
+async function findReusableModelSheet(
+  vehicle: { brand: string; model: string },
+  exactKey: string,
+  exactModelSheet: Awaited<ReturnType<typeof prisma.vehicleModelTechSheet.findUnique>> | null
+) {
+  if (exactModelSheet && parseSheet(exactModelSheet.sheetJson)) return exactModelSheet;
+
+  const modelPrefix = `${vehicle.brand.trim().toUpperCase()}|${vehicle.model.trim().toUpperCase()}|`;
+  const candidates = await prisma.vehicleModelTechSheet.findMany({
+    where: { modelKey: { startsWith: modelPrefix } },
+    orderBy: [{ status: "asc" }, { updatedAt: "desc" }],
+    take: 20,
+  });
+
+  return candidates.find((candidate) => parseSheet(candidate.sheetJson)) || null;
+}
+
+async function applyExistingSheetToVehicle(
+  vehicleId: string,
+  sheet: TechnicalSheet,
+  modelSheet: { id: string; status: string; approvedAt: Date | null }
+) {
+  await prisma.vehicle.update({
+    where: { id: vehicleId },
+    data: {
+      technicalSheetJson: JSON.stringify(sheet),
+      hasTechSheet: true,
+      techSheetModelId: modelSheet.id,
+      techSheetConfirmed: modelSheet.status === "APPROVED",
+      techSheetConfirmedAt: modelSheet.status === "APPROVED" ? modelSheet.approvedAt : null,
+    },
+  });
+}
+
 export async function ensureVehicleTechSheet(
   vehicleId: string,
   options: { preferDeepSeek?: boolean; actorName?: string; force?: boolean } = {}
@@ -59,24 +98,17 @@ export async function ensureVehicleTechSheet(
 
   const modelKey = vehicleTechSheetModelKey(vehicle);
   const ownSheet = parseSheet(vehicle.technicalSheetJson);
-  const cachedModel =
+  const exactModelSheet =
     vehicle.techSheetModel ||
     (await prisma.vehicleModelTechSheet.findUnique({ where: { modelKey } }));
+  const cachedModel = await findReusableModelSheet(vehicle, modelKey, exactModelSheet);
 
-  // 1. Fiche de modèle déjà disponible : on la réutilise sans nouvel appel IA.
+  // 1. Fiche déjà disponible pour ce modèle (même version ou même modèle) :
+  //    on la réutilise sans aucun appel IA.
   if (cachedModel && !options.force) {
     const cachedSheet = parseSheet(cachedModel.sheetJson);
     if (cachedSheet) {
-      await prisma.vehicle.update({
-        where: { id: vehicle.id },
-        data: {
-          technicalSheetJson: JSON.stringify(cachedSheet),
-          hasTechSheet: true,
-          techSheetModelId: cachedModel.id,
-          techSheetConfirmed: cachedModel.status === "APPROVED",
-          techSheetConfirmedAt: cachedModel.status === "APPROVED" ? cachedModel.approvedAt : null,
-        },
-      });
+      await applyExistingSheetToVehicle(vehicle.id, cachedSheet, cachedModel);
       return { sheet: cachedSheet, modelSheet: cachedModel, source: "MODEL_CACHE" as const };
     }
   }
@@ -110,7 +142,60 @@ export async function ensureVehicleTechSheet(
     return { sheet: ownSheet, modelSheet, source: "EXISTING_VEHICLE_SHEET" as const };
   }
 
-  // 3. Génération par l'agent IA DeepSeek (puis fallback catalogue local si indisponible).
+  // 3. Aucune fiche de modèle, mais un autre véhicule du même modèle possède déjà
+  //    une fiche : on la copie sur ce véhicule au lieu de rappeler l'IA.
+  if (!options.force) {
+    const siblingVehicle = await prisma.vehicle.findFirst({
+      where: {
+        id: { not: vehicle.id },
+        brand: { equals: vehicle.brand, mode: "insensitive" },
+        model: { equals: vehicle.model, mode: "insensitive" },
+        technicalSheetJson: { not: null },
+      },
+      orderBy: [{ techSheetConfirmed: "desc" }, { updatedAt: "desc" }],
+      select: {
+        technicalSheetJson: true,
+        techSheetConfirmed: true,
+        techSheetConfirmedAt: true,
+        techSheetModelId: true,
+      },
+    });
+    const siblingSheet = parseSheet(siblingVehicle?.technicalSheetJson);
+    if (siblingVehicle && siblingSheet) {
+      let siblingModelSheet = siblingVehicle.techSheetModelId
+        ? await prisma.vehicleModelTechSheet.findUnique({ where: { id: siblingVehicle.techSheetModelId } })
+        : null;
+
+      if (!siblingModelSheet || !parseSheet(siblingModelSheet.sheetJson)) {
+        siblingModelSheet = await prisma.vehicleModelTechSheet.upsert({
+          where: { modelKey },
+          create: {
+            modelKey,
+            brand: vehicle.brand,
+            model: vehicle.model,
+            variant: vehicle.variant,
+            year: vehicle.year,
+            energy: vehicle.energy,
+            sheetJson: JSON.stringify(siblingSheet),
+            status: siblingVehicle.techSheetConfirmed ? "APPROVED" : "GENERATED",
+            source: "VEHICLE_SHEET_CACHE",
+            generatedBy: options.actorName || null,
+            approvedAt: siblingVehicle.techSheetConfirmed ? siblingVehicle.techSheetConfirmedAt : null,
+          },
+          update: {
+            sheetJson: JSON.stringify(siblingSheet),
+            status: siblingVehicle.techSheetConfirmed ? "APPROVED" : "GENERATED",
+            source: "VEHICLE_SHEET_CACHE",
+          },
+        });
+      }
+
+      await applyExistingSheetToVehicle(vehicle.id, siblingSheet, siblingModelSheet);
+      return { sheet: siblingSheet, modelSheet: siblingModelSheet, source: "VEHICLE_SHEET_CACHE" as const };
+    }
+  }
+
+  // 4. Génération par l'agent IA DeepSeek (puis fallback catalogue local si indisponible).
   let sheet: TechnicalSheet;
   let source = "DEEPSEEK_AGENT";
   try {

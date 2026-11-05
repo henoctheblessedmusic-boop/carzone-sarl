@@ -331,6 +331,7 @@ export async function createRentalVehicle(formData: FormData) {
 
   revalidatePath("/rentals");
   revalidatePath("/vehicles");
+  revalidatePath("/location-vehicule");
   revalidatePath("/dashboard");
 }
 
@@ -398,6 +399,7 @@ export async function createRental(formData: FormData) {
 
   revalidatePath("/rentals");
   revalidatePath("/vehicles");
+  revalidatePath("/location-vehicule");
   revalidatePath("/dashboard");
 }
 
@@ -436,6 +438,7 @@ export async function returnRental(formData: FormData) {
 
   revalidatePath("/rentals");
   revalidatePath("/vehicles");
+  revalidatePath("/location-vehicule");
   revalidatePath("/dashboard");
 }
 

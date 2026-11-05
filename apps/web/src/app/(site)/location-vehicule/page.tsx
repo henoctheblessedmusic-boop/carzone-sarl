@@ -13,6 +13,8 @@ const OG_LOCALE: Record<string, string> = {
   zh: "zh_CN",
 };
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getSiteLocale();
   const copy = siteCopy[locale];

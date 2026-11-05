@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { Car, FilePlus2, Wrench, X } from "lucide-react";
+import { computeRentalTotal, rentalDaysBetween } from "@/lib/rental-contract";
 import {
   createRental,
   createRentalMaintenance,
@@ -14,6 +15,8 @@ type VehicleOption = {
   model: string;
   registrationNumber: string | null;
   vin: string | null;
+  rentalDailyXof?: number | null;
+  rentalMonthlyXof?: number | null;
 };
 
 type CustomerOption = {
@@ -94,9 +97,24 @@ export function RentalActionModals({
   const [modal, setModal] = useState<ModalKind>(null);
   const [brandName, setBrandName] = useState("");
   const [colorChoice, setColorChoice] = useState("");
+  const [contractVehicleId, setContractVehicleId] = useState("");
+  const [contractStart, setContractStart] = useState("");
+  const [contractEnd, setContractEnd] = useState("");
+  const [contractDaily, setContractDaily] = useState("");
+  const [contractMonthly, setContractMonthly] = useState("");
 
   const selectedBrand = brands.find((brand) => brand.name === brandName);
   const yearOptions = Array.from({ length: new Date().getFullYear() + 1 - 2015 + 1 }, (_, index) => new Date().getFullYear() + 1 - index);
+  const selectedContractVehicle = availableVehicles.find((vehicle) => vehicle.id === contractVehicleId);
+  const contractDays =
+    contractStart && contractEnd
+      ? Math.max(0, rentalDaysBetween(new Date(contractStart), new Date(contractEnd)))
+      : 0;
+  const contractTotal = computeRentalTotal({
+    dailyXof: Number(contractDaily) || null,
+    monthlyXof: Number(contractMonthly) || null,
+    days: contractDays,
+  });
 
   function close() {
     setModal(null);
@@ -131,6 +149,13 @@ export function RentalActionModals({
                 if (key === "vehicle") {
                   setBrandName("");
                   setColorChoice("");
+                }
+                if (key === "contract") {
+                  setContractVehicleId("");
+                  setContractStart("");
+                  setContractEnd("");
+                  setContractDaily("");
+                  setContractMonthly("");
                 }
               }}
               title={description}
@@ -349,7 +374,20 @@ export function RentalActionModals({
                   </select>
                 </Field>
                 <Field label="Véhicule disponible *">
-                  <select name="vehicleId" className="ox-select" style={FIELD} required defaultValue="">
+                  <select
+                    name="vehicleId"
+                    className="ox-select"
+                    style={FIELD}
+                    required
+                    value={contractVehicleId}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      setContractVehicleId(value);
+                      const vehicle = availableVehicles.find((item) => item.id === value);
+                      if (vehicle?.rentalDailyXof) setContractDaily(String(vehicle.rentalDailyXof));
+                      if (vehicle?.rentalMonthlyXof) setContractMonthly(String(vehicle.rentalMonthlyXof));
+                    }}
+                  >
                     <option value="" disabled>Sélectionner un véhicule</option>
                     {availableVehicles.map((vehicle) => (
                       <option key={vehicle.id} value={vehicle.id}>
@@ -358,10 +396,17 @@ export function RentalActionModals({
                     ))}
                   </select>
                 </Field>
-                <Field label="Date de début *"><input name="startDate" type="date" className="ox-input" style={FIELD} required /></Field>
-                <Field label="Date de fin"><input name="endDate" type="date" className="ox-input" style={FIELD} /></Field>
-                <Field label="Tarif mensuel (FCFA)" hint="Loyer mensuel convenu. Pour une courte durée, indiquez le forfait mensuel équivalent.">
-                  <input name="monthlyXof" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 150000" />
+                <Field label="Date de début *">
+                  <input name="startDate" type="date" className="ox-input" style={FIELD} required value={contractStart} onChange={(event) => setContractStart(event.target.value)} />
+                </Field>
+                <Field label="Date de fin *" hint="La durée est calculée en jours calendaires. Exemple : du 5 au 8 = 3 jours.">
+                  <input name="endDate" type="date" className="ox-input" style={FIELD} required value={contractEnd} onChange={(event) => setContractEnd(event.target.value)} />
+                </Field>
+                <Field label="Tarif journalier (FCFA) *" hint="Tarif appliqué par jour. Prérempli avec le tarif du véhicule sélectionné.">
+                  <input name="dailyXof" type="number" min="0" className="ox-input" style={FIELD} required={!contractMonthly} value={contractDaily} onChange={(event) => setContractDaily(event.target.value)} placeholder="Ex. 45000" />
+                </Field>
+                <Field label="Tarif mensuel (FCFA)" hint="Optionnel. Utilisé seulement si aucun tarif journalier n'est saisi.">
+                  <input name="monthlyXof" type="number" min="0" className="ox-input" style={FIELD} value={contractMonthly} onChange={(event) => setContractMonthly(event.target.value)} placeholder="Ex. 1350000" />
                 </Field>
                 <Field label="Caution / dépôt de garantie (FCFA)" hint="Montant remboursable versé à la remise des clés. Ce n'est pas un loyer.">
                   <input name="depositXof" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 500000" />
@@ -369,6 +414,31 @@ export function RentalActionModals({
                 <Field label="État au départ" hint="Relevé contradictoire : propreté, carburant, kilométrage, dommages visibles.">
                   <input name="departureCondition" className="ox-input" style={FIELD} placeholder="Ex. Véhicule propre, plein fait" />
                 </Field>
+                <div
+                  style={{
+                    gridColumn: "1 / -1",
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,150px),1fr))",
+                    gap: 8,
+                    padding: "10px 12px",
+                    borderRadius: 10,
+                    border: "1px solid var(--ice-border)",
+                    background: "rgba(255,255,255,0.03)",
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: "0.7rem", opacity: 0.65, textTransform: "uppercase", letterSpacing: "0.04em" }}>Durée facturée</div>
+                    <div style={{ fontWeight: 800, marginTop: 2 }}>{contractDays > 0 ? `${contractDays} jour(s)` : "Sélectionnez les dates"}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "0.7rem", opacity: 0.65, textTransform: "uppercase", letterSpacing: "0.04em" }}>Total du contrat</div>
+                    <div style={{ fontWeight: 800, marginTop: 2 }}>{contractTotal ? `${contractTotal.toLocaleString("fr-BJ")} FCFA` : "À calculer"}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "0.7rem", opacity: 0.65, textTransform: "uppercase", letterSpacing: "0.04em" }}>Véhicule</div>
+                    <div style={{ fontWeight: 700, marginTop: 2 }}>{selectedContractVehicle ? `${selectedContractVehicle.brand} ${selectedContractVehicle.model}` : "-"}</div>
+                  </div>
+                </div>
                 <FormActions onCancel={close} submitLabel="Créer le contrat" />
               </form>
             )}

@@ -404,6 +404,17 @@ model Rental {
   startDate  DateTime
   endDate    DateTime?
   monthlyXof Int?
+  /// Snapshot du tarif journalier au moment du contrat (FCFA).
+  dailyXof   Int?
+  /// Nombre de jours facturés, calculé sur les dates du contrat.
+  days       Int?
+  /// Montant total convenu du contrat (hors caution).
+  totalXof   Int?
+  /// Jeton public sécurisé permettant au client de consulter et imprimer son contrat.
+  contractToken String? @unique
+  signedAt   DateTime?
+  signedByClient  String?
+  signedByCompany String?
   depositXof Int?
   invoiceId  String?   @unique
   invoice    Invoice?  @relation(fields: [invoiceId], references: [id])

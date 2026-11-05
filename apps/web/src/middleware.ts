@@ -12,6 +12,7 @@ const SITE_PATHS = [
   "/",
   "/vehicules",
   "/location-vehicule",
+  "/contrat",
   "/sur-mesure",
   "/nos-services",
   "/recharge",
@@ -40,6 +41,7 @@ const PUBLIC_PATHS = [
   // protégée (src/app/services/page.tsx) ; la page vitrine équivalente vit sur "/nos-services".
   "/vehicules",
   "/location-vehicule",
+  "/contrat",
   "/sur-mesure",
   "/nos-services",
   "/recharge",

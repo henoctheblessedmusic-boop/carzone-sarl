@@ -3,6 +3,7 @@ import { DashboardAutoRefresh } from "@/components/DashboardAutoRefresh";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { formatXof } from "@/lib/format";
+import { computeRentalTotal, rentalDaysBetween, rentalContractReference } from "@/lib/rental-contract";
 import {
   recordRentalPayment,
   returnRental,
@@ -112,10 +113,16 @@ export default async function RentalsPage() {
   );
   const maintenanceCost = maintenances.reduce((sum, item) => sum + item.costXof, 0);
   const expectedContractValue = (rental: (typeof rentals)[number]): number => {
-    if (!rental.monthlyXof) return 0;
-    const end = rental.returnedAt || rental.endDate || now;
-    const months = Math.max(1, Math.ceil((end.getTime() - rental.startDate.getTime()) / (30 * 24 * 60 * 60 * 1000)));
-    return rental.monthlyXof * months;
+    if (rental.totalXof) return rental.totalXof;
+    const end = rental.returnedAt || rental.endDate;
+    const days = rental.days || rentalDaysBetween(rental.startDate, end);
+    return (
+      computeRentalTotal({
+        dailyXof: rental.dailyXof || rental.vehicle.rentalDailyXof,
+        monthlyXof: rental.monthlyXof,
+        days,
+      }) || 0
+    );
   };
   const totalBalance = rentals.reduce(
     (sum, rental) => sum + Math.max(0, expectedContractValue(rental) - (paidByRental.get(rental.id) || 0)),
@@ -402,25 +409,31 @@ export default async function RentalsPage() {
                 <th>Véhicule</th>
                 <th>Début</th>
                 <th>Fin / Retour</th>
-                <th>Tarif</th>
+                <th>Durée</th>
+                <th>Tarif / jour</th>
+                <th>Total contrat</th>
                 <th>Caution</th>
                 <th>Encaissé</th>
                 <th>Solde</th>
                 <th>Statut</th>
+                <th>Contrat</th>
                 {(canManage || canFinance) && <th>Actions</th>}
               </tr>
             </thead>
             <tbody>
               {rentals.length === 0 ? (
                 <tr>
-                  <td colSpan={canManage || canFinance ? 11 : 10} style={{ textAlign: "center", padding: "2rem", opacity: 0.6 }}>
+                  <td colSpan={canManage || canFinance ? 14 : 13} style={{ textAlign: "center", padding: "2rem", opacity: 0.6 }}>
                     Aucun contrat de location enregistré.
                   </td>
                 </tr>
               ) : (
                 rentals.map((rental) => {
                   const paid = paidByRental.get(rental.id) || 0;
-                  const balance = Math.max(0, expectedContractValue(rental) - paid);
+                  const expectedTotal = expectedContractValue(rental);
+                  const balance = Math.max(0, expectedTotal - paid);
+                  const days = rental.days || rentalDaysBetween(rental.startDate, rental.returnedAt || rental.endDate);
+                  const dailyRate = rental.dailyXof || rental.vehicle.rentalDailyXof;
                   return (
                   <tr key={rental.id}>
                     <td>{rental.type}</td>
@@ -438,11 +451,18 @@ export default async function RentalsPage() {
                           ? rental.endDate.toISOString().slice(0, 10)
                           : "-"}
                     </td>
-                    <td>{rental.monthlyXof ? formatXof(rental.monthlyXof) : "-"}</td>
+                    <td>{days ? `${days} j` : "-"}</td>
+                    <td>{dailyRate ? formatXof(dailyRate) : "-"}</td>
+                    <td>{expectedTotal ? formatXof(expectedTotal) : "-"}</td>
                     <td>{rental.depositXof ? formatXof(rental.depositXof) : "-"}</td>
                     <td>{formatXof(paid)}</td>
                     <td style={{ color: balance > 0 ? "var(--warn)" : "inherit", fontWeight: balance > 0 ? 700 : 400 }}>{formatXof(balance)}</td>
                     <td>{STATUS_LABEL[rental.status] || rental.status}</td>
+                    <td>
+                      <a className="ox-btn ox-btn-ghost ox-btn-sm" href={`/rentals/${rental.id}/contrat`} title={rentalContractReference(rental.id)}>
+                        Voir / imprimer
+                      </a>
+                    </td>
                     {(canManage || canFinance) && (
                       <td>
                         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>

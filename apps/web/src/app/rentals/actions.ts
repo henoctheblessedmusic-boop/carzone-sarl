@@ -1,10 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { randomUUID } from "node:crypto";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
 import { ensureVehicleTechSheet, approveVehicleTechSheet } from "@/lib/vehicle-model-tech-sheet";
+import { computeRentalTotal, rentalDaysBetween } from "@/lib/rental-contract";
 
 const MANAGE_ROLES = ["GESTIONNAIRE_LOCATION", "DG", "PDG", "SG"] as const;
 const FINANCE_ROLES = ["GESTIONNAIRE_LOCATION", "COMPTA", "DG", "PDG", "SG"] as const;
@@ -345,26 +347,45 @@ export async function createRental(formData: FormData) {
   const type = String(formData.get("type") || "LCD");
   const startRaw = String(formData.get("startDate") || "");
   const endRaw = String(formData.get("endDate") || "");
-  const monthlyXof = Number(formData.get("monthlyXof") || 0) || null;
-  const depositXof = Number(formData.get("depositXof") || 0) || null;
+  const dailyXofInput = Math.round(Number(formData.get("dailyXof") || 0)) || null;
+  const monthlyXof = Math.round(Number(formData.get("monthlyXof") || 0)) || null;
+  const depositXof = Math.round(Number(formData.get("depositXof") || 0)) || null;
   const departureCondition = String(formData.get("departureCondition") || "").trim() || null;
 
   if (!vehicleId || !customerId) throw new Error("Véhicule et client obligatoires.");
   const startDate = startRaw ? new Date(startRaw) : new Date();
   if (Number.isNaN(startDate.getTime())) throw new Error("Date de début invalide.");
   const endDate = endRaw ? new Date(endRaw) : null;
-  if (endDate && Number.isNaN(endDate.getTime())) throw new Error("Date de fin invalide.");
-  if (endDate && endDate < startDate) throw new Error("La date de fin doit être postérieure au début.");
+  if (!endDate) throw new Error("La date de fin est obligatoire pour calculer la durée du contrat.");
+  if (Number.isNaN(endDate.getTime())) throw new Error("Date de fin invalide.");
+  if (endDate < startDate) throw new Error("La date de fin doit être postérieure à la date de début.");
 
   const vehicle = await prisma.vehicle.findUnique({
     where: { id: vehicleId },
-    select: { id: true, brand: true, model: true, fleetType: true, rentalStatus: true },
+    select: {
+      id: true,
+      brand: true,
+      model: true,
+      fleetType: true,
+      rentalStatus: true,
+      rentalDailyXof: true,
+      rentalMonthlyXof: true,
+    },
   });
   if (!vehicle || vehicle.fleetType !== "RENTAL") {
     throw new Error("Ce véhicule n'appartient pas au parc de location.");
   }
   if (vehicle.rentalStatus !== "DISPONIBLE") {
     throw new Error("Ce véhicule de location n'est pas disponible.");
+  }
+
+  const days = rentalDaysBetween(startDate, endDate);
+  if (days < 1) throw new Error("La durée du contrat doit être d'au moins un jour.");
+  const dailyXof = dailyXofInput || vehicle.rentalDailyXof || null;
+  const effectiveMonthlyXof = monthlyXof || vehicle.rentalMonthlyXof || null;
+  const totalXof = computeRentalTotal({ dailyXof, monthlyXof: effectiveMonthlyXof, days });
+  if (!totalXof) {
+    throw new Error("Renseignez un tarif journalier ou un tarif mensuel pour calculer le total.");
   }
 
   const rental = await prisma.rental.create({
@@ -375,9 +396,13 @@ export async function createRental(formData: FormData) {
       vehicleId,
       startDate,
       endDate,
-      monthlyXof,
+      dailyXof,
+      monthlyXof: monthlyXof || null,
+      days,
+      totalXof,
       depositXof,
       departureCondition,
+      contractToken: randomUUID(),
       createdByName: user.fullName,
     },
     select: { id: true, customer: { select: { contactName: true } } },
@@ -394,13 +419,43 @@ export async function createRental(formData: FormData) {
     entityType: "Rental",
     entityId: rental.id,
     entityLabel: `${vehicle.brand} ${vehicle.model} - ${rental.customer.contactName}`,
-    details: `Contrat ${type} démarré le ${startDate.toISOString().slice(0, 10)}`,
+    details: `Contrat ${type} - ${days} jour(s) - ${totalXof.toLocaleString("fr-BJ")} FCFA`,
   });
 
   revalidatePath("/rentals");
   revalidatePath("/vehicles");
   revalidatePath("/location-vehicule");
   revalidatePath("/dashboard");
+}
+
+export async function markRentalContractSigned(formData: FormData) {
+  const user = await requireUser([...MANAGE_ROLES]);
+  requireManager(user.role);
+  const id = String(formData.get("id") || "").trim();
+  const signedByClient = String(formData.get("signedByClient") || "").trim();
+  const signedByCompany = String(formData.get("signedByCompany") || "").trim();
+  if (!id) throw new Error("Contrat introuvable.");
+  if (!signedByClient || !signedByCompany) {
+    throw new Error("Les noms des deux signataires sont obligatoires.");
+  }
+
+  const rental = await prisma.rental.update({
+    where: { id },
+    data: { signedAt: new Date(), signedByClient, signedByCompany },
+    include: { customer: { select: { contactName: true } }, vehicle: { select: { brand: true, model: true } } },
+  });
+
+  await logAudit({
+    user,
+    action: "rental.contract_sign",
+    entityType: "Rental",
+    entityId: rental.id,
+    entityLabel: `${rental.vehicle.brand} ${rental.vehicle.model} - ${rental.customer.contactName}`,
+    details: `Contrat signé par ${signedByClient} et ${signedByCompany}`,
+  });
+
+  revalidatePath("/rentals");
+  revalidatePath(`/rentals/${id}/contrat`);
 }
 
 export async function returnRental(formData: FormData) {

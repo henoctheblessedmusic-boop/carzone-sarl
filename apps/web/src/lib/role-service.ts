@@ -421,6 +421,7 @@ export class RoleService {
     if (role === "GESTIONNAIRE_LOCATION") {
       return (
         pathname.startsWith("/rentals") ||
+        pathname.startsWith("/contrat") ||
         pathname.startsWith("/clients") ||
         pathname.startsWith("/chat") ||
         pathname.startsWith("/api/chat") ||
@@ -507,6 +508,7 @@ export class RoleService {
     if (user.role === "GESTIONNAIRE_LOCATION") {
       return (
         pathname.startsWith("/rentals") ||
+        pathname.startsWith("/contrat") ||
         pathname.startsWith("/clients") ||
         pathname.startsWith("/chat") ||
         pathname.startsWith("/api/chat") ||

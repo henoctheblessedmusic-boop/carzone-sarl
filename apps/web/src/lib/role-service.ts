@@ -423,6 +423,10 @@ export class RoleService {
         pathname.startsWith("/rentals") ||
         pathname.startsWith("/clients") ||
         pathname.startsWith("/chat") ||
+        pathname.startsWith("/api/chat") ||
+        pathname.startsWith("/api/calls") ||
+        pathname.startsWith("/api/auth") ||
+        pathname.startsWith("/api/notifications") ||
         pathname.startsWith("/dashboard") ||
         pathname.startsWith("/login")
       );
@@ -505,6 +509,10 @@ export class RoleService {
         pathname.startsWith("/rentals") ||
         pathname.startsWith("/clients") ||
         pathname.startsWith("/chat") ||
+        pathname.startsWith("/api/chat") ||
+        pathname.startsWith("/api/calls") ||
+        pathname.startsWith("/api/auth") ||
+        pathname.startsWith("/api/notifications") ||
         pathname.startsWith("/dashboard") ||
         pathname.startsWith("/login")
       );

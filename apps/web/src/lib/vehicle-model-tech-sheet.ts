@@ -45,6 +45,18 @@ export function vehicleTechSheetModelKey(vehicle: {
   ].join("|");
 }
 
+/** Normalise un nom de modèle pour rapprocher "CS75" et "CS75 2026". */
+export function normalizeVehicleModelName(model: string): string {
+  return model
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .replace(/\b20(1[5-9]|2\d|3[0-5])\b/g, " ")
+    .replace(/[^A-Z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 /**
  * Recherche une fiche déjà disponible pour le même modèle.
  * L'égalité stricte (version / année / énergie) est prioritaire, puis on accepte
@@ -52,20 +64,38 @@ export function vehicleTechSheetModelKey(vehicle: {
  */
 async function findReusableModelSheet(
   vehicle: { brand: string; model: string },
-  exactKey: string,
   exactModelSheet: Awaited<ReturnType<typeof prisma.vehicleModelTechSheet.findUnique>> | null
 ) {
   if (exactModelSheet && parseSheet(exactModelSheet.sheetJson)) return exactModelSheet;
 
   const modelPrefix = `${vehicle.brand.trim().toUpperCase()}|${vehicle.model.trim().toUpperCase()}|`;
-  const candidates = await prisma.vehicleModelTechSheet.findMany({
+  const exactCandidates = await prisma.vehicleModelTechSheet.findMany({
     where: { modelKey: { startsWith: modelPrefix } },
     orderBy: [{ status: "asc" }, { updatedAt: "desc" }],
     take: 20,
   });
+  const exactMatch = exactCandidates.find((candidate) => parseSheet(candidate.sheetJson));
+  if (exactMatch) return exactMatch;
 
-  return candidates.find((candidate) => parseSheet(candidate.sheetJson)) || null;
+  const normalizedModel = normalizeVehicleModelName(vehicle.model);
+  if (!normalizedModel) return null;
+
+  const sameBrandSheets = await prisma.vehicleModelTechSheet.findMany({
+    where: {
+      brand: { equals: vehicle.brand, mode: "insensitive" },
+    },
+    orderBy: [{ status: "asc" }, { updatedAt: "desc" }],
+    take: 100,
+  });
+  return (
+    sameBrandSheets.find(
+      (candidate) =>
+        normalizeVehicleModelName(candidate.model) === normalizedModel &&
+        parseSheet(candidate.sheetJson)
+    ) || null
+  );
 }
+
 
 async function applyExistingSheetToVehicle(
   vehicleId: string,
@@ -101,7 +131,7 @@ export async function ensureVehicleTechSheet(
   const exactModelSheet =
     vehicle.techSheetModel ||
     (await prisma.vehicleModelTechSheet.findUnique({ where: { modelKey } }));
-  const cachedModel = await findReusableModelSheet(vehicle, modelKey, exactModelSheet);
+  const cachedModel = await findReusableModelSheet(vehicle, exactModelSheet);
 
   // 1. Fiche déjà disponible pour ce modèle (même version ou même modèle) :
   //    on la réutilise sans aucun appel IA.
@@ -145,21 +175,26 @@ export async function ensureVehicleTechSheet(
   // 3. Aucune fiche de modèle, mais un autre véhicule du même modèle possède déjà
   //    une fiche : on la copie sur ce véhicule au lieu de rappeler l'IA.
   if (!options.force) {
-    const siblingVehicle = await prisma.vehicle.findFirst({
+    const siblingCandidates = await prisma.vehicle.findMany({
       where: {
         id: { not: vehicle.id },
         brand: { equals: vehicle.brand, mode: "insensitive" },
-        model: { equals: vehicle.model, mode: "insensitive" },
         technicalSheetJson: { not: null },
       },
       orderBy: [{ techSheetConfirmed: "desc" }, { updatedAt: "desc" }],
+      take: 50,
       select: {
+        model: true,
         technicalSheetJson: true,
         techSheetConfirmed: true,
         techSheetConfirmedAt: true,
         techSheetModelId: true,
       },
     });
+    const normalizedModel = normalizeVehicleModelName(vehicle.model);
+    const siblingVehicle = siblingCandidates.find(
+      (candidate) => normalizeVehicleModelName(candidate.model) === normalizedModel
+    );
     const siblingSheet = parseSheet(siblingVehicle?.technicalSheetJson);
     if (siblingVehicle && siblingSheet) {
       let siblingModelSheet = siblingVehicle.techSheetModelId

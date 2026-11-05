@@ -338,7 +338,24 @@ export default async function RentalsPage() {
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={vehicle.mainPhotoUrl} alt={`${vehicle.brand} ${vehicle.model}`} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                         </div>
-                      ) : null}
+                      ) : (
+                        <div
+                          style={{
+                            width: 58,
+                            height: 38,
+                            borderRadius: 6,
+                            background: "rgba(255,255,255,0.05)",
+                            border: "1px dashed var(--ice-border, rgba(255,255,255,0.2))",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                          }}
+                          title="Aucune photo enregistrée"
+                        >
+                          <BrandLogoSvg brand={vehicle.brand} size={20} />
+                        </div>
+                      )}
                       <div>
                         <div style={{ fontWeight: 650, display: "flex", alignItems: "center", gap: 6 }}>
                           <BrandLogoSvg brand={vehicle.brand} size={15} />
@@ -363,19 +380,19 @@ export default async function RentalsPage() {
                     <Badge key={`status-${vehicle.id}`} tone={RENTAL_STATUS_TONES[vehicle.rentalStatus || "DISPONIBLE"] || "neutral"}>
                       {STATUS_LABEL[vehicle.rentalStatus || "DISPONIBLE"] || vehicle.rentalStatus || "Disponible"}
                     </Badge>,
-                    <div key={`actions-${vehicle.id}`} style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
-                      <a href={`/rentals/${vehicle.id}/fiche-technique`} className="ox-btn ox-btn-ghost ox-btn-sm">
+                    <div key={`actions-${vehicle.id}`} style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "nowrap" }}>
+                      <a href={`/rentals/${vehicle.id}/fiche-technique`} className="ox-btn ox-btn-ghost ox-btn-sm" style={{ whiteSpace: "nowrap" }}>
                         Fiche technique
                       </a>
                       {activeContract && (
-                        <a href={`/rentals/${activeContract.id}/contrat`} className="ox-btn ox-btn-ghost ox-btn-sm">
+                        <a href={`/rentals/${activeContract.id}/contrat`} className="ox-btn ox-btn-ghost ox-btn-sm" style={{ whiteSpace: "nowrap" }}>
                           Contrat
                         </a>
                       )}
                       {canManage && (
                         <form action={transferVehicleToShowroom}>
                           <input type="hidden" name="vehicleId" value={vehicle.id} />
-                          <button type="submit" className="ox-btn ox-btn-ghost ox-btn-sm" disabled={hasActive} title={hasActive ? "Retournez d'abord le contrat actif." : "Retirer du parc de location"}>
+                          <button type="submit" className="ox-btn ox-btn-ghost ox-btn-sm" disabled={hasActive} title={hasActive ? "Retournez d'abord le contrat actif." : "Retirer du parc de location"} style={{ whiteSpace: "nowrap" }}>
                             Retirer du parc
                           </button>
                         </form>

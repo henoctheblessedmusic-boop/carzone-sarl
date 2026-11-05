@@ -22,6 +22,17 @@ type CustomerOption = {
   companyName: string | null;
 };
 
+type BrandOption = {
+  name: string;
+  models: Array<{ name: string; vehicleType: string | null; energy: string | null }>;
+};
+
+type GarageUser = {
+  id: string;
+  fullName: string;
+  role: string;
+};
+
 type ActiveRentalOption = {
   id: string;
   type: string;
@@ -31,6 +42,12 @@ type ActiveRentalOption = {
 type ModalKind = "vehicle" | "contract" | "maintenance" | null;
 
 const FIELD = { height: 40, fontSize: "0.88rem" } as const;
+
+const GARAGE_ROLE_LABELS: Record<string, string> = {
+  CHEF_ATELIER: "Chef d'atelier",
+  ATELIER: "Technicien atelier",
+  RTA: "Responsable technique atelier",
+};
 
 const ACTIONS = [
   {
@@ -63,14 +80,23 @@ export function RentalActionModals({
   rentalVehicles,
   availableVehicles,
   customers,
+  brands,
+  garageUsers,
   activeRentals,
 }: {
   rentalVehicles: VehicleOption[];
   availableVehicles: VehicleOption[];
   customers: CustomerOption[];
+  brands: BrandOption[];
+  garageUsers: GarageUser[];
   activeRentals: ActiveRentalOption[];
 }) {
   const [modal, setModal] = useState<ModalKind>(null);
+  const [brandName, setBrandName] = useState("");
+  const [colorChoice, setColorChoice] = useState("");
+
+  const selectedBrand = brands.find((brand) => brand.name === brandName);
+  const yearOptions = Array.from({ length: new Date().getFullYear() + 1 - 2015 + 1 }, (_, index) => new Date().getFullYear() + 1 - index);
 
   function close() {
     setModal(null);
@@ -100,7 +126,13 @@ export function RentalActionModals({
             <button
               key={key}
               type="button"
-              onClick={() => setModal(key)}
+              onClick={() => {
+                setModal(key);
+                if (key === "vehicle") {
+                  setBrandName("");
+                  setColorChoice("");
+                }
+              }}
               title={description}
               style={{
                 display: "inline-flex",
@@ -189,10 +221,35 @@ export function RentalActionModals({
                 onSubmit={close}
                 style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,210px),1fr))", gap: 10 }}
               >
-                <Field label="Marque *"><input name="brand" className="ox-input" style={FIELD} required placeholder="Ex. Toyota" /></Field>
-                <Field label="Modèle *"><input name="model" className="ox-input" style={FIELD} required placeholder="Ex. Corolla" /></Field>
-                <Field label="Nom / version"><input name="variant" className="ox-input" style={FIELD} placeholder="Ex. 1.8 Hybride" /></Field>
-                <Field label="Année"><input name="year" type="number" min="1900" max="2100" className="ox-input" style={FIELD} placeholder="Ex. 2026" /></Field>
+                <Field label="Marque *" hint="Marques chinoises importées et marques internationales">
+                  <select
+                    name="brand"
+                    className="ox-select"
+                    style={FIELD}
+                    required
+                    value={brandName}
+                    onChange={(event) => setBrandName(event.target.value)}
+                  >
+                    <option value="" disabled>Sélectionner une marque</option>
+                    {brands.map((brand) => (
+                      <option key={brand.name} value={brand.name}>{brand.name}</option>
+                    ))}
+                  </select>
+                </Field>
+                <Field label="Modèle *" hint={brandName ? `${selectedBrand?.models.length || 0} modèle(s) disponible(s)` : "Choisissez d'abord la marque"}>
+                  <select name="model" className="ox-select" style={FIELD} required defaultValue="" disabled={!brandName}>
+                    <option value="" disabled>{brandName ? "Sélectionner un modèle" : "Marque requise"}</option>
+                    {(selectedBrand?.models || []).map((model) => (
+                      <option key={model.name} value={model.name}>{model.name}</option>
+                    ))}
+                  </select>
+                </Field>
+                <Field label="Version / finition"><input name="variant" className="ox-input" style={FIELD} placeholder="Ex. Premium 1.5T 7DCT" /></Field>
+                <Field label="Année">
+                  <select name="year" className="ox-select" style={FIELD} defaultValue={String(new Date().getFullYear())}>
+                    {yearOptions.map((year) => <option key={year} value={year}>{year}</option>)}
+                  </select>
+                </Field>
                 <Field label="Énergie *">
                   <select name="energy" className="ox-select" style={FIELD} required defaultValue="ESSENCE">
                     <option value="ESSENCE">Essence</option>
@@ -202,13 +259,25 @@ export function RentalActionModals({
                     <option value="ELECTRIQUE">Électrique</option>
                   </select>
                 </Field>
-                <Field label="Prix du véhicule (FCFA) *"><input name="priceXof" type="number" min="1" className="ox-input" style={FIELD} required placeholder="Ex. 12000000" /></Field>
-                <Field label="Tarif location / jour (FCFA)"><input name="rentalDailyXof" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 35000" /></Field>
-                <Field label="Tarif location / mois (FCFA)"><input name="rentalMonthlyXof" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 750000" /></Field>
-                <Field label="Numéro de châssis (VIN) *"><input name="vin" className="ox-input" style={FIELD} required placeholder="Ex. JTDBR32E720123456" autoComplete="off" /></Field>
-                <Field label="Plaque d'immatriculation *"><input name="registrationNumber" className="ox-input" style={FIELD} required placeholder="Ex. AB 1234 RB" autoComplete="off" /></Field>
-                <Field label="Kilométrage"><input name="mileage" type="number" min="0" className="ox-input" style={FIELD} placeholder="0" /></Field>
-                <Field label="Type">
+                <Field label="Valeur du véhicule (FCFA) *" hint="Valeur patrimoniale du véhicule, pas le tarif de location">
+                  <input name="priceXof" type="number" min="1" className="ox-input" style={FIELD} required placeholder="Ex. 12000000" />
+                </Field>
+                <Field label="Tarif location / jour (FCFA)" hint="Utilisé pour la cotation vitrine et l'acompte de 50 %">
+                  <input name="rentalDailyXof" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 35000" />
+                </Field>
+                <Field label="Tarif location / mois (FCFA)" hint="Optionnel, pour les contrats longue durée">
+                  <input name="rentalMonthlyXof" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 750000" />
+                </Field>
+                <Field label="Numéro de châssis (VIN) *" hint="17 caractères en général">
+                  <input name="vin" className="ox-input" style={FIELD} required placeholder="Ex. JTDBR32E720123456" autoComplete="off" />
+                </Field>
+                <Field label="Plaque d'immatriculation *" hint="Format béninois, ex. AB 1234 RB">
+                  <input name="registrationNumber" className="ox-input" style={FIELD} required placeholder="Ex. AB 1234 RB" autoComplete="off" />
+                </Field>
+                <Field label="Kilométrage (km)" hint="Relevez le compteur à l'entrée">
+                  <input name="mileage" type="number" min="0" inputMode="numeric" className="ox-input" style={FIELD} placeholder="Ex. 45000" />
+                </Field>
+                <Field label="Type de véhicule">
                   <select name="vehicleType" className="ox-select" style={FIELD} defaultValue="">
                     <option value="">Non précisé</option>
                     <option value="BERLINE">Berline</option>
@@ -217,8 +286,41 @@ export function RentalActionModals({
                     <option value="VAN">Van</option>
                   </select>
                 </Field>
-                <Field label="Couleur"><input name="color" className="ox-input" style={FIELD} placeholder="Ex. Blanc" /></Field>
-                <Field label="Transmission"><input name="transmission" className="ox-input" style={FIELD} placeholder="Ex. Automatique" /></Field>
+                <Field label="Couleur">
+                  <select name="color" className="ox-select" style={FIELD} value={colorChoice} onChange={(event) => setColorChoice(event.target.value)}>
+                    <option value="">Sélectionner une couleur</option>
+                    <option value="Blanc">Blanc</option>
+                    <option value="Blanc nacré">Blanc nacré</option>
+                    <option value="Noir">Noir</option>
+                    <option value="Noir métallisé">Noir métallisé</option>
+                    <option value="Gris">Gris</option>
+                    <option value="Gris anthracite">Gris anthracite</option>
+                    <option value="Argent">Argent</option>
+                    <option value="Rouge">Rouge</option>
+                    <option value="Bleu">Bleu</option>
+                    <option value="Bleu nuit">Bleu nuit</option>
+                    <option value="Marron">Marron</option>
+                    <option value="Beige">Beige</option>
+                    <option value="Vert">Vert</option>
+                    <option value="Jaune">Jaune</option>
+                    <option value="Orange">Orange</option>
+                    <option value="Or">Or</option>
+                    <option value="Bronze">Bronze</option>
+                    <option value="Violet">Violet</option>
+                    <option value="AUTRE">Couleur personnalisée</option>
+                  </select>
+                </Field>
+                {colorChoice === "AUTRE" && (
+                  <Field label="Couleur personnalisée *">
+                    <input name="colorCustom" className="ox-input" style={FIELD} required placeholder="Saisir la couleur exacte" />
+                  </Field>
+                )}
+                <Field label="Transmission">
+                  <select name="transmission" className="ox-select" style={FIELD} defaultValue="AUTOMATIQUE">
+                    <option value="AUTOMATIQUE">Automatique</option>
+                    <option value="MANUELLE">Manuelle</option>
+                  </select>
+                </Field>
                 <FormActions onCancel={close} submitLabel="Enregistrer le véhicule" />
               </form>
             )}
@@ -258,9 +360,15 @@ export function RentalActionModals({
                 </Field>
                 <Field label="Date de début *"><input name="startDate" type="date" className="ox-input" style={FIELD} required /></Field>
                 <Field label="Date de fin"><input name="endDate" type="date" className="ox-input" style={FIELD} /></Field>
-                <Field label="Tarif mensuel (FCFA)"><input name="monthlyXof" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 150000" /></Field>
-                <Field label="Caution (FCFA)"><input name="depositXof" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 500000" /></Field>
-                <Field label="État au départ"><input name="departureCondition" className="ox-input" style={FIELD} placeholder="Ex. Véhicule propre, plein fait" /></Field>
+                <Field label="Tarif mensuel (FCFA)" hint="Loyer mensuel convenu. Pour une courte durée, indiquez le forfait mensuel équivalent.">
+                  <input name="monthlyXof" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 150000" />
+                </Field>
+                <Field label="Caution / dépôt de garantie (FCFA)" hint="Montant remboursable versé à la remise des clés. Ce n'est pas un loyer.">
+                  <input name="depositXof" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 500000" />
+                </Field>
+                <Field label="État au départ" hint="Relevé contradictoire : propreté, carburant, kilométrage, dommages visibles.">
+                  <input name="departureCondition" className="ox-input" style={FIELD} placeholder="Ex. Véhicule propre, plein fait" />
+                </Field>
                 <FormActions onCancel={close} submitLabel="Créer le contrat" />
               </form>
             )}
@@ -300,10 +408,19 @@ export function RentalActionModals({
                 </Field>
                 <Field label="Description *"><input name="description" className="ox-input" style={FIELD} required placeholder="Ex. Vidange et filtres" /></Field>
                 <Field label="Coût (FCFA)"><input name="costXof" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 25000" /></Field>
-                <Field label="Garage / prestataire"><input name="garageName" className="ox-input" style={FIELD} placeholder="Ex. Garage partenaire" /></Field>
+                <Field label="Garage / prestataire" hint="Garage CARZONE Godomè et intervenants habilités">
+                  <select name="garageName" className="ox-select" style={FIELD} defaultValue="Garage CARZONE Godomè">
+                    <option value="Garage CARZONE Godomè">Garage CARZONE Godomè</option>
+                    {garageUsers.map((garageUser) => (
+                      <option key={garageUser.id} value={garageUser.fullName}>
+                        {garageUser.fullName} - {GARAGE_ROLE_LABELS[garageUser.role] || garageUser.role}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
                 <Field label="Date prévue"><input name="scheduledAt" type="date" className="ox-input" style={FIELD} /></Field>
-                <Field label="Kilométrage"><input name="mileage" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 45000" /></Field>
-                <Field label="Contrat lié (optionnel)">
+                <Field label="Kilométrage (km)"><input name="mileage" type="number" min="0" inputMode="numeric" className="ox-input" style={FIELD} placeholder="Ex. 45000" /></Field>
+                <Field label="Contrat lié (optionnel)" hint="Rattache l'entretien à une location en cours pour suivre le coût par contrat.">
                   <select name="rentalId" className="ox-select" style={FIELD} defaultValue="">
                     <option value="">Sans contrat lié</option>
                     {activeRentals.map((rental) => (
@@ -323,11 +440,12 @@ export function RentalActionModals({
   );
 }
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+function Field({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) {
   return (
     <div style={{ display: "grid", gap: 4, minWidth: 0 }}>
       <label className="ox-label" style={{ margin: 0 }}>{label}</label>
       {children}
+      {hint && <small style={{ opacity: 0.55, fontSize: "0.72rem", lineHeight: 1.35 }}>{hint}</small>}
     </div>
   );
 }

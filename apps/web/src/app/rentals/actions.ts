@@ -267,8 +267,10 @@ export async function createRentalVehicle(formData: FormData) {
   const yearRaw = Number(formData.get("year") || 0);
   const mileage = Math.max(0, Math.round(Number(formData.get("mileage") || 0)));
   const vehicleType = String(formData.get("vehicleType") || "").trim().toUpperCase() || null;
-  const color = String(formData.get("color") || "").trim() || null;
-  const transmission = String(formData.get("transmission") || "").trim() || null;
+  const colorSelect = String(formData.get("color") || "").trim();
+  const colorCustom = String(formData.get("colorCustom") || "").trim();
+  const color = (colorSelect === "AUTRE" ? colorCustom : colorSelect) || null;
+  const transmission = String(formData.get("transmission") || "").trim().toUpperCase() || null;
   const description = String(formData.get("description") || "").trim() || null;
   const year = Number.isFinite(yearRaw) && yearRaw > 1900 ? Math.round(yearRaw) : null;
 

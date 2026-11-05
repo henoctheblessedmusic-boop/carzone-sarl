@@ -46,7 +46,7 @@ export default async function RentalsPage() {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [rentals, rentalVehicles, showroomVehicles, customers, maintenances, rentalRequests] = await Promise.all([
+  const [rentals, rentalVehicles, showroomVehicles, customers, maintenances, rentalRequests, vehicleBrands, garageUsers] = await Promise.all([
     prisma.rental.findMany({
       include: {
         customer: true,
@@ -77,6 +77,22 @@ export default async function RentalsPage() {
       include: { vehicle: { select: { id: true, brand: true, model: true, registrationNumber: true } } },
       orderBy: { createdAt: "desc" },
       take: 20,
+    }),
+    prisma.vehicleBrand.findMany({
+      where: { active: true },
+      include: {
+        models: {
+          where: { active: true },
+          orderBy: { name: "asc" },
+          select: { name: true, vehicleType: true, energy: true },
+        },
+      },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    }),
+    prisma.user.findMany({
+      where: { active: true, role: { in: ["CHEF_ATELIER", "ATELIER", "RTA"] } },
+      select: { id: true, fullName: true, role: true },
+      orderBy: { fullName: "asc" },
     }),
   ]);
 
@@ -138,6 +154,8 @@ export default async function RentalsPage() {
             rentalVehicles={rentalVehicles}
             availableVehicles={availableVehicles}
             customers={customers}
+            brands={vehicleBrands}
+            garageUsers={garageUsers}
             activeRentals={activeRentals.map((rental) => ({
               id: rental.id,
               type: rental.type,

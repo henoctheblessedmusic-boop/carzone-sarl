@@ -25,6 +25,7 @@ export type RentalPublicVehicle = {
   seatsPhotoUrl: string | null;
   rentalDailyXof: number | null;
   rentalMonthlyXof: number | null;
+  photosVerified?: boolean;
   technicalSheet: TechnicalSheet | null;
 };
 
@@ -203,8 +204,8 @@ function photosOf(vehicle: RentalPublicVehicle) {
   return [
     { url: vehicle.mainPhotoUrl, label: "Vue principale" },
     vehicle.exteriorPhotoUrl ? { url: vehicle.exteriorPhotoUrl, label: "Extérieur" } : null,
-    vehicle.interiorPhotoUrl ? { url: vehicle.interiorPhotoUrl, label: "Intérieur" } : null,
-    vehicle.seatsPhotoUrl ? { url: vehicle.seatsPhotoUrl, label: "Sellerie" } : null,
+    vehicle.interiorPhotoUrl && vehicle.photosVerified ? { url: vehicle.interiorPhotoUrl, label: "Intérieur" } : null,
+    vehicle.seatsPhotoUrl && vehicle.photosVerified ? { url: vehicle.seatsPhotoUrl, label: "Sellerie" } : null,
     vehicle.rearPhotoUrl ? { url: vehicle.rearPhotoUrl, label: "Arrière" } : null,
   ].filter((photo): photo is { url: string; label: string } => Boolean(photo));
 }

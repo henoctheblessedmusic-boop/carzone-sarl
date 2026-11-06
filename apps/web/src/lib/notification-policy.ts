@@ -14,7 +14,7 @@ export const FULL_ACTIVITY_NOTIFICATION_ROLES: readonly Role[] = [
 /** Rôles qui reçoivent uniquement les notifications du périmètre atelier/GARAGE. */
 export const GARAGE_ACTIVITY_NOTIFICATION_ROLES: readonly Role[] = [
   "COMPTA_GARAGE",
-  "STOCK",
+  "STOCK_GARAGE",
 ];
 
 export function canReceiveActivityNotifications(role: string): boolean {

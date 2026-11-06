@@ -296,7 +296,12 @@ export const DEFAULT_ROLE_CAPABILITIES: Record<Role, string[]> = {
 
   STOCK: [
     "stock:view", "stock:create", "stock:edit", "stock:delete",
-    "workshop:view_global",
+    "services:view",
+  ],
+
+  // Gestionnaire de stock garage : atelier/pièces uniquement, aucun stock showroom.
+  STOCK_GARAGE: [
+    "workshop:view_global", "workshop:create", "workshop:edit",
     "services:view",
   ],
 

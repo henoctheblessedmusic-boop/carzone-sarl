@@ -134,7 +134,10 @@ export const ONBOARDING_STEPS: Record<Role, OnboardingStep[]> = {
     { id: "catalog", label: "Catalogue officiel & marques chinoises partenaires", href: "/catalog", hint: "BYD, ChangAn, Jetour, Geely, Voyah, Tank, etc." },
     { id: "stock", label: "Ajouter un véhicule en stock avec fiches IA", href: "/vehicles", hint: "Fiches techniques avec confirmation définitive BDD" },
     { id: "imports", label: "Suivi des imports maritimes & transit", href: "/imports", hint: "Ports de départ, ETA Cotonou et dédouanement" },
-    { id: "parts", label: "Inventaire des pièces de rechange", href: "/parts", hint: "Stock physique et alertes de seuil minimal" },
+  ],
+  STOCK_GARAGE: [
+    { id: "workshop", label: "Réception & suivi des véhicules à l'atelier", href: "/workshop", hint: "Ordres de réparation et mouvements atelier" },
+    { id: "parts", label: "Stock physique des pièces détachées", href: "/parts", hint: "Entrées, sorties et alertes de seuil minimal" },
   ],
   ATELIER: [
     { id: "wo", label: "Ouvrir & exécuter un Ordre de Réparation (OR)", href: "/workshop", hint: "Diagnostic technique haute tension & réparations" },

@@ -100,7 +100,10 @@ const QUICK_ACTIONS: Partial<Record<Role, QuickAction[]>> = {
     { href: "/vehicles", label: "Stock véhicules", icon: Car },
     { href: "/catalog", label: "Catalogue & marques", icon: Store },
     { href: "/imports", label: "Imports maritimes", icon: Ship },
-    { href: "/parts", label: "Pièces détachées", icon: Package },
+  ],
+  STOCK_GARAGE: [
+    { href: "/workshop", label: "Atelier SAV", icon: Wrench },
+    { href: "/parts", label: "Stock pièces garage", icon: Package },
   ],
   ATELIER: [
     { href: "/workshop", label: "Atelier SAV", icon: Wrench },
@@ -239,18 +242,29 @@ async function buildMetrics(role: Role): Promise<Metric[]> {
   }
 
   if (role === "STOCK") {
-    const [stock, transit, lowStockParts, imports] = await Promise.all([
+    const [stock, transit, imports] = await Promise.all([
       prisma.vehicle.count({ where: { status: { in: ["EN_STOCK", "EN_MAGASIN"] } } }),
       prisma.vehicle.count({ where: { status: { in: ["COMMANDE", "EN_COMMANDE", "EN_PRODUCTION", "EN_TRANSIT", "AU_PORT"] } } }),
-      prisma.partItem.findMany({ where: { active: true }, select: { stockQuantity: true, minStockAlert: true } }),
       prisma.importOrder.count({ where: { status: { not: "CLOTURE" } } }).catch(() => 0),
     ]);
-    const lowStock = lowStockParts.filter((p) => p.stockQuantity <= p.minStockAlert).length;
     return [
       kpi("Véhicules en stock", String(stock), "#38bdf8", "Disponibles showroom"),
       kpi("En commande / transit", String(transit), "#fbbf24", "Arrivages à venir"),
-      kpi("Pièces sous seuil", String(lowStock), "#fb7185", "Réapprovisionnement"),
       kpi("Imports en cours", String(imports), "#a78bfa", "Dossiers maritimes"),
+    ];
+  }
+
+  if (role === "STOCK_GARAGE") {
+    const [workshopTotal, openWorkshop, lowStockParts] = await Promise.all([
+      prisma.workshopEntry.count(),
+      prisma.workshopEntry.count({ where: { exitDate: null } }).catch(() => 0),
+      prisma.partItem.findMany({ where: { active: true }, select: { stockQuantity: true, minStockAlert: true } }),
+    ]);
+    const lowStock = lowStockParts.filter((p) => p.stockQuantity <= p.minStockAlert).length;
+    return [
+      kpi("Passages atelier", String(workshopTotal), "#38bdf8", "Historique SAV"),
+      kpi("Véhicules en atelier", String(openWorkshop), "#fbbf24", "Sans sortie enregistrée"),
+      kpi("Pièces sous seuil", String(lowStock), "#fb7185", "Stock magasin garage"),
     ];
   }
 

@@ -230,6 +230,11 @@ export async function updateVehicle(formData: FormData) {
   const containerNumber = String(formData.get("containerNumber") || "").trim() || null;
   const orderReference = String(formData.get("orderReference") || "").trim() || null;
   const productionWeek = String(formData.get("productionWeek") || "").trim() || null;
+  const mainPhotoUrl = String(formData.get("mainPhotoUrl") || "").trim() || null;
+  const interiorPhotoUrl = String(formData.get("interiorPhotoUrl") || "").trim() || null;
+  const exteriorPhotoUrl = String(formData.get("exteriorPhotoUrl") || "").trim() || null;
+  const rearPhotoUrl = String(formData.get("rearPhotoUrl") || "").trim() || null;
+  const photosVerified = formData.get("photosVerified") === "true";
 
   const updated = await prisma.vehicle.update({
     where: { id },
@@ -250,6 +255,11 @@ export async function updateVehicle(formData: FormData) {
       containerNumber,
       orderReference,
       productionWeek,
+      mainPhotoUrl,
+      interiorPhotoUrl,
+      exteriorPhotoUrl,
+      rearPhotoUrl,
+      photosVerified,
     },
   });
 

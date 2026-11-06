@@ -199,6 +199,8 @@ model Vehicle {
   interiorPhotoUrl   String?
   exteriorPhotoUrl   String?
   rearPhotoUrl       String?
+  /// Les photos ont été vérifiées comme conformes au véhicule réel (VIN/configuration).
+  photosVerified     Boolean        @default(false)
   hasTechSheet       Boolean        @default(false)
   techSheetConfirmed Boolean        @default(false)
   techSheetConfirmedAt DateTime?

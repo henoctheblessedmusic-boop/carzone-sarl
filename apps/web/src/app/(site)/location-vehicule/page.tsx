@@ -73,6 +73,7 @@ async function getRentalVehicles(): Promise<RentalPublicVehicle[]> {
         seatsPhotoUrl: toSeatsPhotoUrl(vehicle.interiorPhotoUrl),
         rentalDailyXof: vehicle.rentalDailyXof,
         rentalMonthlyXof: vehicle.rentalMonthlyXof,
+        photosVerified: vehicle.photosVerified,
         technicalSheet,
       };
     });

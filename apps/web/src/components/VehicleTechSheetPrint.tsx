@@ -11,6 +11,7 @@ export function VehicleTechSheetPrint({
     vin?: string | null;
     color?: string | null;
     priceXof?: number | null;
+    photosVerified?: boolean;
   };
 }) {
   const normBrand = normalizeBrandName(sheet.brand);
@@ -67,6 +68,18 @@ export function VehicleTechSheetPrint({
     confort.find((i) => /siège|sieges|sièges/i.test(i)) ||
     "Sièges sport en cuir avec maintien latéral renforcé et surpiqûres contrastées";
   const seatsExtra = confort.find((i) => i !== seatsText && /siège|sièges|chauffant|ventil|massant/i.test(i));
+
+  // Une photo d'habitacle n'est affichée que si elle a été validée comme conforme
+  // au véhicule réel. On n'utilise jamais une photo d'un autre modèle ou d'une
+  // autre finition comme illustration.
+  const verifiedInteriorPhoto = vehicleInfo?.photosVerified ? sheet.interiorPhotoUrl || null : null;
+  const verifiedSeatsPhoto = vehicleInfo?.photosVerified
+    ? sheet.interiorSeatsPhotoUrl ||
+      (sheet.interiorPhotoUrl?.includes("-interior.jpg")
+        ? sheet.interiorPhotoUrl.replace("-interior.jpg", "-seats.jpg")
+        : null)
+    : null;
+  const heroPhoto = sheet.mainPhotoUrl || null;
 
   return (
     <div className="ox-tech-sheet-wrapper" style={{ color: "#111827", background: "#f1f5f9" }}>
@@ -332,23 +345,31 @@ export function VehicleTechSheetPrint({
             overflow: "hidden",
           }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={v(sheet.mainPhotoUrl || "/images/vehicles/prado-main.jpg")}
-            alt={sheet.title}
-            referrerPolicy="no-referrer"
-            style={{
-              width: "100%",
-              height: "100%",
-              maxHeight: "100%",
-              maxWidth: "100%",
-              objectFit: "contain",
-              objectPosition: "center center",
-              filter: "drop-shadow(0 14px 28px rgba(15, 23, 42, 0.16))",
-              position: "relative",
-              zIndex: 2,
-            }}
-          />
+          {heroPhoto ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={v(heroPhoto)}
+                alt={sheet.title}
+                referrerPolicy="no-referrer"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  maxHeight: "100%",
+                  maxWidth: "100%",
+                  objectFit: "contain",
+                  objectPosition: "center center",
+                  filter: "drop-shadow(0 14px 28px rgba(15, 23, 42, 0.16))",
+                  position: "relative",
+                  zIndex: 2,
+                }}
+              />
+            </>
+          ) : (
+            <div style={{ color: "#64748b", fontSize: "0.8rem", textAlign: "center", zIndex: 2 }}>
+              Photo du véhicule non disponible
+            </div>
+          )}
           {/* Ombre douce de studio sous le véhicule */}
           <div
             style={{
@@ -657,18 +678,28 @@ export function VehicleTechSheetPrint({
               background: "#f8fafc",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={v(sheet.interiorPhotoUrl || "/images/vehicles/x55-interior.jpg")}
-              alt="Cockpit & Poste de Pilotage Officiel"
-              referrerPolicy="no-referrer"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                objectPosition: "center center",
-              }}
-            />
+            {verifiedInteriorPhoto ? (
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={v(verifiedInteriorPhoto)}
+                  alt="Cockpit & Poste de Pilotage Officiel"
+                  referrerPolicy="no-referrer"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: "center center",
+                  }}
+                />
+              </>
+            ) : (
+              <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 18px", textAlign: "center", color: "#64748b", fontSize: "0.75rem" }}>
+                Photo de l&apos;habitacle non disponible pour ce véhicule.
+                <br />
+                Aucune photo d&apos;un autre modèle n&apos;est utilisée.
+              </div>
+            )}
             <div
               style={{
                 position: "absolute",
@@ -701,23 +732,28 @@ export function VehicleTechSheetPrint({
               background: "#f8fafc",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={v(
-                sheet.interiorSeatsPhotoUrl ||
-                (sheet.interiorPhotoUrl?.includes("-interior")
-                  ? sheet.interiorPhotoUrl.replace("-interior.jpg", "-seats.jpg")
-                  : "/images/vehicles/x55-seats.jpg")
-              )}
-              alt="Sellerie Cuir & Confort Passagers"
-              referrerPolicy="no-referrer"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                objectPosition: "center center",
-              }}
-            />
+            {verifiedSeatsPhoto ? (
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={v(verifiedSeatsPhoto)}
+                  alt="Sellerie Cuir & Confort Passagers"
+                  referrerPolicy="no-referrer"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: "center center",
+                  }}
+                />
+              </>
+            ) : (
+              <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 18px", textAlign: "center", color: "#64748b", fontSize: "0.75rem" }}>
+                Photo de la sellerie non disponible pour ce véhicule.
+                <br />
+                Couleur et finition à confirmer en concession.
+              </div>
+            )}
             <div
               style={{
                 position: "absolute",
@@ -737,6 +773,17 @@ export function VehicleTechSheetPrint({
             </div>
           </div>
         </div>
+
+        {!vehicleInfo?.photosVerified && (
+          <div style={{ display: "flex", gap: 8, alignItems: "flex-start", background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 8, padding: "6px 10px", margin: "0 0 2mm", fontSize: "0.68rem", color: "#9a3412", lineHeight: 1.4 }}>
+            <span style={{ fontWeight: 900, flexShrink: 0 }}>Photos à confirmer</span>
+            <span>
+              Les photos de l&apos;habitacle et de la sellerie ne sont pas affichées tant qu&apos;elles
+              ne correspondent pas au véhicule réel. Cela évite de présenter une couleur ou une
+              finition d&apos;un autre modèle.
+            </span>
+          </div>
+        )}
 
         {/* DESCRIPTION EXPLICITE SOUS LE DUO : COCKPIT DIGITAL + SIÈGES CUIR SPORT */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", margin: "0 0 2mm" }}>
@@ -946,18 +993,26 @@ export function VehicleTechSheetPrint({
               background: "#f8fafc",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={v(sheet.exteriorPhotoUrl || sheet.mainPhotoUrl || "/images/vehicles/prado-exterior.jpg")}
-              alt="Vue Extérieure de Profil"
-              referrerPolicy="no-referrer"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                objectPosition: "center center",
-              }}
-            />
+            {(sheet.exteriorPhotoUrl || sheet.mainPhotoUrl) ? (
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={v(sheet.exteriorPhotoUrl || sheet.mainPhotoUrl || "")}
+                  alt="Vue Extérieure de Profil"
+                  referrerPolicy="no-referrer"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: "center center",
+                  }}
+                />
+              </>
+            ) : (
+              <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", fontSize: "0.75rem", textAlign: "center", padding: "0 16px" }}>
+                Photo extérieure non disponible.
+              </div>
+            )}
             <div
               style={{
                 position: "absolute",
@@ -989,18 +1044,26 @@ export function VehicleTechSheetPrint({
               background: "#f8fafc",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={v(sheet.rearPhotoUrl || sheet.mainPhotoUrl || "/images/vehicles/prado-rear.jpg")}
-              alt="Vue Arrière Officielle"
-              referrerPolicy="no-referrer"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                objectPosition: "center center",
-              }}
-            />
+            {(sheet.rearPhotoUrl || sheet.mainPhotoUrl) ? (
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={v(sheet.rearPhotoUrl || sheet.mainPhotoUrl || "")}
+                  alt="Vue Arrière Officielle"
+                  referrerPolicy="no-referrer"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: "center center",
+                  }}
+                />
+              </>
+            ) : (
+              <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", fontSize: "0.75rem", textAlign: "center", padding: "0 16px" }}>
+                Photo arrière non disponible.
+              </div>
+            )}
             <div
               style={{
                 position: "absolute",

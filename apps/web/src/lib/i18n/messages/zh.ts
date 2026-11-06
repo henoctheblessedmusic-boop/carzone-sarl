@@ -129,6 +129,7 @@ export const zh: Messages = {
     COMPTA: "财务",
     COMPTA_GARAGE: "车间会计",
     STOCK: "库存",
+    STOCK_GARAGE: "车间库存",
     ATELIER: "车间",
     BORNES_OPS: "充电桩与能源",
     INSTALLATEUR: "安装商",

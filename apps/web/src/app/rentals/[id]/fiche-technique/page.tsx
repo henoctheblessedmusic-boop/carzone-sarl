@@ -39,6 +39,7 @@ export default async function RentalVehicleTechSheetPage({
             vin: vehicle.vin,
             color: vehicle.color,
             priceXof: vehicle.priceXof,
+            photosVerified: vehicle.photosVerified,
           }}
         />
       </div>

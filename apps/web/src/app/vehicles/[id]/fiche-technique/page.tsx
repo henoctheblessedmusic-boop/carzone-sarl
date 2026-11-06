@@ -40,6 +40,7 @@ export default async function VehicleTechSheetPage({
             vin: vehicle.vin,
             color: vehicle.color,
             priceXof: vehicle.priceXof,
+            photosVerified: vehicle.photosVerified,
           }}
         />
       </div>

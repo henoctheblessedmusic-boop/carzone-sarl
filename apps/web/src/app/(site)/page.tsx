@@ -75,6 +75,7 @@ async function getHighlightVehicles(): Promise<SlideshowVehicle[]> {
         interiorPhotoUrl: true,
         exteriorPhotoUrl: true,
         rearPhotoUrl: true,
+        photosVerified: true,
       },
       orderBy: [{ createdAt: "desc" }],
       take: 20,

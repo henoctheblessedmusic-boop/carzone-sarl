@@ -53,6 +53,10 @@ export type VehicleItem = {
   siteId?: string | null;
   site?: { id: string; name: string; code?: string } | null;
   mainPhotoUrl?: string | null;
+  interiorPhotoUrl?: string | null;
+  exteriorPhotoUrl?: string | null;
+  rearPhotoUrl?: string | null;
+  photosVerified?: boolean;
   hasTechSheet?: boolean;
   techSheetConfirmed?: boolean;
   techSheetConfirmedAt?: string | null;
@@ -1381,6 +1385,36 @@ export function VehiclesView({
                     ))}
                   </select>
                 </div>
+              </div>
+
+              <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 12, display: "grid", gap: 10 }}>
+                <div style={{ fontSize: "0.78rem", fontWeight: 700 }}>Photos du véhicule réel</div>
+                <div style={{ fontSize: "0.72rem", opacity: 0.65 }}>
+                  Utilisez les photos du véhicule livré, pas une illustration d&apos;un autre modèle ou d&apos;une autre finition.
+                  Les photos d&apos;habitacle ne sont affichées sur la fiche technique que si elles sont vérifiées.
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.72rem", opacity: 0.75, marginBottom: 4 }}>Photo principale (URL)</label>
+                    <input name="mainPhotoUrl" defaultValue={editingVehicle.mainPhotoUrl || ""} className="ox-input" style={{ width: "100%" }} placeholder="/images/vehicles/..." />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.72rem", opacity: 0.75, marginBottom: 4 }}>Photo extérieure (URL)</label>
+                    <input name="exteriorPhotoUrl" defaultValue={editingVehicle.exteriorPhotoUrl || ""} className="ox-input" style={{ width: "100%" }} placeholder="/images/vehicles/..." />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.72rem", opacity: 0.75, marginBottom: 4 }}>Photo intérieure (URL)</label>
+                    <input name="interiorPhotoUrl" defaultValue={editingVehicle.interiorPhotoUrl || ""} className="ox-input" style={{ width: "100%" }} placeholder="/images/vehicles/..." />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.72rem", opacity: 0.75, marginBottom: 4 }}>Photo arrière (URL)</label>
+                    <input name="rearPhotoUrl" defaultValue={editingVehicle.rearPhotoUrl || ""} className="ox-input" style={{ width: "100%" }} placeholder="/images/vehicles/..." />
+                  </div>
+                </div>
+                <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.78rem", cursor: "pointer" }}>
+                  <input type="checkbox" name="photosVerified" value="true" defaultChecked={Boolean(editingVehicle.photosVerified)} />
+                  Je confirme que ces photos correspondent au véhicule réel
+                </label>
               </div>
 
               <div style={{ display: "flex", gap: 10, justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>

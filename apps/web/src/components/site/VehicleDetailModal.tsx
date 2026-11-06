@@ -27,6 +27,7 @@ export interface CatalogVehicle {
   exteriorPhotoUrl: string | null;
   rearPhotoUrl: string | null;
   seatsPhotoUrl: string | null;
+  photosVerified?: boolean;
 }
 
 interface VehicleDetailModalProps {
@@ -51,10 +52,12 @@ function buildGallery(vehicle: CatalogVehicle, copy: SiteCopy["vehicules"]): Gal
     vehicle.exteriorPhotoUrl
       ? { key: "exterior", url: vehicle.exteriorPhotoUrl, label: copy.modal.galleryExteriorLabel }
       : null,
-    vehicle.interiorPhotoUrl
+    vehicle.interiorPhotoUrl && vehicle.photosVerified
       ? { key: "interior", url: vehicle.interiorPhotoUrl, label: copy.modal.galleryInteriorLabel }
       : null,
-    vehicle.seatsPhotoUrl ? { key: "seats", url: vehicle.seatsPhotoUrl, label: copy.modal.gallerySeatsLabel } : null,
+    vehicle.seatsPhotoUrl && vehicle.photosVerified
+      ? { key: "seats", url: vehicle.seatsPhotoUrl, label: copy.modal.gallerySeatsLabel }
+      : null,
     vehicle.rearPhotoUrl ? { key: "rear", url: vehicle.rearPhotoUrl, label: copy.modal.galleryRearLabel } : null,
   ];
   return candidates.filter((photo): photo is GalleryPhoto => photo !== null);

@@ -15,6 +15,7 @@ export default async function WorkshopPage() {
     "CHEF_ATELIER",
     "ASSISTANTE_COMPTABLE",
     "ATELIER",
+    "STOCK_GARAGE",
     "COMPTA",
     "COMPTA_GARAGE",
     "ADMIN",

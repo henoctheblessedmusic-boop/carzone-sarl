@@ -305,6 +305,9 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     "vehicles:read", "vehicles:write",
     "fleet:read",
   ],
+  STOCK_GARAGE: [
+    "workshop:read", "workshop:write",
+  ],
   ATELIER: [
     "workshop:read", "workshop:write",
     "vehicles:read",
@@ -442,6 +445,9 @@ export class RoleService {
     if (pathname.startsWith("/quotes")) {
       return this.hasPermission(role, "quotes:read");
     }
+    if (pathname.startsWith("/parts")) {
+      return this.hasPermission(role, "workshop:read") || this.hasPermission(role, "vehicles:read");
+    }
     if (pathname.startsWith("/vehicles") || pathname.startsWith("/catalog") || pathname.startsWith("/imports")) {
       return this.hasPermission(role, "vehicles:read");
     }
@@ -532,8 +538,10 @@ export class RoleService {
     if (pathname.startsWith("/workshop")) {
       return this.userHasPermission(user, "workshop:read");
     }
+    if (pathname.startsWith("/parts")) {
+      return this.userHasPermission(user, "workshop:read") || this.userHasPermission(user, "vehicles:read");
+    }
     if (
-      pathname.startsWith("/parts") ||
       pathname.startsWith("/vehicles") ||
       pathname.startsWith("/catalog") ||
       pathname.startsWith("/imports")

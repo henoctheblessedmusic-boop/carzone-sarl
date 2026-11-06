@@ -129,6 +129,7 @@ export const fr: Messages = {
     COMPTA: "Comptabilité",
     COMPTA_GARAGE: "Comptable Garage",
     STOCK: "Stock",
+    STOCK_GARAGE: "Stock garage",
     ATELIER: "Atelier",
     BORNES_OPS: "Bornes & énergie",
     INSTALLATEUR: "Installateur",

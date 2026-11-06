@@ -13,7 +13,7 @@ const AUDIT_ALLOWED_ROLES = [
   "COMPTA",
   "ASSISTANTE_COMPTABLE",
   "COMPTA_GARAGE",
-  "STOCK",
+  "STOCK_GARAGE",
   "ADMIN",
 ] as const;
 

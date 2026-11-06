@@ -63,6 +63,7 @@ async function getCatalogVehicles(): Promise<CatalogVehicle[]> {
         interiorPhotoUrl: true,
         exteriorPhotoUrl: true,
         rearPhotoUrl: true,
+        photosVerified: true,
       },
       orderBy: [{ createdAt: "desc" }],
     });

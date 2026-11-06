@@ -14,7 +14,7 @@ export default async function PartsPage() {
     "DC",
     "CHEF_ATELIER",
     "ATELIER",
-    "STOCK",
+    "STOCK_GARAGE",
     "COMPTA",
     "COMPTA_GARAGE",
     "ADMIN",
@@ -53,7 +53,7 @@ export default async function PartsPage() {
     "RTA",
     "CHEF_ATELIER",
     "ATELIER",
-    "STOCK",
+    "STOCK_GARAGE",
     "ADMIN",
   ].includes(user.role);
 

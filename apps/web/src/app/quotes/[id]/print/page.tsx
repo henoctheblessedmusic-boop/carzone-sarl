@@ -457,6 +457,7 @@ export default async function QuotePrintPage({
               vin: vehicle.vin,
               color: vehicle.color,
               priceXof: vehicle.priceXof,
+              photosVerified: vehicle.photosVerified,
             }}
           />
         </div>

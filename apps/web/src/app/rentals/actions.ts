@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
 import { ensureVehicleTechSheet, approveVehicleTechSheet } from "@/lib/vehicle-model-tech-sheet";
+import { inheritVehiclePhotos } from "@/lib/vehicle-photos";
 import { computeRentalTotal, rentalDaysBetween } from "@/lib/rental-contract";
 
 const MANAGE_ROLES = ["GESTIONNAIRE_LOCATION", "DG", "PDG", "SG"] as const;
@@ -324,12 +325,22 @@ export async function createRentalVehicle(formData: FormData) {
   });
 
   // La fiche technique est générée et sauvegardée dès l'entrée du véhicule en base.
-  await ensureVehicleTechSheet(vehicle.id, {
+  // Les photos sont récupérées depuis un véhicule du même modèle ou depuis la fiche.
+  await inheritVehiclePhotos(vehicle.id).catch((error) => {
+    console.error("Photos véhicule location non héritées:", error);
+  });
+  const techSheet = await ensureVehicleTechSheet(vehicle.id, {
     preferDeepSeek: true,
     actorName: user.fullName,
   }).catch((error) => {
     console.error("Fiche technique location non générée automatiquement:", error);
+    return null;
   });
+  if (techSheet?.sheet) {
+    await inheritVehiclePhotos(vehicle.id, techSheet.sheet).catch((error) => {
+      console.error("Photos de la fiche technique non appliquées:", error);
+    });
+  }
 
   revalidatePath("/rentals");
   revalidatePath("/vehicles");
@@ -516,12 +527,21 @@ export async function transferVehicleToRental(formData: FormData) {
   });
 
   // Réutilise la fiche existante du véhicule importé, sinon la génère pour le modèle.
-  await ensureVehicleTechSheet(vehicleId, {
+  await inheritVehiclePhotos(vehicleId).catch((error) => {
+    console.error("Photos du véhicule non héritées au transfert:", error);
+  });
+  const transferSheet = await ensureVehicleTechSheet(vehicleId, {
     preferDeepSeek: true,
     actorName: user.fullName,
   }).catch((error) => {
     console.error("Fiche technique location non générée au transfert:", error);
+    return null;
   });
+  if (transferSheet?.sheet) {
+    await inheritVehiclePhotos(vehicleId, transferSheet.sheet).catch((error) => {
+      console.error("Photos de la fiche non appliquées au transfert:", error);
+    });
+  }
 
   await logAudit({
     user,

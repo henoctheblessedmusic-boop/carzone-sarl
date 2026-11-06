@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { normalizeBrandName } from "@/lib/brand-logos";
 import { logAudit } from "@/lib/audit";
 import { ensureVehicleTechSheet } from "@/lib/vehicle-model-tech-sheet";
+import { inheritVehiclePhotos } from "@/lib/vehicle-photos";
 
 const VEHICLE_MANAGERS = [
   "PDG",
@@ -76,12 +77,21 @@ export async function createVehicle(formData: FormData) {
   });
 
   // Fiche technique générée par l'agent DeepSeek et sauvegardée pour le modèle.
-  await ensureVehicleTechSheet(vehicle.id, {
+  await inheritVehiclePhotos(vehicle.id).catch((err) => {
+    console.error("Vehicle photo inheritance error:", err);
+  });
+  const createdTechSheet = await ensureVehicleTechSheet(vehicle.id, {
     preferDeepSeek: true,
     actorName: user.fullName,
   }).catch((err) => {
     console.error("Auto tech sheet generation error:", err);
+    return null;
   });
+  if (createdTechSheet?.sheet) {
+    await inheritVehiclePhotos(vehicle.id, createdTechSheet.sheet).catch((err) => {
+      console.error("Vehicle sheet photo inheritance error:", err);
+    });
+  }
 
   await logAudit({
     user,

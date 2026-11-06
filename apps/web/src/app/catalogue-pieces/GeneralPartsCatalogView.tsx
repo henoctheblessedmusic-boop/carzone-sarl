@@ -103,13 +103,6 @@ export function GeneralPartsCatalogView({
     const values = new Set(parts.flatMap((part) => part.compatibilities.map((compatibility) => compatibility.vehicleBrand.toUpperCase())));
     return Array.from(values).sort();
   }, [parts]);
-  const referenceStats = useMemo(() => {
-    const all = parts.flatMap((part) => part.references);
-    return {
-      total: all.length,
-      verified: all.filter((reference) => Boolean(reference.verifiedAt)).length,
-    };
-  }, [parts]);
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -195,16 +188,9 @@ export function GeneralPartsCatalogView({
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <span className="ox-badge ox-badge--ice"><Package size={13} /> {parts.length} références</span>
-          <span className="ox-badge ox-badge--ok"><Check size={13} /> {referenceStats.verified} vérifiées</span>
           <span className="ox-badge ox-badge--warn"><Truck size={13} /> {orders.length} commandes</span>
         </div>
       </div>
-      {referenceStats.verified === 0 && (
-        <div className="ox-glass" style={{ padding: "0.7rem 1rem", fontSize: "0.8rem", color: "#fbbf24", borderColor: "rgba(251,191,36,0.35)" }}>
-          Aucune référence OEM vérifiée pour le moment. Les références affichées sont des exemples de démonstration non sourcés :
-          importez les catalogues constructeurs ou fournisseurs avec leur source avant de les utiliser pour commander.
-        </div>
-      )}
 
       <div className="ox-glass" style={{ padding: "1rem 1.2rem", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,180px),1fr))", gap: 8 }}>
         <label style={{ display: "grid", gap: 4, fontSize: "0.78rem" }}>
@@ -285,9 +271,6 @@ export function GeneralPartsCatalogView({
                       ))}
                       {part.references.length > 5 && <span style={{ opacity: 0.6 }}>+{part.references.length - 5}</span>}
                     </div>
-                    {part.references.length > 0 && !part.references.some((reference) => reference.verifiedAt) && (
-                      <div style={{ fontSize: "0.66rem", color: "#fbbf24", marginTop: 3 }}>Référence non vérifiée - source à confirmer</div>
-                    )}
                   </td>
                   <td>
                     <button type="button" className="ox-btn ox-btn-ghost ox-btn-sm" onClick={() => togglePart(part.id)}>

@@ -235,8 +235,8 @@ export function PartsView({
         </div>
 
         <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap" }}>
-          <a href="/parts/catalogue" className="ox-btn ox-btn-ghost">
-            Catalogue croisé & commandes
+          <a href="/catalogue-pieces" className="ox-btn ox-btn-ghost">
+            Catalogue général pièces
           </a>
           {canManage && (
             <button

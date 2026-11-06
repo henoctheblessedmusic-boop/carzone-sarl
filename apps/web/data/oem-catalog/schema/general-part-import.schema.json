@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://carzone.bj/schemas/general-part-import.schema.json",
+  "title": "CARZONE - Import Catalogue General de Pieces (OEM)",
+  "description": "Schema de validation pour l'import normalise du catalogue general de pieces, independant du stock. Correspond aux modeles Prisma GeneralPart, GeneralPartReference, GeneralPartCompatibility. Regle absolue : aucune reference OEM ne doit etre importee sans provenance verifiable (sourceType + sourceRef) sur CHAQUE reference.",
+  "type": "object",
+  "required": ["schemaVersion", "importBatch", "parts"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "importBatch": {
+      "type": "object",
+      "description": "Metadonnees du lot d'import, pour tracabilite dans GeneralPartOrder/notes ou dans un journal d'import externe.",
+      "required": ["preparedBy", "preparedAt", "defaultSourceType"],
+      "additionalProperties": false,
+      "properties": {
+        "preparedBy": { "type": "string", "minLength": 1 },
+        "preparedAt": { "type": "string", "format": "date" },
+        "notes": { "type": "string" },
+        "defaultSourceType": { "$ref": "#/$defs/sourceType" }
+      }
+    },
+    "parts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/generalPart" }
+    }
+  },
+  "$defs": {
+    "sourceType": {
+      "type": "string",
+      "description": "Type de source ayant permis de verifier la reference. Doit correspondre a une source reelle et consultable, jamais 'invente' ou 'estime'.",
+      "enum": [
+        "EPC_CONSTRUCTEUR",
+        "TECDOC",
+        "AUTODATA",
+        "CATALOGUE_FOURNISSEUR_PDF",
+        "CATALOGUE_FOURNISSEUR_PAPIER",
+        "SITE_OFFICIEL_CONSTRUCTEUR",
+        "DOCUMENTATION_TECHNIQUE_VEHICULE",
+        "FACTURE_ACHAT_ANTERIEURE",
+        "AUTRE_SOURCE_VERIFIABLE"
+      ]
+    },
+    "referenceType": {
+      "type": "string",
+      "enum": ["OEM", "EQUIVALENT", "AFTERMARKET"]
+    },
+    "unit": {
+      "type": "string",
+      "enum": ["PIECE", "JEU", "PAIRE", "LITRE", "KIT"]
+    },
+    "system": {
+      "type": "string",
+      "description": "Famille technique. Aligner sur les valeurs deja utilisees dans PartItem.category/system (FREINAGE, FILTRATION, SUSPENSION, MOTEUR, ELECTRICITE, CARROSSERIE, ECLAIRAGE, FLUIDES, TRANSMISSION, DIRECTION, CLIMATISATION, AUTRE).",
+      "enum": [
+        "FREINAGE",
+        "FILTRATION",
+        "SUSPENSION",
+        "MOTEUR",
+        "TRANSMISSION",
+        "DIRECTION",
+        "ELECTRICITE",
+        "CARROSSERIE",
+        "ECLAIRAGE",
+        "FLUIDES",
+        "CLIMATISATION",
+        "AUTRE"
+      ]
+    },
+    "reference": {
+      "type": "object",
+      "description": "Correspond a GeneralPartReference. Toute reference de type OEM DOIT porter une source verifiable.",
+      "required": ["reference", "brand", "referenceType", "isDirectFit", "sourceType", "sourceRef", "verifiedAt"],
+      "additionalProperties": false,
+      "properties": {
+        "reference": {
+          "type": "string",
+          "minLength": 2,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._\\-/]*$",
+          "description": "Numero de reference exact tel que publie par la source. Ne jamais reformater, normaliser l'espacement ou deviner un numero manquant."
+        },
+        "brand": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Marque d'origine de cette reference (constructeur ou equipementier : Changan, Jetour, BYD, Geely, BAIC, Forthing, Toyota, Suzuki, Mercedes-Benz, BMW, Bosch, Mann-Filter, Brembo, etc.)"
+        },
+        "referenceType": { "$ref": "#/$defs/referenceType" },
+        "isDirectFit": { "type": "boolean" },
+        "notes": { "type": "string" },
+        "sourceType": { "$ref": "#/$defs/sourceType" },
+        "sourceRef": {
+          "type": "string",
+          "minLength": 3,
+          "description": "Identifiant precis et consultable de la source : URL, reference de catalogue PDF + page, numero de facture fournisseur + date, nom du document technique + edition. Interdit : 'connaissance generale', 'estimation', 'IA', valeur vide."
+        },
+        "verifiedAt": {
+          "type": "string",
+          "format": "date",
+          "description": "Date a laquelle la reference a ete verifiee contre la source (pas la date d'import)."
+        },
+        "verifiedBy": { "type": "string" }
+      },
+      "not": {
+        "properties": {
+          "sourceRef": {
+            "pattern": "(?i)^(invente|estim|generat|ia|ai|inconnu|n/?a|todo|xxx+)$"
+          }
+        },
+        "required": ["sourceRef"]
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "description": "Correspond a GeneralPartCompatibility.",
+      "required": ["vehicleBrand", "vehicleModel"],
+      "additionalProperties": false,
+      "properties": {
+        "vehicleBrand": { "type": "string", "minLength": 1 },
+        "vehicleModel": { "type": "string", "minLength": 1 },
+        "years": { "type": "string", "pattern": "^[0-9]{4}(-[0-9]{4})?$" },
+        "engine": { "type": "string" },
+        "position": { "type": "string" },
+        "notes": { "type": "string" },
+        "sourceType": { "$ref": "#/$defs/sourceType" },
+        "sourceRef": { "type": "string" }
+      }
+    },
+    "generalPart": {
+      "type": "object",
+      "description": "Correspond a GeneralPart. reference = reference interne CARZONE unique (ex: GEN-FREINAGE-00001).",
+      "required": ["reference", "name", "unit", "references"],
+      "additionalProperties": false,
+      "properties": {
+        "reference": {
+          "type": "string",
+          "pattern": "^GEN-[A-Z]+-[0-9]{5}$",
+          "description": "Reference interne unique du catalogue general, distincte du stock (prefixe GEN-, jamais CZ- deja utilise par PartItem)."
+        },
+        "oemReference": {
+          "type": ["string", "null"],
+          "description": "Reference OEM principale/preferee. Si renseignee, DOIT aussi apparaitre comme une entree de 'references' avec referenceType=OEM et sa source."
+        },
+        "name": { "type": "string", "minLength": 3 },
+        "system": { "$ref": "#/$defs/system" },
+        "subcategory": { "type": "string" },
+        "manufacturer": { "type": "string" },
+        "description": { "type": "string" },
+        "unit": { "$ref": "#/$defs/unit" },
+        "active": { "type": "boolean", "default": true },
+        "references": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/reference" }
+        },
+        "compatibilities": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/compatibility" }
+        }
+      }
+    }
+  }
+}

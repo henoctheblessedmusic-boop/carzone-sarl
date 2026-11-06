@@ -1,0 +1,2 @@
+reference,oemReference,name,system,subcategory,manufacturer,description,unit,active
+GEN-EXEMPLE-00001,EXEMPLE-NE-PAS-IMPORTER,"Exemple : Filtre a huile moteur 1.5T",FILTRATION,"Filtre a huile",Changan,"Ligne d'exemple a supprimer avant import reel. Ne contient aucune reference verifiee.",PIECE,true

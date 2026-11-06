@@ -1251,6 +1251,10 @@ model GeneralPartReference {
   referenceType  String      @default("OEM") // OEM | EQUIVALENT | AFTERMARKET
   isDirectFit    Boolean     @default(true)
   notes          String?
+  /// Origine de la référence : catalogue constructeur, TecDoc, facture fournisseur, etc.
+  sourceType     String?
+  sourceRef      String?
+  verifiedAt     DateTime?
   createdAt      DateTime    @default(now())
 
   @@index([reference])

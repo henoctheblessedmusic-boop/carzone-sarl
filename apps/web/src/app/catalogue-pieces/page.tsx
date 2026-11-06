@@ -7,6 +7,7 @@ import {
   type GeneralPartOrderView,
   type GeneralSupplierView,
 } from "./GeneralPartsCatalogView";
+import { importGeneralPartsCatalog } from "./actions";
 
 const CATALOG_ROLES = [
   "PDG",
@@ -20,8 +21,13 @@ const CATALOG_ROLES = [
   "ADMIN",
 ] as const;
 
-export default async function GeneralPartsCatalogPage() {
+export default async function GeneralPartsCatalogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ imported?: string; skipped?: string }>;
+}) {
   const user = await requireUser([...CATALOG_ROLES]);
+  const params = await searchParams;
 
   const [parts, suppliers, orders] = await Promise.all([
     prisma.generalPart.findMany({
@@ -60,6 +66,9 @@ export default async function GeneralPartsCatalogPage() {
       referenceType: reference.referenceType,
       isDirectFit: reference.isDirectFit,
       notes: reference.notes,
+      sourceType: reference.sourceType,
+      sourceRef: reference.sourceRef,
+      verifiedAt: reference.verifiedAt?.toISOString() || null,
     })),
     compatibilities: part.compatibilities.map((compatibility) => ({
       id: compatibility.id,
@@ -98,12 +107,35 @@ export default async function GeneralPartsCatalogPage() {
 
   return (
     <AppShell user={user} title="Catalogue général des pièces">
-      <GeneralPartsCatalogView
-        parts={catalogParts}
-        suppliers={catalogSuppliers}
-        orders={catalogOrders}
-        canOrder
-      />
+      <div style={{ display: "grid", gap: "1rem" }}>
+        <form
+          action={importGeneralPartsCatalog}
+          encType="multipart/form-data"
+          className="ox-glass"
+          style={{ padding: "0.9rem 1.1rem", display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}
+        >
+          <div style={{ flex: "1 1 280px" }}>
+            <div style={{ fontWeight: 700, fontSize: "0.88rem" }}>Importer un catalogue OEM constructeur</div>
+            <div style={{ opacity: 0.65, fontSize: "0.76rem" }}>
+              Fichier JSON, CSV ou Excel. Le catalogue général reste séparé du stock.
+            </div>
+          </div>
+          <input type="file" name="file" accept=".json,.csv,.xlsx,.xls" required className="ox-input" style={{ padding: 7 }} />
+          <button type="submit" className="ox-btn ox-btn-primary ox-btn-sm">Importer</button>
+          <a href="/templates/catalogue-pieces-modele.csv" className="ox-btn ox-btn-ghost ox-btn-sm" download>Télécharger le modèle CSV</a>
+        </form>
+        {(params.imported || params.skipped) && (
+          <div className="ox-glass" style={{ padding: "0.7rem 1rem", fontSize: "0.84rem", color: "#4ade80" }}>
+            Import terminé : {params.imported || 0} référence(s) importée(s), {params.skipped || 0} ligne(s) ignorée(s).
+          </div>
+        )}
+        <GeneralPartsCatalogView
+          parts={catalogParts}
+          suppliers={catalogSuppliers}
+          orders={catalogOrders}
+          canOrder
+        />
+      </div>
     </AppShell>
   );
 }

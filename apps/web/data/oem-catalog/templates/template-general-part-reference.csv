@@ -1,0 +1,2 @@
+partReference,reference,brand,referenceType,isDirectFit,notes,sourceType,sourceRef,verifiedAt,verifiedBy
+GEN-EXEMPLE-00001,EXEMPLE-NE-PAS-IMPORTER,Changan,OEM,true,"Ligne d'exemple a supprimer avant import reel.",CATALOGUE_FOURNISSEUR_PDF,"Exemple : catalogue-fournisseur-2026.pdf page 12",2026-11-06,"Nom du verificateur"

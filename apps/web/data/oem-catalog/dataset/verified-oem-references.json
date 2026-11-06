@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0.0",
+  "importBatch": {
+    "preparedBy": "Claude Code - session 2026-11-06",
+    "preparedAt": "2026-11-06",
+    "defaultSourceType": "AUTRE_SOURCE_VERIFIABLE",
+    "notes": "Aucune reference verifiee cette session. Les outils WebSearch et WebFetch ont ete testes et ont echoue systematiquement avec l'erreur 'This unattended Claude Code subagent cannot request human approval.' - aucun acces internet n'etait disponible. Conformement a la consigne de ne jamais inventer de reference OEM, ce fichier reste intentionnellement vide de donnees piece. Voir dataset/a-importer.csv pour la liste des pieces prioritaires a verifier lors d'une prochaine session avec acces a une source fiable (catalogue fournisseur, EPC, ou acces web retabli), et sources-report.md pour le detail des sources recommandees."
+  },
+  "parts": []
+}

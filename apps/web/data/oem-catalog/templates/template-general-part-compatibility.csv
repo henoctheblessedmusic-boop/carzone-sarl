@@ -1,0 +1,2 @@
+partReference,vehicleBrand,vehicleModel,years,engine,position,notes,sourceType,sourceRef
+GEN-EXEMPLE-00001,CHANGAN,CS35 PLUS,2020-2026,"1.5T",,"Ligne d'exemple a supprimer avant import reel.",CATALOGUE_FOURNISSEUR_PDF,"Exemple : catalogue-fournisseur-2026.pdf page 12"

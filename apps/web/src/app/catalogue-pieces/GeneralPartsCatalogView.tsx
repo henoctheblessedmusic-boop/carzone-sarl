@@ -23,6 +23,9 @@ export type GeneralPartView = {
     referenceType: string;
     isDirectFit: boolean;
     notes: string | null;
+    sourceType: string | null;
+    sourceRef: string | null;
+    verifiedAt: string | null;
   }>;
   compatibilities: Array<{
     id: string;
@@ -262,12 +265,15 @@ export function GeneralPartsCatalogView({
                   <td>
                     <div style={{ display: "flex", gap: 4, flexWrap: "wrap", maxWidth: 260 }}>
                       {part.references.slice(0, 5).map((reference) => (
-                        <span key={reference.id} className="ox-badge ox-badge--ice" style={{ fontSize: "0.66rem" }} title={`${reference.referenceType} · ${reference.isDirectFit ? "montage direct" : "adaptation"}`}>
+                        <span key={reference.id} className="ox-badge ox-badge--ice" style={{ fontSize: "0.66rem" }} title={`${reference.referenceType} · ${reference.isDirectFit ? "montage direct" : "adaptation"} · ${reference.sourceType ? `source: ${reference.sourceType}` : "source non renseignée"}`}>
                           {reference.brand} · {reference.reference}
                         </span>
                       ))}
                       {part.references.length > 5 && <span style={{ opacity: 0.6 }}>+{part.references.length - 5}</span>}
                     </div>
+                    {part.references.length > 0 && !part.references.some((reference) => reference.verifiedAt) && (
+                      <div style={{ fontSize: "0.66rem", color: "#fbbf24", marginTop: 3 }}>Référence non vérifiée - source à confirmer</div>
+                    )}
                   </td>
                   <td>
                     <button type="button" className="ox-btn ox-btn-ghost ox-btn-sm" onClick={() => togglePart(part.id)}>

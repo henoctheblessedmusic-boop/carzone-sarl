@@ -161,8 +161,8 @@ function parseReference(value: unknown): ImportedReference | null {
   const parts = text(value).split("|").map((item) => item.trim());
   if (parts.length < 2 || !parts[0] || !parts[1]) return null;
   return {
-    reference: parts[0],
-    brand: parts[1],
+    reference: parts[1],
+    brand: parts[0],
     referenceType: (parts[2] || "EQUIVALENT").toUpperCase(),
     isDirectFit: (parts[3] || "1") !== "0",
     notes: parts[4] || null,

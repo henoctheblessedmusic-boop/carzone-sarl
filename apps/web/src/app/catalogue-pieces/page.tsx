@@ -117,7 +117,8 @@ export default async function GeneralPartsCatalogPage({
           <div style={{ flex: "1 1 280px" }}>
             <div style={{ fontWeight: 700, fontSize: "0.88rem" }}>Importer un catalogue OEM constructeur</div>
             <div style={{ opacity: 0.65, fontSize: "0.76rem" }}>
-              Fichier JSON, CSV ou Excel. Le catalogue général reste séparé du stock.
+              Fichier JSON, CSV ou Excel. Le catalogue général reste séparé du stock. Format des références :
+              MARQUE|RÉFÉRENCE|TYPE|1/0|note|sourceType|sourceRef|date.
             </div>
           </div>
           <input type="file" name="file" accept=".json,.csv,.xlsx,.xls" required className="ox-input" style={{ padding: 7 }} />

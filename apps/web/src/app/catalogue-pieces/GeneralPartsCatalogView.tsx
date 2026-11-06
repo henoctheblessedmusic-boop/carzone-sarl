@@ -9,13 +9,23 @@ import { createGeneralPartOrder, updateGeneralPartOrderTracking } from "./action
 export type GeneralPartView = {
   id: string;
   reference: string;
+  partNumber?: string | null;
+  referenceBrand?: string | null;
   oemReference: string | null;
   name: string;
   system: string | null;
   subcategory: string | null;
+  family?: string | null;
+  position?: string | null;
+  characteristics?: string | null;
   manufacturer: string | null;
   description: string | null;
   unit: string;
+  confidence?: string | null;
+  status?: string;
+  sourceCode?: string | null;
+  sourceName?: string | null;
+  sourceUrl?: string | null;
   references: Array<{
     id: string;
     reference: string;
@@ -31,9 +41,12 @@ export type GeneralPartView = {
     id: string;
     vehicleBrand: string;
     vehicleModel: string;
+    version?: string | null;
     years: string | null;
     engine: string | null;
     position: string | null;
+    confidence?: string | null;
+    sourceCode?: string | null;
   }>;
 };
 
@@ -117,8 +130,15 @@ export function GeneralPartsCatalogView({
         part.manufacturer,
         part.system,
         part.subcategory,
+        part.sourceCode,
         ...part.references.flatMap((reference) => [reference.reference, reference.brand]),
-        ...part.compatibilities.flatMap((compatibility) => [compatibility.vehicleBrand, compatibility.vehicleModel]),
+        ...part.compatibilities.flatMap((compatibility) => [
+          compatibility.vehicleBrand,
+          compatibility.vehicleModel,
+          compatibility.version,
+          compatibility.engine,
+          compatibility.years,
+        ]),
       ].filter(Boolean).join(" ").toLowerCase();
       return haystack.includes(query);
     });
@@ -248,13 +268,24 @@ export function GeneralPartsCatalogView({
                   </td>
                   <td>
                     <div style={{ fontWeight: 650 }}>{part.name}</div>
-                    <div style={{ opacity: 0.65 }}>{part.manufacturer || "-"} · {part.unit}</div>
+                    <div style={{ opacity: 0.65 }}>{part.manufacturer || "-"} · {part.unit}{part.position ? ` · ${part.position}` : ""}</div>
                   </td>
                   <td>{partSystemLabel(part.system || "AUTRE")}</td>
                   <td>
                     <div style={{ display: "flex", gap: 4, flexWrap: "wrap", maxWidth: 300 }}>
                       {part.compatibilities.slice(0, 6).map((compatibility) => (
-                        <span key={compatibility.id} className="ox-badge ox-badge--neutral" style={{ fontSize: "0.66rem" }} title={`${compatibility.years || ""} ${compatibility.engine || ""}`}>
+                        <span
+                          key={compatibility.id}
+                          className="ox-badge ox-badge--neutral"
+                          style={{ fontSize: "0.66rem" }}
+                          title={[
+                            compatibility.version,
+                            compatibility.years,
+                            compatibility.engine,
+                            compatibility.sourceCode ? `source ${compatibility.sourceCode}` : null,
+                            compatibility.confidence ? `confiance ${compatibility.confidence}` : null,
+                          ].filter(Boolean).join(" · ")}
+                        >
                           {compatibility.vehicleBrand} {compatibility.vehicleModel}
                         </span>
                       ))}

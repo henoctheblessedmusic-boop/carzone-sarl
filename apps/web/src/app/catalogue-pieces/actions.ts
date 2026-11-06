@@ -120,6 +120,8 @@ type ImportedReference = {
   referenceType: string;
   isDirectFit: boolean;
   notes: string | null;
+  confidence: string | null;
+  status: string;
   sourceType: string | null;
   sourceRef: string | null;
   verifiedAt: Date | null;
@@ -127,10 +129,16 @@ type ImportedReference = {
 type ImportedCompatibility = {
   vehicleBrand: string;
   vehicleModel: string;
+  version: string | null;
   years: string | null;
   engine: string | null;
   position: string | null;
   notes: string | null;
+  confidence: string | null;
+  status: string;
+  sourceCode: string | null;
+  sourceUrl: string | null;
+  proof: string | null;
 };
 
 function text(value: unknown): string {
@@ -153,6 +161,8 @@ function parseReference(value: unknown): ImportedReference | null {
       referenceType: text(row.referenceType || row.type || "EQUIVALENT").toUpperCase(),
       isDirectFit: row.isDirectFit !== false,
       notes: text(row.notes) || null,
+      confidence: text(row.confidence) || null,
+      status: text(row.status) || "a_verifier",
       sourceType: text(row.sourceType || row.source) || null,
       sourceRef: text(row.sourceRef || row.sourceReference) || null,
       verifiedAt: text(row.verifiedAt) ? new Date(text(row.verifiedAt)) : null,
@@ -166,6 +176,8 @@ function parseReference(value: unknown): ImportedReference | null {
     referenceType: (parts[2] || "EQUIVALENT").toUpperCase(),
     isDirectFit: (parts[3] || "1") !== "0",
     notes: parts[4] || null,
+    confidence: null,
+    status: "a_verifier",
     sourceType: parts[5] || null,
     sourceRef: parts[6] || null,
     verifiedAt: parts[7] ? new Date(parts[7]) : null,
@@ -181,10 +193,16 @@ function parseCompatibility(value: unknown): ImportedCompatibility | null {
     return {
       vehicleBrand,
       vehicleModel,
+      version: text(row.version) || null,
       years: text(row.years) || null,
       engine: text(row.engine) || null,
       position: text(row.position) || null,
       notes: text(row.notes) || null,
+      confidence: text(row.confidence) || null,
+      status: text(row.status) || "a_verifier",
+      sourceCode: text(row.sourceCode) || null,
+      sourceUrl: text(row.sourceUrl) || null,
+      proof: text(row.proof) || null,
     };
   }
   const parts = text(value).split("|").map((item) => item.trim());
@@ -192,10 +210,16 @@ function parseCompatibility(value: unknown): ImportedCompatibility | null {
   return {
     vehicleBrand: parts[0],
     vehicleModel: parts[1],
-    years: parts[2] || null,
-    engine: parts[3] || null,
-    position: parts[4] || null,
-    notes: parts[5] || null,
+    version: parts[2] || null,
+    years: parts[3] || null,
+    engine: parts[4] || null,
+    position: parts[5] || null,
+    notes: parts[6] || null,
+    confidence: null,
+    status: "a_verifier",
+    sourceCode: null,
+    sourceUrl: null,
+    proof: null,
   };
 }
 
@@ -238,7 +262,17 @@ export async function importGeneralPartsCatalog(formData: FormData) {
       continue;
     }
     const row = raw as Record<string, unknown>;
-    const reference = text(row.reference || row.partNumber || row.ref);
+    const isLegacyCatalog =
+      row.numero_article !== undefined ||
+      row.marque !== undefined ||
+      row.constructeurs_modeles_compatibles !== undefined;
+    const reference = text(
+      row.reference ||
+        row.partNumber ||
+        row.ref ||
+        row.reference_interne ||
+        row.numero_article
+    );
     const name = text(row.name || row.designation);
     if (!reference || !name) {
       skipped += 1;
@@ -246,52 +280,111 @@ export async function importGeneralPartsCatalog(formData: FormData) {
     }
 
     const references: ImportedReference[] = [];
-    const referencesRaw = row.references ?? row.crossReferences;
+    const referencesRaw =
+      row.references ??
+      row.crossReferences ??
+      (isLegacyCatalog ? row.references_croisees : undefined);
     if (Array.isArray(referencesRaw)) {
       for (const item of referencesRaw) {
         const parsed = parseReference(item);
         if (parsed) references.push(parsed);
       }
     } else if (typeof referencesRaw === "string" && referencesRaw.trim()) {
-      for (const item of referencesRaw.split(";")) {
-        const parsed = parseReference(item);
+      const separator = isLegacyCatalog ? "|" : ";";
+      for (const item of referencesRaw.split(separator)) {
+        const normalized = isLegacyCatalog ? item.replace(/·/g, "|") : item;
+        const parsed = parseReference(normalized);
         if (parsed) references.push(parsed);
+      }
+    }
+    if (isLegacyCatalog && typeof row.sources === "string" && row.sources.trim()) {
+      for (const referenceRow of references) {
+        referenceRow.sourceType = referenceRow.sourceType || text(row.sources);
+        referenceRow.sourceRef = referenceRow.sourceRef || text(row.preuve) || null;
+        referenceRow.confidence = referenceRow.confidence || text(row.confiance_min) || null;
+        referenceRow.status = text(row.statut) || "a_verifier";
       }
     }
 
     const compatibilities: ImportedCompatibility[] = [];
-    const compatRaw = row.compatibilities ?? row.vehicles;
+    const compatRaw =
+      row.compatibilities ??
+      row.vehicles ??
+      (isLegacyCatalog ? row.constructeurs_modeles_compatibles : undefined);
     if (Array.isArray(compatRaw)) {
       for (const item of compatRaw) {
         const parsed = parseCompatibility(item);
         if (parsed) compatibilities.push(parsed);
       }
     } else if (typeof compatRaw === "string" && compatRaw.trim()) {
-      for (const item of compatRaw.split(";")) {
-        const parsed = parseCompatibility(item);
-        if (parsed) compatibilities.push(parsed);
+      const separator = isLegacyCatalog ? "|" : ";";
+      for (const item of compatRaw.split(separator)) {
+        if (isLegacyCatalog) {
+          const chunks = item.trim().split(/\s+/);
+          const vehicleBrand = chunks.shift() || "";
+          const vehicleModel = chunks.join(" ");
+          if (vehicleBrand && vehicleModel) {
+            compatibilities.push({
+              vehicleBrand,
+              vehicleModel,
+              version: null,
+              years: null,
+              engine: null,
+              position: text(row.position) || null,
+              notes: text(row.designation_source) || null,
+              confidence: text(row.confiance_min) || null,
+              status: text(row.statut) || "a_verifier",
+              sourceCode: text(row.sources) || null,
+              sourceUrl: null,
+              proof: text(row.preuve) || null,
+            });
+          }
+        } else {
+          const parsed = parseCompatibility(item);
+          if (parsed) compatibilities.push(parsed);
+        }
       }
     }
     if (text(row.vehicleBrand) && text(row.vehicleModel)) {
       const parsed = parseCompatibility({
         vehicleBrand: row.vehicleBrand,
         vehicleModel: row.vehicleModel,
+        version: row.version,
         years: row.years,
         engine: row.engine,
         position: row.position,
+        notes: row.notes,
+        confidence: row.confidence,
+        status: row.status,
+        sourceCode: row.sourceCode,
+        sourceUrl: row.sourceUrl,
+        proof: row.proof,
       });
       if (parsed) compatibilities.push(parsed);
     }
 
+    const manufacturer = text(row.manufacturer || row.fabricant || row.marque) || null;
+    const system = text(row.system || row.category || row.systeme).toUpperCase() || null;
     const data = {
       reference,
-      oemReference: text(row.oemReference || row.oem) || null,
+      partNumber: text(row.partNumber || row.numero_article || row.numero) || reference,
+      referenceBrand: text(row.referenceBrand || row.marque) || null,
+      oemReference: text(row.oemReference || row.oem || row.numero_article) || null,
       name,
-      system: text(row.system || row.category).toUpperCase() || null,
+      system,
       subcategory: text(row.subcategory).toUpperCase() || null,
-      manufacturer: text(row.manufacturer || row.fabricant) || null,
-      description: text(row.description) || null,
-      unit: text(row.unit) || "PIECE",
+      family: text(row.family || row.systeme) || null,
+      position: text(row.position) || null,
+      characteristics: text(row.characteristics || row.caracteristiques) || null,
+      manufacturer,
+      description: text(row.description || row.designation_source || row.designation) || null,
+      unit: text(row.unit || row.unite) || "PIECE",
+      confidence: text(row.confidence || row.confiance_min) || null,
+      status: text(row.status || row.statut) || "a_verifier",
+      sourceCode: text(row.sources) || null,
+      sourceName: null,
+      sourceUrl: null,
+      notes: text(row.notes) || null,
     };
 
     const existing = await prisma.generalPart.findUnique({ where: { reference }, select: { id: true } });
@@ -326,5 +419,5 @@ export async function importGeneralPartsCatalog(formData: FormData) {
   });
 
   revalidatePath("/catalogue-pieces");
-  redirect(`/catalogue-pieces?imported=${imported}&skipped=${skipped}`);
+  redirect(`/admin/import-pieces?imported=${imported}&skipped=${skipped}`);
 }

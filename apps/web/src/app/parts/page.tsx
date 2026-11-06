@@ -56,6 +56,7 @@ export default async function PartsPage() {
     "STOCK_GARAGE",
     "ADMIN",
   ].includes(user.role);
+  const canImport = ["PDG", "DG", "COMPTA", "STOCK_GARAGE", "ADMIN"].includes(user.role);
 
   return (
     <AppShell user={user} titleKey="parts">
@@ -63,6 +64,7 @@ export default async function PartsPage() {
         parts={rawParts}
         workshopEntries={workshopEntries}
         canManage={canManage}
+        canImport={canImport}
       />
     </AppShell>
   );

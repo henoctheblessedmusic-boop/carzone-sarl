@@ -1223,13 +1223,24 @@ model PartOrderLine {
 model GeneralPart {
   id            String   @id @default(cuid())
   reference     String   @unique
+  partNumber    String?
+  referenceBrand String?
   oemReference  String?
   name          String
   system        String?
   subcategory   String?
+  family        String?
+  position      String?
+  characteristics String?
   manufacturer  String?
   description   String?
   unit          String   @default("PIECE")
+  confidence    String?
+  status        String   @default("a_verifier")
+  sourceCode    String?
+  sourceName    String?
+  sourceUrl     String?
+  notes         String?
   active        Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -1251,6 +1262,8 @@ model GeneralPartReference {
   referenceType  String      @default("OEM") // OEM | EQUIVALENT | AFTERMARKET
   isDirectFit    Boolean     @default(true)
   notes          String?
+  confidence     String?
+  status         String      @default("a_verifier")
   /// Origine de la référence : catalogue constructeur, TecDoc, facture fournisseur, etc.
   sourceType     String?
   sourceRef      String?
@@ -1267,10 +1280,16 @@ model GeneralPartCompatibility {
   generalPart    GeneralPart @relation(fields: [generalPartId], references: [id], onDelete: Cascade)
   vehicleBrand   String
   vehicleModel   String
+  version        String?
   years          String?
   engine         String?
   position       String?
   notes          String?
+  confidence     String?
+  status         String      @default("a_verifier")
+  sourceCode     String?
+  sourceUrl      String?
+  proof          String?
   createdAt      DateTime    @default(now())
 
   @@index([vehicleBrand, vehicleModel])

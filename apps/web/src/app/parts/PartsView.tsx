@@ -110,10 +110,12 @@ export function PartsView({
   parts,
   workshopEntries,
   canManage,
+  canImport = false,
 }: {
   parts: PartItemWithRelations[];
   workshopEntries: WorkshopSelectOption[];
   canManage: boolean;
+  canImport?: boolean;
 }) {
   const { locale } = usePrefs();
   const copy = workshopCopy[locale].parts;
@@ -235,6 +237,11 @@ export function PartsView({
         </div>
 
         <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap" }}>
+          {canImport && (
+            <a href="/admin/import-pieces" className="ox-btn ox-btn-ghost">
+              Importer CSV
+            </a>
+          )}
           <a href="/catalogue-pieces" className="ox-btn ox-btn-ghost">
             Catalogue général pièces
           </a>

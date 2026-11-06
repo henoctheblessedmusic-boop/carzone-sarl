@@ -162,6 +162,8 @@ model Supplier {
   updatedAt    DateTime      @updatedAt
   vehicles     Vehicle[]
   importOrders ImportOrder[]
+  partOffers   PartSupplierOffer[]
+  partOrders   PartOrder[]
 }
 
 model Vehicle {
@@ -1101,6 +1103,10 @@ model PartItem {
   oemNumber        String?                // Réf constructeur OEM d'origine (ex: 3501110-M01)
   name             String                 // Désignation (ex: Plaquettes de frein avant / Patin)
   category         String                 @default("FREINAGE") // FREINAGE, FILTRATION, SUSPENSION, MOTEUR, ELECTRICITE, CARROSSERIE, ECLAIRAGE, FLUIDES, AUTRE
+  /// Famille technique principale : MOTEUR, TRANSMISSION, FREINAGE, etc.
+  system           String?
+  /// Sous-famille : plaquettes, disques, filtres, embrayage, etc.
+  subcategory      String?
   manufacturer     String?                // Marque fabriquant (OEM Changan, Bosch, Brembo, Valeo, Torch, etc.)
   description      String?
   unit             String                 @default("JEU") // PIECE, JEU, PAIRE, LITRE, KIT
@@ -1117,6 +1123,8 @@ model PartItem {
 
   crossReferences  PartCrossReference[]
   compatibilities  PartCompatibility[]
+  supplierOffers   PartSupplierOffer[]
+  orderLines       PartOrderLine[]
   movements        PartStockMovement[]
   workOrderUsages  WorkOrderPartUsage[]
   deliveryNoteLines DeliveryNoteLine[]
@@ -1130,6 +1138,8 @@ model PartCrossReference {
   partItem       PartItem  @relation(fields: [partItemId], references: [id], onDelete: Cascade)
   crossReference String    // Référence équivalente (ex: T15-3501080 ou 0 986 494 567)
   brand          String    // Marque ou équipementier lié (JETOUR, CHERY, BOSCH, BREMBO, VALEO, etc.)
+  /// OEM : référence constructeur ; EQUIVALENT : équivalence technique ; AFTERMARKET : marque alternative.
+  referenceType  String    @default("EQUIVALENT")
   isDirectFit    Boolean   @default(true) // 100% interchangeable
   notes          String?   // Remarque technique (ex: Même étrier de frein et même dimension)
   createdAt      DateTime  @default(now())
@@ -1152,6 +1162,60 @@ model PartCompatibility {
   createdAt      DateTime  @default(now())
 
   @@index([vehicleBrand, vehicleModel])
+}
+
+/// Offre fournisseur pour une pièce : permet de regrouper les commandes par fournisseur.
+model PartSupplierOffer {
+  id                String   @id @default(cuid())
+  partItemId        String
+  partItem          PartItem @relation(fields: [partItemId], references: [id], onDelete: Cascade)
+  supplierId        String
+  supplier          Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  supplierReference String?
+  purchasePriceXof  Int      @default(0)
+  leadTimeDays      Int?
+  minOrderQty       Int      @default(1)
+  active            Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([partItemId, supplierId, supplierReference])
+  @@index([supplierId])
+}
+
+/// Commande groupée de pièces détachées auprès d'un fournisseur.
+model PartOrder {
+  id            String         @id @default(cuid())
+  number        String         @unique
+  supplierId    String
+  supplier      Supplier       @relation(fields: [supplierId], references: [id])
+  status        String         @default("BROUILLON") // BROUILLON | CONFIRMEE | RECUE | ANNULEE
+  totalXof      Int            @default(0)
+  notes         String?
+  createdByName String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  lines         PartOrderLine[]
+
+  @@index([supplierId, status])
+}
+
+model PartOrderLine {
+  id               String    @id @default(cuid())
+  orderId          String
+  order            PartOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  partItemId       String
+  partItem         PartItem  @relation(fields: [partItemId], references: [id])
+  quantity         Int       @default(1)
+  unitPriceXof     Int       @default(0)
+  totalXof         Int       @default(0)
+  vehicleBrand     String?
+  vehicleModel     String?
+  notes            String?
+  createdAt        DateTime  @default(now())
+
+  @@index([orderId])
+  @@index([partItemId])
 }
 
 /// Mouvements et traçabilité du stock pièces (Entrées, Sorties Atelier, Retours, Ajustements)

@@ -27,6 +27,7 @@ import {
   Info,
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
+import { PART_SYSTEMS } from "@/lib/parts-taxonomy";
 import { usePrefs } from "@/components/PrefsProvider";
 import {
   PART_CATEGORY_KEYS,
@@ -121,6 +122,8 @@ export function PartsView({
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
   const [stockStatusFilter, setStockStatusFilter] = useState<string>("ALL");
+  const [createSystem, setCreateSystem] = useState("MOTEUR");
+  const [createSubcategory, setCreateSubcategory] = useState("");
 
   // Modals state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -231,7 +234,10 @@ export function PartsView({
           </p>
         </div>
 
-        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap" }}>
+          <a href="/parts/catalogue" className="ox-btn ox-btn-ghost">
+            Catalogue croisé & commandes
+          </a>
           {canManage && (
             <button
               type="button"
@@ -1516,13 +1522,37 @@ export function PartsView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
                 <div>
                   <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
-                    {copy.createCategoryLabel}
+                    Système technique
                   </label>
-                  <select name="category" className="ox-select" style={{ width: "100%" }}>
-                    {PART_CATEGORY_KEYS.map((key) => (
-                      <option key={key} value={key}>
-                        {copy.category[key]}
-                      </option>
+                  <select
+                    name="system"
+                    className="ox-select"
+                    style={{ width: "100%" }}
+                    value={createSystem}
+                    onChange={(event) => {
+                      setCreateSystem(event.target.value);
+                      setCreateSubcategory("");
+                    }}
+                  >
+                    {PART_SYSTEMS.map((system) => (
+                      <option key={system.code} value={system.code}>{system.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
+                    Sous-catégorie
+                  </label>
+                  <select
+                    name="subcategory"
+                    className="ox-select"
+                    style={{ width: "100%" }}
+                    value={createSubcategory}
+                    onChange={(event) => setCreateSubcategory(event.target.value)}
+                  >
+                    <option value="">Non précisée</option>
+                    {(PART_SYSTEMS.find((system) => system.code === createSystem)?.subcategories || []).map((subcategory) => (
+                      <option key={subcategory.code} value={subcategory.code}>{subcategory.label}</option>
                     ))}
                   </select>
                 </div>
@@ -1537,6 +1567,9 @@ export function PartsView({
                     style={{ width: "100%" }}
                   />
                 </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
                 <div>
                   <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
                     {copy.createUnitLabel}
@@ -1549,9 +1582,6 @@ export function PartsView({
                     ))}
                   </select>
                 </div>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
                 <div>
                   <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
                     {copy.createStockLabel}
@@ -1578,6 +1608,9 @@ export function PartsView({
                     style={{ width: "100%" }}
                   />
                 </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
                 <div>
                   <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
                     {copy.createLocationLabel}
@@ -1588,6 +1621,28 @@ export function PartsView({
                     className="ox-input"
                     style={{ width: "100%" }}
                   />
+                </div>
+                <div>
+                  <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
+                    {copy.createCategoryLabel}
+                  </label>
+                  <select name="category" className="ox-select" style={{ width: "100%" }}>
+                    {PART_CATEGORY_KEYS.map((key) => (
+                      <option key={key} value={key}>
+                        {copy.category[key]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", display: "block", marginBottom: 4 }}>
+                    Type de référence croisée initiale
+                  </label>
+                  <select name="initialCrossRefType" className="ox-select" style={{ width: "100%" }}>
+                    <option value="EQUIVALENT">Équivalent</option>
+                    <option value="OEM">OEM constructeur</option>
+                    <option value="AFTERMARKET">Équipementier</option>
+                  </select>
                 </div>
               </div>
 

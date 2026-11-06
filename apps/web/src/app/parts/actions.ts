@@ -29,6 +29,8 @@ export async function createPart(formData: FormData) {
   const name = String(formData.get("name") || "").trim();
   const oemNumber = String(formData.get("oemNumber") || "").trim().toUpperCase() || null;
   const category = String(formData.get("category") || "FREINAGE").trim().toUpperCase();
+  const system = String(formData.get("system") || "").trim().toUpperCase() || null;
+  const subcategory = String(formData.get("subcategory") || "").trim().toUpperCase() || null;
   const manufacturer = String(formData.get("manufacturer") || "").trim() || null;
   const location = String(formData.get("location") || "").trim() || null;
   const unit = String(formData.get("unit") || "JEU").trim().toUpperCase();
@@ -41,6 +43,7 @@ export async function createPart(formData: FormData) {
   // Références croisées optionnelles saisies à la création
   const initialCrossRef = String(formData.get("initialCrossRef") || "").trim().toUpperCase();
   const initialCrossBrand = String(formData.get("initialCrossBrand") || "").trim().toUpperCase();
+  const initialCrossRefType = String(formData.get("initialCrossRefType") || "EQUIVALENT").trim().toUpperCase();
 
   // Modèle compatible optionnel
   const compatBrand = String(formData.get("compatBrand") || "").trim().toUpperCase();
@@ -52,6 +55,8 @@ export async function createPart(formData: FormData) {
       oemNumber,
       name,
       category,
+      system,
+      subcategory,
       manufacturer,
       location,
       unit,
@@ -66,6 +71,7 @@ export async function createPart(formData: FormData) {
               create: {
                 crossReference: initialCrossRef,
                 brand: initialCrossBrand,
+                referenceType: initialCrossRefType,
                 isDirectFit: true,
                 notes: "Création initiale",
               },
@@ -117,11 +123,17 @@ export async function createPart(formData: FormData) {
 export async function updatePart(formData: FormData) {
   const user = await requireUser(AUTHORIZED_ROLES);
   const id = String(formData.get("id"));
+  const currentPart = await prisma.partItem.findUnique({
+    where: { id },
+    select: { system: true, subcategory: true },
+  });
 
   const partNumber = String(formData.get("partNumber") || "").trim().toUpperCase();
   const name = String(formData.get("name") || "").trim();
   const oemNumber = String(formData.get("oemNumber") || "").trim().toUpperCase() || null;
   const category = String(formData.get("category") || "FREINAGE").trim().toUpperCase();
+  const system = String(formData.get("system") || "").trim().toUpperCase() || currentPart?.system || null;
+  const subcategory = String(formData.get("subcategory") || "").trim().toUpperCase() || currentPart?.subcategory || null;
   const manufacturer = String(formData.get("manufacturer") || "").trim() || null;
   const location = String(formData.get("location") || "").trim() || null;
   const unit = String(formData.get("unit") || "JEU").trim().toUpperCase();
@@ -137,6 +149,8 @@ export async function updatePart(formData: FormData) {
       oemNumber,
       name,
       category,
+      system,
+      subcategory,
       manufacturer,
       location,
       unit,
@@ -183,6 +197,7 @@ export async function addCrossReference(formData: FormData) {
   const partItemId = String(formData.get("partItemId"));
   const crossReference = String(formData.get("crossReference") || "").trim().toUpperCase();
   const brand = String(formData.get("brand") || "").trim().toUpperCase();
+  const referenceType = String(formData.get("referenceType") || "EQUIVALENT").trim().toUpperCase();
   const notes = String(formData.get("notes") || "").trim() || null;
   const isDirectFit = formData.get("isDirectFit") === "true" || formData.get("isDirectFit") === "on";
 
@@ -191,6 +206,7 @@ export async function addCrossReference(formData: FormData) {
       partItemId,
       crossReference,
       brand,
+      referenceType,
       isDirectFit,
       notes,
     },
@@ -385,5 +401,128 @@ export async function assignPartToWorkshopEntry(formData: FormData) {
 
   revalidatePath("/parts");
   revalidatePath("/workshop");
+  return { success: true };
+}
+
+type PartOrderInputLine = {
+  partItemId: string;
+  quantity: number;
+  unitPriceXof?: number;
+  vehicleBrand?: string | null;
+  vehicleModel?: string | null;
+  notes?: string | null;
+};
+
+/**
+ * Crée une commande groupée de pièces auprès d'un seul fournisseur.
+ * Les lignes peuvent concerner plusieurs véhicules compatibles à la fois.
+ */
+export async function createPartOrder(input: {
+  supplierId: string;
+  notes?: string;
+  lines: PartOrderInputLine[];
+}) {
+  const user = await requireUser([...AUTHORIZED_ROLES, "COMMERCIAL"]);
+  const supplierId = String(input.supplierId || "").trim();
+  if (!supplierId) throw new Error("Fournisseur obligatoire.");
+  if (!Array.isArray(input.lines) || input.lines.length === 0) {
+    throw new Error("Ajoutez au moins une pièce à la commande.");
+  }
+
+  const supplier = await prisma.supplier.findUnique({ where: { id: supplierId } });
+  if (!supplier || !supplier.active) throw new Error("Fournisseur introuvable ou inactif.");
+
+  const partIds = Array.from(new Set(input.lines.map((line) => String(line.partItemId))));
+  const parts = await prisma.partItem.findMany({
+    where: { id: { in: partIds } },
+    select: { id: true, partNumber: true, name: true, purchasePriceXof: true },
+  });
+  const partsById = new Map(parts.map((part) => [part.id, part]));
+  if (parts.length !== partIds.length) throw new Error("Une ou plusieurs pièces sont introuvables.");
+
+  const normalizedLines = input.lines.map((line) => {
+    const part = partsById.get(String(line.partItemId));
+    if (!part) throw new Error("Pièce introuvable.");
+    const quantity = Math.max(1, Math.floor(Number(line.quantity) || 1));
+    const unitPriceXof = Math.max(
+      0,
+      Math.round(Number(line.unitPriceXof) || part.purchasePriceXof || 0)
+    );
+    return {
+      partItemId: part.id,
+      quantity,
+      unitPriceXof,
+      totalXof: quantity * unitPriceXof,
+      vehicleBrand: line.vehicleBrand?.trim() || null,
+      vehicleModel: line.vehicleModel?.trim() || null,
+      notes: line.notes?.trim() || null,
+    };
+  });
+
+  const totalXof = normalizedLines.reduce((sum, line) => sum + line.totalXof, 0);
+  const count = await prisma.partOrder.count();
+  const number = `CMD-PC-${new Date().getFullYear()}-${String(count + 1).padStart(4, "0")}`;
+
+  const order = await prisma.partOrder.create({
+    data: {
+      number,
+      supplierId,
+      status: "BROUILLON",
+      totalXof,
+      notes: input.notes?.trim() || null,
+      createdByName: user.fullName,
+      lines: {
+        create: normalizedLines.map((line) => ({
+          partItemId: line.partItemId,
+          quantity: line.quantity,
+          unitPriceXof: line.unitPriceXof,
+          totalXof: line.totalXof,
+          vehicleBrand: line.vehicleBrand,
+          vehicleModel: line.vehicleModel,
+          notes: line.notes,
+        })),
+      },
+    },
+    include: { lines: true },
+  });
+
+  await logAudit({
+    user,
+    action: "part.order_create",
+    entityType: "PartOrder",
+    entityId: order.id,
+    entityLabel: order.number,
+    details: `${normalizedLines.length} ligne(s) - ${totalXof.toLocaleString("fr-BJ")} FCFA - ${supplier.name}`,
+  });
+
+  revalidatePath("/parts");
+  revalidatePath("/parts/catalogue");
+  return { success: true, orderId: order.id, number: order.number };
+}
+
+export async function updatePartOrderStatus(formData: FormData) {
+  const user = await requireUser([...AUTHORIZED_ROLES, "COMMERCIAL"]);
+  const id = String(formData.get("id") || "").trim();
+  const status = String(formData.get("status") || "").trim().toUpperCase();
+  const allowed = ["BROUILLON", "CONFIRMEE", "RECUE", "ANNULEE"];
+  if (!id || !allowed.includes(status)) throw new Error("Statut de commande invalide.");
+
+  const order = await prisma.partOrder.update({
+    where: { id },
+    data: { status },
+    select: { id: true, number: true, totalXof: true },
+  });
+
+  await logAudit({
+    user,
+    action: "part.order_status",
+    entityType: "PartOrder",
+    entityId: order.id,
+    entityLabel: order.number,
+    details: `Statut ${status}`,
+  });
+
+  revalidatePath("/parts/catalogue");
+  revalidatePath("/parts");
   return { success: true };
 }

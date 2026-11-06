@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/require-user";
+import { logAudit } from "@/lib/audit";
 import { getLocale } from "@/lib/i18n/server";
 import { adminCopy } from "@/lib/i18n/messages/admin";
 import { normalizePhone } from "@/lib/client-import";
@@ -137,6 +138,16 @@ export async function createExpense(data: {
   revalidatePath("/expenses");
   revalidatePath("/invoices");
   revalidatePath("/dashboard");
+
+  await logAudit({
+    user,
+    action: "expense.create",
+    entityType: "Expense",
+    entityId: expense.id,
+    entityLabel: `${expense.expenseNumber} - ${expense.title}`,
+    details: `${expense.amountTtcXof.toLocaleString("fr-BJ")} FCFA - ${expense.supplierName}`,
+  });
+
   return expense;
 }
 
@@ -148,7 +159,7 @@ export async function markExpensePaid(
     paymentDate?: string;
   }
 ) {
-  await requireUser([...CAN_MANAGE_EXPENSES]);
+  const user = await requireUser([...CAN_MANAGE_EXPENSES]);
 
   const updated = await prisma.expense.update({
     where: { id },
@@ -160,6 +171,15 @@ export async function markExpensePaid(
     },
   });
 
+  await logAudit({
+    user,
+    action: "expense.pay",
+    entityType: "Expense",
+    entityId: updated.id,
+    entityLabel: `${updated.expenseNumber} - ${updated.title}`,
+    details: `Paiement ${updated.paymentMethod} - ${updated.amountTtcXof.toLocaleString("fr-BJ")} FCFA`,
+  });
+
   revalidatePath("/expenses");
   revalidatePath("/invoices");
   revalidatePath("/dashboard");
@@ -167,10 +187,19 @@ export async function markExpensePaid(
 }
 
 export async function deleteExpense(id: string) {
-  await requireUser([...CAN_MANAGE_EXPENSES]);
+  const user = await requireUser([...CAN_MANAGE_EXPENSES]);
 
-  await prisma.expense.delete({
+  const deleted = await prisma.expense.delete({
     where: { id },
+  });
+
+  await logAudit({
+    user,
+    action: "expense.delete",
+    entityType: "Expense",
+    entityId: id,
+    entityLabel: `${deleted.expenseNumber} - ${deleted.title}`,
+    details: `Suppression d'une dépense de ${deleted.amountTtcXof.toLocaleString("fr-BJ")} FCFA`,
   });
 
   revalidatePath("/expenses");

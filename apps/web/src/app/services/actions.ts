@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
+import { logAudit } from "@/lib/audit";
 
 const SERVICE_MANAGERS = [
   "PDG",
@@ -22,7 +23,7 @@ const SERVICE_MANAGERS = [
 ] as const;
 
 export async function createArticle(formData: FormData) {
-  await requireUser([...SERVICE_MANAGERS]);
+  const user = await requireUser([...SERVICE_MANAGERS]);
 
   const name = String(formData.get("name") || "").trim();
   if (!name) throw new Error("Le nom est obligatoire");
@@ -33,7 +34,7 @@ export async function createArticle(formData: FormData) {
   const unit = String(formData.get("unit") || "1").trim();
   const category = String(formData.get("category") || "SERVICE").trim();
 
-  await prisma.article.create({
+  const article = await prisma.article.create({
     data: {
       name,
       description,
@@ -43,6 +44,16 @@ export async function createArticle(formData: FormData) {
       category,
       active: true,
     },
+    select: { id: true },
+  });
+
+  await logAudit({
+    user,
+    action: "service.create",
+    entityType: "Article",
+    entityId: article.id,
+    entityLabel: name,
+    details: `${unitPriceXof.toLocaleString("fr-BJ")} FCFA`,
   });
 
   revalidatePath("/services");
@@ -50,7 +61,7 @@ export async function createArticle(formData: FormData) {
 }
 
 export async function updateArticle(formData: FormData) {
-  await requireUser([...SERVICE_MANAGERS]);
+  const user = await requireUser([...SERVICE_MANAGERS]);
 
   const id = String(formData.get("id") || "").trim();
   const name = String(formData.get("name") || "").trim();
@@ -79,25 +90,54 @@ export async function updateArticle(formData: FormData) {
     },
   });
 
+  await logAudit({
+    user,
+    action: "service.update",
+    entityType: "Article",
+    entityId: id,
+    entityLabel: name,
+    details: `${unitPriceXof.toLocaleString("fr-BJ")} FCFA - ${active ? "actif" : "inactif"}`,
+  });
+
   revalidatePath("/services");
 }
 
 export async function toggleArticleActive(id: string, active: boolean) {
-  await requireUser([...SERVICE_MANAGERS]);
+  const user = await requireUser([...SERVICE_MANAGERS]);
 
-  await prisma.article.update({
+  const article = await prisma.article.update({
     where: { id },
     data: { active },
+    select: { id: true, name: true },
+  });
+
+  await logAudit({
+    user,
+    action: active ? "service.activate" : "service.deactivate",
+    entityType: "Article",
+    entityId: article.id,
+    entityLabel: article.name,
+    details: active ? "Article activé" : "Article désactivé",
   });
 
   revalidatePath("/services");
 }
 
 export async function deleteArticle(id: string) {
-  await requireUser(["PDG", "SG", "DG", "ADV", "RF", "RTA", "DC", "COMPTA"]);
+  const user = await requireUser(["PDG", "SG", "DG", "ADV", "RF", "RTA", "DC", "COMPTA"]);
 
-  await prisma.article.delete({
+  const article = await prisma.article.delete({
     where: { id },
+    select: { id: true, name: true },
+  });
+
+  await logAudit({
+    user,
+    action: "service.delete",
+    entityType: "Article",
+    entityId: article.id,
+    entityLabel: article.name,
+    details: "Suppression d'un article/service",
   });
 
   revalidatePath("/services");

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
+import { logAudit } from "@/lib/audit";
 import type { Role } from "@/lib/roles";
 import { DEFAULT_ROLE_CAPABILITIES } from "@/lib/permissions-config";
 import { getLocale } from "@/lib/i18n/server";
@@ -50,7 +51,7 @@ export async function createUser(formData: FormData) {
 
   const passwordHash = await bcrypt.hash(password, 10);
 
-  await prisma.user.create({
+  const createdUser = await prisma.user.create({
     data: {
       email,
       fullName,
@@ -60,6 +61,16 @@ export async function createUser(formData: FormData) {
       active: true,
       customPermissions,
     },
+    select: { id: true },
+  });
+
+  await logAudit({
+    user: currentUser,
+    action: "user.create",
+    entityType: "User",
+    entityId: createdUser.id,
+    entityLabel: fullName,
+    details: `Création du compte ${email} avec le rôle ${role}`,
   });
 
   revalidatePath("/users");
@@ -103,6 +114,15 @@ export async function updateUser(formData: FormData) {
       role,
       ...(customPermissions !== undefined ? { customPermissions } : {}),
     },
+  });
+
+  await logAudit({
+    user: currentUser,
+    action: "user.update",
+    entityType: "User",
+    entityId: id,
+    entityLabel: fullName,
+    details: `Mise à jour du compte ${targetUser.email} (rôle ${role})`,
   });
 
   revalidatePath("/users");
@@ -156,6 +176,15 @@ export async function updateUserPassword(userId: string, newPassword: string) {
     },
   });
 
+  await logAudit({
+    user: currentUser,
+    action: "user.password_change",
+    entityType: "User",
+    entityId: targetUser.id,
+    entityLabel: targetUser.fullName,
+    details: `Mot de passe modifié pour ${targetUser.email}`,
+  });
+
   revalidatePath("/users");
   return { success: true };
 }
@@ -166,12 +195,13 @@ export async function changeMyPassword(newPassword: string) {
 }
 
 export async function updateUserPermissions(id: string, permissions: string[]) {
-  await requireUser([...CAN_MANAGE_USERS_ROLES]);
+  const currentUser = await requireUser([...CAN_MANAGE_USERS_ROLES]);
 
   if (!id) {
     throw new Error(adminCopy[await getLocale()].server.users.userIdRequired);
   }
 
+  const targetUser = await prisma.user.findUnique({ where: { id }, select: { fullName: true } });
   await prisma.user.update({
     where: { id },
     data: {
@@ -179,12 +209,21 @@ export async function updateUserPermissions(id: string, permissions: string[]) {
     },
   });
 
+  await logAudit({
+    user: currentUser,
+    action: "user.permissions_update",
+    entityType: "User",
+    entityId: id,
+    entityLabel: targetUser?.fullName || id,
+    details: `${permissions.length} permission(s) personnalisée(s)`,
+  });
+
   revalidatePath("/users");
   return { success: true };
 }
 
 export async function resetUserPermissions(id: string) {
-  await requireUser([...CAN_MANAGE_USERS_ROLES]);
+  const currentUser = await requireUser([...CAN_MANAGE_USERS_ROLES]);
 
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new Error(adminCopy[await getLocale()].server.users.userNotFound);
@@ -198,12 +237,21 @@ export async function resetUserPermissions(id: string) {
     },
   });
 
+  await logAudit({
+    user: currentUser,
+    action: "user.permissions_reset",
+    entityType: "User",
+    entityId: id,
+    entityLabel: user.fullName,
+    details: `Permissions réinitialisées au rôle ${user.role}`,
+  });
+
   revalidatePath("/users");
   return { success: true, count: defaultPerms.length };
 }
 
 export async function updateUserRole(formData: FormData) {
-  await requireUser([...CAN_MANAGE_USERS_ROLES]);
+  const currentUser = await requireUser([...CAN_MANAGE_USERS_ROLES]);
 
   const id = String(formData.get("id") || "").trim();
   const role = String(formData.get("role") || "").trim() as Role;
@@ -215,12 +263,22 @@ export async function updateUserRole(formData: FormData) {
   // Mettre à jour le rôle et synchroniser les capacités par défaut
   const defaultPerms = DEFAULT_ROLE_CAPABILITIES[role] || [];
 
+  const targetUser = await prisma.user.findUnique({ where: { id }, select: { fullName: true, email: true } });
   await prisma.user.update({
     where: { id },
     data: {
       role,
       customPermissions: defaultPerms,
     },
+  });
+
+  await logAudit({
+    user: currentUser,
+    action: "user.role_update",
+    entityType: "User",
+    entityId: id,
+    entityLabel: targetUser?.fullName || id,
+    details: `Nouveau rôle : ${role}`,
   });
 
   revalidatePath("/users");
@@ -240,6 +298,15 @@ export async function toggleUserActive(id: string, active: boolean) {
   await prisma.user.update({
     where: { id },
     data: { active },
+  });
+
+  await logAudit({
+    user: currentUser,
+    action: active ? "user.activate" : "user.deactivate",
+    entityType: "User",
+    entityId: id,
+    entityLabel: targetUser.fullName,
+    details: `${targetUser.email} est maintenant ${active ? "actif" : "inactif"}`,
   });
 
   revalidatePath("/users");
@@ -262,6 +329,15 @@ export async function deleteUser(id: string) {
 
   await prisma.user.delete({
     where: { id },
+  });
+
+  await logAudit({
+    user: currentUser,
+    action: "user.delete",
+    entityType: "User",
+    entityId: id,
+    entityLabel: targetUser.fullName,
+    details: `Suppression du compte ${targetUser.email} (${targetUser.role})`,
   });
 
   revalidatePath("/users");

@@ -11,7 +11,9 @@ import {
   AlertOctagon,
   Globe,
   Radio,
+  Activity,
 } from "lucide-react";
+import { canReceiveActivityNotifications } from "@/lib/notification-policy";
 
 export type AdminNotif = {
   id: string;
@@ -26,12 +28,7 @@ export type AdminNotif = {
 };
 
 export function AdminNotificationsBell({ userRole }: { userRole: string }) {
-  const isPrivileged =
-    userRole === "DEVELOPER" ||
-    userRole === "PDG" ||
-    userRole === "SG" ||
-    userRole === "DG" ||
-    userRole === "ADMIN";
+  const isPrivileged = canReceiveActivityNotifications(userRole);
 
   const isDev = userRole === "DEVELOPER";
 
@@ -87,8 +84,8 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
   useEffect(() => {
     if (!isPrivileged) return;
     fetchNotifs();
-    // Le Développeur dispose d'un polling accéléré (5 secondes) pour une notification immédiate
-    const intervalTime = isDev ? 5000 : 10000;
+    // Les destinataires reçoivent les nouvelles activités en quasi temps réel.
+    const intervalTime = 5000;
     const interval = setInterval(fetchNotifs, intervalTime);
     return () => clearInterval(interval);
   }, [isPrivileged, isDev]);
@@ -149,7 +146,7 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
           setIsOpen(!isOpen);
           if (!isOpen) fetchNotifs();
         }}
-        title="Alertes & Notifications (Mots de passe, système)"
+        title="Notifications et activités de l'application"
         style={{
           position: "relative",
           display: "flex",
@@ -227,7 +224,7 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <Bell size={16} color="var(--gold, #d4af37)" />
               <strong style={{ fontSize: "0.875rem", color: "var(--ice-text)" }}>
-                Alertes de Sécurité
+                Notifications &amp; activités
               </strong>
               {unreadCount > 0 && (
                 <span
@@ -300,7 +297,7 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
                   opacity: 0.6,
                 }}
               >
-                Aucune alerte enregistrée pour le moment.
+                Aucune activité ou alerte enregistrée pour le moment.
               </div>
             ) : (
               notifications.map((n) => (
@@ -331,6 +328,8 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
                           ? "rgba(239, 68, 68, 0.18)"
                           : n.type === "PASSWORD_CHANGED"
                           ? "rgba(212, 175, 55, 0.15)"
+                          : n.type === "ACTIVITY_GARAGE"
+                          ? "rgba(245, 158, 11, 0.15)"
                           : "rgba(59, 130, 246, 0.15)",
                       color:
                         n.type === "LOGIN_ALERT"
@@ -339,6 +338,8 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
                           ? "#f87171"
                           : n.type === "PASSWORD_CHANGED"
                           ? "var(--gold, #d4af37)"
+                          : n.type === "ACTIVITY_GARAGE"
+                          ? "#f59e0b"
                           : "#60a5fa",
                       marginTop: 2,
                       flexShrink: 0,
@@ -348,6 +349,8 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
                       <LogIn size={15} />
                     ) : n.type === "RATE_LIMIT_ALERT" ? (
                       <AlertOctagon size={15} />
+                    ) : n.type === "ACTIVITY" || n.type === "ACTIVITY_GARAGE" ? (
+                      <Activity size={15} />
                     ) : (
                       <Key size={14} />
                     )}

@@ -44,9 +44,18 @@ export function AuditView({
 }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "#9ca3af" }}>
+          Journal consolidé des activités. Le rapport journalier regroupe les actions par journée.
+        </p>
+        <a href="/audit/journalier" style={{ fontWeight: 700 }}>
+          Ouvrir le rapport journalier
+        </a>
+      </div>
+
       {isGarageScoped && (
         <p style={{ fontSize: 13, color: "#9ca3af" }}>
-          Périmètre Comptable Garage : seules les actions liées à l'atelier (GARAGE) sont affichées.
+          Périmètre garage : seules les actions liées à l'atelier (GARAGE) sont affichées.
         </p>
       )}
 

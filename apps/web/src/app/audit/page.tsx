@@ -2,6 +2,7 @@ import { AppShell } from "@/components/AppShell";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { ACTIVITY } from "@/lib/permissions";
+import { isGarageScopedRole } from "@/lib/notification-policy";
 import { AuditView, type AuditLogItem } from "./AuditView";
 
 const AUDIT_ALLOWED_ROLES = [
@@ -10,7 +11,9 @@ const AUDIT_ALLOWED_ROLES = [
   "SG",
   "DG",
   "COMPTA",
+  "ASSISTANTE_COMPTABLE",
   "COMPTA_GARAGE",
+  "STOCK",
   "ADMIN",
 ] as const;
 
@@ -23,10 +26,11 @@ export default async function AuditPage({
 }) {
   const user = await requireUser([...AUDIT_ALLOWED_ROLES]);
   const params = await searchParams;
+  const garageScoped = isGarageScopedRole(user.role);
 
-  // La Comptable Garage ne voit jamais le périmètre showroom. Ce filtre d'activité
-  // est forcé côté serveur, jamais dérivé des paramètres d'URL envoyés par le client.
-  const scopeFilter = user.role === "COMPTA_GARAGE" ? { activity: ACTIVITY.GARAGE } : {};
+  // La Comptable Garage et le gestionnaire de stock garage ne voient jamais le showroom.
+  // Le filtre est forcé côté serveur, jamais dérivé des paramètres d'URL.
+  const scopeFilter = garageScoped ? { activity: ACTIVITY.GARAGE } : {};
 
   const rawLogs = await prisma.auditLog.findMany({
     where: {
@@ -83,7 +87,7 @@ export default async function AuditPage({
           action: params.action || "",
           actorRole: params.actorRole || "",
         }}
-        isGarageScoped={user.role === "COMPTA_GARAGE"}
+        isGarageScoped={garageScoped}
         pageSize={AUDIT_PAGE_SIZE}
       />
     </AppShell>

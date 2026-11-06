@@ -30,6 +30,7 @@ export const en: Messages = {
     workshop: "Workshop",
     garageSupervision: "Garage supervision",
     parts: "Parts & cross-ref",
+    generalPartsCatalog: "Parts catalog",
     imports: "Imports",
     installers: "Charger installers",
     chargeRequests: "Charger quotes",

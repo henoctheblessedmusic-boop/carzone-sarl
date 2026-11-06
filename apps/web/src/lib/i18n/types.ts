@@ -22,6 +22,7 @@ export type Messages = {
     workshop: string;
     garageSupervision?: string;
     parts?: string;
+    generalPartsCatalog?: string;
     imports: string;
     installers: string;
     chargeRequests: string;
@@ -50,6 +51,7 @@ export type Messages = {
     fleet: string;
     workshop: string;
     parts?: string;
+    generalPartsCatalog?: string;
     imports: string;
     installers: string;
     chargeRequests: string;

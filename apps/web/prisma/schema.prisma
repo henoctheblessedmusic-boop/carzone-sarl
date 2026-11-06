@@ -164,6 +164,7 @@ model Supplier {
   importOrders ImportOrder[]
   partOffers   PartSupplierOffer[]
   partOrders   PartOrder[]
+  generalPartOrders GeneralPartOrder[]
 }
 
 model Vehicle {
@@ -1216,6 +1217,93 @@ model PartOrderLine {
 
   @@index([orderId])
   @@index([partItemId])
+}
+
+/// Catalogue général indépendant du stock : sert à préparer et suivre les commandes.
+model GeneralPart {
+  id            String   @id @default(cuid())
+  reference     String   @unique
+  oemReference  String?
+  name          String
+  system        String?
+  subcategory   String?
+  manufacturer  String?
+  description   String?
+  unit          String   @default("PIECE")
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  references       GeneralPartReference[]
+  compatibilities  GeneralPartCompatibility[]
+  orderLines       GeneralPartOrderLine[]
+
+  @@index([system])
+  @@index([manufacturer])
+}
+
+model GeneralPartReference {
+  id             String      @id @default(cuid())
+  generalPartId  String
+  generalPart    GeneralPart @relation(fields: [generalPartId], references: [id], onDelete: Cascade)
+  reference      String
+  brand          String
+  referenceType  String      @default("OEM") // OEM | EQUIVALENT | AFTERMARKET
+  isDirectFit    Boolean     @default(true)
+  notes          String?
+  createdAt      DateTime    @default(now())
+
+  @@index([reference])
+  @@index([brand])
+}
+
+model GeneralPartCompatibility {
+  id             String      @id @default(cuid())
+  generalPartId  String
+  generalPart    GeneralPart @relation(fields: [generalPartId], references: [id], onDelete: Cascade)
+  vehicleBrand   String
+  vehicleModel   String
+  years          String?
+  engine         String?
+  position       String?
+  notes          String?
+  createdAt      DateTime    @default(now())
+
+  @@index([vehicleBrand, vehicleModel])
+}
+
+model GeneralPartOrder {
+  id            String               @id @default(cuid())
+  number        String               @unique
+  supplierId    String?
+  supplier      Supplier?            @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  status        String               @default("COMMANDE") // COMMANDE | EN_TRANSIT | AU_PORT | EN_MAGASIN | ANNULE
+  orderedAt     DateTime             @default(now())
+  expectedAt    DateTime?
+  receivedAt    DateTime?
+  totalXof      Int                  @default(0)
+  notes         String?
+  createdByName String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  lines         GeneralPartOrderLine[]
+
+  @@index([status, orderedAt])
+}
+
+model GeneralPartOrderLine {
+  id             String      @id @default(cuid())
+  generalPartOrderId String
+  generalPartOrder   GeneralPartOrder @relation(fields: [generalPartOrderId], references: [id], onDelete: Cascade)
+  generalPartId  String
+  generalPart    GeneralPart @relation(fields: [generalPartId], references: [id])
+  quantity       Int         @default(1)
+  unitPriceXof   Int?
+  notes          String?
+  createdAt      DateTime    @default(now())
+
+  @@index([generalPartOrderId])
+  @@index([generalPartId])
 }
 
 /// Mouvements et traçabilité du stock pièces (Entrées, Sorties Atelier, Retours, Ajustements)

@@ -425,6 +425,7 @@ export class RoleService {
       return (
         pathname.startsWith("/rentals") ||
         pathname.startsWith("/contrat") ||
+        pathname.startsWith("/catalogue-pieces") ||
         pathname.startsWith("/clients") ||
         pathname.startsWith("/chat") ||
         pathname.startsWith("/api/chat") ||
@@ -515,6 +516,7 @@ export class RoleService {
       return (
         pathname.startsWith("/rentals") ||
         pathname.startsWith("/contrat") ||
+        pathname.startsWith("/catalogue-pieces") ||
         pathname.startsWith("/clients") ||
         pathname.startsWith("/chat") ||
         pathname.startsWith("/api/chat") ||

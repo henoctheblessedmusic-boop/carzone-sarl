@@ -11,6 +11,7 @@ const navDefs = [
   { href: "/dashboard", roles: null as string[] | null },
   { href: "/clients", roles: null },
   { href: "/workshop", roles: ["PDG", "SG", "DG", "ADV", "RF", "RTA", "DC", "CHEF_ATELIER", "ASSISTANTE_COMPTABLE", "ATELIER", "STOCK_GARAGE", "COMPTA", "COMPTA_GARAGE", "ADMIN"] },
+  { href: "/catalogue-pieces", roles: ["PDG", "DG", "COMPTA", "STOCK_GARAGE", "GESTIONNAIRE_LOCATION", "DC", "COMMERCIAL"] },
   { href: "/garage-supervision", roles: ["PDG", "SG", "DG", "CHEF_ATELIER", "COMPTA", "COMPTA_GARAGE"] },
   { href: "/parts", roles: ["PDG", "SG", "DG", "ADV", "RF", "RTA", "DC", "CHEF_ATELIER", "ATELIER", "STOCK_GARAGE", "COMPTA", "COMPTA_GARAGE", "ADMIN", "COMMERCIAL"] },
   { href: "/vehicles", roles: ["PDG", "SG", "DG", "ADV", "RF", "RTA", "DC", "COMMERCIAL", "HOTESSE", "CHEF_ATELIER", "ASSISTANTE_COMPTABLE", "ATELIER", "STOCK", "COMPTA", "ADMIN"] },

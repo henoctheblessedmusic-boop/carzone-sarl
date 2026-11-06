@@ -30,6 +30,7 @@ export const zh: Messages = {
     workshop: "售后服务",
     garageSupervision: "车间监督",
     parts: "配件与交叉参考",
+    generalPartsCatalog: "配件目录",
     imports: "进口",
     installers: "充电桩安装商",
     chargeRequests: "充电桩报价",

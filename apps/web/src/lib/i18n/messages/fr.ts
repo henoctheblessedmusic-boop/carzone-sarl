@@ -30,6 +30,7 @@ export const fr: Messages = {
     workshop: "Atelier",
     garageSupervision: "Supervision garage",
     parts: "Pièces & Références",
+    generalPartsCatalog: "Catalogue pièces",
     imports: "Import",
     installers: "Installateurs bornes",
     chargeRequests: "Devis bornes",

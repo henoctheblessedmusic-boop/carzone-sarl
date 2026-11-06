@@ -18,9 +18,8 @@ export default async function ImportPartsCsvPage({
         <div className="ox-glass" style={{ padding: "1.1rem 1.2rem" }}>
           <h1 style={{ margin: 0, fontSize: "1.2rem" }}>Import CSV du catalogue pièces</h1>
           <p style={{ margin: "6px 0 0", opacity: 0.7, fontSize: "0.84rem" }}>
-            Chargez un fichier de références fournisseur ou constructeur. Le fichier doit contenir les colonnes
-            reference et name, puis les colonnes optionnelles oemReference, system, subcategory, manufacturer,
-            unit, references et compatibilities.
+            Chargez un fichier de références fournisseur ou constructeur. Formats acceptés : CSV, Excel et JSON.
+            Le fichier import_catalogue.csv de la base de références est reconnu.
           </p>
         </div>
 

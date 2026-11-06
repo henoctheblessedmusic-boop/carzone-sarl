@@ -6,6 +6,8 @@ import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { formatXof, nextDocNumber } from "@/lib/format";
 import { getServerMessages } from "@/lib/i18n/server";
+import { logAudit } from "@/lib/audit";
+import { syncImportOrderVehicle } from "@/lib/import-orders";
 import {
   energyCopy,
   IMPORT_STATUS_KEYS,
@@ -15,10 +17,12 @@ import {
 
 async function createImport(formData: FormData) {
   "use server";
-  await requireUser(["DG", "STOCK", "COMPTA"]);
+  const user = await requireUser(["DG", "STOCK", "COMPTA"]);
   const count = await prisma.importOrder.count();
   const originPort = String(formData.get("originPort") || "");
-  await prisma.importOrder.create({
+  const expectedBrand = String(formData.get("brand") || "").trim() || null;
+  const expectedModel = String(formData.get("model") || "").trim() || null;
+  const order = await prisma.importOrder.create({
     data: {
       reference: nextDocNumber("IMP", count).replace(
         "IMP",
@@ -29,22 +33,56 @@ async function createImport(formData: FormData) {
       etaDate: formData.get("etaDate") ? new Date(String(formData.get("etaDate"))) : null,
       costXof: Number(formData.get("costXof") || 0) || null,
       supplierId: String(formData.get("supplierId") || "") || null,
-      expectedBrand: String(formData.get("brand") || "").trim() || null,
-      expectedModel: String(formData.get("model") || "").trim() || null,
+      expectedBrand,
+      expectedModel,
       notes: String(formData.get("notes") || "") || null,
     },
+    select: { id: true, reference: true },
   });
+
+  // Chaque commande import doit immédiatement exister dans le stock véhicules.
+  await syncImportOrderVehicle(order.id);
+
+  await logAudit({
+    user,
+    action: "import.create",
+    entityType: "ImportOrder",
+    entityId: order.id,
+    entityLabel: order.reference,
+    details: `${expectedBrand || "Marque à préciser"} ${expectedModel || "Modèle à préciser"} - ${originPort}`,
+  });
+
   revalidatePath("/imports");
+  revalidatePath("/vehicles");
+  revalidatePath("/catalog");
+  revalidatePath("/dashboard");
 }
 
 async function updateImportStatus(formData: FormData) {
   "use server";
-  await requireUser(["DG", "STOCK", "COMPTA"]);
-  await prisma.importOrder.update({
+  const user = await requireUser(["DG", "STOCK", "COMPTA"]);
+  const order = await prisma.importOrder.update({
     where: { id: String(formData.get("id")) },
     data: { status: String(formData.get("status") || "COMMANDE") },
+    select: { id: true, reference: true, status: true },
   });
+
+  // Le statut logistique doit être répercuté immédiatement sur le véhicule du stock.
+  const sync = await syncImportOrderVehicle(order.id);
+
+  await logAudit({
+    user,
+    action: "import.status_change",
+    entityType: "ImportOrder",
+    entityId: order.id,
+    entityLabel: order.reference,
+    details: `Statut ${order.status}${sync ? ` - véhicule ${sync.created ? "créé" : "synchronisé"}` : ""}`,
+  });
+
   revalidatePath("/imports");
+  revalidatePath("/vehicles");
+  revalidatePath("/catalog");
+  revalidatePath("/dashboard");
 }
 
 export default async function ImportsPage() {

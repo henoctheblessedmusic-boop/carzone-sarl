@@ -163,8 +163,8 @@ export async function updateUserPassword(userId: string, newPassword: string) {
     throw new Error(t.notAllowedChangePassword);
   }
 
-  if (!newPassword || newPassword.trim().length < 4) {
-    throw new Error(t.passwordTooShort);
+  if (!newPassword || newPassword.trim().length < 8) {
+    throw new Error("Le mot de passe doit comporter au moins 8 caractères.");
   }
 
   const targetUser = await prisma.user.findUnique({ where: { id: userId } });

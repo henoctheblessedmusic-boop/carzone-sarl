@@ -23,8 +23,8 @@ export function ChangePasswordModal() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPassword || newPassword.trim().length < 4) {
-      setError("Le mot de passe doit comporter au moins 4 caractères.");
+    if (!newPassword || newPassword.trim().length < 8) {
+      setError("Le mot de passe doit comporter au moins 8 caractères.");
       return;
     }
     if (newPassword !== confirmPassword) {

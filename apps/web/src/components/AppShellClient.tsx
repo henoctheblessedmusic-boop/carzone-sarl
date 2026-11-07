@@ -279,7 +279,7 @@ export function AppShellClient({
         <div className="ox-content">{children}</div>
       </main>
 
-      {pathname !== "/chat" && (
+      {pathname !== "/chat" && !user.mustChangePassword && (
         <OnboardingHost
           role={user.role}
           userName={user.fullName}

@@ -115,3 +115,10 @@ REV-02, REV-04 et REV-05 ne bloquent pas le déploiement de ce lot mais doivent
 être traités à très court terme (périmètre RH/ADV/RTA/DC, vérification du
 véhicule sur `ai/tech-sheet`, validation métier du cas ADV). REV-03, REV-06 et
 REV-07 sont des recommandations de suivi.
+
+## ADDENDUM Lead - 2026-11-07
+
+- REV-01 est corrigé : `assertCanAssignPermissions` est maintenant appelé dans la création, la modification et la personnalisation des permissions.
+- Les rôles financiers RF, COMPTA, ASSISTANTE_COMPTABLE et COMPTA_GARAGE sont également protégés.
+- `tsc --noEmit` et `npm run build` ont été exécutés avec succès après correction.
+- La révocation des sessions a été ajoutée en phase 2.

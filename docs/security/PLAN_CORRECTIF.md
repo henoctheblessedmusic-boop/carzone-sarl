@@ -3,8 +3,9 @@
 ## Statut d'avancement
 
 - Phase 1 : déployée le 2026-11-07, commit `487229b`. Détail : `phase1-report.md`.
+- Phase 2 : révocation des sessions déployée le 2026-11-07, commit `9fd0b5b`. Détail : `phase2-report.md`.
 - En attente d'intervention : secret VAPI et rotation des mots de passe par défaut.
-- À programmer : révocation des sessions, dépendances, CSP, rate limiting, images.
+- À programmer : dépendances, CSP, rate limiting, images.
 
 Objectif : supprimer les risques critiques et hauts sans casser les parcours métier existants.
 Principe : corriger d'abord les autorisations et les accès, puis les dépendances et la configuration, ensuite les contrôles préventifs.

@@ -190,7 +190,7 @@ export function UsersView({
   const availableRoleEntries = useMemo(() => {
     return Object.entries(ROLE_LABELS).filter(([k]) => {
       if (k === "DEVELOPER" && currentUserRole !== "DEVELOPER") return false;
-      if (["PDG", "DG", "SG", "ADMIN", "RF", "COMPTA", "ASSISTANTE_COMPTABLE", "COMPTA_GARAGE"].includes(k) && !isSuperAdmin) {
+      if (["PDG", "DG", "SG", "ADMIN", "ADV", "RF", "COMPTA", "ASSISTANTE_COMPTABLE", "COMPTA_GARAGE"].includes(k) && !isSuperAdmin) {
         return false;
       }
       return true;

@@ -19,6 +19,7 @@ export const PROTECTED_USER_ROLES: readonly Role[] = [
   "DG",
   "SG",
   "ADMIN",
+  "ADV",
   ...FINANCE_USER_ROLES,
 ];
 

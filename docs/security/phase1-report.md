@@ -8,7 +8,7 @@ Commit : `487229b`
 
 ### Gestion des rôles
 
-- Les rôles `PDG`, `DG`, `SG`, `ADMIN` et les rôles financiers `RF`, `COMPTA`, `ASSISTANTE_COMPTABLE`, `COMPTA_GARAGE` sont protégés.
+- Les rôles `PDG`, `DG`, `SG`, `ADMIN`, `ADV` et les rôles financiers `RF`, `COMPTA`, `ASSISTANTE_COMPTABLE`, `COMPTA_GARAGE` sont protégés.
 - Seuls les super-admins peuvent attribuer ou gérer ces comptes.
 - Le rôle `DEVELOPER` reste réservé au DEVELOPER.
 - Un utilisateur ne peut plus modifier son propre rôle.
@@ -42,6 +42,8 @@ Routes corrigées :
 - `/api/terminal/meta` : 200, accès légitime conservé.
 - `/api/workshop/export` : 403.
 - `/api/reports/financial-excel` : 403.
+
+Nouveau contrôle après révocation des sessions : COMMERCIAL toujours 403 sur terminal/meta et workshop/export ; BORNES_OPS toujours 200 sur terminal/meta.
 
 ### Comptes de test
 

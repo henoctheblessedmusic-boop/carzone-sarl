@@ -7,6 +7,13 @@ import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
 import type { Role } from "@/lib/roles";
 import { DEFAULT_ROLE_CAPABILITIES } from "@/lib/permissions-config";
+import {
+  assertCanAssignPermissions,
+  assertCanAssignRole,
+  assertCanManageTargetUser,
+  assertKnownRole,
+  isSuperAdminRole,
+} from "@/lib/user-role-guards";
 import { getLocale } from "@/lib/i18n/server";
 import { adminCopy } from "@/lib/i18n/messages/admin";
 
@@ -18,18 +25,19 @@ export async function createUser(formData: FormData) {
 
   const email = String(formData.get("email") || "").trim().toLowerCase();
   const fullName = String(formData.get("fullName") || "").trim();
-  const role = String(formData.get("role") || "COMMERCIAL").trim() as Role;
-  const password = String(formData.get("password") || "").trim() || "Carzone2026!";
+  const role = String(formData.get("role") || "COMMERCIAL").trim();
+  const password = String(formData.get("password") || "").trim();
   const rawPermissions = String(formData.get("permissions") || "").trim();
   const t = adminCopy[await getLocale()].server.users;
 
-  // Confidentialité : Seul le Développeur peut créer ou assigner le rôle Développeur
-  if (role === "DEVELOPER" && currentUser.role !== "DEVELOPER") {
-    throw new Error(t.onlyDeveloperCanAssignRole);
-  }
+  assertKnownRole(role);
+  assertCanAssignRole(currentUser.role, role);
 
   if (!email || !fullName) {
     throw new Error(t.requiredCreateFields);
+  }
+  if (!password || password.length < 8) {
+    throw new Error("Un mot de passe de 8 caractères minimum est obligatoire.");
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -48,6 +56,7 @@ export async function createUser(formData: FormData) {
     // Par défaut, attribuer les capacités du rôle
     customPermissions = DEFAULT_ROLE_CAPABILITIES[role] || [];
   }
+  assertCanAssignPermissions(currentUser.role, role, customPermissions);
 
   const passwordHash = await bcrypt.hash(password, 10);
 
@@ -81,7 +90,7 @@ export async function updateUser(formData: FormData) {
 
   const id = String(formData.get("id") || "").trim();
   const fullName = String(formData.get("fullName") || "").trim();
-  const role = String(formData.get("role") || "").trim() as Role;
+  const role = String(formData.get("role") || "").trim();
   const rawPermissions = String(formData.get("permissions") || "").trim();
 
   const t = adminCopy[await getLocale()].server.users;
@@ -90,12 +99,16 @@ export async function updateUser(formData: FormData) {
     throw new Error(t.requiredUpdateFields);
   }
 
+  assertKnownRole(role);
+
   const targetUser = await prisma.user.findUnique({ where: { id } });
   if (!targetUser) throw new Error(t.userNotFound);
 
-  // Confidentialité : Seul le Développeur peut modifier un compte Développeur ou attribuer le rôle Développeur
-  if ((targetUser.role === "DEVELOPER" || role === "DEVELOPER") && currentUser.role !== "DEVELOPER") {
-    throw new Error(t.actionNotAllowed);
+  assertCanManageTargetUser(currentUser.role, targetUser.role);
+  assertCanAssignRole(currentUser.role, role);
+
+  if (currentUser.id === id && targetUser.role !== role) {
+    throw new Error("Vous ne pouvez pas modifier votre propre rôle.");
   }
 
   let customPermissions: string[] | undefined = undefined;
@@ -104,6 +117,15 @@ export async function updateUser(formData: FormData) {
       customPermissions = JSON.parse(rawPermissions);
     } catch {
       customPermissions = rawPermissions.split(",").map((s) => s.trim()).filter(Boolean);
+    }
+    const requestedPermissions = customPermissions || [];
+    assertCanAssignPermissions(currentUser.role, role, requestedPermissions);
+    if (currentUser.id === id && !isSuperAdminRole(currentUser.role)) {
+      const before = [...(targetUser.customPermissions || [])].sort().join("|");
+      const after = [...requestedPermissions].sort().join("|");
+      if (before !== after) {
+        throw new Error("Vous ne pouvez pas modifier vos propres permissions.");
+      }
     }
   }
 
@@ -147,9 +169,11 @@ export async function updateUserPassword(userId: string, newPassword: string) {
   const targetUser = await prisma.user.findUnique({ where: { id: userId } });
   if (!targetUser) throw new Error(t.userNotFound);
 
-  // Confidentialité : Seul le Développeur lui-même peut modifier son mot de passe
   if (targetUser.role === "DEVELOPER" && currentUser.role !== "DEVELOPER") {
     throw new Error(t.actionNotAllowed);
+  }
+  if (targetUser.id !== currentUser.id) {
+    assertCanManageTargetUser(currentUser.role, targetUser.role);
   }
 
   const cleanPassword = newPassword.trim();
@@ -201,7 +225,14 @@ export async function updateUserPermissions(id: string, permissions: string[]) {
     throw new Error(adminCopy[await getLocale()].server.users.userIdRequired);
   }
 
-  const targetUser = await prisma.user.findUnique({ where: { id }, select: { fullName: true } });
+  const targetUser = await prisma.user.findUnique({ where: { id }, select: { fullName: true, role: true } });
+  if (!targetUser) throw new Error(adminCopy[await getLocale()].server.users.userNotFound);
+
+  if (currentUser.id === id && !isSuperAdminRole(currentUser.role)) {
+    throw new Error("Vous ne pouvez pas modifier vos propres permissions.");
+  }
+  assertCanManageTargetUser(currentUser.role, targetUser.role);
+  assertCanAssignPermissions(currentUser.role, targetUser.role, permissions);
   await prisma.user.update({
     where: { id },
     data: {
@@ -227,6 +258,8 @@ export async function resetUserPermissions(id: string) {
 
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new Error(adminCopy[await getLocale()].server.users.userNotFound);
+
+  assertCanManageTargetUser(currentUser.role, user.role);
 
   const defaultPerms = DEFAULT_ROLE_CAPABILITIES[user.role as Role] || [];
 
@@ -254,16 +287,31 @@ export async function updateUserRole(formData: FormData) {
   const currentUser = await requireUser([...CAN_MANAGE_USERS_ROLES]);
 
   const id = String(formData.get("id") || "").trim();
-  const role = String(formData.get("role") || "").trim() as Role;
+  const role = String(formData.get("role") || "").trim();
 
   if (!id || !role) {
     throw new Error(adminCopy[await getLocale()].server.users.idAndRoleRequired);
   }
 
-  // Mettre à jour le rôle et synchroniser les capacités par défaut
+  assertKnownRole(role);
+
+  const targetUser = await prisma.user.findUnique({
+    where: { id },
+    select: { fullName: true, email: true, role: true },
+  });
+  if (!targetUser) {
+    throw new Error(adminCopy[await getLocale()].server.users.userNotFound);
+  }
+
+  assertCanManageTargetUser(currentUser.role, targetUser.role);
+  assertCanAssignRole(currentUser.role, role);
+
+  if (currentUser.id === id && targetUser.role !== role) {
+    throw new Error("Vous ne pouvez pas modifier votre propre rôle.");
+  }
+
   const defaultPerms = DEFAULT_ROLE_CAPABILITIES[role] || [];
 
-  const targetUser = await prisma.user.findUnique({ where: { id }, select: { fullName: true, email: true } });
   await prisma.user.update({
     where: { id },
     data: {
@@ -291,9 +339,7 @@ export async function toggleUserActive(id: string, active: boolean) {
   const t = adminCopy[await getLocale()].server.users;
   if (!targetUser) throw new Error(t.userNotFound);
 
-  if (targetUser.role === "DEVELOPER" && currentUser.role !== "DEVELOPER") {
-    throw new Error(t.actionNotAllowed);
-  }
+  assertCanManageTargetUser(currentUser.role, targetUser.role);
 
   await prisma.user.update({
     where: { id },
@@ -323,9 +369,7 @@ export async function deleteUser(id: string) {
   const targetUser = await prisma.user.findUnique({ where: { id } });
   if (!targetUser) throw new Error(t.userNotFound);
 
-  if (targetUser.role === "DEVELOPER" && currentUser.role !== "DEVELOPER") {
-    throw new Error(t.actionNotAllowed);
-  }
+  assertCanManageTargetUser(currentUser.role, targetUser.role);
 
   await prisma.user.delete({
     where: { id },

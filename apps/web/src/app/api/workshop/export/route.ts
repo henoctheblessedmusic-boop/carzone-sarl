@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { exportWorkshopToExcel } from "@/lib/excel-workshop";
+import { apiPermissionDenied, apiUnauthorized, getApiUser, hasApiPermission } from "@/lib/api-auth";
 
 export async function GET() {
-  const session = await getSession();
-  if (!session) {
-    return new NextResponse("Non autorisé", { status: 401 });
-  }
+  const session = await getApiUser();
+  if (!session) return apiUnauthorized();
+  if (!hasApiPermission(session, "workshop:read")) return apiPermissionDenied();
 
   const entries = await prisma.workshopEntry.findMany({
     orderBy: { createdAt: "desc" },

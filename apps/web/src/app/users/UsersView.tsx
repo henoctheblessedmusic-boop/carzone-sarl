@@ -80,6 +80,11 @@ export function UsersView({
     currentUserRole === "SG" ||
     currentUserRole === "DG" ||
     currentUserRole === "ADMIN";
+  const isSuperAdmin =
+    currentUserRole === "DEVELOPER" ||
+    currentUserRole === "PDG" ||
+    currentUserRole === "SG" ||
+    currentUserRole === "DG";
 
   // Password Management State (DG / Admin)
   const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({});
@@ -185,9 +190,12 @@ export function UsersView({
   const availableRoleEntries = useMemo(() => {
     return Object.entries(ROLE_LABELS).filter(([k]) => {
       if (k === "DEVELOPER" && currentUserRole !== "DEVELOPER") return false;
+      if (["PDG", "DG", "SG", "ADMIN", "RF", "COMPTA", "ASSISTANTE_COMPTABLE", "COMPTA_GARAGE"].includes(k) && !isSuperAdmin) {
+        return false;
+      }
       return true;
     });
-  }, [currentUserRole]);
+  }, [currentUserRole, isSuperAdmin]);
 
   // Filtered Users
   const filteredUsers = useMemo(() => {
@@ -225,6 +233,10 @@ export function UsersView({
       alert(teamCopy.alerts.missingFields);
       return;
     }
+    if (newPassword.trim().length < 8) {
+      alert("Définissez un mot de passe de 8 caractères minimum pour ce compte.");
+      return;
+    }
 
     startTransition(async () => {
       try {
@@ -232,7 +244,7 @@ export function UsersView({
         formData.set("fullName", newFullName.trim());
         formData.set("email", newEmail.trim());
         formData.set("role", newRole);
-        formData.set("password", newPassword.trim() || "Carzone2026!");
+        formData.set("password", newPassword.trim());
         formData.set("permissions", JSON.stringify(newPermissions));
 
         await createUser(formData);

@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { apiPermissionDenied, apiUnauthorized, getApiUser, hasApiPermission } from "@/lib/api-auth";
 
 export async function GET() {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const session = await getApiUser();
+  if (!session) return apiUnauthorized();
+  if (!hasApiPermission(session, "charging:read")) return apiPermissionDenied();
 
   const [stations, rawCustomers] = await Promise.all([
     prisma.chargingStation.findMany({

@@ -1,25 +1,20 @@
 import { NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
 import { RoleService } from "@/lib/role-service";
 import { prisma } from "@/lib/prisma";
 import { ACTIVITY } from "@/lib/permissions";
 import * as XLSX from "xlsx";
+import { apiPermissionDenied, apiUnauthorized, getApiUser } from "@/lib/api-auth";
 
 export async function GET() {
-  const session = await getSession();
+  const session = await getApiUser();
   if (!session) {
-    return new NextResponse("Non authentifié", { status: 401 });
+    return apiUnauthorized();
   }
 
   // Vérification stricte du droit d'extraction du bilan financier
   const canExportFinancials = RoleService.hasPermission(session.role, "financial_report:export");
   if (!canExportFinancials) {
-    return new NextResponse(
-      JSON.stringify({
-        error: "Accès refusé : L'extraction du bilan financier n'est pas autorisée pour votre rôle (" + session.role + ").",
-      }),
-      { status: 403, headers: { "Content-Type": "application/json" } }
-    );
+    return apiPermissionDenied();
   }
 
   // La Comptable Garage n'extrait que le périmètre GARAGE : jamais de bilan consolidé showroom.

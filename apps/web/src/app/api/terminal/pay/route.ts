@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth";
 import { nextDocNumber } from "@/lib/format";
 import { getLocale } from "@/lib/i18n/server";
 import { energyCopy } from "@/lib/i18n/messages/energy";
+import { apiPermissionDenied, apiUnauthorized, getApiUser, hasApiPermission } from "@/lib/api-auth";
 
 /** Simulate charging terminal payment (Mobile Money / card) */
 export async function POST(req: NextRequest) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const session = await getApiUser();
+  if (!session) return apiUnauthorized();
+  if (!hasApiPermission(session, "charging:write")) return apiPermissionDenied();
 
   const body = await req.json();
   const stationId = String(body.stationId || "");

@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateTechSheetWithAI } from "@/lib/openai-tech-sheet";
-import { getSession } from "@/lib/auth";
+import { apiPermissionDenied, apiUnauthorized, getApiUser, hasApiPermission } from "@/lib/api-auth";
 
 export async function POST(req: Request) {
   try {
-    const session = await getSession();
+    const session = await getApiUser();
     if (!session) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+      return apiUnauthorized();
+    }
+    if (!hasApiPermission(session, "vehicles:write")) {
+      return apiPermissionDenied();
     }
     const body = await req.json();
     const { vehicleId, customApiKey, action, sheetData } = body;

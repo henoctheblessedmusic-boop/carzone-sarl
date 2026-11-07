@@ -184,6 +184,7 @@ export async function updateUserPassword(userId: string, newPassword: string) {
     data: {
       passwordHash,
       lastPasswordChange: new Date(),
+      mustChangePassword: !isSelf,
       sessionVersion: { increment: 1 },
     },
   });
@@ -217,6 +218,62 @@ export async function updateUserPassword(userId: string, newPassword: string) {
 export async function changeMyPassword(newPassword: string) {
   const currentUser = await requireUser();
   return updateUserPassword(currentUser.id, newPassword);
+}
+
+/**
+ * Changement forcé à la connexion : vérifie l'ancien mot de passe,
+ * applique le nouveau puis lève le drapeau mustChangePassword.
+ */
+export async function changePasswordWithOldPassword(
+  oldPassword: string,
+  newPassword: string,
+  confirmPassword: string
+) {
+  const currentUser = await requireUser();
+  const t = adminCopy[await getLocale()].server.users;
+
+  if (!oldPassword || !newPassword || !confirmPassword) {
+    throw new Error("Tous les champs sont obligatoires.");
+  }
+  if (newPassword !== confirmPassword) {
+    throw new Error("Les deux nouveaux mots de passe ne correspondent pas.");
+  }
+  if (newPassword.trim().length < 8) {
+    throw new Error("Le nouveau mot de passe doit comporter au moins 8 caractères.");
+  }
+
+  const dbUser = await prisma.user.findUnique({ where: { id: currentUser.id } });
+  if (!dbUser) throw new Error(t.userNotFound);
+
+  const oldPasswordMatches = await bcrypt.compare(oldPassword, dbUser.passwordHash);
+  if (!oldPasswordMatches) {
+    throw new Error("L'ancien mot de passe est incorrect.");
+  }
+  if (await bcrypt.compare(newPassword.trim(), dbUser.passwordHash)) {
+    throw new Error("Le nouveau mot de passe doit être différent de l'ancien.");
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword.trim(), 10);
+  await prisma.user.update({
+    where: { id: currentUser.id },
+    data: {
+      passwordHash,
+      lastPasswordChange: new Date(),
+      mustChangePassword: false,
+      sessionVersion: { increment: 1 },
+    },
+  });
+
+  await logAudit({
+    user: currentUser,
+    action: "user.password_change_forced",
+    entityType: "User",
+    entityId: currentUser.id,
+    entityLabel: currentUser.fullName,
+    details: "Changement de mot de passe obligatoire effectué à la connexion",
+  });
+
+  return { success: true };
 }
 
 export async function updateUserPermissions(id: string, permissions: string[]) {

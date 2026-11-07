@@ -13,6 +13,7 @@ export type SessionUser = {
   role: Role;
   customPermissions?: string[];
   sessionVersion?: number;
+  mustChangePassword?: boolean;
 };
 
 export type SessionPayload = SessionUser & {
@@ -33,6 +34,7 @@ export async function createSession(user: SessionUser) {
   const payload: SessionPayload = {
     ...user,
     sessionVersion: user.sessionVersion ?? 0,
+    mustChangePassword: user.mustChangePassword ?? false,
     iat: now,
     exp: now + 60 * 60 * 24 * 14, // 14 jours de validité maximale
   };
@@ -83,6 +85,7 @@ export async function getSession(): Promise<SessionUser | null> {
         role: true,
         customPermissions: true,
         sessionVersion: true,
+        mustChangePassword: true,
       },
     });
     if (!dbUser || !dbUser.active) return null;
@@ -95,6 +98,7 @@ export async function getSession(): Promise<SessionUser | null> {
       role: dbUser.role as Role,
       customPermissions: dbUser.customPermissions || [],
       sessionVersion: dbUser.sessionVersion,
+      mustChangePassword: dbUser.mustChangePassword,
     };
   } catch {
     return null;
@@ -210,7 +214,17 @@ export async function authenticate(
     };
   }
 
-  // 4. Succès : création session + notification immédiate Directeur Général
+  // 4. Succès : détecter un mot de passe de démonstration encore actif.
+  const isLegacyDefaultPassword =
+    (await bcrypt.compare("carzone2026", user.passwordHash)) ||
+    (await bcrypt.compare("Carzone2026!", user.passwordHash));
+  if (isLegacyDefaultPassword && !user.mustChangePassword) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { mustChangePassword: true },
+    });
+  }
+
   const session: SessionUser = {
     id: user.id,
     email: user.email,
@@ -218,6 +232,7 @@ export async function authenticate(
     role: user.role as Role,
     customPermissions: user.customPermissions || [],
     sessionVersion: user.sessionVersion,
+    mustChangePassword: isLegacyDefaultPassword || user.mustChangePassword,
   };
 
   await createSession(session);

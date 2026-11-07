@@ -30,6 +30,8 @@ model User {
   active        Boolean        @default(true)
   /// Incrémenté lors d'une révocation explicite de toutes les sessions.
   sessionVersion Int           @default(0)
+  /// Force le changement de mot de passe à la prochaine connexion.
+  mustChangePassword Boolean   @default(false)
   lastPasswordChange DateTime?
   customPermissions String[]   @default([])
   lastSeenAt        DateTime?

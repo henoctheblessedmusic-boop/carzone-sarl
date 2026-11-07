@@ -13,6 +13,7 @@ export default async function LoginPage({
     label?: string;
     remaining?: string;
     email?: string;
+    passwordChanged?: string;
   }>;
 }) {
   const params = await searchParams;
@@ -49,6 +50,21 @@ export default async function LoginPage({
           remaining={params.remaining}
           defaultErrorMessage={messages.login.error}
         />
+
+        {params.passwordChanged === "1" && (
+          <div
+            style={{
+              padding: "10px 14px",
+              borderRadius: 8,
+              background: "rgba(34, 197, 94, 0.15)",
+              border: "1px solid rgba(34, 197, 94, 0.3)",
+              color: "#4ade80",
+              fontSize: "0.84rem",
+            }}
+          >
+            Votre mot de passe a été modifié. Reconnectez-vous avec votre nouveau mot de passe.
+          </div>
+        )}
 
         <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           {messages.login.email}

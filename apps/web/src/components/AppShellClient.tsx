@@ -11,6 +11,7 @@ import { OnboardingHost } from "@/components/OnboardingHost";
 import { HelpCenterModal } from "@/components/HelpCenterModal";
 import { AdminNotificationsBell } from "@/components/AdminNotificationsBell";
 import { ChangePasswordModal } from "@/components/ChangePasswordModal";
+import { MandatoryPasswordChangeModal } from "@/components/MandatoryPasswordChangeModal";
 import { DevicePermissionsSetup } from "@/components/DevicePermissionsSetup";
 import { GlobalCallManager } from "@/components/GlobalCallManager";
 import type { SessionUser } from "@/lib/auth";
@@ -294,6 +295,10 @@ export function AppShellClient({
       />
 
       <GlobalCallManager currentUserId={user.id} />
+
+      {user.mustChangePassword && (
+        <MandatoryPasswordChangeModal userName={user.fullName} />
+      )}
     </div>
   );
 }

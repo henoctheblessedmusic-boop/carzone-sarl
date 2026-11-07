@@ -93,3 +93,15 @@ Barème suggéré : 3 points, note de passage 2/3.
 - `presentations/06-location-vehicules`
 
 - `presentations/roles/commercial.pptx` : support court dédié à ce rôle.
+
+## 11. Notifications, messages et audio
+
+- La cloche de notifications est en haut à droite. Elle affiche les alertes non lues et ouvre le panneau Notifications et activités. Elle est visible selon les droits du rôle ; utiliser aussi les alertes du module et le centre d'aide si elle n'apparaît pas.
+- Pour recevoir les alertes hors de l'onglet, autoriser les notifications du navigateur lors de la première utilisation.
+- Ouvrir la configuration matérielle avec le bouton Activer en 1 clic ou Configuration et activation du matériel.
+- Autoriser le microphone dans la fenêtre du navigateur : sans cette autorisation, les appels audio ne peuvent pas démarrer.
+- Utiliser Tester le son pour vérifier le rendu audio et la sonnerie d'appel.
+- Si le microphone est bloqué, cliquer sur le cadenas de la barre d'adresse, remettre Microphone et Notifications sur Autoriser, puis actualiser la page.
+- Ouvrir Discussions et Appels pour les messages d'équipe, les messages privés, les appels audio, les conférences et le journal des appels.
+- Ne pas appeler directement le DG ou le PDG ; laisser un message dans la conversation prévue.
+- Porter un casque avec micro et couper le micro ou quitter l'appel en fin de réunion.

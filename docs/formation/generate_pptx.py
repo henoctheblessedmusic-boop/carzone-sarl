@@ -254,6 +254,7 @@ def create_role_deck(role_path: Path) -> Path:
         "Support CARZONE : +229 01 92 61 61 61 / +229 01 63 70 00 00",
         "Email : contact@topcarzone.com / direction@topcarzone.com",
     ], None, 8, role_slug)
+    add_communication_slides(prs, role_slug, len(prs.slides) + 1)
     output_dir = PRESENTATION_DIR / "roles"
     output_dir.mkdir(parents=True, exist_ok=True)
     output = output_dir / f"{role_slug}.pptx"
@@ -276,6 +277,7 @@ def make_cover(prs, deck_title: str, subtitle: str):
     add_box(slide, 0.7, 4.95, 1.25, 0.06, RED)
     add_text(slide, "Support de formation des équipes", 0.7, 5.18, 8.5, 0.3, 12, GOLD, bold=True)
     add_text(slide, "Version de travail - 2026", 0.7, 6.5, 7, 0.25, 9, SLATE)
+    add_text(slide, "Diaporama : F5 pour voir les animations", 0.7, 5.75, 7, 0.25, 9, GOLD)
     add_text(slide, "DRIVE YOUR DREAM", 10.75, 6.45, 2.2, 0.25, 9, GOLD, bold=True)
     add_fade_transition(slide)
     return slide
@@ -304,6 +306,55 @@ def deck_subtitle(content_path: Path) -> str:
     return mapping.get(slug, "Procédures, bonnes pratiques et exercices")
 
 
+
+def add_communication_slides(prs, deck_label: str, start_page: int) -> int:
+    """Ajoute les trois procédures communes de communication à chaque deck."""
+    pages = [
+        {
+            "title": "La cloche de notifications",
+            "bullets": [
+                "La cloche se trouve en haut à droite du tableau de bord. Elle affiche le nombre d'alertes non lues.",
+                "Cliquer sur la cloche ouvre le panneau Notifications et activités.",
+                "Lire une alerte, la marquer comme lue, puis utiliser Tout lu pour remettre le compteur à zéro.",
+                "Les alertes couvrent les activités, les messages, les appels manqués et les événements de sécurité selon votre rôle.",
+                "Si la cloche n'apparaît pas pour votre rôle, les alertes utiles restent visibles dans les modules concernés et dans le centre d'aide.",
+                "Autoriser les notifications du navigateur lors du premier accès pour recevoir les alertes hors de l'onglet.",
+            ],
+            "captures": ["captures/commun/05-cloche-notifications.png"],
+        },
+        {
+            "title": "Autoriser le micro, le son et les notifications",
+            "bullets": [
+                "Dans l'en-tête, cliquer sur Activer en 1 clic ou ouvrir Configuration et activation du matériel.",
+                "Autoriser le microphone dans la fenêtre du navigateur. Sans cette autorisation, les appels audio ne peuvent pas démarrer.",
+                "Autoriser les notifications du navigateur pour être prévenu des appels et messages importants.",
+                "Cliquer sur Tester le son pour vérifier le rendu audio et la sonnerie d'appel.",
+                "Si le micro est bloqué, cliquer sur le cadenas dans la barre d'adresse, remettre Microphone sur Autoriser, puis actualiser la page.",
+                "Utiliser un casque avec micro pour éviter les échos et protéger la confidentialité des échanges.",
+            ],
+            "captures": ["captures/commun/04-permissions-navigateur.png"],
+        },
+        {
+            "title": "Messages, appels et conférences",
+            "bullets": [
+                "Ouvrir le menu Discussions et Appels.",
+                "Choisir un canal d'équipe pour les messages collectifs ou un collègue pour un message privé.",
+                "Cliquer sur l'icône d'appel du collègue pour lancer un appel audio après avoir autorisé le micro.",
+                "Consulter le Journal des appels pour retrouver les appels manqués et l'historique.",
+                "Les salles de conférence permettent de réunir plusieurs collaborateurs selon votre rôle.",
+                "Ne pas appeler directement le DG ou le PDG : laisser un message dans la conversation prévue.",
+                "Toujours couper le micro ou quitter l'appel en fin de réunion, surtout sur un poste partagé.",
+            ],
+            "captures": ["captures/commun/06-chat-appels.png"],
+        },
+    ]
+    page = start_page
+    for slide_data in pages:
+        make_content(prs, slide_data, page, deck_label)
+        page += 1
+    return page
+
+
 def create_deck(content_path: Path) -> Path:
     slides = parse_content(content_path)
     if not slides:
@@ -317,6 +368,7 @@ def create_deck(content_path: Path) -> Path:
     make_cover(prs, title, subtitle)
     for index, slide_data in enumerate(slides[1:], start=2):
         make_content(prs, slide_data, index, deck_label)
+    add_communication_slides(prs, deck_label, len(prs.slides) + 1)
     output = PRESENTATION_DIR / f"{deck_label}.pptx"
     prs.save(output)
     return output

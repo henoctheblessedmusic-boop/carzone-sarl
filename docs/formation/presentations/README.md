@@ -1,6 +1,6 @@
 # Présentations de formation
 
-Les 9 modules et les 20 decks de rôle sont générés en PowerPoint 16:9 avec la charte CARZONE.
+Les 9 modules et les 20 decks de rôle sont générés en PowerPoint 16:9 avec la charte CARZONE. Chaque deck contient trois slides communes sur la cloche de notifications, les autorisations navigateur, le micro et les appels.
 
 ## Modules communs et familles de métiers
 
@@ -34,3 +34,9 @@ slide.
 - Captures réelles, sans maquette.
 - Numérotation des slides.
 - Aucun tiret cadratin U+2014.
+
+## Animations
+
+Après génération, exécuter `../apply_animations.ps1` avec PowerShell pour ajouter les animations
+d'entrée. Pour les voir, lancer PowerPoint en mode Diaporama (F5), car le mode édition ne les
+affiche pas.

@@ -80,4 +80,4 @@ Ce tableau indique les capacités accordées par le moteur de permissions (`Role
 
 ## Limite de cette version
 
-Cette matrice a été établie par lecture directe du code (source la plus fiable disponible), **sans vérification visuelle en conditions réelles** (connexion effective à chacun des 20 comptes de test), car l'environnement d'exécution de cette session ne permettait pas d'accéder au navigateur ni à la base de données de production (voir `docs/formation/verification.md` pour le détail). Une vérification de terrain, rôle par rôle, reste recommandée avant la diffusion officielle du kit.
+Cette matrice a été établie par lecture directe du code, puis les menus et écrans principaux ont été vérifiés visuellement avec des comptes de démonstration par rôle. Les captures correspondantes sont dans `docs/formation/captures/`. Une validation métier finale par le responsable de chaque service reste recommandée avant la diffusion officielle.

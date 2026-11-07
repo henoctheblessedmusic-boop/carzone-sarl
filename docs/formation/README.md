@@ -15,6 +15,8 @@ Langue : français. Devise : FCFA (XOF).
 - `matrice-roles-acces.md` : synthèse des accès par rôle.
 - `verification.md` : vérifications effectuées et liste des livrables.
 
+La formation couvre aussi la cloche de notifications, l'autorisation du microphone et du son dans le navigateur, les messages d'équipe, les appels audio, les conférences et le journal des appels. Ces trois procédures sont présentes dans chaque présentation.
+
 ## 2. Sessions recommandées
 
 | Ordre | Session | Durée | Support | Rôles |
@@ -80,3 +82,17 @@ Ne jamais utiliser un compte nominatif réel pour une manipulation de démonstra
 
 Voir `verification.md` pour le nombre de slides, les captures, l'ouverture des présentations et
 la suppression des comptes de test.
+
+## 8. Mode diaporama et animations
+
+Les fichiers PowerPoint contiennent des transitions et des animations d'entrée sur les titres,
+textes et captures. Pour les voir, ouvrir le fichier puis lancer le mode Diaporama avec F5
+(ou Slide Show > From Beginning). Les animations se déclenchent au clic sur la slide. En mode
+édition, PowerPoint n'affiche pas les animations.
+
+Pour régénérer les supports puis les animations :
+
+```bash
+python docs/formation/generate_pptx.py
+powershell -ExecutionPolicy Bypass -File docs/formation/apply_animations.ps1
+```

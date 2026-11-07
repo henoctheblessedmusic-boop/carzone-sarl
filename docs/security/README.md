@@ -31,4 +31,6 @@ Claude a confirmé l'absence de secrets dans Git, la présence de `AUTH_SECRET` 
 
 ## État des correctifs
 
-Aucun correctif n'a été appliqué dans cette phase. Le plan est prêt et doit être exécuté par phases, avec sauvegarde préalable, tests de non-régression et rollback. Les priorités immédiates sont détaillées dans [PLAN_CORRECTIF.md](PLAN_CORRECTIF.md).
+La phase 1 est déployée : gardes de rôles, blocage des promotions protégées, contrôles d'accès sur les API terminal, atelier, fiche technique et export financier. Voir [phase1-report.md](phase1-report.md).
+
+Restent à traiter : secret VAPI, rotation des mots de passe par défaut, révocation des sessions, dépendances, CSP et rate limiting. Voir [PLAN_CORRECTIF.md](PLAN_CORRECTIF.md).

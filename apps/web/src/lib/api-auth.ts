@@ -1,30 +1,14 @@
 import { NextResponse } from "next/server";
 import { getSession, type SessionUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import type { Role } from "@/lib/roles";
 import { RoleService } from "@/lib/role-service";
 import type { Permission } from "@/lib/role-service";
 
 /**
- * Récupère l'utilisateur API en relisant son rôle et son état actif en base.
- * Évite qu'un cookie de session périmé conserve un rôle ou un accès après
- * désactivation, rétrogradation ou changement de permissions.
+ * Récupère l'utilisateur API. getSession relit désormais le rôle, l'état actif,
+ * les permissions et la version de session en base.
  */
 export async function getApiUser(): Promise<SessionUser | null> {
-  const session = await getSession();
-  if (!session) return null;
-
-  const user = await prisma.user.findUnique({
-    where: { id: session.id },
-    select: { active: true, role: true, customPermissions: true },
-  });
-  if (!user || !user.active) return null;
-
-  return {
-    ...session,
-    role: user.role as Role,
-    customPermissions: user.customPermissions || [],
-  };
+  return getSession();
 }
 
 export function apiUnauthorized(): NextResponse {

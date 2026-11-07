@@ -12,6 +12,7 @@ export type SessionUser = {
   fullName: string;
   role: Role;
   customPermissions?: string[];
+  sessionVersion?: number;
 };
 
 export type SessionPayload = SessionUser & {
@@ -31,6 +32,7 @@ export async function createSession(user: SessionUser) {
   const now = Math.floor(Date.now() / 1000);
   const payload: SessionPayload = {
     ...user,
+    sessionVersion: user.sessionVersion ?? 0,
     iat: now,
     exp: now + 60 * 60 * 24 * 14, // 14 jours de validité maximale
   };
@@ -71,12 +73,28 @@ export async function getSession(): Promise<SessionUser | null> {
       return null;
     }
 
+    // Revalider l'état réel en base : une désactivation, une rétrogradation,
+    // un changement de permissions ou une révocation de session prend effet
+    // immédiatement, même si le cookie est encore cryptographiquement valide.
+    const dbUser = await prisma.user.findUnique({
+      where: { id: raw.id },
+      select: {
+        active: true,
+        role: true,
+        customPermissions: true,
+        sessionVersion: true,
+      },
+    });
+    if (!dbUser || !dbUser.active) return null;
+    if ((raw.sessionVersion ?? 0) !== dbUser.sessionVersion) return null;
+
     return {
       id: raw.id,
       email: raw.email,
       fullName: raw.fullName,
-      role: raw.role,
-      customPermissions: raw.customPermissions || [],
+      role: dbUser.role as Role,
+      customPermissions: dbUser.customPermissions || [],
+      sessionVersion: dbUser.sessionVersion,
     };
   } catch {
     return null;
@@ -199,6 +217,7 @@ export async function authenticate(
     fullName: user.fullName,
     role: user.role as Role,
     customPermissions: user.customPermissions || [],
+    sessionVersion: user.sessionVersion,
   };
 
   await createSession(session);

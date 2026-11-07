@@ -184,6 +184,7 @@ export async function updateUserPassword(userId: string, newPassword: string) {
     data: {
       passwordHash,
       lastPasswordChange: new Date(),
+      sessionVersion: { increment: 1 },
     },
   });
 
@@ -343,7 +344,10 @@ export async function toggleUserActive(id: string, active: boolean) {
 
   await prisma.user.update({
     where: { id },
-    data: { active },
+    data: {
+      active,
+      sessionVersion: { increment: 1 },
+    },
   });
 
   await logAudit({

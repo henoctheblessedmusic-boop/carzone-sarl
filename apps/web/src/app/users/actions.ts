@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { requireUser } from "@/lib/require-user";
+import { destroySession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
 import type { Role } from "@/lib/roles";
@@ -272,6 +273,10 @@ export async function changePasswordWithOldPassword(
     entityLabel: currentUser.fullName,
     details: "Changement de mot de passe obligatoire effectué à la connexion",
   });
+
+  // La version de session a été incrémentée : supprimer immédiatement le cookie
+  // courant pour éviter une boucle de redirection entre /login et /dashboard.
+  await destroySession();
 
   return { success: true };
 }

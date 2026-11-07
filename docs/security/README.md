@@ -35,4 +35,6 @@ La phase 1 est déployée : gardes de rôles, blocage des promotions protégées
 
 La phase 2 est déployée : révocation des sessions après désactivation, changement de rôle, permissions ou mot de passe. Voir [phase2-report.md](phase2-report.md).
 
-Restent à traiter : secret VAPI, rotation des mots de passe par défaut, dépendances, CSP et rate limiting. Voir [PLAN_CORRECTIF.md](PLAN_CORRECTIF.md).
+La phase 3 est déployée : suppression des comptes de démonstration présents, marquage des mots de passe par défaut et popup obligatoire de changement à la connexion, avec ancien mot de passe, nouveau mot de passe et confirmation. Voir [phase3-report.md](phase3-report.md).
+
+Restent à traiter : secret VAPI, dépendances, CSP et rate limiting. Voir [PLAN_CORRECTIF.md](PLAN_CORRECTIF.md).

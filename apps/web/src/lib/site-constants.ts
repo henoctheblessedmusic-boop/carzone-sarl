@@ -21,7 +21,8 @@ export const SITE_ADDRESS = {
 } as const;
 
 export const SITE_MAPS_URL = "https://maps.app.goo.gl/ie79JAW6ri2km8Qx8?g_st=ac";
-export const SITE_WEBSITE = "https://www.topcarzone.com";
+export const SITE_WEBSITE =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://topcarzone.africa";
 
 /** Réseaux sociaux officiels. Instagram n'est pas encore configure : logo sans lien. */
 export const SITE_SOCIAL = {

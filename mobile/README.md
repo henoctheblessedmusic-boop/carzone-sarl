@@ -9,7 +9,7 @@ Application Android interne CARZONE, basée sur une Trusted Web Activity.
 | Nom affiché | `CARZONE` |
 | Package Android | `com.topcarzone.app` |
 | Type | TWA, pas de publication publique Play Store |
-| URL chargée | `https://carzone-sarl.vercel.app/dashboard` par défaut |
+| URL chargée | `https://topcarzone.africa/dashboard` par défaut |
 | Version initiale | `1.0.0` (`versionCode` 1) |
 | Min SDK | 23 |
 | Target SDK | 35 |
@@ -17,7 +17,7 @@ Application Android interne CARZONE, basée sur une Trusted Web Activity.
 L'URL peut être remplacée sans modifier le package :
 
 ```powershell
-$env:CARZONE_TWA_URL = "https://topcarzone.africa"
+$env:CARZONE_TWA_URL = "https://topcarzone.africa/dashboard"
 ```
 
 ou au moment du build :

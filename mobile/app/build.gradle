@@ -2,7 +2,7 @@ plugins {
     id "com.android.application"
 }
 
-def twaUrl = System.getenv("CARZONE_TWA_URL") ?: (project.findProperty("carzoneTwaUrl") ?: "https://carzone-sarl.vercel.app/dashboard")
+def twaUrl = System.getenv("CARZONE_TWA_URL") ?: (project.findProperty("carzoneTwaUrl") ?: "https://topcarzone.africa/dashboard")
 def twaUri = new URL(twaUrl)
 def twaOrigin = "${twaUri.protocol}://${twaUri.authority}"
 def assetStatements = "[{\"relation\":[\"delegate_permission/common.handle_all_urls\"],\"target\":{\"namespace\":\"web\",\"site\":\"${twaOrigin}\"}}]"

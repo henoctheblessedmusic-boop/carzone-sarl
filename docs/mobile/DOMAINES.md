@@ -159,13 +159,92 @@ Ordre recommandé :
 
 Le mobile n'est pas bloqué.
 
-La TWA charge actuellement `https://carzone-sarl.vercel.app` et les fichiers PWA sont déployés sur cette origine.
+Avant la bascule DNS, l'APK de debug installé sur le téléphone pointe encore vers `https://carzone-sarl.vercel.app`. Le code source est maintenant préparé pour `https://topcarzone.africa/dashboard`.
 
-Si le domaine change plus tard, il faudra :
+Après activation du domaine, il faudra :
 
-- modifier `CARZONE_TWA_URL` ;
 - reconstruire l'APK avec la nouvelle URL ;
+- réinstaller l'APK de test ;
 - publier `assetlinks.json` sur le nouveau domaine ;
 - ajouter l'empreinte de signature release.
 
 Aucune de ces actions ne doit être faite avant d'avoir les accès DNS et d'avoir validé la stratégie de domaine.
+
+## 9. Mise en service provisoire de topcarzone.africa
+
+Le domaine `topcarzone.africa` a été ajouté au projet Vercel `carzone-sarl`.
+
+Domaines attachés :
+
+- `topcarzone.africa`
+- `www.topcarzone.africa`
+
+### Enregistrements Namecheap à appliquer
+
+Dans Namecheap, onglet `Advanced DNS` :
+
+1. Supprimer `URL Redirect Record` sur `@` qui pointe vers `http://www.topcarzone.africa/`.
+2. Supprimer `CNAME Record` sur `www` qui pointe vers `parkingpage.namecheap.com`.
+3. Vérifier qu'aucun ancien A `192.64.119.108` ne reste sur `@`.
+4. Ajouter les deux A records suivants sur `@` :
+
+```text
+Type: A Record
+Host: @
+Value: 216.150.1.1
+TTL: Automatic
+```
+
+```text
+Type: A Record
+Host: @
+Value: 216.150.16.1
+TTL: Automatic
+```
+
+5. Ajouter le CNAME suivant sur `www` :
+
+```text
+Type: CNAME Record
+Host: www
+Value: 25ecc0d0856b8e68.vercel-dns-017.com.
+TTL: Automatic
+```
+
+6. Ne pas modifier les enregistrements MX.
+7. Ne pas changer les nameservers si l'objectif est de garder la gestion DNS chez Namecheap.
+
+### Vérification
+
+Après sauvegarde et propagation :
+
+```powershell
+Resolve-DnsName topcarzone.africa
+Resolve-DnsName www.topcarzone.africa
+vercel domains verify topcarzone.africa
+vercel domains verify www.topcarzone.africa
+```
+
+Vercel doit alors générer le certificat HTTPS.
+
+### Application web
+
+Le site utilise désormais `topcarzone.africa` comme URL publique par défaut :
+
+- liens de contrats ;
+- liens de factures ;
+- métadonnées publiques ;
+- partage des documents.
+
+La variable `NEXT_PUBLIC_SITE_URL` permet de changer cette origine sans toucher au code.
+
+### Application Android TWA
+
+Après activation du domaine :
+
+1. reconstruire l'APK avec `https://topcarzone.africa/dashboard` ;
+2. réinstaller l'APK de test ;
+3. vérifier que la TWA s'ouvre toujours sans barre d'adresse ;
+4. vérifier que `/.well-known/assetlinks.json` est bien servi sur `topcarzone.africa`.
+
+Le `.com` reste inchangé. Aucun enregistrement DNS du `.com` ne doit être modifié pendant cette phase.

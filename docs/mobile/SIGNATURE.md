@@ -146,6 +146,82 @@ La vérification TWA dépend de la correspondance entre :
 - l'empreinte du certificat qui a signé l'APK installé ;
 - le fichier `assetlinks.json` servi sur le domaine.
 
+## 8bis. Erreur "keystore password was incorrect"
+
+Cette erreur signifie que Gradle n'arrive pas à ouvrir le fichier `.jks` avec la valeur de :
+
+```text
+CARZONE_ANDROID_KEYSTORE_PASSWORD
+```
+
+Ce n'est pas le mot de passe du compte utilisateur, ni le mot de passe de l'application.
+
+Deux mots de passe existent :
+
+- le mot de passe du fichier de clés, demandé par `keytool` à la ligne "Entrez le mot de passe du fichier de clés" ;
+- le mot de passe de la clé privée, demandé séparément dans certains cas.
+
+Pour un fichier PKCS12 créé avec `keytool -genkeypair` sans `-keypass`, les deux sont généralement identiques.
+
+### Vérifier le mot de passe du fichier
+
+Tester le fichier seul, sans Gradle :
+
+```powershell
+keytool -list -v `
+  -keystore "C:\Users\IGOR_GIANI\Documents\Doc LAPREMIERE BJ\Projects\CARZONE_KEYS\carzone-release.jks" `
+  -alias "carzone"
+```
+
+Saisir le mot de passe manuellement quand `keytool` le demande.
+
+- Si `keytool` ouvre le fichier : le mot de passe est bon, mais la variable d'environnement Gradle ne contient pas la même valeur.
+- Si `keytool` refuse : le mot de passe saisi à la création n'est pas celui utilisé, ou il a été oublié.
+
+### Vérifier la valeur Gradle sans afficher le secret
+
+```powershell
+Write-Output "Chemin : $env:CARZONE_ANDROID_KEYSTORE_PATH"
+Write-Output "Alias : $env:CARZONE_ANDROID_KEY_ALIAS"
+Write-Output "Longueur du mot de passe fichier : $($env:CARZONE_ANDROID_KEYSTORE_PASSWORD.Length)"
+Write-Output "Longueur du mot de passe clé : $($env:CARZONE_ANDROID_KEY_PASSWORD.Length)"
+```
+
+Les longueurs doivent correspondre aux mots de passe réellement saisis. Ne pas afficher les valeurs.
+
+### Causes fréquentes
+
+- valeur différente entre la création et la variable d'environnement ;
+- guillemets inclus dans la variable ;
+- espaces avant ou après ;
+- caractère `$` interprété par PowerShell dans une chaîne à double guillemet ;
+- variable définie dans une ancienne fenêtre puis perdue ;
+- mot de passe de clé confondu avec le mot de passe du fichier.
+
+### Correction
+
+Si le mot de passe est connu, redéfinir la variable dans la même session PowerShell :
+
+```powershell
+$env:CARZONE_ANDROID_KEYSTORE_PASSWORD = 'mot-de-passe-exact'
+```
+
+Utiliser des guillemets simples si le mot de passe contient `$`.
+
+Si le mot de passe est perdu et que la clé n'a pas encore été diffusée, créer une nouvelle clé avec un nouveau nom de fichier, puis mettre à jour les variables :
+
+```powershell
+keytool -genkeypair -v `
+  -keystore "C:\CARZONE_KEYS\carzone-release-2026.jks" `
+  -alias "carzone" `
+  -keyalg RSA `
+  -keysize 4096 `
+  -validity 10000 `
+  -storetype PKCS12
+```
+
+Ne pas supprimer l'ancienne clé avant d'être certain qu'elle n'a jamais servi à signer un APK distribué.
+
 ## 9. Installation interne
 
 Pour un pilote :

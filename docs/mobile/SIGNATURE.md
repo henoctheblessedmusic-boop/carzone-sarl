@@ -222,6 +222,39 @@ keytool -genkeypair -v `
 
 Ne pas supprimer l'ancienne clé avant d'être certain qu'elle n'a jamais servi à signer un APK distribué.
 
+### Erreur "Given final block not properly padded"
+
+Cette erreur apparaît après que le mot de passe du fichier a été accepté.
+
+Elle signifie que le mot de passe de la clé privée est incorrect :
+
+```text
+CARZONE_ANDROID_KEY_PASSWORD
+```
+
+Le fichier `.jks` est ouvert, mais la clé `carzone` ne peut pas être déchiffrée.
+
+Avec un fichier PKCS12 créé sans mot de passe de clé séparé, les deux valeurs doivent être identiques :
+
+```powershell
+$env:CARZONE_ANDROID_KEY_PASSWORD = $env:CARZONE_ANDROID_KEYSTORE_PASSWORD
+```
+
+Vérifier uniquement les longueurs, sans afficher les secrets :
+
+```powershell
+$env:CARZONE_ANDROID_KEYSTORE_PASSWORD.Length
+$env:CARZONE_ANDROID_KEY_PASSWORD.Length
+```
+
+Puis relancer :
+
+```powershell
+.\gradlew.bat clean assembleRelease
+```
+
+Si l'erreur persiste avec deux valeurs identiques, la clé privée a peut-être été créée avec un autre mot de passe ou le fichier est corrompu. Dans ce cas, recréer une nouvelle clé avec un nouveau nom de fichier et utiliser le même mot de passe pour le fichier et la clé.
+
 ## 9. Installation interne
 
 Pour un pilote :

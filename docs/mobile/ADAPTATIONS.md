@@ -83,7 +83,7 @@ Aucun de ces points n'est déclaré fonctionnel sur Android à ce stade.
 
 ## 6. Vérifications web
 
-Effectuées localement :
+Effectuées localement puis en production :
 
 - `npx tsc --noEmit` : OK.
 - `npm run build` : OK.
@@ -93,6 +93,7 @@ Effectuées localement :
 - `/sw.js` : HTTP 200, type JavaScript.
 - `/offline.html` : HTTP 200.
 - `/icons/icon-192.png` : HTTP 200.
+- En production Vercel : `/manifest.webmanifest`, `/.well-known/assetlinks.json`, `/sw.js`, `/offline.html` et `/icons/icon-512.png` répondent tous en HTTP 200.
 - Lien `<link rel="manifest">` présent dans le HTML.
 - `node --check public/sw.js` : OK.
 

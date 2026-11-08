@@ -6,6 +6,7 @@ import { getServerMessages } from "@/lib/i18n/server";
 import { isSiteLocale } from "@/lib/site-prefs";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { NetworkStatusBanner } from "@/components/NetworkStatusBanner";
+import { AndroidBackGuard } from "@/components/AndroidBackGuard";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -51,6 +52,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </AppPrefs>
         <ServiceWorkerRegister />
         <NetworkStatusBanner />
+        <AndroidBackGuard />
       </body>
     </html>
   );

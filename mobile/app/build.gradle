@@ -9,8 +9,8 @@ def assetStatements = "[{\"relation\":[\"delegate_permission/common.handle_all_u
 
 def keystorePath = System.getenv("CARZONE_ANDROID_KEYSTORE_PATH")
 def keystorePassword = System.getenv("CARZONE_ANDROID_KEYSTORE_PASSWORD")
-def keyAlias = System.getenv("CARZONE_ANDROID_KEY_ALIAS")
-def keyPassword = System.getenv("CARZONE_ANDROID_KEY_PASSWORD")
+def signingKeyAlias = System.getenv("CARZONE_ANDROID_KEY_ALIAS")
+def signingKeyPassword = System.getenv("CARZONE_ANDROID_KEY_PASSWORD")
 
 android {
     namespace "com.topcarzone.app"
@@ -28,12 +28,12 @@ android {
     }
 
     signingConfigs {
-        if (keystorePath && keystorePassword && keyAlias && keyPassword) {
+        if (keystorePath && keystorePassword && signingKeyAlias && signingKeyPassword) {
             release {
                 storeFile file(keystorePath)
                 storePassword keystorePassword
-                keyAlias keyAlias
-                keyPassword keyPassword
+                keyAlias signingKeyAlias
+                keyPassword signingKeyPassword
             }
         }
     }

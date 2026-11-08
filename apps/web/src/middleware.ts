@@ -92,6 +92,16 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // 1bis. Une seule adresse publique : rediriger www vers l'apex.
+  const hostname = req.headers.get("host")?.split(":")[0]?.toLowerCase();
+  if (hostname === "www.topcarzone.africa") {
+    const canonicalUrl = new URL(req.url);
+    canonicalUrl.hostname = "topcarzone.africa";
+    canonicalUrl.protocol = "https:";
+    canonicalUrl.port = "";
+    return NextResponse.redirect(canonicalUrl, 308);
+  }
+
   // 2. Autoriser les chemins publics
   const isPublic = PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
 

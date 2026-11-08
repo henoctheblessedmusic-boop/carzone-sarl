@@ -1,0 +1,214 @@
+# Étape 6 - Signature et diffusion
+
+Date : 2026-11-08
+Statut : procédure documentée. Aucune clé de release n'a été créée.
+
+## 1. Principe
+
+La diffusion interne utilise un APK signé.
+
+Un AAB peut aussi être produit, mais un AAB ne s'installe pas directement sur un téléphone. Il sert surtout à Google Play ou à un catalogue d'entreprise qui accepte les AAB. Pour une diffusion directe, l'APK reste le format de référence.
+
+La configuration Gradle lit la clé depuis des variables d'environnement. Aucun mot de passe ni fichier de clé ne doit être placé dans le dépôt.
+
+## 2. Créer la clé de signature
+
+Créer un dossier sécurisé en dehors du dépôt, par exemple :
+
+```text
+C:\CARZONE_KEYS
+```
+
+Créer la clé avec `keytool` :
+
+```powershell
+keytool -genkeypair -v `
+  -keystore "C:\CARZONE_KEYS\carzone-release.jks" `
+  -alias "carzone" `
+  -keyalg RSA `
+  -keysize 4096 `
+  -validity 10000 `
+  -storetype PKCS12
+```
+
+`keytool` demandera :
+
+- le mot de passe du fichier de clé ;
+- la confirmation de ce mot de passe ;
+- les informations du propriétaire, par exemple `CN=CARZONE SARL, O=CARZONE SARL, L=Cotonou, C=BJ`.
+
+Ne jamais utiliser la clé de debug pour une diffusion.
+
+## 3. Sauvegarder la clé
+
+Avant toute diffusion :
+
+- copier le fichier `.jks` sur un support chiffré hors ligne ;
+- conserver une deuxième copie dans un coffre-fort de mots de passe d'entreprise ;
+- conserver l'alias et les mots de passe séparément ;
+- ne jamais envoyer la clé par WhatsApp, email ou ticket ;
+- ne jamais commiter le fichier `.jks`, `.keystore` ou les mots de passe.
+
+Une perte de clé empêche les mises à jour de l'application sans désinstallation ou changement d'identité.
+
+## 4. Configurer la session PowerShell
+
+Exemple de variables attendues :
+
+```powershell
+$env:CARZONE_ANDROID_KEYSTORE_PATH = "C:\CARZONE_KEYS\carzone-release.jks"
+$env:CARZONE_ANDROID_KEYSTORE_PASSWORD = "<mot de passe du fichier>"
+$env:CARZONE_ANDROID_KEY_ALIAS = "carzone"
+$env:CARZONE_ANDROID_KEY_PASSWORD = "<mot de passe de la clé>"
+```
+
+Attention : les valeurs saisies dans un terminal peuvent rester dans l'historique de la session. Pour une diffusion réelle, utiliser une session dédiée et fermer le terminal après le build.
+
+Le fichier `mobile/.env.example` ne contient que les noms des variables, jamais les valeurs.
+
+## 5. Construire l'APK signé
+
+Depuis `mobile/` :
+
+```powershell
+.\gradlew.bat clean assembleRelease
+```
+
+Sortie attendue :
+
+```text
+mobile/app/build/outputs/apk/release/app-release.apk
+```
+
+Sans les variables d'environnement, le build produit un APK non signé :
+
+```text
+mobile/app/build/outputs/apk/release/app-release-unsigned.apk
+```
+
+C'est ce qui a été observé pendant la vérification actuelle : le build release fonctionne, mais aucune clé de release n'a été créée.
+
+## 6. Construire l'AAB
+
+```powershell
+.\gradlew.bat clean bundleRelease
+```
+
+Sortie observée sans clé :
+
+```text
+mobile/app/build/outputs/bundle/release/app-release.aab
+```
+
+Cet AAB est non signé tant que les variables de signature ne sont pas définies.
+
+Pour une diffusion directe, préférer l'APK. Pour Google Play, l'AAB est le format attendu.
+
+## 7. Vérifier la signature
+
+Afficher les certificats de l'APK :
+
+```powershell
+& "$env:ANDROID_HOME\build-tools\35.0.0\apksigner.bat" verify --print-certs `
+  ".\app\build\outputs\apk\release\app-release.apk"
+```
+
+Afficher l'empreinte SHA-256 de la clé :
+
+```powershell
+keytool -list -v `
+  -keystore "C:\CARZONE_KEYS\carzone-release.jks" `
+  -alias "carzone"
+```
+
+La ligne `SHA256:` doit être ajoutée au fichier `assetlinks.json`.
+
+## 8. Mettre à jour les Digital Asset Links
+
+Fichier web :
+
+```text
+apps/web/public/.well-known/assetlinks.json
+```
+
+Ajouter l'empreinte SHA-256 du certificat de release dans `sha256_cert_fingerprints`.
+
+Pendant les tests, l'empreinte de debug est présente. Pour une diffusion de release :
+
+- ajouter l'empreinte de release ;
+- retirer l'empreinte de debug si elle ne doit plus être acceptée ;
+- déployer le fichier avec le site ;
+- vérifier que la TWA s'ouvre encore sans barre d'adresse Chrome.
+
+La vérification TWA dépend de la correspondance entre :
+
+- le package `com.topcarzone.app` ;
+- l'empreinte du certificat qui a signé l'APK installé ;
+- le fichier `assetlinks.json` servi sur le domaine.
+
+## 9. Installation interne
+
+Pour un pilote :
+
+```powershell
+adb install -r .\app\build\outputs\apk\release\app-release.apk
+```
+
+Pour un parc plus important :
+
+- utiliser un MDM ;
+- pousser l'APK signé ;
+- verrouiller l'installation depuis des sources inconnues ;
+- documenter la procédure d'installation ;
+- conserver la même clé pour toutes les mises à jour.
+
+Android peut afficher un avertissement d'installation hors Play Store. C'est normal pour une distribution interne.
+
+## 10. AAB et Google Play
+
+L'application n'est pas prévue pour une publication publique sur Google Play.
+
+Si une publication privée est envisagée plus tard :
+
+- utiliser l'AAB ;
+- utiliser Google Play App Signing ou gérer la clé de signature de manière compatible ;
+- récupérer l'empreinte du certificat de signature Play pour `assetlinks.json` ;
+- ne pas confondre l'empreinte de la clé d'upload et l'empreinte de la clé de signature Play.
+
+L'AAB seul ne peut pas être installé directement sur un téléphone. Pour tester un AAB hors Play, il faut le convertir avec `bundletool` en APK universal ou split APKs.
+
+## 11. Procédure de release recommandée
+
+1. Incrémenter `versionCode` et `versionName` dans `mobile/app/build.gradle`.
+2. Vérifier que `CARZONE_TWA_URL` pointe vers l'origine HTTPS stable.
+3. Construire l'APK signé.
+4. Construire l'AAB si nécessaire.
+5. Vérifier la signature.
+6. Mettre à jour `assetlinks.json` avec l'empreinte release.
+7. Déployer le web.
+8. Installer l'APK sur un appareil de test.
+9. Vérifier connexion, téléchargement, impression et navigation.
+10. Diffuser via MDM ou dépôt APK contrôlé.
+11. Archiver l'APK, l'AAB, le numéro de version et l'empreinte de signature.
+
+## 12. Module véhicule
+
+Le futur module véhicule doit utiliser :
+
+- un package distinct, par exemple `com.topcarzone.vehicle` ;
+- une clé de signature distincte ;
+- un canal de mise à jour distinct ;
+- le même backend ou une API dédiée.
+
+Ne pas réutiliser la clé de l'application principale pour le module embarqué dans les véhicules.
+
+## 13. État actuel
+
+- Aucune clé de release créée.
+- Aucun mot de passe de signature enregistré.
+- Aucun fichier `.jks` ou `.aab` commité.
+- Build release non signé vérifié.
+- Build debug installé et testé sur le téléphone.
+- Asset Links actuellement limité au certificat de debug.
+
+La création de la clé et la production de l'APK signé doivent être faites par le propriétaire de l'entreprise ou une personne habilitée.

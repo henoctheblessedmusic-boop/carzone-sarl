@@ -112,7 +112,7 @@ $env:CARZONE_ANDROID_KEY_PASSWORD = "..."
 
 Si ces variables sont absentes, le build release n'est pas signé. Le build debug utilise la clé de débogage locale d'Android.
 
-La création de la clé et la procédure de diffusion complète seront documentées à l'étape 6.
+La création de la clé, la production de l'APK signé et de l'AAB sont documentées dans [docs/mobile/SIGNATURE.md](../docs/mobile/SIGNATURE.md).
 
 ## PWA et Digital Asset Links
 

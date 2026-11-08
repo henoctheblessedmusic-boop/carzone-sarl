@@ -248,3 +248,29 @@ Après activation du domaine :
 4. vérifier que `/.well-known/assetlinks.json` est bien servi sur `topcarzone.africa`.
 
 Le `.com` reste inchangé. Aucun enregistrement DNS du `.com` ne doit être modifié pendant cette phase.
+
+
+## 10. Statut final du 8 novembre 2026
+
+Le domaine `topcarzone.africa` est actif.
+
+Verifications effectuees :
+
+- `vercel domains verify topcarzone.africa` : configuration valide ;
+- `vercel domains verify www.topcarzone.africa` : configuration valide ;
+- certificat HTTPS Vercel delivre ;
+- `https://topcarzone.africa` : HTTP 200, serveur Vercel ;
+- `https://www.topcarzone.africa` : redirection 308 vers l'apex ;
+- `https://topcarzone.africa/.well-known/assetlinks.json` : HTTP 200 ;
+- PWA et service worker servis sur l'apex ;
+- TWA reconstruite avec `https://topcarzone.africa/dashboard` ;
+- connexion et tableau de bord testes sur le domaine `.africa`.
+
+Point de redondance DNS :
+
+- `topcarzone.africa` resout actuellement vers `216.150.1.1` ;
+- il est recommande d'ajouter aussi le second A record Vercel `216.150.16.1` pour la redondance.
+
+Le `.com` n'a pas ete modifie.
+
+La TWA fonctionne en plein ecran sur `.africa` avec le certificat de debug. L'empreinte de release reste a ajouter apres creation de la cle de signature.

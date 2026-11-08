@@ -30,6 +30,8 @@ Statuts : OK, KO, PARTIEL, NON TESTÉ.
 | Persistance de la session | OK | Cookie de session encore présent après redémarrage de l'application |
 | Tableau de bord | OK | Capture `captures/twa-dashboard.png` |
 | Navigation entre pages | OK | Passage tableau de bord vers Clients, puis retour Android vers le tableau de bord |
+| Domaine `topcarzone.africa` | OK | HTTPS, certificat Vercel, redirection www et assetlinks vérifiés |
+| TWA sur `topcarzone.africa` | OK | Connexion et tableau de bord testés sur le nouveau domaine, capture `captures/twa-africa-dashboard.png` |
 | Bouton retour Android sur une page | OK | Le retour navigateur fonctionne pour les changements de page |
 | Bouton retour Android sur une modale | KO | La modale d'import clients est ouverte, le retour a quitté la page au lieu de fermer la modale. Capture `captures/modal-back-ko.png` |
 | Téléchargement Excel | OK | Fichier `Bilan_Financier_Entreprise_2026-11-08.xlsx`, 19 150 octets, enregistré dans `/sdcard/Download`. Capture `captures/excel-download.png` |

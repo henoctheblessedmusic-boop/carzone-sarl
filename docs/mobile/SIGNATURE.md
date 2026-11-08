@@ -313,11 +313,26 @@ Ne pas réutiliser la clé de l'application principale pour le module embarqué 
 
 ## 13. État actuel
 
-- Aucune clé de release créée.
-- Aucun mot de passe de signature enregistré.
+- Clé de release créée par le client, hors du dépôt.
+- Aucun mot de passe de signature enregistré dans le dépôt.
 - Aucun fichier `.jks` ou `.aab` commité.
-- Build release non signé vérifié.
-- Build debug installé et testé sur le téléphone.
-- Asset Links actuellement limité au certificat de debug.
+- APK release signé produit :
+  - package `com.topcarzone.app` ;
+  - version `1.0.0`, versionCode 1 ;
+  - signature vérifiée avec `apksigner`.
+- Empreinte SHA-256 du certificat release :
 
-La création de la clé et la production de l'APK signé doivent être faites par le propriétaire de l'entreprise ou une personne habilitée.
+```text
+A7:88:E1:97:80:35:BF:59:C2:6F:ED:39:CA:5E:B2:DA:78:72:C3:F3:DF:37:90:A7:2E:D1:F3:42:AE:17:D5:0B
+```
+
+- `assetlinks.json` a été mis à jour avec cette empreinte release.
+- L'empreinte de debug a été retirée.
+- APK release installé sur le téléphone à la place de l'APK debug.
+- Connexion testée sur `https://topcarzone.africa/dashboard` avec un compte temporaire, puis compte supprimé.
+- La TWA release s'ouvre en plein écran.
+- Le fichier `.jks` et les mots de passe doivent encore être sauvegardés par le client dans un coffre-fort.
+
+La sauvegarde de la clé reste obligatoire avant toute diffusion à un autre appareil.
+
+La limite du bouton retour Android sur les modales reste présente.

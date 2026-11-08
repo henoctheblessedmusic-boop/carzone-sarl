@@ -117,3 +117,29 @@ L'étape 5 doit :
 6. relancer les tests web.
 
 Aucun résultat Android ne sera déclaré avant ces tests.
+
+## 8. Résultats Android
+
+Les tests réels ont été réalisés sur un Motorola moto g 2025 sous Android 15, avec Chrome Android 156.
+
+Résultats détaillés : [TESTS.md](TESTS.md).
+
+Points confirmés :
+
+- TWA en plein écran ;
+- démarrage sur le tableau de bord ;
+- connexion et session ;
+- navigation et bouton retour entre pages ;
+- téléchargement Excel ;
+- ouverture de l'impression native.
+
+Points non validés :
+
+- retour Android sur une modale : KO ;
+- impression physique : NON TESTÉ ;
+- upload de fichier : NON TESTÉ ;
+- liens externes : NON CONCLUANT ;
+- perte de réseau : NON TESTÉ ;
+- microphone, WebRTC et notifications en arrière-plan : NON TESTÉ.
+
+La protection web du retour Android a été essayée puis retirée, car elle ne fermait pas correctement les modales et pouvait provoquer une navigation inattendue. La TWA seule ne permet pas d'intercepter nativement `onBackPressed`. Si cette fonction est obligatoire, il faudra valider une coquille WebView native ou Capacitor.

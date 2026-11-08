@@ -1648,4 +1648,27 @@ body:has(.ox-chat-container) .ox-onboarding-fab {
   max-width: 55%;
 }
 
+/* Adaptation mobile et TWA : bords d'écran et barre gestuelle Android. */
+:root {
+  --carzone-safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (max-width: 900px) {
+  .ox-content {
+    padding-bottom: calc(1rem + var(--carzone-safe-bottom));
+  }
+
+  .ox-aside {
+    padding-bottom: calc(0.5rem + var(--carzone-safe-bottom));
+  }
+}
+
+input,
+textarea,
+select {
+  scroll-margin-top: 96px;
+  scroll-margin-bottom: calc(96px + var(--carzone-safe-bottom));
+}
+
+
 

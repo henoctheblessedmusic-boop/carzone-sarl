@@ -1,0 +1,26 @@
+# Gradle
+.gradle/
+**/build/
+local.properties
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+
+# Artefacts de build
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Secrets de signature
+*.jks
+*.keystore
+keystore.properties
+.env
+.env.*
+!.env.example
+
+# Divers
+captures/
+*.log

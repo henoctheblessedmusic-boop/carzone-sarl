@@ -36,6 +36,8 @@ const PUBLIC_PATHS = [
   "/images",
   "/favicon.ico",
   "/robots.txt",
+  "/manifest.webmanifest",
+  "/offline.html",
   // Vitrine publique multi-pages (voir docs/SITE_VITRINE_PLAN.md).
   // "/services" n'est volontairement PAS ajouté ici : il désigne la route CRM interne
   // protégée (src/app/services/page.tsx) ; la page vitrine équivalente vit sur "/nos-services".

@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.topcarzone.app",
+      "sha256_cert_fingerprints": [
+        "0C:0E:AC:6B:85:42:33:F6:4C:42:32:52:60:9F:E9:64:B6:8E:14:01:C1:05:6A:C4:FB:FC:40:6F:FA:F2:BD:2F"
+      ]
+    }
+  }
+]

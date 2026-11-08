@@ -1,0 +1,66 @@
+plugins {
+    id "com.android.application"
+}
+
+def twaUrl = System.getenv("CARZONE_TWA_URL") ?: (project.findProperty("carzoneTwaUrl") ?: "https://carzone-sarl.vercel.app")
+def assetStatements = "[{\"relation\":[\"delegate_permission/common.handle_all_urls\"],\"target\":{\"namespace\":\"web\",\"site\":\"${twaUrl}\"}}]"
+
+def keystorePath = System.getenv("CARZONE_ANDROID_KEYSTORE_PATH")
+def keystorePassword = System.getenv("CARZONE_ANDROID_KEYSTORE_PASSWORD")
+def keyAlias = System.getenv("CARZONE_ANDROID_KEY_ALIAS")
+def keyPassword = System.getenv("CARZONE_ANDROID_KEY_PASSWORD")
+
+android {
+    namespace "com.topcarzone.app"
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.topcarzone.app"
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName "1.0.0"
+
+        manifestPlaceholders = [defaultUrl: twaUrl]
+        resValue "string", "asset_statements", assetStatements
+    }
+
+    signingConfigs {
+        if (keystorePath && keystorePassword && keyAlias && keyPassword) {
+            release {
+                storeFile file(keystorePath)
+                storePassword keystorePassword
+                keyAlias keyAlias
+                keyPassword keyPassword
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            if (signingConfigs.findByName("release") != null) {
+                signingConfig signingConfigs.release
+            }
+        }
+        debug {
+            applicationIdSuffix ""
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+}
+
+dependencies {
+    implementation "androidx.appcompat:appcompat:1.7.0"
+    implementation "com.google.android.material:material:1.12.0"
+    implementation "com.google.androidbrowserhelper:androidbrowserhelper:2.5.0"
+}

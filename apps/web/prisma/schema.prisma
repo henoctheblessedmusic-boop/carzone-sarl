@@ -562,6 +562,8 @@ model ImportOrder {
   /// Marque / modèle attendus (notes catalogue)
   expectedBrand String?
   expectedModel String?
+  /// Nombre d'unités commandées pour ce même modèle.
+  quantity      Int        @default(1)
   notes         String?
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt

@@ -22,6 +22,10 @@ async function createImport(formData: FormData) {
   const originPort = String(formData.get("originPort") || "");
   const expectedBrand = String(formData.get("brand") || "").trim() || null;
   const expectedModel = String(formData.get("model") || "").trim() || null;
+  const rawQuantity = Number(formData.get("quantity") || 1);
+  const quantity = Number.isFinite(rawQuantity)
+    ? Math.min(50, Math.max(1, Math.floor(rawQuantity)))
+    : 1;
   const order = await prisma.importOrder.create({
     data: {
       reference: nextDocNumber("IMP", count).replace(
@@ -35,6 +39,7 @@ async function createImport(formData: FormData) {
       supplierId: String(formData.get("supplierId") || "") || null,
       expectedBrand,
       expectedModel,
+      quantity,
       notes: String(formData.get("notes") || "") || null,
     },
     select: { id: true, reference: true },
@@ -49,7 +54,7 @@ async function createImport(formData: FormData) {
     entityType: "ImportOrder",
     entityId: order.id,
     entityLabel: order.reference,
-    details: `${expectedBrand || "Marque à préciser"} ${expectedModel || "Modèle à préciser"} - ${originPort}`,
+    details: `${expectedBrand || "Marque à préciser"} ${expectedModel || "Modèle à préciser"} - ${originPort}${quantity > 1 ? ` - ${quantity} unités` : ""}`,
   });
 
   revalidatePath("/imports");
@@ -135,6 +140,19 @@ export default async function ImportsPage() {
           </select>
           <input name="etaDate" type="date" className="ox-input" title={t.form.etaTitle} />
           <input name="costXof" type="number" placeholder={t.form.costPlaceholder} className="ox-input" />
+          <input
+            name="quantity"
+            type="number"
+            min={1}
+            max={50}
+            step={1}
+            defaultValue={1}
+            required
+            placeholder={t.form.quantityPlaceholder}
+            title={t.form.quantityTitle}
+            className="ox-input"
+            style={{ maxWidth: 180 }}
+          />
           <input name="notes" placeholder={t.form.notesPlaceholder} className="ox-input" style={{ minWidth: 200 }} />
         </div>
         <div style={{ fontSize: "0.85rem", opacity: 0.75, margin: "10px 0 6px" }}>

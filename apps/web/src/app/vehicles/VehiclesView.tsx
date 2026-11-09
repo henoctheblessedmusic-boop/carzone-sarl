@@ -451,6 +451,15 @@ export function VehiclesView({
                 await createVehicle(formData);
                 setIsCreateModalOpen(false);
               }}
+              onSubmit={(event) => {
+                const data = new FormData(event.currentTarget);
+                const quantity = Number(data.get("quantity") || 1);
+                const vin = String(data.get("vin") || "").trim();
+                if (quantity > 1 && vin) {
+                  event.preventDefault();
+                  alert(copy.createModal.quantityVinError);
+                }
+              }}
               style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}
             >
               {/* SECTION 1 : VÉHICULE & MODÈLE */}
@@ -583,6 +592,18 @@ export function VehiclesView({
                 </div>
                 <div className="ox-form-row">
                   <input
+                    name="quantity"
+                    type="number"
+                    min={1}
+                    max={50}
+                    step={1}
+                    defaultValue={1}
+                    required
+                    placeholder={copy.createModal.quantityPlaceholder}
+                    className="ox-input"
+                    title={copy.createModal.quantityTitle}
+                  />
+                  <input
                     name="priceXof"
                     type="number"
                     placeholder={copy.createModal.pricePlaceholder}
@@ -592,6 +613,9 @@ export function VehiclesView({
                     style={{ fontWeight: 800, fontSize: "1.05rem", color: "#34d399", minWidth: 260 }}
                   />
                 </div>
+                <p style={{ margin: "8px 0 0", fontSize: "0.76rem", color: "var(--ice-text-muted)", lineHeight: 1.5 }}>
+                  {copy.createModal.quantityHint}
+                </p>
               </div>
 
               {/* Actions Footer */}

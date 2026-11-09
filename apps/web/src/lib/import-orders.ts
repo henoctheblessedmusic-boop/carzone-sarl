@@ -58,29 +58,36 @@ export async function syncImportOrderVehicle(orderId: string) {
     select: { energy: true, vehicleType: true },
   });
 
-  const vehicle = await prisma.vehicle.create({
-    data: {
-      brand,
-      model,
-      energy: catalogModel?.energy || "ESSENCE",
-      vehicleType: catalogModel?.vehicleType || null,
-      priceXof: order.costXof || 0,
-      costXof: order.costXof || 0,
-      status,
-      fleetType: "SHOWROOM",
-      supplierId: order.supplierId,
-      shippingOriginPort: order.originPort,
-      etaDate: order.etaDate,
-      orderReference: order.reference,
-      importOrderId: order.id,
-      description: order.notes || null,
-    },
-    select: { id: true },
-  });
+  const quantity = Math.min(50, Math.max(1, Math.floor(order.quantity || 1)));
+  const vehicleIds: string[] = [];
 
-  await inheritVehiclePhotos(vehicle.id).catch((error) => {
-    console.error("Photos du véhicule import non héritées:", error);
-  });
+  for (let index = 0; index < quantity; index += 1) {
+    const vehicle = await prisma.vehicle.create({
+      data: {
+        brand,
+        model,
+        energy: catalogModel?.energy || "ESSENCE",
+        vehicleType: catalogModel?.vehicleType || null,
+        priceXof: order.costXof || 0,
+        costXof: order.costXof || 0,
+        status,
+        fleetType: "SHOWROOM",
+        supplierId: order.supplierId,
+        shippingOriginPort: order.originPort,
+        etaDate: order.etaDate,
+        orderReference: order.reference,
+        importOrderId: order.id,
+        description: order.notes || null,
+      },
+      select: { id: true },
+    });
 
-  return { created: true, vehicleIds: [vehicle.id], status };
+    vehicleIds.push(vehicle.id);
+
+    await inheritVehiclePhotos(vehicle.id).catch((error) => {
+      console.error("Photos du véhicule import non héritées:", error);
+    });
+  }
+
+  return { created: true, vehicleIds, status };
 }

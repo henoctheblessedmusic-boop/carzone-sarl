@@ -236,6 +236,8 @@ export type EnergyCopy = {
       supplierOptional: string;
       etaTitle: string;
       costPlaceholder: string;
+      quantityPlaceholder: string;
+      quantityTitle: string;
       notesPlaceholder: string;
       catalogHint: string;
       submit: string;
@@ -704,6 +706,8 @@ const fr: EnergyCopy = {
       supplierOptional: "Fournisseur (facultatif)",
       etaTitle: "Arrivée prévue",
       costPlaceholder: "Coût XOF",
+      quantityPlaceholder: "Nombre de véhicules *",
+      quantityTitle: "Nombre de véhicules à importer",
       notesPlaceholder: "Notes",
       catalogHint: "Marque et modèle attendus (catalogue, facultatif)",
       submit: "Nouvelle commande import",
@@ -1097,6 +1101,8 @@ const en: EnergyCopy = {
       supplierOptional: "Supplier (optional)",
       etaTitle: "Expected arrival",
       costPlaceholder: "Cost in XOF",
+      quantityPlaceholder: "Number of vehicles *",
+      quantityTitle: "Number of vehicles to import",
       notesPlaceholder: "Notes",
       catalogHint: "Expected brand and model (catalogue, optional)",
       submit: "New import order",
@@ -1472,6 +1478,8 @@ const zh: EnergyCopy = {
       supplierOptional: "供应商(可选)",
       etaTitle: "预计到港",
       costPlaceholder: "成本(XOF)",
+      quantityPlaceholder: "车辆数量 *",
+      quantityTitle: "要进口的车辆数量",
       notesPlaceholder: "备注",
       catalogHint: "预计品牌与车型(目录,可选)",
       submit: "新建进口订单",

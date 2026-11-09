@@ -74,6 +74,10 @@ export type StockCopy = {
     section4: string;
     pricePlaceholder: string;
     priceTitle: string;
+    quantityPlaceholder: string;
+    quantityTitle: string;
+    quantityHint: string;
+    quantityVinError: string;
     cancel: string;
     submit: string;
   };
@@ -317,6 +321,12 @@ const fr: StockCopy = {
     section4: "4. Tarification en francs CFA",
     pricePlaceholder: "Prix de vente en FCFA *",
     priceTitle: "Prix de vente en francs CFA",
+    quantityPlaceholder: "Nombre de véhicules *",
+    quantityTitle: "Nombre de véhicules à ajouter",
+    quantityHint:
+      "Pour plusieurs unités du même modèle, laissez le VIN vide. Chaque unité sera créée séparément avec son propre suivi.",
+    quantityVinError:
+      "Un VIN ne peut être associé qu'à un seul véhicule. Laissez le VIN vide pour une entrée en quantité.",
     cancel: "Annuler",
     submit: "Valider et ajouter au stock",
   },
@@ -509,6 +519,12 @@ const en: StockCopy = {
     section4: "4. Pricing in CFA francs",
     pricePlaceholder: "Sale price in XOF *",
     priceTitle: "Sale price in CFA francs",
+    quantityPlaceholder: "Number of vehicles *",
+    quantityTitle: "Number of vehicles to add",
+    quantityHint:
+      "For multiple units of the same model, leave the VIN empty. Each unit is created separately with its own tracking.",
+    quantityVinError:
+      "A VIN can only be assigned to one vehicle. Leave the VIN empty for a quantity entry.",
     cancel: "Cancel",
     submit: "Save and add to stock",
   },
@@ -698,6 +714,10 @@ const zh: StockCopy = {
     section4: "4. 以中非法郎计价",
     pricePlaceholder: "销售价(XOF)*",
     priceTitle: "销售价(中非法郎)",
+    quantityPlaceholder: "车辆数量 *",
+    quantityTitle: "要添加的车辆数量",
+    quantityHint: "同一车型有多台时，请将 VIN 留空。每台车辆会单独创建并单独跟踪。",
+    quantityVinError: "一个 VIN 只能对应一台车辆。批量入库时请将 VIN 留空。",
     cancel: "取消",
     submit: "确认并加入库存",
   },

@@ -54,51 +54,69 @@ export async function createVehicle(formData: FormData) {
   const containerNumber = String(formData.get("containerNumber") || "").trim() || null;
   const orderReference = String(formData.get("orderReference") || "").trim() || null;
   const productionWeek = String(formData.get("productionWeek") || "").trim() || null;
+  const vin = String(formData.get("vin") || "").trim() || null;
+  const rawQuantity = Number(formData.get("quantity") || 1);
+  const quantity = Number.isFinite(rawQuantity)
+    ? Math.min(50, Math.max(1, Math.floor(rawQuantity)))
+    : 1;
 
-  const vehicle = await prisma.vehicle.create({
-    data: {
-      vin: String(formData.get("vin") || "").trim() || null,
-      brand,
-      model,
-      variant: String(formData.get("variant") || "").trim() || null,
-      year: Number(formData.get("year") || new Date().getFullYear()),
-      energy,
-      vehicleType,
-      priceXof: Number(formData.get("priceXof") || 0),
-      status,
-      siteId: site?.id || siteIdInput || null,
-      supplierId,
-      shippingOriginPort,
-      etaDate,
-      containerNumber,
-      orderReference,
-      productionWeek,
-    },
-  });
-
-  // Fiche technique générée par l'agent DeepSeek et sauvegardée pour le modèle.
-  await inheritVehiclePhotos(vehicle.id).catch((err) => {
-    console.error("Vehicle photo inheritance error:", err);
-  });
-  const createdTechSheet = await ensureVehicleTechSheet(vehicle.id, {
-    preferDeepSeek: true,
-    actorName: user.fullName,
-  }).catch((err) => {
-    console.error("Auto tech sheet generation error:", err);
-    return null;
-  });
-  if (createdTechSheet?.sheet) {
-    await inheritVehiclePhotos(vehicle.id, createdTechSheet.sheet).catch((err) => {
-      console.error("Vehicle sheet photo inheritance error:", err);
-    });
+  if (quantity > 1 && vin) {
+    throw new Error("Un VIN ne peut être associé qu'à un seul véhicule. Laissez le VIN vide pour une entrée en quantité.");
   }
+
+  const createdVehicles = [];
+
+  for (let index = 0; index < quantity; index += 1) {
+    const vehicle = await prisma.vehicle.create({
+      data: {
+        vin,
+        brand,
+        model,
+        variant: String(formData.get("variant") || "").trim() || null,
+        year: Number(formData.get("year") || new Date().getFullYear()),
+        energy,
+        vehicleType,
+        priceXof: Number(formData.get("priceXof") || 0),
+        status,
+        siteId: site?.id || siteIdInput || null,
+        supplierId,
+        shippingOriginPort,
+        etaDate,
+        containerNumber,
+        orderReference,
+        productionWeek,
+      },
+    });
+
+    createdVehicles.push(vehicle);
+
+    // Fiche technique générée par l'agent DeepSeek et sauvegardée pour le modèle.
+    await inheritVehiclePhotos(vehicle.id).catch((err) => {
+      console.error("Vehicle photo inheritance error:", err);
+    });
+    const createdTechSheet = await ensureVehicleTechSheet(vehicle.id, {
+      preferDeepSeek: true,
+      actorName: user.fullName,
+    }).catch((err) => {
+      console.error("Auto tech sheet generation error:", err);
+      return null;
+    });
+    if (createdTechSheet?.sheet) {
+      await inheritVehiclePhotos(vehicle.id, createdTechSheet.sheet).catch((err) => {
+        console.error("Vehicle sheet photo inheritance error:", err);
+      });
+    }
+  }
+
+  const firstVehicle = createdVehicles[0];
 
   await logAudit({
     user,
     action: "vehicle.create",
     entityType: "Vehicle",
-    entityId: vehicle.id,
-    entityLabel: `${vehicle.brand} ${vehicle.model}`,
+    entityId: firstVehicle.id,
+    entityLabel: `${firstVehicle.brand} ${firstVehicle.model}`,
+    details: quantity > 1 ? `Entrée en stock de ${quantity} unités du même modèle.` : null,
   });
 
   revalidatePath("/vehicles");

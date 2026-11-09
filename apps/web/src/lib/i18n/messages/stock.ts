@@ -78,6 +78,7 @@ export type StockCopy = {
     quantityTitle: string;
     quantityHint: string;
     quantityVinError: string;
+    vinRequiredError: string;
     cancel: string;
     submit: string;
   };
@@ -327,6 +328,8 @@ const fr: StockCopy = {
       "Pour plusieurs unités du même modèle, laissez le VIN vide. Chaque unité sera créée séparément avec son propre suivi.",
     quantityVinError:
       "Un VIN ne peut être associé qu'à un seul véhicule. Laissez le VIN vide pour une entrée en quantité.",
+    vinRequiredError:
+      "Le VIN est obligatoire pour un véhicule saisi à l'unité. Pour plusieurs unités, laissez le VIN vide et renseignez chaque VIN ensuite.",
     cancel: "Annuler",
     submit: "Valider et ajouter au stock",
   },
@@ -525,6 +528,8 @@ const en: StockCopy = {
       "For multiple units of the same model, leave the VIN empty. Each unit is created separately with its own tracking.",
     quantityVinError:
       "A VIN can only be assigned to one vehicle. Leave the VIN empty for a quantity entry.",
+    vinRequiredError:
+      "The VIN is required for a single vehicle entry. For multiple units, leave the VIN empty and fill each VIN afterwards.",
     cancel: "Cancel",
     submit: "Save and add to stock",
   },
@@ -718,6 +723,7 @@ const zh: StockCopy = {
     quantityTitle: "要添加的车辆数量",
     quantityHint: "同一车型有多台时，请将 VIN 留空。每台车辆会单独创建并单独跟踪。",
     quantityVinError: "一个 VIN 只能对应一台车辆。批量入库时请将 VIN 留空。",
+    vinRequiredError: "单台入库时 VIN 为必填项。批量入库时请将 VIN 留空，之后再逐台填写 VIN。",
     cancel: "取消",
     submit: "确认并加入库存",
   },

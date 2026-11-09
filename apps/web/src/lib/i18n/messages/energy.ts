@@ -253,6 +253,9 @@ export type EnergyCopy = {
       vehicles: string;
       status: string;
       action: string;
+      delete: string;
+      deleteTitle: string;
+      deleteConfirm: string;
     };
     status: Record<ImportStatusKey, string>;
     statusOption: Record<ImportStatusKey, string>;
@@ -723,6 +726,9 @@ const fr: EnergyCopy = {
       vehicles: "Véhicules",
       status: "Statut",
       action: "Action",
+      delete: "Supprimer",
+      deleteTitle: "Supprimer cette commande et ses véhicules non liés",
+      deleteConfirm: "Supprimer définitivement cette commande d'import et ses véhicules ?",
     },
     status: {
       COMMANDE: "Commandée",
@@ -1118,6 +1124,9 @@ const en: EnergyCopy = {
       vehicles: "Vehicles",
       status: "Status",
       action: "Action",
+      delete: "Delete",
+      deleteTitle: "Delete this order and its unlinked vehicles",
+      deleteConfirm: "Permanently delete this import order and its vehicles?",
     },
     status: {
       COMMANDE: "Ordered",
@@ -1495,6 +1504,9 @@ const zh: EnergyCopy = {
       vehicles: "车辆",
       status: "状态",
       action: "操作",
+      delete: "删除",
+      deleteTitle: "删除该订单及其未关联车辆",
+      deleteConfirm: "确定永久删除该进口订单及其车辆吗？",
     },
     status: {
       COMMANDE: "已下单",

@@ -59,7 +59,17 @@ export async function createVehicle(formData: FormData) {
   const quantity = Number.isFinite(rawQuantity)
     ? Math.min(50, Math.max(1, Math.floor(rawQuantity)))
     : 1;
+  const priceXof = Number(formData.get("priceXof") || 0);
 
+  if (!brand || !model) {
+    throw new Error("La marque et le modèle sont obligatoires.");
+  }
+  if (!Number.isFinite(priceXof) || priceXof <= 0) {
+    throw new Error("Le prix de vente est obligatoire et doit être supérieur à zéro.");
+  }
+  if (quantity === 1 && !vin) {
+    throw new Error("Le VIN est obligatoire pour un véhicule saisi à l'unité.");
+  }
   if (quantity > 1 && vin) {
     throw new Error("Un VIN ne peut être associé qu'à un seul véhicule. Laissez le VIN vide pour une entrée en quantité.");
   }
@@ -76,7 +86,7 @@ export async function createVehicle(formData: FormData) {
         year: Number(formData.get("year") || new Date().getFullYear()),
         energy,
         vehicleType,
-        priceXof: Number(formData.get("priceXof") || 0),
+        priceXof,
         status,
         siteId: site?.id || siteIdInput || null,
         supplierId,
@@ -237,6 +247,9 @@ export async function updateVehicle(formData: FormData) {
   const energy = String(formData.get("energy") || "ESSENCE");
   const vehicleType = String(formData.get("vehicleType") || "").trim() || null;
   const priceXof = Number(formData.get("priceXof") || 0);
+  if (!Number.isFinite(priceXof) || priceXof <= 0) {
+    throw new Error("Le prix de vente est obligatoire et doit être supérieur à zéro.");
+  }
   const status = String(formData.get("status") || "EN_MAGASIN");
   const mileage = Number(formData.get("mileage") || 0);
   const color = String(formData.get("color") || "").trim() || null;

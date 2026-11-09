@@ -455,6 +455,11 @@ export function VehiclesView({
                 const data = new FormData(event.currentTarget);
                 const quantity = Number(data.get("quantity") || 1);
                 const vin = String(data.get("vin") || "").trim();
+                if (quantity === 1 && !vin) {
+                  event.preventDefault();
+                  alert(copy.createModal.vinRequiredError);
+                  return;
+                }
                 if (quantity > 1 && vin) {
                   event.preventDefault();
                   alert(copy.createModal.quantityVinError);
@@ -606,6 +611,7 @@ export function VehiclesView({
                   <input
                     name="priceXof"
                     type="number"
+                    min={1}
                     placeholder={copy.createModal.pricePlaceholder}
                     required
                     className="ox-input"

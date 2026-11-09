@@ -76,6 +76,7 @@ export const NAV_KEYS_BY_HREF: Record<string, Exclude<NavKey, "aria">> = {
   "/expenses": "expenses",
   "/delivery-notes": "deliveryNotes",
   "/audit": "audit",
+  "/mobile-app": "mobileApp",
 };
 
 export type PageKey = keyof Messages["pages"];

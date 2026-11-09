@@ -44,6 +44,7 @@ export const fr: Messages = {
     expenses: "Dépenses & Prestataires",
     deliveryNotes: "Bons de livraison",
     audit: "Journal d'audit",
+    mobileApp: "Application mobile",
     aria: "Navigation principale",
   },
   pages: {
@@ -71,6 +72,7 @@ export const fr: Messages = {
     expenses: "Charges, dépenses & bons de commande",
     deliveryNotes: "Bons de livraison internes (non fiscaux)",
     audit: "Journal d'audit & traçabilité",
+    mobileApp: "Application mobile CARZONE",
   },
   common: {
     logout: "Déconnexion",

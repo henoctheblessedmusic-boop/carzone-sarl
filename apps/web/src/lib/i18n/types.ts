@@ -36,6 +36,7 @@ export type Messages = {
     expenses?: string;
     deliveryNotes?: string;
     audit?: string;
+    mobileApp?: string;
     aria: string;
   };
   pages: {
@@ -64,6 +65,7 @@ export type Messages = {
     expenses?: string;
     deliveryNotes?: string;
     audit?: string;
+    mobileApp?: string;
   };
   common: {
     logout: string;

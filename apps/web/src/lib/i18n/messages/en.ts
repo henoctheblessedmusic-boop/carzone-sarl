@@ -44,6 +44,7 @@ export const en: Messages = {
     expenses: "Expenses & vendors",
     deliveryNotes: "Delivery notes",
     audit: "Audit log",
+    mobileApp: "Mobile app",
     aria: "Main navigation",
   },
   pages: {
@@ -71,6 +72,7 @@ export const en: Messages = {
     expenses: "Operating expenses & purchase orders",
     deliveryNotes: "Internal delivery notes (non-fiscal)",
     audit: "Audit log & traceability",
+    mobileApp: "CARZONE mobile app",
   },
   common: {
     logout: "Sign out",

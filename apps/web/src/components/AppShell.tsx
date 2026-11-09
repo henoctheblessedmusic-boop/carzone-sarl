@@ -35,6 +35,7 @@ const navDefs = [
   { href: "/charge-requests", roles: ["PDG", "SG", "DG", "BORNES_OPS", "COMMERCIAL", "INSTALLATEUR"] },
   { href: "/charging", roles: ["PDG", "SG", "DG", "BORNES_OPS", "COMPTA"] },
   { href: "/terminal", roles: ["PDG", "SG", "DG", "BORNES_OPS"] },
+  { href: "/mobile-app", roles: null as string[] | null },
 ];
 
 export async function AppShell({

@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+  outputFileTracingIncludes: {
+    "/api/mobile/apk": ["./private/mobile/**/*.apk"],
+  },
   images: {
     remotePatterns: [
       {

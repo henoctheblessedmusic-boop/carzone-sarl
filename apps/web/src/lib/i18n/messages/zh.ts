@@ -44,6 +44,7 @@ export const zh: Messages = {
     expenses: "支出与供应商",
     deliveryNotes: "内部出库单",
     audit: "审计日志",
+    mobileApp: "移动应用",
     aria: "主导航",
   },
   pages: {
@@ -71,6 +72,7 @@ export const zh: Messages = {
     expenses: "费用、支出与采购单",
     deliveryNotes: "内部出库单（非税务文件）",
     audit: "审计日志与可追溯性",
+    mobileApp: "CARZONE 移动应用",
   },
   common: {
     logout: "退出登录",

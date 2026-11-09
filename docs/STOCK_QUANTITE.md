@@ -21,7 +21,7 @@ Pour une quantité supérieure à 1 :
 - laisser le champ VIN vide ;
 - renseigner les VIN individuels plus tard, véhicule par véhicule, dans la fiche de chaque unité.
 
-Le formulaire bloque la soumission si une quantité supérieure à 1 est combinée à un VIN, et l'action serveur applique la même validation.
+Pour une quantité de 1, le VIN est obligatoire. Le formulaire bloque la soumission si un véhicule unique est saisi sans VIN, ou si une quantité supérieure à 1 est combinée à un VIN. L'action serveur applique les mêmes contrôles.
 
 ## Commande d'import
 
@@ -29,6 +29,8 @@ Le formulaire de création d'une commande d'import contient maintenant un champ 
 
 - valeur minimale : 1 ;
 - valeur maximale : 50 ;
+- la marque et le modèle sont obligatoires ;
+- le coût d'import doit être supérieur à zéro ;
 - la commande crée immédiatement autant de véhicules que la quantité demandée ;
 - tous les véhicules sont liés à la même commande `ImportOrder` ;
 - les changements de statut de la commande mettent à jour toutes les unités liées ;

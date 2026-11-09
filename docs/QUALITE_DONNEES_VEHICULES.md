@@ -83,3 +83,13 @@ Un directeur, un administrateur ou un développeur peut maintenant :
 - `npx tsc --noEmit` : OK ;
 - `npm run build` : OK ;
 - `npm run check:no-em-dash` : OK.
+
+
+## Tests de production
+
+- Formulaire Import accessible avec un compte ADMIN : OK.
+- Champs marque, modèle, coût et quantité rendus obligatoires : OK.
+- Bouton Supprimer visible pour ADMIN : OK.
+- Suppression réelle d'une commande d'import de test et de son véhicule depuis l'interface : OK.
+- Vérification après suppression : 0 commande et 0 véhicule restants.
+- Compte de test et données de test supprimés.

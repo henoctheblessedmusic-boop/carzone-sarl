@@ -52,5 +52,8 @@ Aucun champ de quantité n'a été ajouté à `Vehicle`, car chaque unité est u
 - `npm run build` : OK ;
 - `npm run check:no-em-dash` : OK ;
 - test d'intégration import : 3 unités créées pour une commande de quantité 3 ;
+- test UI stock en production : 2 unités du même modèle créées depuis le modal, puis supprimées ;
+- test UI import en production : commande de quantité 2, 2 véhicules liés créés puis supprimés ;
+- données de test nettoyées après exécution ;
 - test nettoyé après exécution ;
 - build release mobile non concerné par cette modification web.

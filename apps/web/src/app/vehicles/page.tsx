@@ -8,7 +8,7 @@ import { VehiclesView, type VehicleItem } from "./VehiclesView";
 export default async function VehiclesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ energy?: string; q?: string; vehicleType?: string; siteId?: string; brand?: string; zone?: string; status?: string; incomplete?: string }>;
+  searchParams: Promise<{ energy?: string; q?: string; vehicleType?: string; siteId?: string; brand?: string; zone?: string; status?: string; incomplete?: string; color?: string }>;
 }) {
   const user = await requireUser([
     "PDG",
@@ -39,6 +39,15 @@ export default async function VehiclesPage({
         ...(params.zone ? { stockZone: params.zone } : {}),
         ...(params.status ? { status: params.status } : {}),
         ...(params.incomplete === "1" ? { isIncompleteSheet: true } : {}),
+        ...(params.color
+          ? {
+              OR: [
+                { exteriorColorBase: { contains: params.color } },
+                { exteriorColorShade: { contains: params.color } },
+                { color: { contains: params.color } },
+              ],
+            }
+          : {}),
         ...(params.q
           ? {
               OR: [
@@ -54,7 +63,7 @@ export default async function VehiclesPage({
     }),
     prisma.vehicle.findMany({
       where: { fleetType: "SHOWROOM" },
-      select: { stockZone: true, brand: true, model: true, energy: true, status: true, isIncompleteSheet: true },
+      select: { stockZone: true, brand: true, model: true, energy: true, status: true, isIncompleteSheet: true, exteriorColorBase: true, exteriorColorShade: true, color: true },
     }),
     prisma.vehicleBrand.findMany({
       where: { active: true },
@@ -122,6 +131,7 @@ export default async function VehiclesPage({
     byModel: countBy(allVehicles.map((vehicle) => `${vehicle.brand} ${vehicle.model}`)),
     byBrand: countBy(allVehicles.map((vehicle) => vehicle.brand)),
     byEnergy: countBy(allVehicles.map((vehicle) => vehicle.energy)),
+    byColor: countBy(allVehicles.map((vehicle) => vehicle.exteriorColorShade || vehicle.exteriorColorBase || vehicle.color || "Non renseignée")),
     byStatus: countBy(allVehicles.map((vehicle) => vehicle.status)),
     modelZone: Array.from(modelZoneMap.entries())
       .map(([model, counts]) => ({ model, counts, total: Object.values(counts).reduce((a, b) => a + b, 0) }))

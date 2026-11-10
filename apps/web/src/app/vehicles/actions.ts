@@ -60,6 +60,9 @@ export async function createVehicle(formData: FormData) {
     ? Math.min(50, Math.max(1, Math.floor(rawQuantity)))
     : 1;
   const priceXof = Number(formData.get("priceXof") || 0);
+  const exteriorColorBase = String(formData.get("exteriorColorBase") || "").trim() || null;
+  const exteriorColorShade = String(formData.get("exteriorColorShade") || "").trim() || null;
+  const interiorColor = String(formData.get("interiorColor") || "").trim() || null;
 
   if (!brand || !model) {
     throw new Error("La marque et le modèle sont obligatoires.");
@@ -87,6 +90,10 @@ export async function createVehicle(formData: FormData) {
         energy,
         vehicleType,
         priceXof,
+        exteriorColorBase,
+        exteriorColorShade,
+        interiorColor,
+        color: exteriorColorShade || exteriorColorBase || null,
         status,
         siteId: site?.id || siteIdInput || null,
         supplierId,
@@ -252,7 +259,10 @@ export async function updateVehicle(formData: FormData) {
   }
   const status = String(formData.get("status") || "EN_MAGASIN");
   const mileage = Number(formData.get("mileage") || 0);
-  const color = String(formData.get("color") || "").trim() || null;
+  const exteriorColorBase = String(formData.get("exteriorColorBase") || "").trim() || null;
+  const exteriorColorShade = String(formData.get("exteriorColorShade") || "").trim() || null;
+  const interiorColor = String(formData.get("interiorColor") || "").trim() || null;
+  const color = String(formData.get("color") || "").trim() || exteriorColorShade || exteriorColorBase || null;
   const supplierId = String(formData.get("supplierId") || "").trim() || null;
   const rawSiteId = String(formData.get("siteId") || "").trim();
   const siteId = rawSiteId || null;
@@ -280,6 +290,9 @@ export async function updateVehicle(formData: FormData) {
       status,
       mileage,
       color,
+      exteriorColorBase,
+      exteriorColorShade,
+      interiorColor,
       supplierId,
       siteId,
       shippingOriginPort,

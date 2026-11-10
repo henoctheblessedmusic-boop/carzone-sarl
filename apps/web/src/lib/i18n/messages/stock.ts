@@ -99,6 +99,7 @@ export type StockCopy = {
     colVehicle: string;
     colRange: string;
     colEnergy: string;
+    colColor: string;
     colSupplier: string;
     colShowroom: string;
     colPrice: string;
@@ -359,6 +360,7 @@ const fr: StockCopy = {
     colVehicle: "Véhicule",
     colRange: "Gamme",
     colEnergy: "Énergie",
+    colColor: "Couleur",
     colSupplier: "Fournisseur",
     colShowroom: "Showroom",
     colPrice: "Prix",
@@ -565,6 +567,7 @@ const en: StockCopy = {
     colVehicle: "Vehicle",
     colRange: "Body type",
     colEnergy: "Fuel type",
+    colColor: "Color",
     colSupplier: "Supplier",
     colShowroom: "Showroom",
     colPrice: "Price",
@@ -765,6 +768,7 @@ const zh: StockCopy = {
     colVehicle: "车辆",
     colRange: "车型类别",
     colEnergy: "能源",
+    colColor: "颜色",
     colSupplier: "供应商",
     colShowroom: "展厅",
     colPrice: "价格",

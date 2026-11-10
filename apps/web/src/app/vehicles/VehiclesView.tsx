@@ -25,6 +25,7 @@ import {
   PlusCircle,
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
+import { vehicleColorHex } from "@/lib/vehicle-colors";
 import { BrandLogoSvg } from "@/lib/brand-logos";
 import { usePrefs } from "@/components/PrefsProvider";
 import {
@@ -132,7 +133,7 @@ export function VehiclesView({
   sites: { id: string; name: string; code?: string }[];
   canCreate: boolean;
   canDelete?: boolean;
-  initialParams: { energy?: string; q?: string; vehicleType?: string; siteId?: string; brand?: string; zone?: string; status?: string; incomplete?: string };
+  initialParams: { energy?: string; q?: string; vehicleType?: string; siteId?: string; brand?: string; zone?: string; status?: string; incomplete?: string; color?: string };
   stockSummary: {
     total: number;
     incomplete: number;
@@ -140,6 +141,7 @@ export function VehiclesView({
     byModel: [string, number][];
     byBrand: [string, number][];
     byEnergy: [string, number][];
+    byColor: [string, number][];
     byStatus: [string, number][];
     modelZone: { model: string; counts: Record<string, number>; total: number }[];
     zones: string[];
@@ -520,6 +522,11 @@ export function VehiclesView({
                     <option value="DIESEL">{copy.energyOption.DIESEL}</option>
                   </select>
                 </div>
+                <div className="ox-form-row" style={{ marginTop: "0.75rem" }}>
+                  <input name="exteriorColorBase" placeholder="Couleur extérieure (base)" className="ox-input" title="Couleur de base utilisée par les filtres" />
+                  <input name="exteriorColorShade" placeholder="Teinte extérieure exacte" className="ox-input" title="Teinte exacte affichée" />
+                  <input name="interiorColor" placeholder="Couleur intérieure" className="ox-input" title="Couleur de l'intérieur" />
+                </div>
               </div>
 
               {/* SECTION 2 : ÉTAPE LOGISTIQUE & SHOWROOM */}
@@ -748,6 +755,12 @@ export function VehiclesView({
               {energyLabel(copy, energy)}: {count}
             </span>
           ))}
+          {stockSummary.byColor.map(([color, count]) => (
+            <span key={`color-${color}`} style={{ fontSize: "0.74rem", padding: "3px 8px", borderRadius: 999, background: "rgba(148,163,184,0.1)", border: "1px solid rgba(148,163,184,0.25)", display: "inline-flex", alignItems: "center", gap: 5 }}>
+              <span style={{ width: 9, height: 9, borderRadius: 999, background: vehicleColorHex(color), border: "1px solid rgba(255,255,255,0.3)" }} />
+              {color}: {count}
+            </span>
+          ))}
           {stockSummary.byStatus.map(([status, count]) => (
             <span key={`status-${status}`} style={{ fontSize: "0.74rem", padding: "3px 8px", borderRadius: 999, background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)" }}>
               {statusLabel(copy, status)}: {count}
@@ -799,6 +812,12 @@ export function VehiclesView({
           <option value="RESERVE">{copy.status.RESERVE}</option>
           <option value="VENDU">{copy.status.VENDU}</option>
           <option value="RETIRE">{copy.status.RETIRE}</option>
+        </select>
+        <select name="color" defaultValue={initialParams.color || ""} className="ox-select">
+          <option value="">Toutes les couleurs</option>
+          {stockSummary.byColor.filter(([color]) => color !== "Non renseignée").map(([color]) => (
+            <option key={color} value={color}>{color}</option>
+          ))}
         </select>
         <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.82rem" }}>
           <input type="checkbox" name="incomplete" value="1" defaultChecked={initialParams.incomplete === "1"} />
@@ -968,6 +987,11 @@ export function VehiclesView({
                           <span>{vehicleTypeLabel(copy, v.vehicleType || "SUV")}</span>
                           <span>{v.year || 2026}</span>
                         </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: "0.73rem", color: "var(--ice-text-muted)" }}>
+                          <span style={{ width: 9, height: 9, borderRadius: 999, background: vehicleColorHex(v.exteriorColorShade || v.exteriorColorBase || v.color), border: "1px solid rgba(255,255,255,0.3)" }} />
+                          <span>Couleur : {v.exteriorColorShade || v.exteriorColorBase || v.color || "à confirmer"}</span>
+                          {v.interiorColor ? <span style={{ opacity: 0.65 }}>· int. {v.interiorColor}</span> : null}
+                        </div>
 
                         {/* PRIX */}
                         <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "#34d399" }}>
@@ -1108,6 +1132,7 @@ export function VehiclesView({
             copy.table.colVehicle,
             copy.table.colRange,
             copy.table.colEnergy,
+            copy.table.colColor,
             copy.table.colSupplier,
             copy.table.colShowroom,
             copy.table.colPrice,
@@ -1161,6 +1186,16 @@ export function VehiclesView({
             </div>,
             v.vehicleType ? vehicleTypeLabel(copy, v.vehicleType) : "-",
             energyLabel(copy, v.energy),
+            <div key={`color-${v.id}`} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontWeight: 600 }}>
+                <span style={{ width: 10, height: 10, borderRadius: 999, background: vehicleColorHex(v.exteriorColorShade || v.exteriorColorBase || v.color), border: "1px solid rgba(255,255,255,0.3)" }} />
+                {v.exteriorColorShade || v.exteriorColorBase || v.color || "-"}
+              </span>
+              {v.exteriorColorBase && v.exteriorColorShade && v.exteriorColorBase !== v.exteriorColorShade ? (
+                <span style={{ fontSize: "0.72rem", opacity: 0.6 }}>Base : {v.exteriorColorBase}</span>
+              ) : null}
+              {v.interiorColor ? <span style={{ fontSize: "0.72rem", opacity: 0.6 }}>Intérieur : {v.interiorColor}</span> : null}
+            </div>,
             v.supplier?.name || "-",
             v.site ? (
               <span
@@ -1505,6 +1540,21 @@ export function VehiclesView({
                     <option value="BERLINE">{copy.vehicleType.BERLINE}</option>
                     <option value="VAN">{copy.vehicleType.VAN}</option>
                   </select>
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>Couleur extérieure (base)</label>
+                  <input name="exteriorColorBase" defaultValue={editingVehicle.exteriorColorBase || ""} className="ox-input" style={{ width: "100%" }} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>Teinte extérieure exacte</label>
+                  <input name="exteriorColorShade" defaultValue={editingVehicle.exteriorColorShade || ""} className="ox-input" style={{ width: "100%" }} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.76rem", opacity: 0.75, marginBottom: 4 }}>Couleur intérieure</label>
+                  <input name="interiorColor" defaultValue={editingVehicle.interiorColor || ""} className="ox-input" style={{ width: "100%" }} />
                 </div>
               </div>
 

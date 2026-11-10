@@ -21,7 +21,7 @@ import {
   Layers,
   Calendar,
   MapPin,
-  Box,
+  Car,
   PlusCircle,
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
@@ -930,7 +930,21 @@ export function VehiclesView({
                               />
                             </div>
                           ) : (
-                            <Box size={24} color={stage.color} />
+                            <div
+                              style={{
+                                width: 56,
+                                height: 38,
+                                borderRadius: 6,
+                                background: "radial-gradient(ellipse at center, #1e293b 0%, #0f172a 100%)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                flexShrink: 0,
+                              }}
+                              title="Photo du véhicule à ajouter"
+                            >
+                              <Car size={22} color="#64748b" />
+                            </div>
                           )}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontWeight: 700, fontSize: "0.88rem", display: "flex", alignItems: "center", gap: 5 }}>

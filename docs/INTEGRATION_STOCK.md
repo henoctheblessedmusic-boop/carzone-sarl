@@ -100,6 +100,17 @@ Trois onglets :
 
 Accès : DEVELOPER et PDG.
 
+## Photos
+
+Le fichier Excel ne contient aucune URL de photo. Les 27 véhicules importés ont donc `mainPhotoUrl = null` et `photosVerified = false`.
+
+Deux conséquences normales :
+
+- dans le stock, le véhicule sans photo affiche un pictogramme de voiture et non une photo réelle ;
+- dans la fiche technique, les emplacements habitacle et sellerie ne sont plus affichés comme deux cadres vides. Un avertissement indique que les photos doivent être confirmées.
+
+Les photos réelles doivent être ajoutées véhicule par véhicule dans le modal d'édition, via les champs URL de photos. Aucune photo d'un autre modèle ne doit être utilisée.
+
 ## Vérifications
 
 - `npx tsc --noEmit` : OK ;

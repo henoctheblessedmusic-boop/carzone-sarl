@@ -657,6 +657,7 @@ export function VehicleTechSheetPrint({
         </div>
 
         {/* DUO PHOTOGRAPHIES DE L'HABITACLE AU FORMAT 4:3 : POSTE DE PILOTAGE & SELLERIE CUIR */}
+        {(verifiedInteriorPhoto || verifiedSeatsPhoto) && (
         <div
           style={{
             display: "grid",
@@ -773,6 +774,7 @@ export function VehicleTechSheetPrint({
             </div>
           </div>
         </div>
+        )}
 
         {!vehicleInfo?.photosVerified && (
           <div style={{ display: "flex", gap: 8, alignItems: "flex-start", background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 8, padding: "6px 10px", margin: "0 0 2mm", fontSize: "0.68rem", color: "#9a3412", lineHeight: 1.4 }}>

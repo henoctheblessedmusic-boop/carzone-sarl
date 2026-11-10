@@ -2,6 +2,7 @@ import { AppShell } from "@/components/AppShell";
 import Link from "next/link";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
+import { resolveVehicleDisplayPhoto } from "@/lib/vehicle-display-photo";
 import { VehiclesView, type VehicleItem } from "./VehiclesView";
 
 export default async function VehiclesPage({
@@ -154,6 +155,7 @@ export default async function VehiclesPage({
     siteId: v.siteId,
     site: v.site ? { id: v.site.id, name: v.site.name, code: v.site.code } : null,
     mainPhotoUrl: v.mainPhotoUrl,
+    displayPhotoUrl: resolveVehicleDisplayPhoto(v),
     interiorPhotoUrl: v.interiorPhotoUrl,
     exteriorPhotoUrl: v.exteriorPhotoUrl,
     rearPhotoUrl: v.rearPhotoUrl,

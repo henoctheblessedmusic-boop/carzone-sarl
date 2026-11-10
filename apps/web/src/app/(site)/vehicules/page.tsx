@@ -8,6 +8,7 @@ import { VehiclesCatalog } from "@/components/site/VehiclesCatalog";
 import { QuoteRequestProvider } from "@/components/site/QuoteRequestProvider";
 import type { CatalogVehicle } from "@/components/site/VehicleDetailModal";
 import { SITE_WEBSITE } from "@/lib/site-constants";
+import { resolveVehicleDisplayPhoto } from "@/lib/vehicle-display-photo";
 
 const OG_LOCALE: Record<SiteLocale, string> = {
   fr: "fr_FR",
@@ -75,6 +76,9 @@ async function getCatalogVehicles(): Promise<CatalogVehicle[]> {
         exteriorPhotoUrl: true,
         rearPhotoUrl: true,
         photosVerified: true,
+        technicalSheetJson: true,
+        techSheetConfirmed: true,
+        description: true,
       },
       orderBy: [{ createdAt: "desc" }],
     });
@@ -93,6 +97,7 @@ async function getCatalogVehicles(): Promise<CatalogVehicle[]> {
       } else {
         grouped.set(key, {
           ...vehicle,
+          mainPhotoUrl: resolveVehicleDisplayPhoto(vehicle),
           seatsPhotoUrl: toSeatsPhotoUrl(vehicle.interiorPhotoUrl),
           availableCount: 1,
           colors: shade ? [shade] : [],

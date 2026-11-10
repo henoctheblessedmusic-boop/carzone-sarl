@@ -61,6 +61,7 @@ export type VehicleItem = {
   siteId?: string | null;
   site?: { id: string; name: string; code?: string } | null;
   mainPhotoUrl?: string | null;
+  displayPhotoUrl?: string | null;
   interiorPhotoUrl?: string | null;
   exteriorPhotoUrl?: string | null;
   rearPhotoUrl?: string | null;
@@ -905,7 +906,7 @@ export function VehiclesView({
                       >
                         {/* PHOTO & MARQUE (STUDIO CADRÉ SANS AUCUN ROGNAGE) */}
                         <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-                          {v.mainPhotoUrl ? (
+                          {v.displayPhotoUrl || v.mainPhotoUrl ? (
                             <div
                               style={{
                                 width: 56,
@@ -923,7 +924,7 @@ export function VehiclesView({
                             >
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
-                                src={v.mainPhotoUrl}
+                                src={v.displayPhotoUrl || v.mainPhotoUrl || ""}
                                 alt={v.model}
                                 referrerPolicy="no-referrer"
                                 style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center" }}
@@ -1116,7 +1117,7 @@ export function VehiclesView({
           rows={vehicles.map((v) => [
             v.vin || "-",
             <div key={v.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              {v.mainPhotoUrl ? (
+              {v.displayPhotoUrl || v.mainPhotoUrl ? (
                 <div
                   style={{
                     width: 58,
@@ -1135,7 +1136,7 @@ export function VehiclesView({
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={v.mainPhotoUrl}
+                    src={v.displayPhotoUrl || v.mainPhotoUrl || ""}
                     alt={v.model}
                     referrerPolicy="no-referrer"
                     style={{

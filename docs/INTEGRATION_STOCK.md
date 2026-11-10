@@ -111,6 +111,31 @@ Deux conséquences normales :
 
 Les photos réelles doivent être ajoutées véhicule par véhicule dans le modal d'édition, via les champs URL de photos. Aucune photo d'un autre modèle ne doit être utilisée.
 
+### Règle de repli photo
+
+La carte stock utilise, dans l'ordre :
+
+1. la photo principale du véhicule ;
+2. la photo extérieure ;
+3. la photo intérieure si elle est vérifiée ;
+4. la photo arrière ;
+5. la première photo de la fiche technique, uniquement si le modèle correspond exactement au catalogue.
+
+DeepSeek ne génère pas de photos. L'API DeepSeek sert à produire le texte de la fiche technique. Les photos de catalogue viennent de `vehicle-catalog-specs.ts` ou des URL saisies manuellement.
+
+### Dossier de captures
+
+Un dossier de photos peut être fourni avec une arborescence par VIN :
+
+```text
+photos/<VIN>/main.jpg
+photos/<VIN>/exterior.jpg
+photos/<VIN>/interior.jpg
+photos/<VIN>/rear.jpg
+```
+
+Les photos doivent être des photos réelles du véhicule livré, sans plaque civile visible et sans image d'un autre modèle.
+
 ## Vérifications
 
 - `npx tsc --noEmit` : OK ;

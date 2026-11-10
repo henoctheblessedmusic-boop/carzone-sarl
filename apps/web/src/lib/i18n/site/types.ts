@@ -208,6 +208,8 @@ export interface SiteCopy {
     card: {
       priceOnRequest: string;
       viewDetails: string;
+      availableTemplate: string;
+      colorsLabel: string;
     };
     modal: {
       closeLabel: string;

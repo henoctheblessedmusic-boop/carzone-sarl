@@ -169,6 +169,29 @@ async function main() {
         { name: "DOLPHIN", vehicleType: "BERLINE", energy: "ELECTRIQUE" },
       ],
     },
+    {
+      name: "CHANGAN",
+      models: [
+        { name: "UNI-K", vehicleType: "SUV", energy: "ESSENCE" },
+        { name: "UNI-Z", vehicleType: "SUV", energy: "ESSENCE" },
+        { name: "CS75 PLUS", vehicleType: "SUV", energy: "ESSENCE" },
+        { name: "X5 PLUS", vehicleType: "SUV", energy: "ESSENCE" },
+      ],
+    },
+    {
+      name: "EXEED",
+      models: [
+        { name: "YAOGUANG", vehicleType: "SUV", energy: "ESSENCE" },
+        { name: "YAOGUANG C-DM", vehicleType: "SUV", energy: "PHEV" },
+      ],
+    },
+    {
+      name: "JETOUR",
+      models: [
+        { name: "DASHENG", vehicleType: "SUV", energy: "ESSENCE" },
+        { name: "MOUNTAIN & SEA T1", vehicleType: "SUV", energy: "PHEV" },
+      ],
+    },
   ];
 
   for (let i = 0; i < catalog.length; i++) {

@@ -276,6 +276,7 @@ export async function updateVehicle(formData: FormData) {
       energy,
       vehicleType,
       priceXof,
+      priceToConfirm: priceXof <= 0,
       status,
       mileage,
       color,

@@ -352,6 +352,8 @@ export const en: SiteCopy = {
     card: {
       priceOnRequest: "Price on request",
       viewDetails: "View vehicle",
+      availableTemplate: "{count} available",
+      colorsLabel: "Colors:",
     },
     modal: {
       closeLabel: "Close",

@@ -337,6 +337,8 @@ export const zh: SiteCopy = {
     card: {
       priceOnRequest: "价格面议",
       viewDetails: "查看车辆",
+      availableTemplate: "{count} 台可售",
+      colorsLabel: "颜色：",
     },
     modal: {
       closeLabel: "关闭",

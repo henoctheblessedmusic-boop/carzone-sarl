@@ -45,9 +45,17 @@ export type VehicleItem = {
   energy: string;
   vehicleType?: string | null;
   priceXof: number;
+  priceToConfirm?: boolean;
   status: string;
   mileage?: number;
   color?: string | null;
+  stockZone?: string | null;
+  exteriorColorBase?: string | null;
+  exteriorColorShade?: string | null;
+  interiorColor?: string | null;
+  arrivalDate?: string | null;
+  publishedOnSite?: boolean;
+  isIncompleteSheet?: boolean;
   supplierId?: string | null;
   supplier?: { id: string; name: string } | null;
   siteId?: string | null;
@@ -115,6 +123,7 @@ export function VehiclesView({
   canCreate,
   canDelete = false,
   initialParams,
+  stockSummary,
 }: {
   vehicles: VehicleItem[];
   catalog: CatalogBrand[];
@@ -122,10 +131,23 @@ export function VehiclesView({
   sites: { id: string; name: string; code?: string }[];
   canCreate: boolean;
   canDelete?: boolean;
-  initialParams: { energy?: string; q?: string; vehicleType?: string; siteId?: string };
+  initialParams: { energy?: string; q?: string; vehicleType?: string; siteId?: string; brand?: string; zone?: string; status?: string; incomplete?: string };
+  stockSummary: {
+    total: number;
+    incomplete: number;
+    byZone: [string, number][];
+    byModel: [string, number][];
+    byBrand: [string, number][];
+    byEnergy: [string, number][];
+    byStatus: [string, number][];
+    modelZone: { model: string; counts: Record<string, number>; total: number }[];
+    zones: string[];
+  };
 }) {
   const { locale } = usePrefs();
   const copy = stockCopy[locale];
+  const displayPrice = (vehicle: VehicleItem) =>
+    vehicle.priceToConfirm || vehicle.priceXof <= 0 ? "Prix à définir" : formatXof(vehicle.priceXof);
   const [viewMode, setViewMode] = useState<"pipeline" | "table">("pipeline");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<VehicleItem | null>(null);
@@ -524,6 +546,8 @@ export function VehiclesView({
                     <option value="EN_TRANSIT">{copy.statusOption.EN_TRANSIT}</option>
                     <option value="AU_PORT">{copy.statusOption.AU_PORT}</option>
                     <option value="EN_MAGASIN">{copy.statusOption.EN_MAGASIN}</option>
+                    <option value="EN_ARRIVAGE">{copy.statusOption.EN_ARRIVAGE}</option>
+                    <option value="RETIRE">{copy.statusOption.RETIRE}</option>
                   </select>
 
                   <select name="siteId" className="ox-select" defaultValue={sites[0]?.id || ""} title={copy.createModal.siteTitle}>
@@ -662,6 +686,75 @@ export function VehiclesView({
         </div>
       )}
 
+      {/* RÉCAPITULATIF STOCK */}
+      <div className="ox-glass" style={{ padding: "1rem", borderRadius: 14, marginBottom: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
+          <h3 style={{ margin: 0, fontSize: "1rem" }}>Récapitulatif du stock</h3>
+          <span style={{ fontSize: "0.8rem", opacity: 0.7 }}>
+            {stockSummary.total} véhicules · {stockSummary.incomplete} fiche(s) incomplète(s)
+          </span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 8, marginBottom: 12 }}>
+          {stockSummary.zones.map((zone) => {
+            const count = stockSummary.byZone.find(([label]) => label === zone)?.[1] ?? 0;
+            return (
+              <Link
+                key={zone}
+                href={`/vehicles?zone=${encodeURIComponent(zone)}`}
+                style={{ textDecoration: "none", color: "inherit", padding: "8px 10px", borderRadius: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+              >
+                <div style={{ fontSize: "0.72rem", opacity: 0.65 }}>{zone}</div>
+                <div style={{ fontSize: "1.2rem", fontWeight: 800 }}>{count}</div>
+              </Link>
+            );
+          })}
+          <Link
+            href="/vehicles?incomplete=1"
+            style={{ textDecoration: "none", color: "#fcd34d", padding: "8px 10px", borderRadius: 8, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)" }}
+          >
+            <div style={{ fontSize: "0.72rem", opacity: 0.8 }}>Fiches à compléter</div>
+            <div style={{ fontSize: "1.2rem", fontWeight: 800 }}>{stockSummary.incomplete}</div>
+          </Link>
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.76rem" }}>
+            <thead>
+              <tr style={{ textAlign: "left", opacity: 0.7 }}>
+                <th style={{ padding: "4px 6px" }}>Modèle</th>
+                {stockSummary.zones.map((zone) => <th key={zone} style={{ padding: "4px 6px" }}>{zone}</th>)}
+                <th style={{ padding: "4px 6px" }}>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stockSummary.modelZone.map((row) => (
+                <tr key={row.model} style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+                  <td style={{ padding: "4px 6px" }}>{row.model}</td>
+                  {stockSummary.zones.map((zone) => <td key={zone} style={{ padding: "4px 6px" }}>{row.counts[zone] ?? 0}</td>)}
+                  <td style={{ padding: "4px 6px", fontWeight: 700 }}>{row.total}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
+          {stockSummary.byBrand.map(([brand, count]) => (
+            <span key={`brand-${brand}`} style={{ fontSize: "0.74rem", padding: "3px 8px", borderRadius: 999, background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.25)" }}>
+              {brand}: {count}
+            </span>
+          ))}
+          {stockSummary.byEnergy.map(([energy, count]) => (
+            <span key={`energy-${energy}`} style={{ fontSize: "0.74rem", padding: "3px 8px", borderRadius: 999, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)" }}>
+              {energyLabel(copy, energy)}: {count}
+            </span>
+          ))}
+          {stockSummary.byStatus.map(([status, count]) => (
+            <span key={`status-${status}`} style={{ fontSize: "0.74rem", padding: "3px 8px", borderRadius: 999, background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)" }}>
+              {statusLabel(copy, status)}: {count}
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* RECHERCHE ET FILTRES RAPIDES */}
       <form className="ox-form-row" style={{ marginBottom: 16 }}>
         <input
@@ -694,6 +787,22 @@ export function VehiclesView({
           <option value="BERLINE">{copy.vehicleType.BERLINE}</option>
           <option value="VAN">{copy.vehicleType.VAN}</option>
         </select>
+        <select name="zone" defaultValue={initialParams.zone || ""} className="ox-select">
+          <option value="">Toutes les zones</option>
+          {stockSummary.zones.map((zone) => <option key={zone} value={zone}>{zone}</option>)}
+        </select>
+        <select name="status" defaultValue={initialParams.status || ""} className="ox-select">
+          <option value="">Tous les statuts</option>
+          <option value="EN_MAGASIN">{copy.status.EN_MAGASIN}</option>
+          <option value="EN_ARRIVAGE">{copy.status.EN_ARRIVAGE}</option>
+          <option value="RESERVE">{copy.status.RESERVE}</option>
+          <option value="VENDU">{copy.status.VENDU}</option>
+          <option value="RETIRE">{copy.status.RETIRE}</option>
+        </select>
+        <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.82rem" }}>
+          <input type="checkbox" name="incomplete" value="1" defaultChecked={initialParams.incomplete === "1"} />
+          Fiche incomplète
+        </label>
         <button type="submit" className="ox-btn">
           {copy.filters.submit}
         </button>
@@ -847,7 +956,7 @@ export function VehiclesView({
 
                         {/* PRIX */}
                         <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "#34d399" }}>
-                          {formatXof(v.priceXof)}
+                          {displayPrice(v)}
                         </div>
 
                         {/* INFOS LOGISTIQUES */}
@@ -1030,6 +1139,9 @@ export function VehiclesView({
                   <span>{`${v.brand} ${v.model}`}</span>
                 </div>
                 {v.variant && <div style={{ fontSize: "0.78rem", opacity: 0.7 }}>{v.variant}</div>}
+                {v.isIncompleteSheet && (
+                  <div style={{ fontSize: "0.72rem", color: "#fcd34d" }}>Fiche incomplète</div>
+                )}
               </div>
             </div>,
             v.vehicleType ? vehicleTypeLabel(copy, v.vehicleType) : "-",
@@ -1050,11 +1162,12 @@ export function VehiclesView({
               >
                 <span style={{ fontSize: "0.85rem" }}>📍</span>
                 <span>{v.site.name}</span>
+                {v.stockZone && <span style={{ opacity: 0.7 }}>· {v.stockZone}</span>}
               </span>
             ) : (
               <span key={`site-${v.id}`} style={{ opacity: 0.5 }}>-</span>
             ),
-            formatXof(v.priceXof),
+            displayPrice(v),
             <Badge
               key={`b-${v.id}`}
               tone={
@@ -1239,6 +1352,8 @@ export function VehiclesView({
                     <option value="EN_TRANSIT">{copy.statusOption.EN_TRANSIT}</option>
                     <option value="AU_PORT">{copy.statusOption.AU_PORT}</option>
                     <option value="EN_MAGASIN">{copy.statusOption.EN_MAGASIN}</option>
+                    <option value="EN_ARRIVAGE">{copy.statusOption.EN_ARRIVAGE}</option>
+                    <option value="RETIRE">{copy.statusOption.RETIRE}</option>
                     <option value="RESERVE">{copy.statusOption.RESERVE}</option>
                     <option value="VENDU">{copy.statusOption.VENDU}</option>
                   </select>

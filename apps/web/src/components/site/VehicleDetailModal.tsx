@@ -21,6 +21,9 @@ export interface CatalogVehicle {
   color: string | null;
   mileage: number;
   priceXof: number;
+  priceToConfirm?: boolean;
+  availableCount?: number;
+  colors?: string[];
   status: string;
   mainPhotoUrl: string | null;
   interiorPhotoUrl: string | null;

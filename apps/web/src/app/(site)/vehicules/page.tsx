@@ -46,6 +46,13 @@ function toSeatsPhotoUrl(interiorPhotoUrl: string | null): string | null {
 async function getCatalogVehicles(): Promise<CatalogVehicle[]> {
   try {
     const vehicles = await prisma.vehicle.findMany({
+      where: {
+        status: { in: ["EN_MAGASIN", "EN_STOCK"] },
+        publishedOnSite: true,
+        variant: { not: null },
+        year: { not: null },
+        energy: { not: "NON_RENSEIGNEE" },
+      },
       select: {
         id: true,
         brand: true,
@@ -56,8 +63,12 @@ async function getCatalogVehicles(): Promise<CatalogVehicle[]> {
         vehicleType: true,
         transmission: true,
         color: true,
+        exteriorColorShade: true,
+        exteriorColorBase: true,
+        versionId: true,
         mileage: true,
         priceXof: true,
+        priceToConfirm: true,
         status: true,
         mainPhotoUrl: true,
         interiorPhotoUrl: true,
@@ -68,9 +79,31 @@ async function getCatalogVehicles(): Promise<CatalogVehicle[]> {
       orderBy: [{ createdAt: "desc" }],
     });
 
-    return vehicles.map((vehicle) => ({
+    const grouped = new Map<string, CatalogVehicle & { colorSet: Set<string> }>();
+    for (const vehicle of vehicles) {
+      const key =
+        vehicle.versionId ||
+        [vehicle.brand, vehicle.model, vehicle.variant, vehicle.year, vehicle.energy].join("|");
+      const shade = vehicle.exteriorColorShade || vehicle.exteriorColorBase || vehicle.color;
+      const current = grouped.get(key);
+      if (current) {
+        current.availableCount = (current.availableCount ?? 1) + 1;
+        if (shade) current.colorSet.add(shade);
+        if ((vehicle.priceXof || 0) > 0 && (current.priceXof || 0) === 0) current.priceXof = vehicle.priceXof;
+      } else {
+        grouped.set(key, {
+          ...vehicle,
+          seatsPhotoUrl: toSeatsPhotoUrl(vehicle.interiorPhotoUrl),
+          availableCount: 1,
+          colors: shade ? [shade] : [],
+          colorSet: new Set(shade ? [shade] : []),
+        });
+      }
+    }
+
+    return Array.from(grouped.values()).map(({ colorSet, ...vehicle }) => ({
       ...vehicle,
-      seatsPhotoUrl: toSeatsPhotoUrl(vehicle.interiorPhotoUrl),
+      colors: Array.from(colorSet),
     }));
   } catch (error) {
     console.error("Erreur chargement du catalogue véhicules (vitrine) :", error);

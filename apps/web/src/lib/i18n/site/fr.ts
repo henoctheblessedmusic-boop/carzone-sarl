@@ -354,6 +354,8 @@ export const fr: SiteCopy = {
     card: {
       priceOnRequest: "Prix sur demande",
       viewDetails: "Voir la fiche",
+      availableTemplate: "{count} disponibles",
+      colorsLabel: "Coloris :",
     },
     modal: {
       closeLabel: "Fermer",

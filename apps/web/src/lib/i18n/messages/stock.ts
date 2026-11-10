@@ -9,9 +9,9 @@ export type StockStageKey =
   | "EN_MAGASIN";
 
 /** Codes de statut rencontrés en base, y compris les statuts hors pipeline. */
-export type StockStatusKey = StockStageKey | "EN_STOCK" | "RESERVE" | "VENDU";
+export type StockStatusKey = StockStageKey | "EN_STOCK" | "EN_ARRIVAGE" | "RETIRE" | "RESERVE" | "VENDU";
 
-export type StockEnergyKey = "ELECTRIQUE" | "HYBRIDE" | "PHEV" | "ESSENCE" | "DIESEL";
+export type StockEnergyKey = "ELECTRIQUE" | "HYBRIDE" | "PHEV" | "ESSENCE" | "DIESEL" | "NON_RENSEIGNEE";
 
 export type StockVehicleTypeKey = "SUV" | "PICKUP" | "BERLINE" | "VAN";
 
@@ -166,6 +166,8 @@ export const STOCK_STATUS_KEYS: StockStatusKey[] = [
   "AU_PORT",
   "EN_MAGASIN",
   "EN_STOCK",
+  "EN_ARRIVAGE",
+  "RETIRE",
   "RESERVE",
   "VENDU",
 ];
@@ -176,6 +178,7 @@ export const STOCK_ENERGY_KEYS: StockEnergyKey[] = [
   "PHEV",
   "ESSENCE",
   "DIESEL",
+  "NON_RENSEIGNEE",
 ];
 
 export const STOCK_VEHICLE_TYPE_KEYS: StockVehicleTypeKey[] = [
@@ -258,6 +261,8 @@ const fr: StockCopy = {
     AU_PORT: "Au port",
     EN_MAGASIN: "En stock showroom",
     EN_STOCK: "En stock",
+    EN_ARRIVAGE: "En arrivage",
+    RETIRE: "Retiré",
     RESERVE: "Réservé",
     VENDU: "Vendu",
   },
@@ -268,6 +273,8 @@ const fr: StockCopy = {
     AU_PORT: "4. Au port (port de Cotonou)",
     EN_MAGASIN: "5. Stock showroom (disponible à Cotonou)",
     EN_STOCK: "En stock showroom",
+    EN_ARRIVAGE: "En arrivage (hors port)",
+    RETIRE: "Retiré du stock",
     RESERVE: "Réservé (client)",
     VENDU: "Vendu (facturé)",
   },
@@ -277,6 +284,7 @@ const fr: StockCopy = {
     PHEV: "Hybride rechargeable",
     ESSENCE: "Essence",
     DIESEL: "Diesel",
+    NON_RENSEIGNEE: "Non renseignée",
   },
   energyOption: {
     ELECTRIQUE: "Électrique (EV)",
@@ -284,6 +292,7 @@ const fr: StockCopy = {
     PHEV: "Hybride rechargeable (PHEV)",
     ESSENCE: "Essence",
     DIESEL: "Diesel",
+    NON_RENSEIGNEE: "Non renseignée",
   },
   vehicleType: {
     SUV: "SUV",
@@ -458,6 +467,8 @@ const en: StockCopy = {
     AU_PORT: "At port",
     EN_MAGASIN: "In showroom stock",
     EN_STOCK: "In stock",
+    EN_ARRIVAGE: "Arriving",
+    RETIRE: "Withdrawn",
     RESERVE: "Reserved",
     VENDU: "Sold",
   },
@@ -468,6 +479,8 @@ const en: StockCopy = {
     AU_PORT: "4. At port (Port of Cotonou)",
     EN_MAGASIN: "5. Showroom stock (available in Cotonou)",
     EN_STOCK: "Showroom stock",
+    EN_ARRIVAGE: "Arriving (left port)",
+    RETIRE: "Withdrawn",
     RESERVE: "Reserved (customer)",
     VENDU: "Sold (invoiced)",
   },
@@ -477,6 +490,7 @@ const en: StockCopy = {
     PHEV: "Plug-in hybrid",
     ESSENCE: "Petrol",
     DIESEL: "Diesel",
+    NON_RENSEIGNEE: "Not specified",
   },
   energyOption: {
     ELECTRIQUE: "Electric (EV)",
@@ -484,6 +498,7 @@ const en: StockCopy = {
     PHEV: "Plug-in hybrid (PHEV)",
     ESSENCE: "Petrol",
     DIESEL: "Diesel",
+    NON_RENSEIGNEE: "Not specified",
   },
   vehicleType: {
     SUV: "SUV",
@@ -656,6 +671,8 @@ const zh: StockCopy = {
     AU_PORT: "在港",
     EN_MAGASIN: "展厅现车",
     EN_STOCK: "现货",
+    EN_ARRIVAGE: "在途到达",
+    RETIRE: "已撤出",
     RESERVE: "已预订",
     VENDU: "已售出",
   },
@@ -666,6 +683,8 @@ const zh: StockCopy = {
     AU_PORT: "4. 在港(科托努港)",
     EN_MAGASIN: "5. 展厅现车(科托努可提)",
     EN_STOCK: "展厅现车",
+    EN_ARRIVAGE: "在途到达",
+    RETIRE: "已撤出",
     RESERVE: "已预订(客户)",
     VENDU: "已售出(已开票)",
   },
@@ -675,6 +694,7 @@ const zh: StockCopy = {
     PHEV: "插电混动",
     ESSENCE: "汽油",
     DIESEL: "柴油",
+    NON_RENSEIGNEE: "未填写",
   },
   energyOption: {
     ELECTRIQUE: "纯电(EV)",
@@ -682,6 +702,7 @@ const zh: StockCopy = {
     PHEV: "插电混动(PHEV)",
     ESSENCE: "汽油",
     DIESEL: "柴油",
+    NON_RENSEIGNEE: "未填写",
   },
   vehicleType: {
     SUV: "SUV",

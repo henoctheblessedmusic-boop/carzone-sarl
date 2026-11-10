@@ -217,6 +217,16 @@ function CatalogCard({ vehicle, copy, locale, quoteCopy, onOpen }: CatalogCardPr
           </p>
           <h3 className="site-vehicle-card-title">{title}</h3>
           {vehicle.year ? <p className="site-vehicle-card-year">{vehicle.year}</p> : null}
+          {(vehicle.availableCount ?? 0) > 1 ? (
+            <p className="site-vehicle-card-year">
+              {copy.card.availableTemplate.replace("{count}", String(vehicle.availableCount))}
+            </p>
+          ) : null}
+          {vehicle.colors && vehicle.colors.length > 0 ? (
+            <p className="site-vehicle-card-year">
+              {copy.card.colorsLabel} {vehicle.colors.join(", ")}
+            </p>
+          ) : null}
           <span className="site-catalog-card-cta">{copy.card.viewDetails}</span>
         </div>
       </button>

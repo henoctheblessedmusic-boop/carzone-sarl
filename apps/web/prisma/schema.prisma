@@ -135,6 +135,32 @@ model VehicleBrand {
   models    VehicleModel[]
 }
 
+/// Version catalogue dédupliquée : marque + modèle + finition + année + énergie.
+model VehicleVersion {
+  id                String    @id @default(cuid())
+  key               String    @unique
+  brand             String
+  model             String
+  trim              String?
+  year              Int?
+  energy            String?
+  engineLabel       String?
+  transmissionType  String?
+  gearboxLabel      String?
+  seats             Int?
+  otherFeatures     String?
+  powerHp           Int?
+  rangeKm           Int?
+  batteryKwh        Float?
+  technologies      String[]  @default([])
+  description       String?
+  vehicles          Vehicle[]
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([brand, model])
+}
+
 model VehicleModel {
   id          String       @id @default(cuid())
   brandId     String
@@ -185,10 +211,24 @@ model Vehicle {
   vehicleType   String?
   transmission  String?
   color         String?
+  /// Couleur de base utilisée par les filtres du stock.
+  exteriorColorBase  String?
+  exteriorColorShade String?
+  interiorColor      String?
+  /// Zone interne sous le site physique Maro-Militaire.
+  stockZone          String?
+  arrivalDate        DateTime?
+  publishedOnSite    Boolean       @default(true)
+  isIncompleteSheet  Boolean       @default(false)
+  /// Le prix reste à confirmer : 0 ne doit pas être présenté comme un prix réel.
+  priceToConfirm     Boolean       @default(false)
+  internalNotes      String?
   mileage       Int            @default(0)
-  priceXof      Int
+  priceXof      Int            @default(0)
   costXof       Int?
   status        String         @default("EN_STOCK")
+  versionId     String?
+  version       VehicleVersion? @relation(fields: [versionId], references: [id], onDelete: SetNull)
   /// SHOWROOM = stock de vente ; RENTAL = parc de location distinct.
   fleetType     String         @default("SHOWROOM")
   /// DISPONIBLE | LOUE | MAINTENANCE | HORS_SERVICE (pertinent si fleetType = RENTAL)

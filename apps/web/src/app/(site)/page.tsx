@@ -57,7 +57,14 @@ export async function generateMetadata(): Promise<Metadata> {
 async function getHighlightVehicles(): Promise<SlideshowVehicle[]> {
   try {
     const vehicles = await prisma.vehicle.findMany({
-      where: { status: { in: HIGHLIGHT_STATUSES }, mainPhotoUrl: { not: null } },
+      where: {
+        status: { in: HIGHLIGHT_STATUSES },
+        publishedOnSite: true,
+        variant: { not: null },
+        year: { not: null },
+        energy: { not: "NON_RENSEIGNEE" },
+        mainPhotoUrl: { not: null },
+      },
       select: {
         id: true,
         brand: true,
@@ -106,7 +113,15 @@ async function getHighlightVehicles(): Promise<SlideshowVehicle[]> {
 
 async function getAvailableVehiclesCount(): Promise<number> {
   try {
-    return await prisma.vehicle.count({ where: { status: { in: SHOWROOM_STATUSES } } });
+    return await prisma.vehicle.count({
+      where: {
+        status: { in: SHOWROOM_STATUSES },
+        publishedOnSite: true,
+        variant: { not: null },
+        year: { not: null },
+        energy: { not: "NON_RENSEIGNEE" },
+      },
+    });
   } catch (error) {
     console.error("Erreur comptage des véhicules disponibles (accueil vitrine) :", error);
     return 0;

@@ -16,7 +16,8 @@
     "audit:navigation": "node ../../scripts/audit-navigation.mjs",
     "check:no-em-dash": "node ../../scripts/check-no-em-dash.mjs",
     "db:assign-configurations": "tsx scripts/assign-vehicle-configurations.ts",
-    "check:contrast": "node ../../scripts/check-contrast.mjs"
+    "check:contrast": "node ../../scripts/check-contrast.mjs",
+    "media:plan": "tsx scripts/plan-showroom-media.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

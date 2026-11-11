@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Printer, ArrowLeft, ShieldCheck } from "lucide-react";
 import { WORKSHOP_CHECKLIST_TEMPLATE } from "@/lib/workshop-checklist-data";
 import { usePrefs } from "@/components/PrefsProvider";
+import { SITE_LEGAL_LINE } from "@/lib/site-constants";
 import { workshopCopy, checklistCategoryLabel, checklistTaskLabel } from "@/lib/i18n/messages/workshop";
 
 export type ChecklistTaskExecution = {
@@ -557,6 +558,7 @@ export function FicheEntretienSystematiquePrint({ data }: { data: SystematicMain
           }}
         >
           {copy.footer}
+          <div style={{ marginTop: "1px" }}>{SITE_LEGAL_LINE}</div>
         </div>
       </div>
     </div>

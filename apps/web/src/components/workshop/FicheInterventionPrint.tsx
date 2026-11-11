@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Printer, ArrowLeft, Check, ShieldCheck } from "lucide-react";
 import { usePrefs } from "@/components/PrefsProvider";
+import { SITE_LEGAL_LINE } from "@/lib/site-constants";
 import { workshopCopy } from "@/lib/i18n/messages/workshop";
 
 export type InterventionData = {
@@ -568,6 +569,7 @@ export function FicheInterventionPrint({ data }: { data: InterventionData }) {
           }}
         >
           {copy.footer}
+          <div style={{ marginTop: "1px" }}>{SITE_LEGAL_LINE}</div>
         </div>
       </div>
     </div>

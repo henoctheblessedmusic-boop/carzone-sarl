@@ -1,6 +1,7 @@
 import React from "react";
 import type { TechnicalSheet } from "@/lib/tech-sheet-generator";
 import { BrandLogoSvg, BRAND_METADATA, normalizeBrandName } from "@/lib/brand-logos";
+import { SITE_LEGAL_LINE } from "@/lib/site-constants";
 
 export function VehicleTechSheetPrint({
   sheet,
@@ -1260,7 +1261,8 @@ export function VehicleTechSheetPrint({
           }}
         >
           <div>
-            CARZONE SARL · Fiche certifiée conforme constructeur · {vehicleInfo?.vin ? `N° VIN: ${vehicleInfo.vin}` : ""}
+            <div>CARZONE SARL · Fiche certifiée conforme constructeur · {vehicleInfo?.vin ? `N° VIN: ${vehicleInfo.vin}` : ""}</div>
+            <div style={{ fontSize: "0.62rem", marginTop: "2px" }}>{SITE_LEGAL_LINE}</div>
           </div>
           <div style={{ fontWeight: 800, color: "#0f172a" }}>Page 3 / 3</div>
         </div>

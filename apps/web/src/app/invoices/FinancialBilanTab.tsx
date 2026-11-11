@@ -13,6 +13,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { formatXof } from "@/lib/format";
+import { SITE_LEGAL_LINE } from "@/lib/site-constants";
 import { usePrefs } from "@/components/PrefsProvider";
 import { invoicesCopy } from "@/lib/i18n/messages/invoices";
 import type { InvoiceItem, PaymentRow } from "./InvoicesView";
@@ -784,6 +785,9 @@ export function FinancialBilanTab({
             </tfoot>
           </table>
         </div>
+      </div>
+      <div style={{ marginTop: 24, paddingTop: 12, borderTop: "1px solid var(--border)", textAlign: "center", fontSize: "0.75rem", color: "var(--text-muted)" }}>
+        CARZONE SARL · {SITE_LEGAL_LINE}
       </div>
     </div>
   );

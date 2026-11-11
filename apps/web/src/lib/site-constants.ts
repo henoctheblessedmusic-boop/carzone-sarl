@@ -55,6 +55,8 @@ export const SITE_FISCAL = {
   rccm: "RB/COT/23 B 34567",
 } as const;
 
+export const SITE_LEGAL_LINE = `IFU ${SITE_FISCAL.ifu} · RCCM ${SITE_FISCAL.rccm}`;
+
 export const SITE_BRANDS = [
   "Changan",
   "Deepal",

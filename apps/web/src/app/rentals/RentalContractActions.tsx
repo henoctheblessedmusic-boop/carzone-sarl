@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { Pencil, Trash2, X } from "lucide-react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { Pencil, Trash2 } from "lucide-react";
 import { deleteRentalContract, updateRentalContract } from "./actions";
+import { RentalModal } from "./RentalModal";
 
 type ContractRow = {
   id: string;
@@ -21,22 +23,36 @@ type ContractRow = {
 const FIELD = { width: "100%", height: 38, fontSize: "0.86rem" } as const;
 
 export function RentalContractActions({ rental }: { rental: ContractRow }) {
+  const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [isDeleting, startDeletion] = useTransition();
 
+  // La ligne disparait du tableau des que la suppression aboutit : le composant
+  // est demonte alors que la transition tourne encore.
+  const isAlive = useRef(true);
+  useEffect(() => {
+    isAlive.current = true;
+    return () => {
+      isAlive.current = false;
+    };
+  }, []);
+
   function handleDelete(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (isDeleting) return;
     const formData = new FormData(event.currentTarget);
     setDeleteError("");
     startDeletion(async () => {
       try {
         await deleteRentalContract(formData);
+        if (!isAlive.current) return;
         setConfirmDelete(false);
-        window.location.reload();
+        router.refresh();
       } catch (error) {
-        setDeleteError(error instanceof Error ? error.message : "La suppression a echoue. Reessayez.");
+        if (!isAlive.current) return;
+        setDeleteError(error instanceof Error ? error.message : "La suppression n'a pas abouti. Reessayez.");
       }
     });
   }
@@ -57,7 +73,7 @@ export function RentalContractActions({ rental }: { rental: ContractRow }) {
       </button>
 
       {confirmDelete && (
-        <Modal title="Supprimer ce contrat ?" onClose={() => setConfirmDelete(false)}>
+        <RentalModal title="Supprimer ce contrat ?" onClose={() => setConfirmDelete(false)} busy={isDeleting}>
           <p style={{ margin: "0 0 14px", color: "var(--text-muted)", lineHeight: 1.5 }}>
             Le contrat sera définitivement supprimé. Le véhicule sera remis à disposition s&apos;il était actif.
             {rental.paymentCount > 0 ? " Suppression impossible : des encaissements existent." : ""}
@@ -76,11 +92,11 @@ export function RentalContractActions({ rental }: { rental: ContractRow }) {
               {deleteError}
             </div>
           ) : null}
-        </Modal>
+        </RentalModal>
       )}
 
       {editing && (
-        <Modal title="Modifier le contrat de location" onClose={() => setEditing(false)}>
+        <RentalModal title="Modifier le contrat de location" onClose={() => setEditing(false)}>
           <form action={updateRentalContract} style={{ display: "grid", gap: 10 }}>
             <input type="hidden" name="id" value={rental.id} />
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,180px),1fr))", gap: 10 }}>
@@ -104,7 +120,7 @@ export function RentalContractActions({ rental }: { rental: ContractRow }) {
               <button type="submit" className="ox-btn ox-btn-primary">Enregistrer</button>
             </div>
           </form>
-        </Modal>
+        </RentalModal>
       )}
     </div>
   );
@@ -116,29 +132,5 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       {label}
       {children}
     </label>
-  );
-}
-
-function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
-  return (
-    <div
-      role="presentation"
-      onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}
-      style={{ position: "fixed", inset: 0, zIndex: 1200, display: "grid", placeItems: "center", padding: "1rem", background: "var(--surface-overlay)", backdropFilter: "blur(8px)" }}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        onMouseDown={(event) => event.stopPropagation()}
-        style={{ width: "min(720px,100%)", maxHeight: "90vh", overflowY: "auto", padding: "1.2rem", borderRadius: 14, background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-lg)" }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", marginBottom: 14 }}>
-          <strong>{title}</strong>
-          <button type="button" onClick={onClose} aria-label="Fermer" className="ox-btn ox-btn-ghost ox-btn-sm"><X size={16} /></button>
-        </div>
-        {children}
-      </div>
-    </div>
   );
 }

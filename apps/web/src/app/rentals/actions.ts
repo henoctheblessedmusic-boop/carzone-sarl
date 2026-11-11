@@ -8,6 +8,7 @@ import { logAudit } from "@/lib/audit";
 import { ensureVehicleTechSheet, approveVehicleTechSheet } from "@/lib/vehicle-model-tech-sheet";
 import { inheritVehiclePhotos } from "@/lib/vehicle-photos";
 import { computeRentalTotal, rentalDaysBetween } from "@/lib/rental-contract";
+import { CONFIRMATION_WORD, isConfirmationWord } from "./confirmation";
 
 const MANAGE_ROLES = ["GESTIONNAIRE_LOCATION", "DG", "PDG", "SG"] as const;
 const FINANCE_ROLES = ["GESTIONNAIRE_LOCATION", "COMPTA", "DG", "PDG", "SG"] as const;
@@ -559,21 +560,47 @@ export async function transferVehicleToRental(formData: FormData) {
   revalidatePath("/vehicles");
 }
 
-export async function transferVehicleToShowroom(formData: FormData) {
+/**
+ * Retire un véhicule du parc de location et le remet au stock showroom.
+ *
+ * Renvoie un résultat au lieu de lever une exception sur les refus métier :
+ * en production, Next.js remplace le message d'une erreur levée dans une
+ * action serveur par un texte générique, ce qui priverait l'utilisateur de la
+ * raison réelle du refus. Les pannes inattendues, elles, continuent de lever.
+ */
+export async function transferVehicleToShowroom(
+  formData: FormData,
+): Promise<{ ok: true } | { ok: false; message: string }> {
   const user = await requireUser([...MANAGE_ROLES]);
   requireManager(user.role);
   const vehicleId = String(formData.get("vehicleId") || "").trim();
-  const confirmation = String(formData.get("confirmation") || "").trim().toUpperCase();
-  if (!vehicleId) throw new Error("Véhicule requis.");
-  if (confirmation !== "SUPPRIMER") {
-    throw new Error("Saisissez SUPPRIMER pour confirmer le retrait du véhicule.");
+  const confirmation = String(formData.get("confirmation") || "").trim();
+  if (!vehicleId) {
+    return { ok: false, message: "Véhicule requis." };
+  }
+  if (!isConfirmationWord(confirmation)) {
+    return {
+      ok: false,
+      message: `Saisissez exactement ${CONFIRMATION_WORD} pour confirmer le retrait du véhicule.`,
+    };
+  }
+
+  const target = await prisma.vehicle.findUnique({
+    where: { id: vehicleId },
+    select: { id: true, fleetType: true },
+  });
+  if (!target) {
+    return { ok: false, message: "Ce véhicule n'existe plus. Actualisez la page." };
+  }
+  if (target.fleetType !== "RENTAL") {
+    return { ok: false, message: "Ce véhicule n'appartient pas au parc de location." };
   }
 
   const activeRental = await prisma.rental.count({
     where: { vehicleId, status: "ACTIF" },
   });
   if (activeRental > 0) {
-    throw new Error("Impossible de sortir un véhicule avec un contrat de location actif.");
+    return { ok: false, message: "Impossible de sortir un véhicule avec un contrat de location actif." };
   }
 
   const vehicle = await prisma.vehicle.update({
@@ -591,6 +618,7 @@ export async function transferVehicleToShowroom(formData: FormData) {
   });
   revalidatePath("/rentals");
   revalidatePath("/vehicles");
+  return { ok: true };
 }
 
 

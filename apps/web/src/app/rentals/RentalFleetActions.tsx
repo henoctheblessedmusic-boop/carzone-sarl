@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { Pencil, Trash2, X } from "lucide-react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { Pencil, Trash2 } from "lucide-react";
 import { transferVehicleToShowroom, updateRentalVehicle } from "./actions";
+import { CONFIRMATION_WORD, isConfirmationWord } from "./confirmation";
+import { RentalModal } from "./RentalModal";
 
 type FleetVehicle = {
   id: string;
@@ -21,26 +24,73 @@ type FleetVehicle = {
 const FIELD = { width: "100%", height: 38, fontSize: "0.86rem" } as const;
 
 export function RentalFleetActions({ vehicle, hasActive }: { vehicle: FleetVehicle; hasActive: boolean }) {
+  const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
   const [removeError, setRemoveError] = useState("");
   const [removeWord, setRemoveWord] = useState("");
   const [isRemoving, startRemoval] = useTransition();
 
+  // La ligne disparait du tableau des que le retrait aboutit : le composant est
+  // alors demonte alors que la transition tourne encore. On ne touche plus a
+  // l'etat apres ce point.
+  const isAlive = useRef(true);
+  useEffect(() => {
+    isAlive.current = true;
+    return () => {
+      isAlive.current = false;
+    };
+  }, []);
+
+  function openRemoval() {
+    setRemoveWord("");
+    setRemoveError("");
+    setConfirmRemove(true);
+  }
+
+  function closeRemoval() {
+    setConfirmRemove(false);
+    setRemoveWord("");
+    setRemoveError("");
+  }
+
   function handleRemove(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+    if (isRemoving) return;
+
+    if (!isConfirmationWord(removeWord)) {
+      setRemoveError(`Saisissez exactement ${CONFIRMATION_WORD} pour confirmer le retrait.`);
+      return;
+    }
+
+    const formData = new FormData();
+    formData.set("vehicleId", vehicle.id);
+    formData.set("confirmation", removeWord.trim());
     setRemoveError("");
+
     startRemoval(async () => {
       try {
-        await transferVehicleToShowroom(formData);
+        const result = await transferVehicleToShowroom(formData);
+        if (!isAlive.current) return;
+        if (!result.ok) {
+          setRemoveError(result.message);
+          return;
+        }
         setConfirmRemove(false);
-        window.location.reload();
-      } catch (error) {
-        setRemoveError(error instanceof Error ? error.message : "Le retrait a echoue. Reessayez.");
+        setRemoveWord("");
+        // Rafraichissement cible du rendu serveur : la ligne disparait sans
+        // rechargement complet de la page.
+        router.refresh();
+      } catch {
+        if (!isAlive.current) return;
+        setRemoveError("Le retrait n'a pas abouti. Verifiez votre connexion puis reessayez.");
       }
     });
   }
+
+  const canSubmitRemoval = isConfirmationWord(removeWord) && !isRemoving;
+  // Le bouton desactive seul n'explique pas pourquoi il l'est : on le dit.
+  const showWordHint = removeWord.trim().length > 0 && !isConfirmationWord(removeWord);
 
   return (
     <>
@@ -53,49 +103,60 @@ export function RentalFleetActions({ vehicle, hasActive }: { vehicle: FleetVehic
           className="ox-btn ox-btn-ghost ox-btn-sm"
           disabled={hasActive}
           title={hasActive ? "Retournez d'abord le contrat actif." : "Retirer du parc de location"}
-          onClick={() => setConfirmRemove(true)}
+          onClick={openRemoval}
         >
           <Trash2 size={13} /> Retirer du parc
         </button>
       </div>
 
       {confirmRemove && (
-        <Modal title="Retirer ce véhicule du parc ?" onClose={() => setConfirmRemove(false)}>
-          <p style={{ margin: "0 0 10px", color: "var(--text-muted)", lineHeight: 1.5 }}>
-            {vehicle.brand} {vehicle.model} {vehicle.registrationNumber ? `(${vehicle.registrationNumber})` : ""} sera retiré de la base locative et remis dans le stock showroom.
-            Cette action ne supprime pas la fiche véhicule.
-          </p>
-          <label style={{ display: "grid", gap: 5, marginBottom: 14, fontSize: "0.82rem", color: "var(--text-muted)" }}>
-            Saisissez <strong style={{ color: "var(--danger-fg)" }}>SUPPRIMER</strong> pour confirmer
-            <input
-              value={removeWord}
-              onChange={(event) => setRemoveWord(event.target.value)}
-              className="ox-input"
-              autoComplete="off"
-              placeholder="SUPPRIMER"
-              style={{ maxWidth: 260, height: 38 }}
-            />
-          </label>
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-            <button type="button" className="ox-btn ox-btn-ghost" onClick={() => setConfirmRemove(false)} disabled={isRemoving}>Annuler</button>
-            <form onSubmit={handleRemove}>
-              <input type="hidden" name="vehicleId" value={vehicle.id} />
-              <input type="hidden" name="confirmation" value={removeWord} />
-              <button type="submit" className="ox-btn ox-btn-primary" disabled={isRemoving || removeWord.trim().toUpperCase() !== "SUPPRIMER"}>
+        <RentalModal title="Retirer ce véhicule du parc ?" onClose={closeRemoval} busy={isRemoving}>
+          <form onSubmit={handleRemove}>
+            <p style={{ margin: "0 0 10px", color: "var(--text-muted)", lineHeight: 1.5 }}>
+              {vehicle.brand} {vehicle.model} {vehicle.registrationNumber ? `(${vehicle.registrationNumber})` : ""} sera retiré de la base locative et remis dans le stock showroom.
+              Cette action ne supprime pas la fiche véhicule.
+            </p>
+            <label style={{ display: "grid", gap: 5, marginBottom: 14, fontSize: "0.82rem", color: "var(--text-muted)" }}>
+              Saisissez <strong style={{ color: "var(--danger-fg)" }}>{CONFIRMATION_WORD}</strong> pour confirmer
+              <input
+                value={removeWord}
+                onChange={(event) => {
+                  setRemoveWord(event.target.value);
+                  setRemoveError("");
+                }}
+                className="ox-input"
+                autoComplete="off"
+                autoFocus
+                disabled={isRemoving}
+                placeholder={CONFIRMATION_WORD}
+                aria-invalid={removeError ? true : undefined}
+                style={{ maxWidth: 260, height: 38 }}
+              />
+              {showWordHint ? (
+                <span style={{ color: "var(--danger-fg)", fontSize: "0.76rem" }}>
+                  Le mot doit être saisi exactement : {CONFIRMATION_WORD}.
+                </span>
+              ) : null}
+            </label>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+              <button type="button" className="ox-btn ox-btn-ghost" onClick={closeRemoval} disabled={isRemoving}>
+                Annuler
+              </button>
+              <button type="submit" className="ox-btn ox-btn-primary" disabled={!canSubmitRemoval}>
                 {isRemoving ? "Retrait en cours..." : "Confirmer le retrait"}
               </button>
-            </form>
-          </div>
+            </div>
+          </form>
           {removeError ? (
             <div role="alert" style={{ marginTop: 10, padding: "8px 10px", borderRadius: 8, background: "var(--danger-soft)", color: "var(--danger-fg)", fontSize: "0.8rem" }}>
               {removeError}
             </div>
           ) : null}
-        </Modal>
+        </RentalModal>
       )}
 
       {editing && (
-        <Modal title="Modifier le véhicule de location" onClose={() => setEditing(false)}>
+        <RentalModal title="Modifier le véhicule de location" onClose={() => setEditing(false)}>
           <form action={updateRentalVehicle} style={{ display: "grid", gap: 10 }}>
             <input type="hidden" name="vehicleId" value={vehicle.id} />
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,180px),1fr))", gap: 10 }}>
@@ -115,7 +176,7 @@ export function RentalFleetActions({ vehicle, hasActive }: { vehicle: FleetVehic
               <button type="submit" className="ox-btn ox-btn-primary">Enregistrer</button>
             </div>
           </form>
-        </Modal>
+        </RentalModal>
       )}
     </>
   );
@@ -127,29 +188,5 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       {label}
       {children}
     </label>
-  );
-}
-
-function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
-  return (
-    <div
-      role="presentation"
-      onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}
-      style={{ position: "fixed", inset: 0, zIndex: 1200, display: "grid", placeItems: "center", padding: "1rem", background: "var(--surface-overlay)", backdropFilter: "blur(8px)" }}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        onMouseDown={(event) => event.stopPropagation()}
-        style={{ width: "min(720px,100%)", maxHeight: "90vh", overflowY: "auto", padding: "1.2rem", borderRadius: 14, background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-lg)" }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", marginBottom: 14 }}>
-          <strong>{title}</strong>
-          <button type="button" onClick={onClose} aria-label="Fermer" className="ox-btn ox-btn-ghost ox-btn-sm"><X size={16} /></button>
-        </div>
-        {children}
-      </div>
-    </div>
   );
 }

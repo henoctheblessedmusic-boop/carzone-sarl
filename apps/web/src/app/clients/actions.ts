@@ -33,20 +33,22 @@ const CLIENT_MANAGERS = [
   "ADMIN",
 ] as const;
 
-function readScopeFlags(formData: FormData): {
+function readScopeFlags(formData: FormData, rentalOnly = false): {
   scopeShowroom: boolean;
   scopeGarage: boolean;
+  scopeRental: boolean;
   isPartner: boolean;
 } {
   const scopeShowroomRaw = formData.get("scopeShowroom");
   const scopeGarageRaw = formData.get("scopeGarage");
-  const scopeShowroom = scopeShowroomRaw === null ? true : scopeShowroomRaw === "true";
-  const scopeGarage = scopeGarageRaw === null ? false : scopeGarageRaw === "true";
+  const scopeShowroom = rentalOnly ? false : scopeShowroomRaw === null ? true : scopeShowroomRaw === "true";
+  const scopeGarage = rentalOnly ? false : scopeGarageRaw === null ? false : scopeGarageRaw === "true";
+  const scopeRental = rentalOnly || formData.get("scopeRental") === "true";
   const isPartner = formData.get("isPartner") === "true";
-  if (!scopeShowroom && !scopeGarage) {
-    throw new Error("Un client doit appartenir au périmètre Showroom et/ou Garage.");
+  if (!scopeShowroom && !scopeGarage && !scopeRental) {
+    throw new Error("Un client doit appartenir au périmètre Showroom, Garage ou Location.");
   }
-  return { scopeShowroom, scopeGarage, isPartner };
+  return { scopeShowroom, scopeGarage, scopeRental, isPartner };
 }
 
 export async function createCustomer(formData: FormData) {
@@ -66,7 +68,10 @@ export async function createCustomer(formData: FormData) {
   const category = String(formData.get("category") || "Particulier").trim();
   const notes = String(formData.get("notes") || "").trim() || null;
   const showroomNotes = String(formData.get("showroomNotes") || "").trim() || null;
-  const { scopeShowroom, scopeGarage, isPartner } = readScopeFlags(formData);
+  const { scopeShowroom, scopeGarage, scopeRental, isPartner } = readScopeFlags(
+    formData,
+    user.role === "GESTIONNAIRE_LOCATION",
+  );
 
   const customer = await prisma.customer.create({
     data: {
@@ -82,6 +87,7 @@ export async function createCustomer(formData: FormData) {
       showroomNotes,
       scopeShowroom,
       scopeGarage,
+      scopeRental,
       isPartner,
       active: true,
     },
@@ -122,7 +128,10 @@ export async function updateCustomer(formData: FormData) {
     formData.get("active") === "true" ||
     formData.get("active") === "1" ||
     formData.get("active") === "on";
-  const { scopeShowroom, scopeGarage, isPartner } = readScopeFlags(formData);
+  const { scopeShowroom, scopeGarage, scopeRental, isPartner } = readScopeFlags(
+    formData,
+    user.role === "GESTIONNAIRE_LOCATION",
+  );
 
   const updated = await prisma.customer.update({
     where: { id },
@@ -139,6 +148,7 @@ export async function updateCustomer(formData: FormData) {
       showroomNotes,
       scopeShowroom,
       scopeGarage,
+      scopeRental,
       isPartner,
       active,
     },
@@ -329,6 +339,9 @@ export async function importClients(input: {
     ifu: string | null;
     category: string;
     notes: string | null;
+    scopeShowroom: boolean;
+    scopeGarage: boolean;
+    scopeRental: boolean;
     active: boolean;
   }[] = [];
   const errors: { row: number; message: string }[] = [];
@@ -372,6 +385,9 @@ export async function importClients(input: {
       ifu: row.ifu.trim() || null,
       category: row.category.trim() || "Particulier",
       notes: row.notes.trim() || null,
+      scopeShowroom: user.role !== "GESTIONNAIRE_LOCATION",
+      scopeGarage: false,
+      scopeRental: user.role === "GESTIONNAIRE_LOCATION",
       active: true,
     });
   });

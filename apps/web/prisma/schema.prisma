@@ -71,6 +71,8 @@ model Customer {
   scopeShowroom    Boolean                @default(true)
   /// Client du périmètre garage / atelier (pièces, prestations, entretien).
   scopeGarage      Boolean                @default(false)
+  /// Client du périmètre location de véhicules (contrats et parc locatif).
+  scopeRental      Boolean                @default(false)
   /// Entreprise partenaire (peut cumuler les deux périmètres).
   isPartner        Boolean                @default(false)
   createdAt        DateTime               @default(now())

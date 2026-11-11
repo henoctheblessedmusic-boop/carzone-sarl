@@ -11,6 +11,10 @@ export default async function ClientsPage() {
   const canImport = userHasCapability(user.role, "customers:create", user.customPermissions);
 
   const customers = await prisma.customer.findMany({
+    where:
+      user.role === "GESTIONNAIRE_LOCATION"
+        ? { OR: [{ scopeRental: true }, { rentals: { some: {} } }] }
+        : undefined,
     orderBy: { createdAt: "desc" },
     include: {
       documents: {
@@ -36,6 +40,7 @@ export default async function ClientsPage() {
         canDelete={canDelete}
         canImport={canImport}
         defaultGarageScope={user.role === "COMPTA_GARAGE"}
+        rentalScope={user.role === "GESTIONNAIRE_LOCATION"}
       />
     </AppShell>
   );

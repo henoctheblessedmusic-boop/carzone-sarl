@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Pencil, Trash2, X } from "lucide-react";
 import { deleteRentalContract, updateRentalContract } from "./actions";
 
@@ -23,6 +23,23 @@ const FIELD = { width: "100%", height: 38, fontSize: "0.86rem" } as const;
 export function RentalContractActions({ rental }: { rental: ContractRow }) {
   const [editing, setEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+  const [isDeleting, startDeletion] = useTransition();
+
+  function handleDelete(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    setDeleteError("");
+    startDeletion(async () => {
+      try {
+        await deleteRentalContract(formData);
+        setConfirmDelete(false);
+        window.location.reload();
+      } catch (error) {
+        setDeleteError(error instanceof Error ? error.message : "La suppression a echoue. Reessayez.");
+      }
+    });
+  }
 
   return (
     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -46,12 +63,19 @@ export function RentalContractActions({ rental }: { rental: ContractRow }) {
             {rental.paymentCount > 0 ? " Suppression impossible : des encaissements existent." : ""}
           </p>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-            <button type="button" className="ox-btn ox-btn-ghost" onClick={() => setConfirmDelete(false)}>Annuler</button>
-            <form action={deleteRentalContract} onSubmit={() => setConfirmDelete(false)}>
+            <button type="button" className="ox-btn ox-btn-ghost" onClick={() => setConfirmDelete(false)} disabled={isDeleting}>Annuler</button>
+            <form onSubmit={handleDelete}>
               <input type="hidden" name="id" value={rental.id} />
-              <button type="submit" className="ox-btn ox-btn-primary" disabled={rental.paymentCount > 0}>Confirmer la suppression</button>
+              <button type="submit" className="ox-btn ox-btn-primary" disabled={rental.paymentCount > 0 || isDeleting}>
+                {isDeleting ? "Suppression..." : "Confirmer la suppression"}
+              </button>
             </form>
           </div>
+          {deleteError ? (
+            <div role="alert" style={{ marginTop: 10, padding: "8px 10px", borderRadius: 8, background: "var(--danger-soft)", color: "var(--danger-fg)", fontSize: "0.8rem" }}>
+              {deleteError}
+            </div>
+          ) : null}
         </Modal>
       )}
 

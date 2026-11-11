@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Pencil, Trash2, X } from "lucide-react";
 import { transferVehicleToShowroom, updateRentalVehicle } from "./actions";
 
@@ -23,6 +23,24 @@ const FIELD = { width: "100%", height: 38, fontSize: "0.86rem" } as const;
 export function RentalFleetActions({ vehicle, hasActive }: { vehicle: FleetVehicle; hasActive: boolean }) {
   const [editing, setEditing] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
+  const [removeError, setRemoveError] = useState("");
+  const [removeWord, setRemoveWord] = useState("");
+  const [isRemoving, startRemoval] = useTransition();
+
+  function handleRemove(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    setRemoveError("");
+    startRemoval(async () => {
+      try {
+        await transferVehicleToShowroom(formData);
+        setConfirmRemove(false);
+        window.location.reload();
+      } catch (error) {
+        setRemoveError(error instanceof Error ? error.message : "Le retrait a echoue. Reessayez.");
+      }
+    });
+  }
 
   return (
     <>
@@ -43,17 +61,36 @@ export function RentalFleetActions({ vehicle, hasActive }: { vehicle: FleetVehic
 
       {confirmRemove && (
         <Modal title="Retirer ce véhicule du parc ?" onClose={() => setConfirmRemove(false)}>
-          <p style={{ margin: "0 0 14px", color: "var(--text-muted)", lineHeight: 1.5 }}>
-            {vehicle.brand} {vehicle.model} {vehicle.registrationNumber ? `(${vehicle.registrationNumber})` : ""} sera remis dans le stock showroom.
-            Cette action ne supprime pas le véhicule.
+          <p style={{ margin: "0 0 10px", color: "var(--text-muted)", lineHeight: 1.5 }}>
+            {vehicle.brand} {vehicle.model} {vehicle.registrationNumber ? `(${vehicle.registrationNumber})` : ""} sera retiré de la base locative et remis dans le stock showroom.
+            Cette action ne supprime pas la fiche véhicule.
           </p>
+          <label style={{ display: "grid", gap: 5, marginBottom: 14, fontSize: "0.82rem", color: "var(--text-muted)" }}>
+            Saisissez <strong style={{ color: "var(--danger-fg)" }}>SUPPRIMER</strong> pour confirmer
+            <input
+              value={removeWord}
+              onChange={(event) => setRemoveWord(event.target.value)}
+              className="ox-input"
+              autoComplete="off"
+              placeholder="SUPPRIMER"
+              style={{ maxWidth: 260, height: 38 }}
+            />
+          </label>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-            <button type="button" className="ox-btn ox-btn-ghost" onClick={() => setConfirmRemove(false)}>Annuler</button>
-            <form action={transferVehicleToShowroom} onSubmit={() => setConfirmRemove(false)}>
+            <button type="button" className="ox-btn ox-btn-ghost" onClick={() => setConfirmRemove(false)} disabled={isRemoving}>Annuler</button>
+            <form onSubmit={handleRemove}>
               <input type="hidden" name="vehicleId" value={vehicle.id} />
-              <button type="submit" className="ox-btn ox-btn-primary">Confirmer le retrait</button>
+              <input type="hidden" name="confirmation" value={removeWord} />
+              <button type="submit" className="ox-btn ox-btn-primary" disabled={isRemoving || removeWord.trim().toUpperCase() !== "SUPPRIMER"}>
+                {isRemoving ? "Retrait en cours..." : "Confirmer le retrait"}
+              </button>
             </form>
           </div>
+          {removeError ? (
+            <div role="alert" style={{ marginTop: 10, padding: "8px 10px", borderRadius: 8, background: "var(--danger-soft)", color: "var(--danger-fg)", fontSize: "0.8rem" }}>
+              {removeError}
+            </div>
+          ) : null}
         </Modal>
       )}
 

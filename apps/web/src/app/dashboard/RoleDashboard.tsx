@@ -320,13 +320,15 @@ async function buildMetrics(role: Role): Promise<Metric[]> {
       prisma.vehicle.count({ where: { fleetType: "RENTAL" } }),
       prisma.vehicle.count({ where: { fleetType: "RENTAL", rentalStatus: "DISPONIBLE" } }),
       prisma.rental.count({ where: { status: "ACTIF" } }),
-      prisma.customer.count({ where: { active: true } }),
+      prisma.customer.count({
+        where: { active: true, OR: [{ scopeRental: true }, { rentals: { some: {} } }] },
+      }),
     ]);
     return [
       kpi("Parc de location", String(fleet), "#38bdf8", "Véhicules à louer"),
       kpi("Disponibles", String(available), "#34d399", "Prêts à louer"),
       kpi("Locations actives", String(activeRentals), "#fbbf24", "Contrats en cours"),
-      kpi("Clients", String(customers), "#a78bfa", "Base clients location"),
+      kpi("Clients location", String(customers), "#a78bfa", "Base clients location"),
     ];
   }
 

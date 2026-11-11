@@ -423,6 +423,10 @@ export async function createRental(formData: FormData) {
     where: { id: vehicleId },
     data: { rentalStatus: "LOUE" },
   });
+  await prisma.customer.update({
+    where: { id: customerId },
+    data: { scopeRental: true },
+  });
 
   await logAudit({
     user,
@@ -559,7 +563,11 @@ export async function transferVehicleToShowroom(formData: FormData) {
   const user = await requireUser([...MANAGE_ROLES]);
   requireManager(user.role);
   const vehicleId = String(formData.get("vehicleId") || "").trim();
+  const confirmation = String(formData.get("confirmation") || "").trim().toUpperCase();
   if (!vehicleId) throw new Error("Véhicule requis.");
+  if (confirmation !== "SUPPRIMER") {
+    throw new Error("Saisissez SUPPRIMER pour confirmer le retrait du véhicule.");
+  }
 
   const activeRental = await prisma.rental.count({
     where: { vehicleId, status: "ACTIF" },

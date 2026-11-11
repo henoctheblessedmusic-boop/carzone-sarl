@@ -93,7 +93,10 @@ export default async function RentalsPage() {
       select: { id: true, brand: true, model: true, vin: true },
     }),
     prisma.customer.findMany({
-      where: { active: true },
+      where:
+        user.role === "GESTIONNAIRE_LOCATION"
+          ? { active: true, OR: [{ scopeRental: true }, { rentals: { some: {} } }] }
+          : { active: true },
       orderBy: { contactName: "asc" },
       select: { id: true, contactName: true, companyName: true },
     }),

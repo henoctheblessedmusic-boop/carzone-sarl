@@ -66,6 +66,7 @@ export type CustomerItem = {
   category: string | null;
   scopeShowroom: boolean;
   scopeGarage: boolean;
+  scopeRental: boolean;
   isPartner: boolean;
   active: boolean;
   notes: string | null;
@@ -86,12 +87,14 @@ export function ClientsView({
   canDelete,
   canImport,
   defaultGarageScope = false,
+  rentalScope = false,
 }: {
   initialCustomers: CustomerItem[];
   canManage: boolean;
   canDelete: boolean;
   canImport: boolean;
   defaultGarageScope?: boolean;
+  rentalScope?: boolean;
 }) {
   const { locale } = usePrefs();
   const router = useRouter();
@@ -737,6 +740,19 @@ export function ClientsView({
                           : copy.category.individual}
                       </span>
                       <div style={{ display: "flex", gap: 4, marginTop: 4, flexWrap: "wrap" }}>
+                        {customer.scopeRental && (
+                          <span
+                            className="ox-badge"
+                            style={{
+                              fontSize: "0.68rem",
+                              background: "var(--purple-soft)",
+                              color: "var(--purple-fg)",
+                              borderColor: "var(--purple)",
+                            }}
+                          >
+                            Location
+                          </span>
+                        )}
                         {customer.scopeShowroom && (
                           <span
                             className="ox-badge"
@@ -1055,23 +1071,35 @@ export function ClientsView({
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 6 }}>
                   Périmètre client <span style={{ color: "var(--bad)" }}>*</span>
                 </label>
-                <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: "0.85rem" }}>
-                  <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                    <input type="checkbox" name="scopeShowroom" value="true" defaultChecked={!defaultGarageScope} />
-                    Showroom
-                  </label>
-                  <input type="hidden" name="scopeShowroom" value="false" />
-                  <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                    <input type="checkbox" name="scopeGarage" value="true" defaultChecked={defaultGarageScope} />
-                    Garage / Atelier
-                  </label>
-                  <input type="hidden" name="scopeGarage" value="false" />
-                  <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                    <input type="checkbox" name="isPartner" value="true" />
-                    Entreprise partenaire
-                  </label>
-                  <input type="hidden" name="isPartner" value="false" />
-                </div>
+                {rentalScope ? (
+                  <div>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 9px", borderRadius: 999, background: "var(--purple-soft)", color: "var(--purple-fg)", border: "1px solid var(--purple)", fontSize: "0.82rem", fontWeight: 700 }}>
+                      Base clients location
+                    </div>
+                    <input type="hidden" name="scopeRental" value="true" />
+                    <input type="hidden" name="scopeShowroom" value="false" />
+                    <input type="hidden" name="scopeGarage" value="false" />
+                    <input type="hidden" name="isPartner" value="false" />
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: "0.85rem" }}>
+                    <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <input type="checkbox" name="scopeShowroom" value="true" defaultChecked={!defaultGarageScope} />
+                      Showroom
+                    </label>
+                    <input type="hidden" name="scopeShowroom" value="false" />
+                    <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <input type="checkbox" name="scopeGarage" value="true" defaultChecked={defaultGarageScope} />
+                      Garage / Atelier
+                    </label>
+                    <input type="hidden" name="scopeGarage" value="false" />
+                    <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <input type="checkbox" name="isPartner" value="true" />
+                      Entreprise partenaire
+                    </label>
+                    <input type="hidden" name="isPartner" value="false" />
+                  </div>
+                )}
               </div>
 
               <div>
@@ -1284,38 +1312,35 @@ export function ClientsView({
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 6 }}>
                   Périmètre client <span style={{ color: "var(--bad)" }}>*</span>
                 </label>
-                <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: "0.85rem" }}>
-                  <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                    <input
-                      type="checkbox"
-                      name="scopeShowroom"
-                      value="true"
-                      defaultChecked={editingCustomer.scopeShowroom}
-                    />
-                    Showroom
-                  </label>
-                  <input type="hidden" name="scopeShowroom" value="false" />
-                  <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                    <input
-                      type="checkbox"
-                      name="scopeGarage"
-                      value="true"
-                      defaultChecked={editingCustomer.scopeGarage}
-                    />
-                    Garage / Atelier
-                  </label>
-                  <input type="hidden" name="scopeGarage" value="false" />
-                  <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                    <input
-                      type="checkbox"
-                      name="isPartner"
-                      value="true"
-                      defaultChecked={editingCustomer.isPartner}
-                    />
-                    Entreprise partenaire
-                  </label>
-                  <input type="hidden" name="isPartner" value="false" />
-                </div>
+                {rentalScope ? (
+                  <div>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 9px", borderRadius: 999, background: "var(--purple-soft)", color: "var(--purple-fg)", border: "1px solid var(--purple)", fontSize: "0.82rem", fontWeight: 700 }}>
+                      Base clients location
+                    </div>
+                    <input type="hidden" name="scopeRental" value="true" />
+                    <input type="hidden" name="scopeShowroom" value="false" />
+                    <input type="hidden" name="scopeGarage" value="false" />
+                    <input type="hidden" name="isPartner" value="false" />
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: "0.85rem" }}>
+                    <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <input type="checkbox" name="scopeShowroom" value="true" defaultChecked={editingCustomer.scopeShowroom} />
+                      Showroom
+                    </label>
+                    <input type="hidden" name="scopeShowroom" value="false" />
+                    <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <input type="checkbox" name="scopeGarage" value="true" defaultChecked={editingCustomer.scopeGarage} />
+                      Garage / Atelier
+                    </label>
+                    <input type="hidden" name="scopeGarage" value="false" />
+                    <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <input type="checkbox" name="isPartner" value="true" defaultChecked={editingCustomer.isPartner} />
+                      Entreprise partenaire
+                    </label>
+                    <input type="hidden" name="isPartner" value="false" />
+                  </div>
+                )}
               </div>
 
               <div>

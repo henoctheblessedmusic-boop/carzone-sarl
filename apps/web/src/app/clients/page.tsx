@@ -6,7 +6,7 @@ import { ClientsView } from "./ClientsView";
 
 export default async function ClientsPage() {
   const user = await requireUser();
-  const canManage = ["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE", "ADMIN"].includes(user.role);
+  const canManage = ["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE", "GESTIONNAIRE_LOCATION", "ADMIN"].includes(user.role);
   const canDelete = ["PDG", "SG", "DG", "ADV", "RF", "COMPTA", "ADMIN"].includes(user.role);
   const canImport = userHasCapability(user.role, "customers:create", user.customPermissions);
 

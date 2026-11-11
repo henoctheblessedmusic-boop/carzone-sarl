@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import type { SiteCopy } from "@/lib/i18n/site";
 import type { SiteLocale } from "@/lib/site-prefs";
+import { catalogVersionFromVehicle } from "@/lib/vehicle-catalog";
 import { QuoteActions } from "./QuoteActions";
 import { VehicleDetailModal, type CatalogVehicle } from "./VehicleDetailModal";
 
@@ -85,7 +86,7 @@ export function VehicleCard({
 
       {isGalleryOpen ? (
         <VehicleDetailModal
-          vehicle={vehicle}
+          version={catalogVersionFromVehicle(vehicle)}
           copy={vehicleCopy}
           locale={locale}
           quoteCopy={quoteCopy}

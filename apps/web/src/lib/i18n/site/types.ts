@@ -183,6 +183,8 @@ export interface SiteCopy {
       brandLabel: string;
       energyLabel: string;
       typeLabel: string;
+      /** Filtre de teinte : il présélectionne aussi la configuration à l'ouverture. */
+      colorLabel: string;
       statusLabel: string;
       priceLabel: string;
       allOption: string;
@@ -209,7 +211,16 @@ export interface SiteCopy {
       priceOnRequest: string;
       viewDetails: string;
       availableTemplate: string;
+      availableOneTemplate: string;
       colorsLabel: string;
+      /** Libellé du groupe de pastilles de la carte. */
+      colorsAvailableLabel: string;
+      /** Libellé lisible d'une pastille : "{color}, {count} disponibles". */
+      colorSwatchTemplate: string;
+      /** Signalement d'un visuel constructeur sur la carte. */
+      manufacturerVisualBadge: string;
+      /** Carte sans aucune image de la configuration. */
+      photosComingSoon: string;
     };
     modal: {
       closeLabel: string;
@@ -233,6 +244,40 @@ export interface SiteCopy {
       whatsappCta: string;
       whatsappMessageTemplate: string;
       contactCta: string;
+      /** Sélecteurs de configuration : teinte extérieure puis intérieur compatible. */
+      configuratorTitle: string;
+      exteriorTitle: string;
+      interiorTitle: string;
+      interiorSingleNote: string;
+      interiorLabel: string;
+      configurationCodeLabel: string;
+      /** Disponibilité de la configuration choisie. */
+      availabilityTemplate: string;
+      availabilityOneTemplate: string;
+      availabilityNone: string;
+      versionTotalTemplate: string;
+      versionTotalOneTemplate: string;
+      /** Libellés lisibles des pastilles, pour le clavier et le lecteur d'écran. */
+      exteriorSwatchTemplate: string;
+      interiorSwatchTemplate: string;
+      /** Modes de la scène. */
+      modeGalleryLabel: string;
+      modeSpinLabel: string;
+      modeInteriorLabel: string;
+      modeUnavailableNote: string;
+      /** Vues du canevas imposé, indexées par code C01 à C10. */
+      canvasLabels: Record<string, string>;
+      /** Photos héritées d'un véhicule, indexées par clé interne. */
+      vehiclePhotoLabels: Record<string, string>;
+      /** Avertissement affiché sous un visuel constructeur. */
+      manufacturerNotice: string;
+      emptyMediaTitle: string;
+      emptyMediaText: string;
+      previousPhotoLabel: string;
+      nextPhotoLabel: string;
+      photoCounterTemplate: string;
+      shareLabel: string;
+      shareCopiedLabel: string;
     };
   };
 

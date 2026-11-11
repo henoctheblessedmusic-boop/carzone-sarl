@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
-import { prisma } from "@/lib/prisma";
 import { getSiteLocale } from "@/lib/site-locale-server";
 import { siteCopy } from "@/lib/i18n/site";
 import type { SiteLocale } from "@/lib/site-prefs";
 import { Container } from "@/components/site/Container";
 import { VehiclesCatalog } from "@/components/site/VehiclesCatalog";
 import { QuoteRequestProvider } from "@/components/site/QuoteRequestProvider";
-import type { CatalogColorOption, CatalogVehicle } from "@/components/site/VehicleDetailModal";
 import { SITE_WEBSITE } from "@/lib/site-constants";
-import { resolveVehicleDisplayPhoto } from "@/lib/vehicle-display-photo";
-import { vehicleColorHex, vehicleColorLabel } from "@/lib/vehicle-colors";
+import { loadCatalogVersions } from "@/server/vehicle-catalog-query";
+import { parseCatalogUrlState } from "@/lib/vehicle-catalog-url";
+import type { CatalogVersion } from "@/lib/vehicle-catalog";
 
 const OG_LOCALE: Record<SiteLocale, string> = {
   fr: "fr_FR",
@@ -17,6 +16,8 @@ const OG_LOCALE: Record<SiteLocale, string> = {
   es: "es_ES",
   zh: "zh_CN",
 };
+
+const CATALOG_PATHNAME = "/vehicules";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getSiteLocale();
@@ -26,11 +27,11 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(SITE_WEBSITE),
     title: copy.meta.vehicules.title,
     description: copy.meta.vehicules.description,
-    alternates: { canonical: "/vehicules" },
+    alternates: { canonical: CATALOG_PATHNAME },
     openGraph: {
       title: copy.meta.vehicules.title,
       description: copy.meta.vehicules.description,
-      url: "/vehicules",
+      url: CATALOG_PATHNAME,
       siteName: "CARZONE SARL",
       locale: OG_LOCALE[locale],
       type: "website",
@@ -40,113 +41,33 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-function toSeatsPhotoUrl(interiorPhotoUrl: string | null): string | null {
-  if (!interiorPhotoUrl || !interiorPhotoUrl.includes("-interior.")) return null;
-  return interiorPhotoUrl.replace("-interior.", "-seats.");
-}
-
-async function getCatalogVehicles(): Promise<CatalogVehicle[]> {
+/**
+ * Le catalogue reste affiché si la base est injoignable : une erreur de lecture
+ * ne doit pas renvoyer une page en erreur au visiteur.
+ */
+async function getCatalogVersions(): Promise<CatalogVersion[]> {
   try {
-    const vehicles = await prisma.vehicle.findMany({
-      where: {
-        status: { in: ["EN_MAGASIN", "EN_STOCK"] },
-        publishedOnSite: true,
-        fleetType: "SHOWROOM",
-        variant: { not: null },
-        year: { not: null },
-        energy: { not: "NON_RENSEIGNEE" },
-      },
-      select: {
-        id: true,
-        brand: true,
-        model: true,
-        variant: true,
-        year: true,
-        energy: true,
-        vehicleType: true,
-        transmission: true,
-        color: true,
-        exteriorColorShade: true,
-        exteriorColorBase: true,
-        interiorColor: true,
-        versionId: true,
-        mileage: true,
-        priceXof: true,
-        priceToConfirm: true,
-        status: true,
-        mainPhotoUrl: true,
-        interiorPhotoUrl: true,
-        exteriorPhotoUrl: true,
-        rearPhotoUrl: true,
-        photosVerified: true,
-        technicalSheetJson: true,
-        techSheetConfirmed: true,
-        description: true,
-      },
-      orderBy: [{ createdAt: "desc" }],
-    });
-
-    const grouped = new Map<string, CatalogVehicle & { colorOptions: CatalogColorOption[] }>();
-    for (const vehicle of vehicles) {
-      const key =
-        vehicle.versionId ||
-        [vehicle.brand, vehicle.model, vehicle.variant, vehicle.year, vehicle.energy].join("|");
-      const label = vehicleColorLabel(vehicle.exteriorColorShade || vehicle.exteriorColorBase || vehicle.color);
-      const hex = vehicleColorHex(vehicle.exteriorColorShade || vehicle.exteriorColorBase || vehicle.color);
-      const displayPhoto = resolveVehicleDisplayPhoto(vehicle);
-      const option: CatalogColorOption = {
-        id: vehicle.id,
-        label,
-        base: vehicle.exteriorColorBase || null,
-        hex,
-        available: 1,
-        mainPhotoUrl: displayPhoto,
-        interiorPhotoUrl: vehicle.interiorPhotoUrl,
-        exteriorPhotoUrl: vehicle.exteriorPhotoUrl,
-        rearPhotoUrl: vehicle.rearPhotoUrl,
-        seatsPhotoUrl: toSeatsPhotoUrl(vehicle.interiorPhotoUrl),
-        photosVerified: Boolean(vehicle.photosVerified),
-      };
-      const current = grouped.get(key);
-      if (current) {
-        current.availableCount = (current.availableCount ?? 1) + 1;
-        const existing = current.colorOptions.find((color) => color.label === label);
-        if (existing) {
-          existing.available += 1;
-          if (!existing.mainPhotoUrl && option.mainPhotoUrl) existing.mainPhotoUrl = option.mainPhotoUrl;
-          if (!existing.exteriorPhotoUrl && option.exteriorPhotoUrl) existing.exteriorPhotoUrl = option.exteriorPhotoUrl;
-          if (!existing.interiorPhotoUrl && option.interiorPhotoUrl) existing.interiorPhotoUrl = option.interiorPhotoUrl;
-          if (!existing.rearPhotoUrl && option.rearPhotoUrl) existing.rearPhotoUrl = option.rearPhotoUrl;
-        } else {
-          current.colorOptions.push(option);
-        }
-        if ((vehicle.priceXof || 0) > 0 && (current.priceXof || 0) === 0) current.priceXof = vehicle.priceXof;
-      } else {
-        grouped.set(key, {
-          ...vehicle,
-          mainPhotoUrl: displayPhoto,
-          seatsPhotoUrl: toSeatsPhotoUrl(vehicle.interiorPhotoUrl),
-          availableCount: 1,
-          colors: [label],
-          colorOptions: [option],
-        });
-      }
-    }
-
-    return Array.from(grouped.values()).map((vehicle) => ({
-      ...vehicle,
-      colors: vehicle.colorOptions.map((option) => option.label),
-    }));
+    return await loadCatalogVersions();
   } catch (error) {
-    console.error("Erreur chargement du catalogue véhicules (vitrine) :", error);
+    console.error("Erreur chargement du catalogue vehicules (vitrine) :", error);
     return [];
   }
 }
 
-export default async function VehiculesPage() {
+interface VehiculesPageProps {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export default async function VehiculesPage({ searchParams }: VehiculesPageProps) {
   const locale = await getSiteLocale();
   const copy = siteCopy[locale];
-  const vehicles = await getCatalogVehicles();
+  const [versions, resolvedSearchParams] = await Promise.all([
+    getCatalogVersions(),
+    searchParams ?? Promise.resolve({}),
+  ]);
+  // Lu côté serveur : un lien partagé rouvre la bonne fiche sans attendre le
+  // premier rendu client.
+  const initialState = parseCatalogUrlState(resolvedSearchParams);
 
   return (
     <QuoteRequestProvider
@@ -155,19 +76,26 @@ export default async function VehiculesPage() {
       energyLabels={copy.vehicules.energyLabels}
     >
       <>
-      <section className="site-page-hero site-page-hero--compact">
-        <Container>
-          <p className="site-eyebrow">{copy.vehicules.hero.eyebrow}</p>
-          <h1 className="site-page-title">{copy.vehicules.hero.title}</h1>
-          <p className="site-page-subtitle">{copy.vehicules.hero.subtitle}</p>
-        </Container>
-      </section>
+        <section className="site-page-hero site-page-hero--compact">
+          <Container>
+            <p className="site-eyebrow">{copy.vehicules.hero.eyebrow}</p>
+            <h1 className="site-page-title">{copy.vehicules.hero.title}</h1>
+            <p className="site-page-subtitle">{copy.vehicules.hero.subtitle}</p>
+          </Container>
+        </section>
 
-      <section className="site-section site-section--tight-top">
-        <Container>
-          <VehiclesCatalog vehicles={vehicles} copy={copy.vehicules} locale={locale} quoteCopy={copy.quote} />
-        </Container>
-      </section>
+        <section className="site-section site-section--tight-top">
+          <Container>
+            <VehiclesCatalog
+              versions={versions}
+              copy={copy.vehicules}
+              locale={locale}
+              quoteCopy={copy.quote}
+              initialState={initialState}
+              pathname={CATALOG_PATHNAME}
+            />
+          </Container>
+        </section>
       </>
     </QuoteRequestProvider>
   );

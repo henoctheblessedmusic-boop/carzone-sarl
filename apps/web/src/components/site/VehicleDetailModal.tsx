@@ -1,138 +1,190 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
-import { X } from "lucide-react";
+import { Link2, X } from "lucide-react";
+import { track } from "@vercel/analytics";
 import type { SiteCopy } from "@/lib/i18n/site";
 import type { SiteLocale } from "@/lib/site-prefs";
+import { parseConfigurationCode } from "@/lib/vehicle-configuration";
+import {
+  clampSceneMode,
+  configurationForExterior,
+  findConfigurationByCode,
+  preserveSceneKey,
+  resolveInitialConfiguration,
+  versionTitle,
+  type CatalogConfiguration,
+  type CatalogSceneMode,
+  type CatalogVersion,
+  type LegacyCatalogVehicle,
+} from "@/lib/vehicle-catalog";
+import { buildCatalogHref, type CatalogUrlState } from "@/lib/vehicle-catalog-url";
 import { formatSiteNumber } from "./vehicle-format";
 import { QuoteActions } from "./QuoteActions";
+import { VehicleConfigurator } from "./VehicleConfigurator";
+import { VehicleScene } from "./VehicleScene";
 
-export interface CatalogColorOption {
-  id: string;
-  label: string;
-  base: string | null;
-  hex: string;
-  available: number;
-  mainPhotoUrl: string | null;
-  interiorPhotoUrl: string | null;
-  exteriorPhotoUrl: string | null;
-  rearPhotoUrl: string | null;
-  seatsPhotoUrl: string | null;
-  photosVerified: boolean;
-}
+/**
+ * Forme héritée encore attendue par l'accueil et le diaporama. Les deux
+ * convertissent leur véhicule en version à une configuration avec
+ * catalogVersionFromVehicle() avant d'ouvrir cette fiche.
+ */
+export type CatalogVehicle = LegacyCatalogVehicle;
 
-export interface CatalogVehicle {
-  id: string;
-  brand: string;
-  model: string;
-  variant: string | null;
-  year: number | null;
-  energy: string;
-  vehicleType: string | null;
-  transmission: string | null;
-  color: string | null;
-  interiorColor?: string | null;
-  mileage: number;
-  priceXof: number;
-  priceToConfirm?: boolean;
-  availableCount?: number;
-  colors?: string[];
-  colorOptions?: CatalogColorOption[];
-  status: string;
-  mainPhotoUrl: string | null;
-  interiorPhotoUrl: string | null;
-  exteriorPhotoUrl: string | null;
-  rearPhotoUrl: string | null;
-  seatsPhotoUrl: string | null;
-  photosVerified?: boolean;
-}
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), select, input, [tabindex]:not([tabindex="-1"])';
+
+/** Marqueur de l'entrée d'historique ajoutée à l'ouverture, pour le geste retour. */
+const MODAL_HISTORY_MARKER = "carzoneVehicleModal";
+
+/** Délai d'affichage de la confirmation de copie du lien. */
+const COPY_FEEDBACK_MS = 2500;
+
+/** Partie de l'adresse que la vitrine doit conserver quand la fiche s'ouvre. */
+export type VehicleModalUrlState = {
+  pathname: string;
+  exteriorColorBase: string | null;
+};
 
 interface VehicleDetailModalProps {
-  vehicle: CatalogVehicle;
+  version: CatalogVersion;
   copy: SiteCopy["vehicules"];
   locale: SiteLocale;
   quoteCopy: SiteCopy["quote"];
   onClose: () => void;
+  /** Configuration à ouvrir, lue dans l'adresse ou choisie depuis une pastille. */
+  initialConfigurationCode?: string | null;
+  initialMode?: CatalogSceneMode | null;
+  /**
+   * Quand elle est fournie, l'état de la fiche est porté par l'adresse et le
+   * geste retour du téléphone la referme. L'accueil n'en a pas besoin.
+   */
+  urlState?: VehicleModalUrlState | null;
 }
 
-interface GalleryPhoto {
-  key: string;
-  url: string;
-  label: string;
-}
-
-const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), select, [tabindex]:not([tabindex="-1"])';
-
-function buildGallery(vehicle: CatalogVehicle, copy: SiteCopy["vehicules"]): GalleryPhoto[] {
-  const candidates: Array<GalleryPhoto | null> = [
-    vehicle.mainPhotoUrl ? { key: "main", url: vehicle.mainPhotoUrl, label: copy.modal.galleryMainLabel } : null,
-    vehicle.exteriorPhotoUrl
-      ? { key: "exterior", url: vehicle.exteriorPhotoUrl, label: copy.modal.galleryExteriorLabel }
-      : null,
-    vehicle.interiorPhotoUrl && vehicle.photosVerified
-      ? { key: "interior", url: vehicle.interiorPhotoUrl, label: copy.modal.galleryInteriorLabel }
-      : null,
-    vehicle.seatsPhotoUrl && vehicle.photosVerified
-      ? { key: "seats", url: vehicle.seatsPhotoUrl, label: copy.modal.gallerySeatsLabel }
-      : null,
-    vehicle.rearPhotoUrl ? { key: "rear", url: vehicle.rearPhotoUrl, label: copy.modal.galleryRearLabel } : null,
-  ];
-  return candidates.filter((photo): photo is GalleryPhoto => photo !== null);
-}
-
-export function VehicleDetailModal({ vehicle, copy, locale, quoteCopy, onClose }: VehicleDetailModalProps) {
+export function VehicleDetailModal({
+  version,
+  copy,
+  locale,
+  quoteCopy,
+  onClose,
+  initialConfigurationCode = null,
+  initialMode = null,
+  urlState = null,
+}: VehicleDetailModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const pushedHistoryEntry = useRef(false);
   const [mounted, setMounted] = useState(false);
-  const colorOptions = vehicle.colorOptions?.length
-    ? vehicle.colorOptions
-    : [
-        {
-          id: vehicle.id,
-          label: vehicle.color ?? "Couleur à confirmer",
-          base: vehicle.color,
-          hex: "#64748b",
-          available: 1,
-          mainPhotoUrl: vehicle.mainPhotoUrl,
-          interiorPhotoUrl: vehicle.interiorPhotoUrl,
-          exteriorPhotoUrl: vehicle.exteriorPhotoUrl,
-          rearPhotoUrl: vehicle.rearPhotoUrl,
-          seatsPhotoUrl: vehicle.seatsPhotoUrl,
-          photosVerified: Boolean(vehicle.photosVerified),
-        },
-      ];
-  const [selectedColor, setSelectedColor] = useState(colorOptions[0].label);
-  const selectedOption = colorOptions.find((option) => option.label === selectedColor) ?? colorOptions[0];
-  const displayVehicle: CatalogVehicle = {
-    ...vehicle,
-    id: selectedOption.id,
-    color: selectedOption.label,
-    interiorColor: vehicle.interiorColor,
-    mainPhotoUrl: selectedOption.mainPhotoUrl,
-    interiorPhotoUrl: selectedOption.interiorPhotoUrl,
-    exteriorPhotoUrl: selectedOption.exteriorPhotoUrl,
-    rearPhotoUrl: selectedOption.rearPhotoUrl,
-    seatsPhotoUrl: selectedOption.seatsPhotoUrl,
-    photosVerified: selectedOption.photosVerified,
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const initialConfiguration = resolveInitialConfiguration(version, {
+    code: initialConfigurationCode,
+    exteriorColorBase: urlState?.exteriorColorBase ?? null,
+  });
+
+  const [configurationCode, setConfigurationCode] = useState(initialConfiguration?.code ?? "");
+  const [mode, setMode] = useState<CatalogSceneMode>(() =>
+    clampSceneMode(initialMode, initialConfiguration),
+  );
+  const [sceneKey, setSceneKey] = useState<string | null>(() =>
+    preserveSceneKey(null, initialConfiguration),
+  );
+
+  const configuration: CatalogConfiguration | null =
+    findConfigurationByCode(version, configurationCode) ?? initialConfiguration;
+  const title = versionTitle(version);
+
+  const href = urlState
+    ? buildCatalogHref(urlState.pathname, {
+        exteriorColorBase: urlState.exteriorColorBase,
+        versionSlug: version.slug,
+        configurationCode: configuration?.code ?? null,
+        mode,
+      } satisfies Partial<CatalogUrlState>)
+    : null;
+
+  /** Teinte, intérieur et code de configuration, déjà traduits, pour la cotation. */
+  const configurationSummary = configuration
+    ? `${configuration.exteriorColorLabel}, ${copy.modal.interiorLabel.toLowerCase()} ${
+        configuration.interiorColorLabel
+      }${parseConfigurationCode(configuration.code) ? ` (${configuration.code})` : ""}`
+    : null;
+
+  const quoteVehicle = {
+    id: version.slug,
+    brand: version.brand,
+    model: version.model,
+    variant: version.trim,
+    year: version.year,
+    energy: version.energy,
+    status: version.status,
+    configurationSummary,
   };
 
-  const title = [displayVehicle.brand, displayVehicle.model, displayVehicle.variant].filter(Boolean).join(" ");
-  const photos = buildGallery(displayVehicle, copy);
-  const activePhoto = photos[activeIndex] ?? photos[0];
+  const selectConfiguration = useCallback(
+    (next: CatalogConfiguration | null, event: "color_change" | "interior_change") => {
+      if (!next || next.code === configurationCode) return;
+      setConfigurationCode(next.code);
+      // L'angle est conservé : on ne repart de la premiere vue que si la
+      // nouvelle configuration ne possede pas la vue courante.
+      setSceneKey((previous) => preserveSceneKey(previous, next));
+      setMode((previous) => clampSceneMode(previous, next));
+      track(event, { version: version.slug, configuration: next.code });
+    },
+    [configurationCode, version.slug],
+  );
 
-  const energyLabel = copy.energyLabels[displayVehicle.energy] ?? displayVehicle.energy;
-  const typeLabel = displayVehicle.vehicleType ? copy.typeLabels[displayVehicle.vehicleType] ?? displayVehicle.vehicleType : null;
+  function selectExterior(exteriorColorLabel: string) {
+    selectConfiguration(
+      configurationForExterior(version, exteriorColorLabel, configuration?.interiorColorLabel),
+      "color_change",
+    );
+  }
 
-  function selectColor(option: (typeof colorOptions)[number]) {
-    setSelectedColor(option.label);
-    setActiveIndex(0);
+  function selectConfigurationCode(code: string) {
+    selectConfiguration(findConfigurationByCode(version, code), "interior_change");
+  }
+
+  function selectMode(next: CatalogSceneMode) {
+    if (next === mode) return;
+    setMode(next);
+    const payload = { version: version.slug, configuration: configurationCode };
+    if (next === "spin") track("spin_interact", payload);
+    if (next === "interior") track("interior_open", payload);
+  }
+
+  async function copyLink() {
+    if (!href || typeof window === "undefined") return;
+    try {
+      await navigator.clipboard.writeText(new URL(href, window.location.origin).toString());
+      setLinkCopied(true);
+    } catch {
+      // Presse-papiers refusé (contexte non sécurisé, permission) : l'adresse de
+      // la barre porte déjà le même état, le client peut la copier à la main.
+      setLinkCopied(false);
+    }
   }
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!linkCopied) return;
+    const timer = window.setTimeout(() => setLinkCopied(false), COPY_FEEDBACK_MS);
+    return () => window.clearTimeout(timer);
+  }, [linkCopied]);
+
+  useEffect(() => {
+    track("vehicle_open", {
+      version: version.slug,
+      configuration: initialConfiguration?.code ?? "",
+    });
+    // Un seul évènement par ouverture : les changements de configuration ont
+    // leurs propres évènements.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -170,171 +222,173 @@ export function VehicleDetailModal({ vehicle, copy, locale, quoteCopy, onClose }
     };
   }, [onClose]);
 
-  if (!mounted) return null;
+  /**
+   * L'adresse porte l'état de la fiche. L'ouverture ajoute une entrée
+   * d'historique, ce qui fait du geste retour du téléphone une fermeture, et la
+   * fermeture par bouton ou par Échap retire cette entrée.
+   */
+  useEffect(() => {
+    if (!href) return;
+    if (!pushedHistoryEntry.current) {
+      window.history.pushState({ [MODAL_HISTORY_MARKER]: true }, "", href);
+      pushedHistoryEntry.current = true;
+      return;
+    }
+    window.history.replaceState({ [MODAL_HISTORY_MARKER]: true }, "", href);
+  }, [href]);
+
+  useEffect(() => {
+    if (!urlState) return;
+
+    function handlePopState() {
+      pushedHistoryEntry.current = false;
+      onClose();
+    }
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      if (pushedHistoryEntry.current) {
+        pushedHistoryEntry.current = false;
+        window.history.back();
+      }
+    };
+  }, [urlState, onClose]);
+
+  if (!mounted || !configuration) return null;
+
+  const energyLabel = copy.energyLabels[version.energy] ?? version.energy;
+  const typeLabel = version.vehicleType
+    ? copy.typeLabels[version.vehicleType] ?? version.vehicleType
+    : null;
+  const showConfigurationCode = parseConfigurationCode(configuration.code) !== null;
 
   // Portail vers document.body : le modal reste fixe et centré même s'il est déclenché
   // depuis une carte avec transform/overflow, ce qui évite le rendu déformé dans la carte.
   // Le conteneur .site-shell réapplique les variables de thème du site au modal.
   return createPortal(
     <div className="site-shell site-modal-shell">
-    <div className="site-modal-backdrop" onMouseDown={onClose}>
-      <div
-        className="site-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="vehicle-modal-title"
-        ref={dialogRef}
-        onMouseDown={(event) => event.stopPropagation()}
-      >
-        <button type="button" className="site-modal-close" onClick={onClose}>
-          <span className="site-sr-only">{copy.modal.closeLabel}</span>
-          <X aria-hidden="true" size={20} />
-        </button>
+      <div className="site-modal-backdrop" onMouseDown={onClose}>
+        <div
+          className="site-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="vehicle-modal-title"
+          ref={dialogRef}
+          onMouseDown={(event) => event.stopPropagation()}
+        >
+          <button type="button" className="site-modal-close" onClick={onClose}>
+            <span className="site-sr-only">{copy.modal.closeLabel}</span>
+            <X aria-hidden="true" size={20} />
+          </button>
 
-        <div className="site-modal-gallery">
-          <div className="site-modal-gallery-main">
-            {activePhoto ? (
-              <Image
-                src={activePhoto.url}
-                alt={`${title} - ${activePhoto.label}`}
-                fill
-                sizes="(max-width: 768px) 100vw, 640px"
-                className="site-modal-gallery-img"
-                priority
-              />
-            ) : (
-              <div className="site-vehicle-card-placeholder" aria-hidden="true" />
-            )}
+          <div className="site-modal-gallery">
+            <VehicleScene
+              version={version}
+              configuration={configuration}
+              mode={mode}
+              sceneKey={sceneKey}
+              title={title}
+              copy={copy}
+              onModeChange={selectMode}
+              onSceneKeyChange={setSceneKey}
+            />
           </div>
-          {photos.length > 1 ? (
-            <div className="site-modal-thumbs">
-              {photos.map((photo, index) => (
-                <button
-                  key={photo.key}
-                  type="button"
-                  aria-label={photo.label}
-                  aria-pressed={index === activeIndex}
-                  className={index === activeIndex ? "site-modal-thumb is-active" : "site-modal-thumb"}
-                  onClick={() => setActiveIndex(index)}
-                >
-                  <Image src={photo.url} alt="" fill sizes="80px" className="site-modal-thumb-img" />
-                </button>
-              ))}
-            </div>
-          ) : null}
-        </div>
 
-        <div className="site-modal-body">
-          <h2 id="vehicle-modal-title" className="site-modal-title">
-            {title}
-          </h2>
+          <div className="site-modal-body">
+            <h2 id="vehicle-modal-title" className="site-modal-title">
+              {title}
+            </h2>
 
-          <dl className="site-modal-specs">
-            <div>
-              <dt>{copy.modal.brandLabel}</dt>
-              <dd>{displayVehicle.brand}</dd>
-            </div>
-            <div>
-              <dt>{copy.modal.modelLabel}</dt>
-              <dd>{displayVehicle.model}</dd>
-            </div>
-            {vehicle.variant ? (
+            <VehicleConfigurator
+              version={version}
+              configuration={configuration}
+              copy={copy}
+              onSelectExterior={selectExterior}
+              onSelectConfiguration={selectConfigurationCode}
+            />
+
+            <dl className="site-modal-specs">
               <div>
-                <dt>{copy.modal.variantLabel}</dt>
-                <dd>{displayVehicle.variant}</dd>
+                <dt>{copy.modal.brandLabel}</dt>
+                <dd>{version.brand}</dd>
               </div>
-            ) : null}
-            {vehicle.year ? (
               <div>
-                <dt>{copy.modal.yearLabel}</dt>
-                <dd>{displayVehicle.year}</dd>
+                <dt>{copy.modal.modelLabel}</dt>
+                <dd>{version.model}</dd>
               </div>
-            ) : null}
-            <div>
-              <dt>{copy.modal.energyLabel}</dt>
-              <dd>{energyLabel}</dd>
-            </div>
-            {typeLabel ? (
-              <div>
-                <dt>{copy.modal.typeLabel}</dt>
-                <dd>{typeLabel}</dd>
-              </div>
-            ) : null}
-            {vehicle.transmission ? (
-              <div>
-                <dt>{copy.modal.transmissionLabel}</dt>
-                <dd>{displayVehicle.transmission}</dd>
-              </div>
-            ) : null}
-            {vehicle.color ? (
+              {version.trim ? (
+                <div>
+                  <dt>{copy.modal.variantLabel}</dt>
+                  <dd>{version.trim}</dd>
+                </div>
+              ) : null}
+              {version.year ? (
+                <div>
+                  <dt>{copy.modal.yearLabel}</dt>
+                  <dd>{version.year}</dd>
+                </div>
+              ) : null}
+              {version.energy ? (
+                <div>
+                  <dt>{copy.modal.energyLabel}</dt>
+                  <dd>{energyLabel}</dd>
+                </div>
+              ) : null}
+              {typeLabel ? (
+                <div>
+                  <dt>{copy.modal.typeLabel}</dt>
+                  <dd>{typeLabel}</dd>
+                </div>
+              ) : null}
+              {version.transmission ? (
+                <div>
+                  <dt>{copy.modal.transmissionLabel}</dt>
+                  <dd>{version.transmission}</dd>
+                </div>
+              ) : null}
               <div>
                 <dt>{copy.modal.colorLabel}</dt>
-                <dd>{displayVehicle.color}</dd>
+                <dd>{configuration.exteriorColorLabel}</dd>
               </div>
+              <div>
+                <dt>{copy.modal.interiorLabel}</dt>
+                <dd>{configuration.interiorColorLabel}</dd>
+              </div>
+              {showConfigurationCode ? (
+                <div>
+                  <dt>{copy.modal.configurationCodeLabel}</dt>
+                  <dd>{configuration.code}</dd>
+                </div>
+              ) : null}
+              {version.mileage !== null ? (
+                <div>
+                  <dt>{copy.modal.mileageLabel}</dt>
+                  <dd>
+                    {formatSiteNumber(version.mileage, locale)} {copy.modal.mileageUnit}
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+
+            <QuoteActions
+              vehicle={quoteVehicle}
+              copy={quoteCopy}
+              statusLabels={copy.statusLabels}
+              energyLabels={copy.energyLabels}
+              configurationCode={configuration.code}
+            />
+
+            {href ? (
+              <button type="button" className="site-modal-share" onClick={copyLink}>
+                <Link2 aria-hidden="true" size={16} />
+                {linkCopied ? copy.modal.shareCopiedLabel : copy.modal.shareLabel}
+              </button>
             ) : null}
-            <div>
-              <dt>{copy.modal.mileageLabel}</dt>
-              <dd>
-                {formatSiteNumber(displayVehicle.mileage, locale)} {copy.modal.mileageUnit}
-              </dd>
-            </div>
-          </dl>
-
-          {colorOptions.length > 0 && (
-            <div style={{ margin: "12px 0 16px" }}>
-              <div style={{ fontSize: "0.78rem", fontWeight: 700, marginBottom: 7 }}>
-                {copy.modal.colorLabel}
-              </div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {colorOptions.map((option) => (
-                  <button
-                    key={option.label}
-                    type="button"
-                    title={`${option.label}${option.available > 1 ? ` · ${option.available}` : ""}`}
-                    aria-label={`${option.label}${option.available > 1 ? ` · ${option.available}` : ""}`}
-                    aria-pressed={option.label === selectedColor}
-                    onClick={() => selectColor(option)}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 6,
-                      padding: "6px 9px",
-                      borderRadius: 8,
-                      border: option.label === selectedColor ? "1px solid #d4af37" : "1px solid rgba(255,255,255,0.16)",
-                      background: option.label === selectedColor ? "rgba(212,175,55,0.12)" : "rgba(255,255,255,0.04)",
-                      color: "inherit",
-                      cursor: "pointer",
-                      fontSize: "0.78rem",
-                    }}
-                  >
-                    <span
-                      aria-hidden="true"
-                      style={{
-                        width: 16,
-                        height: 16,
-                        borderRadius: 999,
-                        background: option.hex,
-                        border: "1px solid rgba(255,255,255,0.35)",
-                        flexShrink: 0,
-                      }}
-                    />
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <QuoteActions
-            vehicle={displayVehicle}
-            copy={quoteCopy}
-            statusLabels={copy.statusLabels}
-            energyLabels={copy.energyLabels}
-          />
+          </div>
         </div>
       </div>
-    </div>
     </div>,
-    document.body
+    document.body,
   );
 }

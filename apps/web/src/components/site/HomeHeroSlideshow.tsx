@@ -9,6 +9,7 @@ import { CtaLink } from "./CtaLink";
 import type { SiteCopy } from "@/lib/i18n/site/types";
 import { QuoteActions } from "./QuoteActions";
 import type { SiteLocale } from "@/lib/site-prefs";
+import { catalogVersionFromVehicle } from "@/lib/vehicle-catalog";
 import { VehicleDetailModal, type CatalogVehicle } from "./VehicleDetailModal";
 
 export type SlideshowVehicle = CatalogVehicle & {
@@ -283,7 +284,7 @@ export function HomeHeroSlideshow({ vehicles, locale, statusLabels, energyLabels
 
     {galleryVehicle ? (
       <VehicleDetailModal
-        vehicle={galleryVehicle}
+        version={catalogVersionFromVehicle(galleryVehicle)}
         copy={vehicleCopy}
         locale={locale}
         quoteCopy={quoteCopy}

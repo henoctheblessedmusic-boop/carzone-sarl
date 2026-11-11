@@ -1,68 +1,143 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Search, SlidersHorizontal } from "lucide-react";
 import type { SiteCopy } from "@/lib/i18n/site";
 import type { SiteLocale } from "@/lib/site-prefs";
-import { VehicleDetailModal, type CatalogVehicle } from "./VehicleDetailModal";
+import {
+  cardImageOf,
+  exteriorBaseFilterOptions,
+  exteriorOptionsOf,
+  resolveInitialConfiguration,
+  versionAvailableCount,
+  versionHasExteriorBase,
+  versionTitle,
+  visibleVersions,
+  type CatalogSceneMode,
+  type CatalogVersion,
+} from "@/lib/vehicle-catalog";
+import { buildCatalogSearch, type CatalogUrlState } from "@/lib/vehicle-catalog-url";
 import { QuoteActions } from "./QuoteActions";
 
+/**
+ * La fiche n'est chargée qu'à la première ouverture : sur un Android d'entrée de
+ * gamme en 4G, la page de liste ne paie pas le code de la scène ni celui des
+ * sélecteurs de configuration.
+ */
+const VehicleDetailModal = dynamic(
+  () => import("./VehicleDetailModal").then((module) => module.VehicleDetailModal),
+  { ssr: false },
+);
+
 interface VehiclesCatalogProps {
-  vehicles: CatalogVehicle[];
+  versions: CatalogVersion[];
   copy: SiteCopy["vehicules"];
   locale: SiteLocale;
   quoteCopy: SiteCopy["quote"];
+  /** État lu dans l'adresse côté serveur : un lien partagé ouvre la bonne fiche. */
+  initialState: CatalogUrlState;
+  pathname: string;
 }
 
-const byNewestYear = (a: CatalogVehicle, b: CatalogVehicle) => (b.year ?? 0) - (a.year ?? 0);
+/** Fiche ouverte : version, configuration et mode, tels qu'ils figurent dans l'adresse. */
+type OpenVehicleState = {
+  versionSlug: string;
+  configurationCode: string | null;
+  mode: CatalogSceneMode | null;
+};
+
+const byNewestYear = (a: CatalogVersion, b: CatalogVersion) => (b.year ?? 0) - (a.year ?? 0);
 
 function uniqueSorted(values: Array<string | null>): string[] {
   return Array.from(new Set(values.filter((value): value is string => Boolean(value)))).sort();
 }
 
-export function VehiclesCatalog({ vehicles, copy, locale, quoteCopy }: VehiclesCatalogProps) {
+export function VehiclesCatalog({
+  versions,
+  copy,
+  locale,
+  quoteCopy,
+  initialState,
+  pathname,
+}: VehiclesCatalogProps) {
+  const published = useMemo(() => visibleVersions(versions), [versions]);
+
   const [search, setSearch] = useState("");
   const [brand, setBrand] = useState("");
   const [energy, setEnergy] = useState("");
   const [vehicleType, setVehicleType] = useState("");
-
-  const [selectedVehicle, setSelectedVehicle] = useState<CatalogVehicle | null>(null);
+  const [colorBase, setColorBase] = useState(initialState.exteriorColorBase ?? "");
   const [showFilters, setShowFilters] = useState(false);
 
-  const brandOptions = useMemo(() => uniqueSorted(vehicles.map((v) => v.brand)), [vehicles]);
-  const energyOptions = useMemo(() => uniqueSorted(vehicles.map((v) => v.energy)), [vehicles]);
-  const typeOptions = useMemo(() => uniqueSorted(vehicles.map((v) => v.vehicleType)), [vehicles]);
+  const [openVehicle, setOpenVehicle] = useState<OpenVehicleState | null>(() =>
+    initialState.versionSlug
+      ? {
+          versionSlug: initialState.versionSlug,
+          configurationCode: initialState.configurationCode,
+          mode: initialState.mode,
+        }
+      : null,
+  );
 
-  const hasActiveFilters = Boolean(search || brand || energy || vehicleType);
-  const activeFilterCount = [brand, energy, vehicleType].filter(Boolean).length;
+  const brandOptions = useMemo(() => uniqueSorted(published.map((v) => v.brand)), [published]);
+  const energyOptions = useMemo(() => uniqueSorted(published.map((v) => v.energy)), [published]);
+  const typeOptions = useMemo(() => uniqueSorted(published.map((v) => v.vehicleType)), [published]);
+  const colorOptions = useMemo(() => exteriorBaseFilterOptions(published), [published]);
 
-  const filteredVehicles = useMemo(() => {
+  const hasActiveFilters = Boolean(search || brand || energy || vehicleType || colorBase);
+  const activeFilterCount = [brand, energy, vehicleType, colorBase].filter(Boolean).length;
+
+  const filteredVersions = useMemo(() => {
     const query = search.trim().toLowerCase();
-    const filtered = vehicles.filter((vehicle) => {
-      if (brand && vehicle.brand !== brand) return false;
-      if (energy && vehicle.energy !== energy) return false;
-      if (vehicleType && vehicle.vehicleType !== vehicleType) return false;
+    const filtered = published.filter((version) => {
+      if (brand && version.brand !== brand) return false;
+      if (energy && version.energy !== energy) return false;
+      if (vehicleType && version.vehicleType !== vehicleType) return false;
+      if (colorBase && !versionHasExteriorBase(version, colorBase)) return false;
       if (query) {
-        const haystack = [vehicle.brand, vehicle.model, vehicle.variant].filter(Boolean).join(" ").toLowerCase();
+        const haystack = [version.brand, version.model, version.trim]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
         if (!haystack.includes(query)) return false;
       }
       return true;
     });
     return [...filtered].sort(byNewestYear);
-  }, [vehicles, search, brand, energy, vehicleType]);
+  }, [published, search, brand, energy, vehicleType, colorBase]);
+
+  const selectedVersion = openVehicle
+    ? published.find((version) => version.slug === openVehicle.versionSlug) ?? null
+    : null;
+
+  /**
+   * Le filtre de teinte reste dans l'adresse pour qu'un lien partagé rouvre la
+   * même sélection. Quand la fiche est ouverte, c'est elle qui tient l'adresse :
+   * on ne lui passe pas devant.
+   */
+  useEffect(() => {
+    // Garde sur selectedVersion et non sur openVehicle : un lien portant une
+    // version inconnue n'ouvre aucune fiche, et son adresse doit être nettoyée.
+    if (typeof window === "undefined" || selectedVersion) return;
+    const next = `${pathname}${buildCatalogSearch({ exteriorColorBase: colorBase || null })}`;
+    if (`${window.location.pathname}${window.location.search}` === next) return;
+    window.history.replaceState(window.history.state, "", next);
+  }, [colorBase, selectedVersion, pathname]);
 
   function resetFilters() {
     setSearch("");
     setBrand("");
     setEnergy("");
     setVehicleType("");
+    setColorBase("");
   }
 
   const resultsLabel =
-    filteredVehicles.length === 1
+    filteredVersions.length === 1
       ? copy.resultsCountOne.replace("{count}", "1")
-      : copy.resultsCountOther.replace("{count}", String(filteredVehicles.length));
+      : copy.resultsCountOther.replace("{count}", String(filteredVersions.length));
 
   return (
     <div className="site-catalog">
@@ -98,50 +173,78 @@ export function VehiclesCatalog({ vehicles, copy, locale, quoteCopy }: VehiclesC
           id="vehicle-advanced-filters"
           className={showFilters ? "site-filters-fields is-open" : "site-filters-fields"}
         >
-        <div className="site-filter-field">
-          <label htmlFor="vehicle-brand">{copy.filters.brandLabel}</label>
-          <select id="vehicle-brand" value={brand} onChange={(event) => setBrand(event.target.value)}>
-            <option value="">{copy.filters.allOption}</option>
-            {brandOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
+          <div className="site-filter-field">
+            <label htmlFor="vehicle-brand">{copy.filters.brandLabel}</label>
+            <select
+              id="vehicle-brand"
+              value={brand}
+              onChange={(event) => setBrand(event.target.value)}
+            >
+              <option value="">{copy.filters.allOption}</option>
+              {brandOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div className="site-filter-field">
-          <label htmlFor="vehicle-energy">{copy.filters.energyLabel}</label>
-          <select id="vehicle-energy" value={energy} onChange={(event) => setEnergy(event.target.value)}>
-            <option value="">{copy.filters.allOption}</option>
-            {energyOptions.map((option) => (
-              <option key={option} value={option}>
-                {copy.energyLabels[option] ?? option}
-              </option>
-            ))}
-          </select>
-        </div>
+          <div className="site-filter-field">
+            <label htmlFor="vehicle-energy">{copy.filters.energyLabel}</label>
+            <select
+              id="vehicle-energy"
+              value={energy}
+              onChange={(event) => setEnergy(event.target.value)}
+            >
+              <option value="">{copy.filters.allOption}</option>
+              {energyOptions.map((option) => (
+                <option key={option} value={option}>
+                  {copy.energyLabels[option] ?? option}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div className="site-filter-field">
-          <label htmlFor="vehicle-type">{copy.filters.typeLabel}</label>
-          <select id="vehicle-type" value={vehicleType} onChange={(event) => setVehicleType(event.target.value)}>
-            <option value="">{copy.filters.allOption}</option>
-            {typeOptions.map((option) => (
-              <option key={option} value={option}>
-                {copy.typeLabels[option] ?? option}
-              </option>
-            ))}
-          </select>
-        </div>
+          <div className="site-filter-field">
+            <label htmlFor="vehicle-type">{copy.filters.typeLabel}</label>
+            <select
+              id="vehicle-type"
+              value={vehicleType}
+              onChange={(event) => setVehicleType(event.target.value)}
+            >
+              <option value="">{copy.filters.allOption}</option>
+              {typeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {copy.typeLabels[option] ?? option}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <button
-          type="button"
-          className="site-cta site-cta--ghost site-filters-reset"
-          onClick={resetFilters}
-          disabled={!hasActiveFilters}
-        >
-          {copy.filters.resetLabel}
-        </button>
+          <div className="site-filter-field">
+            <label htmlFor="vehicle-color">{copy.filters.colorLabel}</label>
+            <select
+              id="vehicle-color"
+              value={colorBase}
+              onChange={(event) => setColorBase(event.target.value)}
+            >
+              <option value="">{copy.filters.allOption}</option>
+              {colorOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            type="button"
+            className="site-cta site-cta--ghost site-filters-reset"
+            onClick={resetFilters}
+            disabled={!hasActiveFilters}
+          >
+            {copy.filters.resetLabel}
+          </button>
         </div>
       </form>
 
@@ -149,16 +252,18 @@ export function VehiclesCatalog({ vehicles, copy, locale, quoteCopy }: VehiclesC
         {resultsLabel}
       </p>
 
-      {filteredVehicles.length > 0 ? (
+      {filteredVersions.length > 0 ? (
         <div className="site-catalog-grid">
-          {filteredVehicles.map((vehicle) => (
+          {filteredVersions.map((version) => (
             <CatalogCard
-              key={vehicle.id}
-              vehicle={vehicle}
+              key={version.slug}
+              version={version}
               copy={copy}
-              locale={locale}
               quoteCopy={quoteCopy}
-              onOpen={() => setSelectedVehicle(vehicle)}
+              colorBase={colorBase}
+              onOpen={(configurationCode) =>
+                setOpenVehicle({ versionSlug: version.slug, configurationCode, mode: null })
+              }
             />
           ))}
         </div>
@@ -169,13 +274,16 @@ export function VehiclesCatalog({ vehicles, copy, locale, quoteCopy }: VehiclesC
         </div>
       )}
 
-      {selectedVehicle ? (
+      {selectedVersion && openVehicle ? (
         <VehicleDetailModal
-          vehicle={selectedVehicle}
+          version={selectedVersion}
           copy={copy}
           locale={locale}
           quoteCopy={quoteCopy}
-          onClose={() => setSelectedVehicle(null)}
+          initialConfigurationCode={openVehicle.configurationCode}
+          initialMode={openVehicle.mode}
+          urlState={{ pathname, exteriorColorBase: colorBase || null }}
+          onClose={() => setOpenVehicle(null)}
         />
       ) : null}
     </div>
@@ -183,31 +291,64 @@ export function VehiclesCatalog({ vehicles, copy, locale, quoteCopy }: VehiclesC
 }
 
 interface CatalogCardProps {
-  vehicle: CatalogVehicle;
+  version: CatalogVersion;
   copy: SiteCopy["vehicules"];
-  locale: SiteLocale;
   quoteCopy: SiteCopy["quote"];
-  onOpen: () => void;
+  /** Teinte présélectionnée par le filtre : la carte montre cette configuration. */
+  colorBase: string;
+  onOpen: (configurationCode: string | null) => void;
 }
 
-function CatalogCard({ vehicle, copy, locale, quoteCopy, onOpen }: CatalogCardProps) {
-  const title = [vehicle.brand, vehicle.model, vehicle.variant].filter(Boolean).join(" ");
-  const energyLabel = copy.energyLabels[vehicle.energy] ?? vehicle.energy;
+function CatalogCard({ version, copy, quoteCopy, colorBase, onOpen }: CatalogCardProps) {
+  const title = versionTitle(version);
+  const energyLabel = copy.energyLabels[version.energy] ?? version.energy;
+  const configuration = resolveInitialConfiguration(version, {
+    exteriorColorBase: colorBase || null,
+  });
+  const image = cardImageOf(version, configuration);
+  const exteriors = exteriorOptionsOf(version);
+  const availableCount = versionAvailableCount(version);
+  const availableLabel = (
+    availableCount === 1 ? copy.card.availableOneTemplate : copy.card.availableTemplate
+  ).replace("{count}", String(availableCount));
+
+  const quoteVehicle = {
+    id: version.slug,
+    brand: version.brand,
+    model: version.model,
+    variant: version.trim,
+    year: version.year,
+    energy: version.energy,
+    status: version.status,
+  };
 
   return (
     <article className="site-vehicle-card site-catalog-card">
-      <button type="button" className="site-catalog-card-trigger" onClick={onOpen}>
+      <button
+        type="button"
+        className="site-catalog-card-trigger"
+        onClick={() => onOpen(configuration?.code ?? null)}
+      >
         <div className="site-vehicle-card-media">
-          {vehicle.mainPhotoUrl ? (
-            <Image
-              src={vehicle.mainPhotoUrl}
-              alt={title}
-              fill
-              sizes="(max-width: 768px) 92vw, (max-width: 1024px) 45vw, 30vw"
-              className="site-vehicle-card-img"
-            />
+          {image ? (
+            <>
+              <Image
+                src={image.url}
+                alt={title}
+                fill
+                sizes="(max-width: 768px) 92vw, (max-width: 1024px) 45vw, 30vw"
+                className="site-vehicle-card-img"
+                placeholder={image.blurDataUrl ? "blur" : "empty"}
+                blurDataURL={image.blurDataUrl ?? undefined}
+              />
+              {image.origin === "CONSTRUCTEUR" ? (
+                <span className="site-card-badge">{copy.card.manufacturerVisualBadge}</span>
+              ) : null}
+            </>
           ) : (
-            <div className="site-vehicle-card-placeholder" aria-hidden="true" />
+            <div className="site-vehicle-card-placeholder">
+              <span>{copy.card.photosComingSoon}</span>
+            </div>
           )}
         </div>
         <div className="site-vehicle-card-body">
@@ -216,22 +357,50 @@ function CatalogCard({ vehicle, copy, locale, quoteCopy, onOpen }: CatalogCardPr
             <strong>{energyLabel}</strong>
           </p>
           <h3 className="site-vehicle-card-title">{title}</h3>
-          {vehicle.year ? <p className="site-vehicle-card-year">{vehicle.year}</p> : null}
-          {(vehicle.availableCount ?? 0) > 1 ? (
-            <p className="site-vehicle-card-year">
-              {copy.card.availableTemplate.replace("{count}", String(vehicle.availableCount))}
-            </p>
-          ) : null}
-          {vehicle.colors && vehicle.colors.length > 0 ? (
-            <p className="site-vehicle-card-year">
-              {copy.card.colorsLabel} {vehicle.colors.join(", ")}
-            </p>
-          ) : null}
+          {version.year ? <p className="site-vehicle-card-year">{version.year}</p> : null}
+          <p className="site-vehicle-card-year">{availableLabel}</p>
           <span className="site-catalog-card-cta">{copy.card.viewDetails}</span>
         </div>
       </button>
+
+      {exteriors.length > 0 ? (
+        <div className="site-card-swatches">
+          <p className="site-card-swatches-label">{copy.card.colorsAvailableLabel}</p>
+          <div className="site-card-swatches-list">
+            {exteriors.map((option) => {
+              const label = copy.card.colorSwatchTemplate
+                .replace("{color}", option.label)
+                .replace("{count}", String(option.availableCount));
+              const target =
+                version.configurations.find(
+                  (item) => item.exteriorColorLabel === option.label,
+                ) ?? null;
+              return (
+                <button
+                  key={option.label}
+                  type="button"
+                  className="site-card-swatch"
+                  title={label}
+                  aria-label={label}
+                  onClick={() => onOpen(target?.code ?? null)}
+                >
+                  <span
+                    className="site-card-swatch-dot"
+                    style={{ background: option.hex }}
+                    aria-hidden="true"
+                  />
+                  <span className="site-card-swatch-count" aria-hidden="true">
+                    {option.availableCount}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+
       <QuoteActions
-        vehicle={vehicle}
+        vehicle={quoteVehicle}
         copy={quoteCopy}
         statusLabels={copy.statusLabels}
         energyLabels={copy.energyLabels}

@@ -55,7 +55,7 @@ export function InvoiceEmailModal({
         inset: 0,
         width: "100vw",
         height: "100vh",
-        backgroundColor: "rgba(3, 8, 15, 0.88)",
+        backgroundColor: "var(--surface)",
         backdropFilter: "blur(10px)",
         display: "flex",
         alignItems: "center",
@@ -79,7 +79,7 @@ export function InvoiceEmailModal({
           flexDirection: "column",
           gap: "1.1rem",
           margin: "auto",
-          background: "rgba(10, 24, 34, 0.98)",
+          background: "var(--surface)",
           border: "1px solid var(--ice-border)",
           borderRadius: 18,
           boxShadow: "0 25px 65px rgba(0, 0, 0, 0.8)",
@@ -87,7 +87,7 @@ export function InvoiceEmailModal({
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <Mail size={20} color="var(--gold)" />
+            <Mail size={20} color="var(--gold-fg)" />
             <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700 }}>
               Envoyer la facture {invoice.number} par e-mail
             </h3>
@@ -96,7 +96,7 @@ export function InvoiceEmailModal({
             type="button"
             onClick={onClose}
             disabled={isSending}
-            style={{ background: "transparent", border: "none", color: "#fff", opacity: 0.7, cursor: "pointer" }}
+            style={{ background: "transparent", border: "none", color: "var(--surface)", opacity: 0.7, cursor: "pointer" }}
           >
             <X size={18} />
           </button>
@@ -106,8 +106,8 @@ export function InvoiceEmailModal({
           style={{
             padding: "0.65rem 0.9rem",
             borderRadius: 8,
-            background: "rgba(0, 120, 212, 0.08)",
-            border: "1px solid rgba(0, 120, 212, 0.25)",
+            background: "var(--info-soft)",
+            border: "1px solid var(--info)",
             fontSize: "0.78rem",
             lineHeight: 1.5,
             opacity: 0.9,
@@ -163,7 +163,7 @@ export function InvoiceEmailModal({
           />
         </div>
 
-        {error && <div style={{ color: "#ef4444", fontSize: "0.85rem" }}>{error}</div>}
+        {error && <div style={{ color: "var(--danger-fg)", fontSize: "0.85rem" }}>{error}</div>}
 
         <div
           style={{

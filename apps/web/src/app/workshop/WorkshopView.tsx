@@ -100,54 +100,54 @@ const STATUS_CONFIG: Record<
   { bg: string; text: string; border: string }
 > = {
   L: {
-    bg: "rgba(34, 197, 94, 0.15)",
-    text: "#4ade80",
-    border: "rgba(34, 197, 94, 0.3)",
+    bg: "var(--success)",
+    text: "var(--success)",
+    border: "var(--success)",
   },
   C: {
-    bg: "rgba(59, 130, 246, 0.15)",
-    text: "#60a5fa",
-    border: "rgba(59, 130, 246, 0.3)",
+    bg: "var(--info)",
+    text: "var(--info)",
+    border: "var(--info)",
   },
   AT: {
-    bg: "rgba(234, 179, 8, 0.15)",
-    text: "#facc15",
-    border: "rgba(234, 179, 8, 0.3)",
+    bg: "var(--warning)",
+    text: "var(--warning)",
+    border: "var(--warning)",
   },
   AC: {
-    bg: "rgba(249, 115, 22, 0.15)",
-    text: "#fb923c",
-    border: "rgba(249, 115, 22, 0.3)",
+    bg: "var(--warning)",
+    text: "var(--warning)",
+    border: "var(--warning)",
   },
   F: {
-    bg: "rgba(20, 184, 166, 0.15)",
-    text: "#2dd4bf",
-    border: "rgba(20, 184, 166, 0.3)",
+    bg: "var(--success)",
+    text: "var(--success)",
+    border: "var(--success)",
   },
   D: {
-    bg: "rgba(168, 85, 247, 0.15)",
-    text: "#c084fc",
-    border: "rgba(168, 85, 247, 0.3)",
+    bg: "var(--purple)",
+    text: "var(--purple)",
+    border: "var(--purple)",
   },
   ATD: {
-    bg: "rgba(244, 63, 94, 0.15)",
-    text: "#fb7185",
-    border: "rgba(244, 63, 94, 0.3)",
+    bg: "var(--danger)",
+    text: "var(--danger)",
+    border: "var(--danger)",
   },
   AF: {
-    bg: "rgba(148, 163, 184, 0.15)",
-    text: "#cbd5e1",
-    border: "rgba(148, 163, 184, 0.3)",
+    bg: "var(--border)",
+    text: "var(--border-strong)",
+    border: "var(--border-strong)",
   },
   HSAV: {
-    bg: "rgba(100, 116, 139, 0.15)",
-    text: "#94a3b8",
-    border: "rgba(100, 116, 139, 0.3)",
+    bg: "var(--border)",
+    text: "var(--border-strong)",
+    border: "var(--border-strong)",
   },
   ANN: {
-    bg: "rgba(239, 68, 68, 0.15)",
-    text: "#f87171",
-    border: "rgba(239, 68, 68, 0.3)",
+    bg: "var(--danger)",
+    text: "var(--danger)",
+    border: "var(--danger)",
   },
 };
 
@@ -394,8 +394,8 @@ export function WorkshopView({
           alignItems: "flex-start",
           flexWrap: "wrap",
           gap: 16,
-          background: "var(--ice-card-bg, rgba(22, 27, 34, 0.6))",
-          border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.08))",
+          background: "var(--ice-card-bg)",
+          border: "1px solid var(--ice-border)",
           borderRadius: 16,
           padding: "20px 24px",
         }}
@@ -407,8 +407,8 @@ export function WorkshopView({
                 display: "inline-flex",
                 padding: "8px",
                 borderRadius: "10px",
-                background: "rgba(212, 175, 55, 0.15)",
-                color: "var(--gold, #d4af37)",
+                background: "var(--gold-soft)",
+                color: "var(--gold-fg)",
               }}
             >
               <FileSpreadsheet size={24} />
@@ -421,8 +421,8 @@ export function WorkshopView({
                 fontSize: "0.75rem",
                 padding: "2px 8px",
                 borderRadius: 6,
-                background: "rgba(212, 175, 55, 0.15)",
-                color: "var(--gold, #d4af37)",
+                background: "var(--gold-soft)",
+                color: "var(--gold-fg)",
                 fontWeight: 600,
               }}
             >
@@ -445,9 +445,9 @@ export function WorkshopView({
               gap: 8,
               padding: "9px 16px",
               borderRadius: 10,
-              border: "1px solid rgba(34, 197, 94, 0.4)",
-              background: "linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(21, 128, 61, 0.3))",
-              color: "#4ade80",
+              border: "1px solid var(--success)",
+              background: "var(--success-soft)",
+              color: "var(--success-fg)",
               fontWeight: 650,
               fontSize: "0.875rem",
               cursor: "pointer",
@@ -467,8 +467,8 @@ export function WorkshopView({
               gap: 8,
               padding: "9px 15px",
               borderRadius: 10,
-              border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-              background: "var(--ice-card-bg, rgba(255, 255, 255, 0.05))",
+              border: "1px solid var(--ice-border)",
+              background: "var(--ice-card-bg)",
               color: "var(--ice-text)",
               textDecoration: "none",
               fontSize: "0.875rem",
@@ -490,7 +490,7 @@ export function WorkshopView({
               gap: 6,
               padding: "9px 12px",
               borderRadius: 10,
-              border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+              border: "1px solid var(--ice-border)",
               background: "transparent",
               color: "var(--ice-text)",
               opacity: 0.8,
@@ -512,9 +512,9 @@ export function WorkshopView({
               gap: 8,
               padding: "9px 14px",
               borderRadius: 10,
-              border: "1px solid rgba(225, 29, 72, 0.4)",
-              background: "rgba(225, 29, 72, 0.12)",
-              color: "#fda4af",
+              border: "1px solid var(--accent)",
+              background: "var(--accent-soft)",
+              color: "var(--danger-fg)",
               fontSize: "0.875rem",
               fontWeight: 600,
               textDecoration: "none",
@@ -537,8 +537,8 @@ export function WorkshopView({
               padding: "9px 16px",
               borderRadius: 10,
               border: 0,
-              background: "linear-gradient(135deg, #c4a35a, #8b6914)",
-              color: "#111",
+              background: "var(--gold-solid)",
+              color: "var(--text-strong)",
               fontWeight: 700,
               fontSize: "0.875rem",
               cursor: "pointer",
@@ -564,7 +564,7 @@ export function WorkshopView({
         <div style={kpiCardStyle}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: "0.78rem", opacity: 0.7, textTransform: "uppercase" }}>{t.kpiTotal}</span>
-            <Car size={16} style={{ color: "#d4af37" }} />
+            <Car size={16} style={{ color: "var(--gold-fg)" }} />
           </div>
           <span style={{ fontSize: "1.75rem", fontWeight: 800, marginTop: 4 }}>{stats.total}</span>
           <span style={{ fontSize: "0.75rem", opacity: 0.6 }}>{t.kpiTotalHint}</span>
@@ -573,9 +573,9 @@ export function WorkshopView({
         <div style={kpiCardStyle}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: "0.78rem", opacity: 0.7, textTransform: "uppercase" }}>{t.kpiOngoing}</span>
-            <Clock size={16} style={{ color: "#60a5fa" }} />
+            <Clock size={16} style={{ color: "var(--info-fg)" }} />
           </div>
-          <span style={{ fontSize: "1.75rem", fontWeight: 800, marginTop: 4, color: "#60a5fa" }}>
+          <span style={{ fontSize: "1.75rem", fontWeight: 800, marginTop: 4, color: "var(--info-fg)" }}>
             {stats.enCours}
           </span>
           <span style={{ fontSize: "0.75rem", opacity: 0.6 }}>{t.kpiOngoingHint}</span>
@@ -584,9 +584,9 @@ export function WorkshopView({
         <div style={kpiCardStyle}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: "0.78rem", opacity: 0.7, textTransform: "uppercase" }}>{t.kpiPart}</span>
-            <AlertCircle size={16} style={{ color: "#facc15" }} />
+            <AlertCircle size={16} style={{ color: "var(--warning-fg)" }} />
           </div>
-          <span style={{ fontSize: "1.75rem", fontWeight: 800, marginTop: 4, color: "#facc15" }}>
+          <span style={{ fontSize: "1.75rem", fontWeight: 800, marginTop: 4, color: "var(--warning-fg)" }}>
             {stats.attentePiece}
           </span>
           <span style={{ fontSize: "0.75rem", opacity: 0.6 }}>{t.kpiPartHint}</span>
@@ -595,9 +595,9 @@ export function WorkshopView({
         <div style={kpiCardStyle}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: "0.78rem", opacity: 0.7, textTransform: "uppercase" }}>{t.kpiApproval}</span>
-            <AlertCircle size={16} style={{ color: "#fb923c" }} />
+            <AlertCircle size={16} style={{ color: "var(--warning-fg)" }} />
           </div>
-          <span style={{ fontSize: "1.75rem", fontWeight: 800, marginTop: 4, color: "#fb923c" }}>
+          <span style={{ fontSize: "1.75rem", fontWeight: 800, marginTop: 4, color: "var(--warning-fg)" }}>
             {stats.attenteAccord}
           </span>
           <span style={{ fontSize: "0.75rem", opacity: 0.6 }}>{t.kpiApprovalHint}</span>
@@ -606,9 +606,9 @@ export function WorkshopView({
         <div style={kpiCardStyle}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: "0.78rem", opacity: 0.7, textTransform: "uppercase" }}>{t.kpiDelivered}</span>
-            <CheckCircle2 size={16} style={{ color: "#4ade80" }} />
+            <CheckCircle2 size={16} style={{ color: "var(--success-fg)" }} />
           </div>
-          <span style={{ fontSize: "1.75rem", fontWeight: 800, marginTop: 4, color: "#4ade80" }}>
+          <span style={{ fontSize: "1.75rem", fontWeight: 800, marginTop: 4, color: "var(--success-fg)" }}>
             {stats.livrés}
           </span>
           <span style={{ fontSize: "0.75rem", opacity: 0.6 }}>{t.kpiDeliveredHint}</span>
@@ -623,13 +623,13 @@ export function WorkshopView({
           gap: 8,
           flexWrap: "wrap",
           padding: "10px 16px",
-          background: "var(--ice-card-bg, rgba(22, 27, 34, 0.4))",
-          border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.06))",
+          background: "var(--ice-card-bg)",
+          border: "1px solid var(--ice-border)",
           borderRadius: 12,
           fontSize: "0.8rem",
         }}
       >
-        <span style={{ fontWeight: 700, color: "var(--gold, #d4af37)", marginRight: 6 }}>
+        <span style={{ fontWeight: 700, color: "var(--gold-fg)", marginRight: 6 }}>
           {t.legendTitle}
         </span>
         {Object.entries(STATUS_CONFIG).map(([code, conf]) => (
@@ -659,8 +659,8 @@ export function WorkshopView({
       {/* SECTION NOUVEAU MODULE GARAGE & ORDRES DE RÉPARATION (ACCÈS DIRECT FICHES ET TABLETTE) */}
       <div
         style={{
-          background: "linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.85))",
-          border: "1px solid rgba(245, 158, 11, 0.35)",
+          background: "linear-gradient(135deg, var(--surface-sunken), var(--surface))",
+          border: "1px solid var(--warning)",
           borderRadius: 16,
           padding: "20px 24px",
           display: "flex",
@@ -674,8 +674,8 @@ export function WorkshopView({
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
               <span
                 style={{
-                  background: "rgba(245, 158, 11, 0.2)",
-                  color: "#fbbf24",
+                  background: "var(--warning-soft)",
+                  color: "var(--warning-fg)",
                   padding: "3px 10px",
                   borderRadius: 6,
                   fontWeight: 800,
@@ -685,7 +685,7 @@ export function WorkshopView({
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 5,
-                  border: "1px solid rgba(245, 158, 11, 0.4)",
+                  border: "1px solid var(--warning)",
                 }}
               >
                 <Sparkles size={12} />
@@ -711,11 +711,11 @@ export function WorkshopView({
                 gap: 6,
                 padding: "6px 12px",
                 borderRadius: 8,
-                background: "rgba(56, 189, 248, 0.12)",
-                color: "#38bdf8",
+                background: "var(--info-soft)",
+                color: "var(--info-fg)",
                 fontSize: "0.78rem",
                 fontWeight: 650,
-                border: "1px solid rgba(56, 189, 248, 0.25)",
+                border: "1px solid var(--info)",
               }}
             >
               <Printer size={13} /> {t.heroChip1}
@@ -727,11 +727,11 @@ export function WorkshopView({
                 gap: 6,
                 padding: "6px 12px",
                 borderRadius: 8,
-                background: "rgba(168, 85, 247, 0.12)",
-                color: "#c084fc",
+                background: "var(--purple-soft)",
+                color: "var(--purple-fg)",
                 fontSize: "0.78rem",
                 fontWeight: 650,
-                border: "1px solid rgba(168, 85, 247, 0.25)",
+                border: "1px solid var(--purple)",
               }}
             >
               <CheckSquare size={13} /> {t.heroChip2}
@@ -743,11 +743,11 @@ export function WorkshopView({
                 gap: 6,
                 padding: "6px 12px",
                 borderRadius: 8,
-                background: "rgba(245, 158, 11, 0.12)",
-                color: "#fbbf24",
+                background: "var(--warning-soft)",
+                color: "var(--warning-fg)",
                 fontSize: "0.78rem",
                 fontWeight: 650,
-                border: "1px solid rgba(245, 158, 11, 0.25)",
+                border: "1px solid var(--warning)",
               }}
             >
               <Tablet size={13} /> {t.heroChip3}
@@ -758,7 +758,7 @@ export function WorkshopView({
         {/* Grille des cartes véhicules actifs */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 14 }}>
           {activeEntries.length === 0 ? (
-            <div style={{ padding: "16px", borderRadius: 10, background: "rgba(255, 255, 255, 0.03)", opacity: 0.6, fontSize: "0.85rem" }}>
+            <div style={{ padding: "16px", borderRadius: 10, background: "var(--surface-soft)", opacity: 0.6, fontSize: "0.85rem" }}>
               {t.heroEmpty}
             </div>
           ) : (
@@ -766,8 +766,8 @@ export function WorkshopView({
               <div
                 key={`hero-card-${entry.id}`}
                 style={{
-                  background: "rgba(15, 23, 42, 0.85)",
-                  border: "1px solid rgba(255, 255, 255, 0.12)",
+                  background: "var(--surface)",
+                  border: "1px solid var(--border)",
                   borderRadius: 12,
                   padding: "16px 18px",
                   display: "flex",
@@ -781,15 +781,15 @@ export function WorkshopView({
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span
                         style={{
-                          background: "rgba(225, 29, 72, 0.2)",
-                          color: "#fb7185",
+                          background: "var(--accent-soft)",
+                          color: "var(--danger-fg)",
                           padding: "3px 8px",
                           borderRadius: 6,
                           fontWeight: 800,
                           fontSize: "0.85rem",
                           fontFamily: "monospace",
                           letterSpacing: "0.5px",
-                          border: "1px solid rgba(225, 29, 72, 0.35)",
+                          border: "1px solid var(--accent)",
                         }}
                       >
                         {entry.immatriculation}
@@ -807,11 +807,11 @@ export function WorkshopView({
                     style={{
                       padding: "3px 8px",
                       borderRadius: 6,
-                      background: "rgba(245, 158, 11, 0.15)",
-                      color: "#fbbf24",
+                      background: "var(--warning-soft)",
+                      color: "var(--warning-fg)",
                       fontSize: "0.75rem",
                       fontWeight: 700,
-                      border: "1px solid rgba(245, 158, 11, 0.3)",
+                      border: "1px solid var(--warning)",
                       whiteSpace: "nowrap",
                     }}
                   >
@@ -823,10 +823,10 @@ export function WorkshopView({
                   <div
                     style={{
                       fontSize: "0.78rem",
-                      background: "rgba(255, 255, 255, 0.04)",
+                      background: "var(--surface-soft)",
                       padding: "6px 10px",
                       borderRadius: 6,
-                      borderLeft: "3px solid #f59e0b",
+                      borderLeft: "3px solid var(--warning)",
                       opacity: 0.88,
                     }}
                   >
@@ -840,9 +840,9 @@ export function WorkshopView({
                     type="button"
                     onClick={() => setTabletEntry(entry)}
                     style={{
-                      background: "linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.35))",
-                      border: "1px solid rgba(245, 158, 11, 0.5)",
-                      color: "#fbbf24",
+                      background: "var(--warning-soft)",
+                      border: "1px solid var(--warning)",
+                      color: "var(--warning-fg)",
                       padding: "9px 6px",
                       borderRadius: 8,
                       fontWeight: 700,
@@ -866,9 +866,9 @@ export function WorkshopView({
                     target="_blank"
                     rel="noreferrer"
                     style={{
-                      background: "linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(14, 165, 233, 0.3))",
-                      border: "1px solid rgba(56, 189, 248, 0.5)",
-                      color: "#7dd3fc",
+                      background: "var(--info-soft)",
+                      border: "1px solid var(--info)",
+                      color: "var(--info-fg)",
                       padding: "9px 6px",
                       borderRadius: 8,
                       fontWeight: 700,
@@ -891,9 +891,9 @@ export function WorkshopView({
                     target="_blank"
                     rel="noreferrer"
                     style={{
-                      background: "linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(147, 51, 234, 0.3))",
-                      border: "1px solid rgba(168, 85, 247, 0.5)",
-                      color: "#d8b4fe",
+                      background: "var(--purple-soft)",
+                      border: "1px solid var(--purple)",
+                      color: "var(--purple-fg)",
                       padding: "9px 6px",
                       borderRadius: 8,
                       fontWeight: 700,
@@ -933,8 +933,8 @@ export function WorkshopView({
               display: "flex",
               alignItems: "center",
               gap: 8,
-              background: "var(--ice-input-bg, rgba(255, 255, 255, 0.05))",
-              border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.12))",
+              background: "var(--ice-input-bg)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 10,
               padding: "0 12px",
               flex: 1,
@@ -999,8 +999,8 @@ export function WorkshopView({
       <div
         style={{
           overflowX: "auto",
-          background: "var(--ice-card-bg, rgba(22, 27, 34, 0.5))",
-          border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.08))",
+          background: "var(--ice-card-bg)",
+          border: "1px solid var(--ice-border)",
           borderRadius: 14,
           boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
         }}
@@ -1009,8 +1009,8 @@ export function WorkshopView({
           <thead>
             <tr
               style={{
-                background: "rgba(255, 255, 255, 0.04)",
-                borderBottom: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+                background: "var(--surface-soft)",
+                borderBottom: "1px solid var(--ice-border)",
                 color: "var(--ice-text)",
                 opacity: 0.9,
                 fontWeight: 650,
@@ -1021,7 +1021,7 @@ export function WorkshopView({
               <th style={thStyle}>{t.colOr}</th>
               <th style={thStyle}>{t.colImmat}</th>
               <th style={thStyle}>{t.colVehicle}</th>
-              <th style={{ ...thStyle, background: "rgba(245, 158, 11, 0.08)", minWidth: 210 }}>{t.colSheets}</th>
+              <th style={{ ...thStyle, background: "var(--warning-soft)", minWidth: 210 }}>{t.colSheets}</th>
               <th style={thStyle}>{t.colChassis}</th>
               <th style={thStyle}>{t.colMileage}</th>
               <th style={thStyle}>{t.colClient}</th>
@@ -1056,10 +1056,10 @@ export function WorkshopView({
                   <tr
                     key={row.id}
                     style={{
-                      borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
+                      borderBottom: "1px solid var(--border)",
                       transition: "background 0.15s ease",
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)")}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "var(--border)")}
                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                   >
                     <td style={tdStyle}>
@@ -1072,11 +1072,11 @@ export function WorkshopView({
                           style={{
                             padding: "2px 7px",
                             borderRadius: 4,
-                            background: "rgba(212, 175, 55, 0.12)",
-                            color: "var(--gold, #d4af37)",
+                            background: "var(--gold-soft)",
+                            color: "var(--gold-fg)",
                             fontWeight: 700,
                             fontSize: "0.78rem",
-                            border: "1px solid rgba(212, 175, 55, 0.25)",
+                            border: "1px solid var(--gold)",
                           }}
                         >
                           #{row.orNumber}
@@ -1108,9 +1108,9 @@ export function WorkshopView({
                           title={t.rowTabletTitle}
                           style={{
                             border: 0,
-                            background: "rgba(245, 158, 11, 0.2)",
+                            background: "var(--warning-soft)",
                             cursor: "pointer",
-                            color: "#fbbf24",
+                            color: "var(--warning-fg)",
                             padding: "4px 8px",
                             borderRadius: 6,
                             fontWeight: 700,
@@ -1130,8 +1130,8 @@ export function WorkshopView({
                           title={t.rowFiche1Title}
                           style={{
                             textDecoration: "none",
-                            background: "rgba(56, 189, 248, 0.2)",
-                            color: "#7dd3fc",
+                            background: "var(--info-soft)",
+                            color: "var(--info-fg)",
                             padding: "4px 8px",
                             borderRadius: 6,
                             fontWeight: 700,
@@ -1151,8 +1151,8 @@ export function WorkshopView({
                           title={t.rowFiche2Title}
                           style={{
                             textDecoration: "none",
-                            background: "rgba(168, 85, 247, 0.2)",
-                            color: "#d8b4fe",
+                            background: "var(--purple-soft)",
+                            color: "var(--purple-fg)",
                             padding: "4px 8px",
                             borderRadius: 6,
                             fontWeight: 700,
@@ -1188,8 +1188,8 @@ export function WorkshopView({
                           padding: "2px 6px",
                           borderRadius: 4,
                           fontSize: "0.73rem",
-                          background: row.clientType === "Interne" ? "rgba(99, 102, 241, 0.15)" : "rgba(255, 255, 255, 0.05)",
-                          color: row.clientType === "Interne" ? "#818cf8" : "inherit",
+                          background: row.clientType === "Interne" ? "var(--purple-soft)" : "var(--surface-soft)",
+                          color: row.clientType === "Interne" ? "var(--purple-fg)" : "inherit",
                         }}
                       >
                         {row.clientType || copy.clientType.client}
@@ -1258,15 +1258,15 @@ export function WorkshopView({
                             borderRadius: 4,
                             background:
                               row.paymentMode.toLowerCase().includes("bc")
-                                ? "rgba(234, 179, 8, 0.15)"
+                                ? "var(--warning-soft)"
                                 : row.paymentMode.toLowerCase().includes("money")
-                                ? "rgba(34, 197, 94, 0.15)"
-                                : "rgba(255, 255, 255, 0.08)",
+                                ? "var(--success-soft)"
+                                : "var(--surface-soft)",
                             color:
                               row.paymentMode.toLowerCase().includes("bc")
-                                ? "#facc15"
+                                ? "var(--warning-fg)"
                                 : row.paymentMode.toLowerCase().includes("money")
-                                ? "#4ade80"
+                                ? "var(--success-fg)"
                                 : "inherit",
                             fontSize: "0.75rem",
                             fontWeight: 650,
@@ -1284,9 +1284,9 @@ export function WorkshopView({
                         title={t.rowTabletTitle}
                         style={{
                           border: 0,
-                          background: "rgba(245, 158, 11, 0.15)",
+                          background: "var(--warning-soft)",
                           cursor: "pointer",
-                          color: "#f59e0b",
+                          color: "var(--warning-fg)",
                           padding: "4px 8px",
                           borderRadius: 6,
                           fontWeight: 700,
@@ -1307,8 +1307,8 @@ export function WorkshopView({
                         title={t.rowFiche1Title}
                         style={{
                           textDecoration: "none",
-                          background: "rgba(56, 189, 248, 0.15)",
-                          color: "#38bdf8",
+                          background: "var(--info-soft)",
+                          color: "var(--info-fg)",
                           padding: "4px 8px",
                           borderRadius: 6,
                           fontWeight: 700,
@@ -1329,8 +1329,8 @@ export function WorkshopView({
                         title={t.rowFiche2Title}
                         style={{
                           textDecoration: "none",
-                          background: "rgba(168, 85, 247, 0.15)",
-                          color: "#c084fc",
+                          background: "var(--purple-soft)",
+                          color: "var(--purple-fg)",
                           padding: "4px 8px",
                           borderRadius: 6,
                           fontWeight: 700,
@@ -1365,7 +1365,7 @@ export function WorkshopView({
                           border: 0,
                           background: "transparent",
                           cursor: "pointer",
-                          color: "#f87171",
+                          color: "var(--danger-fg)",
                           opacity: 0.8,
                           padding: "4px 6px",
                         }}
@@ -1391,8 +1391,8 @@ export function WorkshopView({
                   style={{
                     padding: 8,
                     borderRadius: 8,
-                    background: "rgba(34, 197, 94, 0.15)",
-                    color: "#4ade80",
+                    background: "var(--success-soft)",
+                    color: "var(--success-fg)",
                   }}
                 >
                   <UploadCloud size={20} />
@@ -1416,11 +1416,11 @@ export function WorkshopView({
             <form onSubmit={handleImportSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div
                 style={{
-                  border: "2px dashed var(--ice-border, rgba(255, 255, 255, 0.2))",
+                  border: "2px dashed var(--ice-border)",
                   borderRadius: 12,
                   padding: "30px 20px",
                   textAlign: "center",
-                  background: "rgba(255, 255, 255, 0.02)",
+                  background: "var(--surface-soft)",
                   cursor: "pointer",
                 }}
               >
@@ -1432,7 +1432,7 @@ export function WorkshopView({
                   style={{ display: "none" }}
                 />
                 <label htmlFor="excelFileInput" style={{ cursor: "pointer", display: "block" }}>
-                  <FileSpreadsheet size={36} style={{ color: "#4ade80", marginBottom: 10 }} />
+                  <FileSpreadsheet size={36} style={{ color: "var(--success-fg)", marginBottom: 10 }} />
                   <div style={{ fontWeight: 650, fontSize: "0.95rem" }}>
                     {importFile ? importFile.name : t.importModal.choose}
                   </div>
@@ -1447,8 +1447,8 @@ export function WorkshopView({
                   style={{
                     padding: "10px 14px",
                     borderRadius: 8,
-                    background: "rgba(59, 130, 246, 0.15)",
-                    color: "#60a5fa",
+                    background: "var(--info-soft)",
+                    color: "var(--info-fg)",
                     fontSize: "0.85rem",
                   }}
                 >
@@ -1461,8 +1461,8 @@ export function WorkshopView({
                   style={{
                     padding: "10px 14px",
                     borderRadius: 8,
-                    background: "rgba(239, 68, 68, 0.15)",
-                    color: "#f87171",
+                    background: "var(--danger-soft)",
+                    color: "var(--danger-fg)",
                     fontSize: "0.85rem",
                   }}
                 >
@@ -1503,7 +1503,7 @@ export function WorkshopView({
                 <h3 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700 }}>
                   {t.createModal.title}
                 </h3>
-                <span style={{ fontSize: "0.78rem", color: "var(--gold)", fontWeight: 600 }}>
+                <span style={{ fontSize: "0.78rem", color: "var(--gold-fg)", fontWeight: 600 }}>
                   {t.createModal.subtitle(nextOrderNumber)}
                 </span>
               </div>
@@ -1541,18 +1541,18 @@ export function WorkshopView({
               {/* Sélection Client en base ou Nouveau client */}
               <div
                 style={{
-                  background: "rgba(255, 255, 255, 0.03)",
-                  border: "1px solid rgba(255, 255, 255, 0.09)",
+                  background: "var(--surface-soft)",
+                  border: "1px solid var(--border)",
                   borderRadius: 10,
                   padding: "10px 14px",
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                  <label style={{ ...labelStyle, marginBottom: 0, fontWeight: 700, color: "var(--gold)" }}>
+                  <label style={{ ...labelStyle, marginBottom: 0, fontWeight: 700, color: "var(--gold-fg)" }}>
                     {t.createModal.clientLabel}
                   </label>
                   {createCustomerSelection && createCustomerSelection !== "__NEW__" && (
-                    <span style={{ fontSize: "0.72rem", color: "#4ade80", fontWeight: 600 }}>
+                    <span style={{ fontSize: "0.72rem", color: "var(--success-fg)", fontWeight: 600 }}>
                       ✓ {t.createModal.autofillBadge}
                     </span>
                   )}
@@ -1562,10 +1562,10 @@ export function WorkshopView({
                   onChange={(e) => handleCustomerSelect(e.target.value)}
                   style={{ ...selectStyle, fontWeight: 550 }}
                 >
-                  <option value="" style={{ ...optionStyle, color: "#94a3b8" }}>
+                  <option value="" style={{ ...optionStyle, color: "var(--text-muted)" }}>
                     -- {t.createModal.clientPlaceholder(customers.length)} --
                   </option>
-                  <option value="__NEW__" style={{ ...optionStyle, color: "#60a5fa", fontWeight: 700 }}>
+                  <option value="__NEW__" style={{ ...optionStyle, color: "var(--info-fg)", fontWeight: 700 }}>
                     {t.createModal.newClientOption}
                   </option>
                   {customers.map((c) => (
@@ -1578,9 +1578,9 @@ export function WorkshopView({
                   <div
                     style={{
                       fontSize: "0.75rem",
-                      color: "#86efac",
+                      color: "var(--success-fg)",
                       marginTop: 6,
-                      background: "rgba(34, 197, 94, 0.1)",
+                      background: "var(--success-soft)",
                       padding: "5px 10px",
                       borderRadius: 6,
                     }}
@@ -1655,7 +1655,7 @@ export function WorkshopView({
               <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={labelStyle}>
-                    {t.createModal.orLabel} <span style={{ fontSize: "0.7rem", color: "var(--gold)" }}>{t.createModal.orTag}</span>
+                    {t.createModal.orLabel} <span style={{ fontSize: "0.7rem", color: "var(--gold-fg)" }}>{t.createModal.orTag}</span>
                   </label>
                   <div
                     style={{
@@ -1663,14 +1663,14 @@ export function WorkshopView({
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      background: "rgba(255, 255, 255, 0.04)",
-                      borderColor: "rgba(212, 175, 55, 0.35)",
+                      background: "var(--surface-soft)",
+                      borderColor: "var(--gold)",
                       cursor: "not-allowed",
                       userSelect: "none",
                     }}
                     title={t.createModal.orTitle}
                   >
-                    <span style={{ fontWeight: 800, color: "var(--gold)", fontSize: "0.95rem" }}>
+                    <span style={{ fontWeight: 800, color: "var(--gold-fg)", fontSize: "0.95rem" }}>
                       #{nextOrderNumber}
                     </span>
                     <span
@@ -1678,8 +1678,8 @@ export function WorkshopView({
                         fontSize: "0.68rem",
                         padding: "2px 6px",
                         borderRadius: 4,
-                        background: "rgba(212, 175, 55, 0.15)",
-                        color: "var(--gold)",
+                        background: "var(--gold-soft)",
+                        color: "var(--gold-fg)",
                         fontWeight: 600,
                       }}
                     >
@@ -1866,7 +1866,7 @@ export function WorkshopView({
                 <h3 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700 }}>
                   {t.editModal.title(editingItem.immatriculation)}
                 </h3>
-                <span style={{ fontSize: "0.78rem", color: "var(--gold)", fontWeight: 600 }}>
+                <span style={{ fontSize: "0.78rem", color: "var(--gold-fg)", fontWeight: 600 }}>
                   {t.editModal.subtitle(editingItem.orNumber || "-")}
                 </span>
               </div>
@@ -1939,7 +1939,7 @@ export function WorkshopView({
               <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={labelStyle}>
-                    {t.editModal.orLabel} <span style={{ fontSize: "0.7rem", color: "var(--gold)" }}>{t.createModal.orTag}</span>
+                    {t.editModal.orLabel} <span style={{ fontSize: "0.7rem", color: "var(--gold-fg)" }}>{t.createModal.orTag}</span>
                   </label>
                   <div
                     style={{
@@ -1947,12 +1947,12 @@ export function WorkshopView({
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      background: "rgba(255, 255, 255, 0.04)",
-                      borderColor: "rgba(212, 175, 55, 0.35)",
+                      background: "var(--surface-soft)",
+                      borderColor: "var(--gold)",
                       cursor: "not-allowed",
                     }}
                   >
-                    <span style={{ fontWeight: 800, color: "var(--gold)" }}>
+                    <span style={{ fontWeight: 800, color: "var(--gold-fg)" }}>
                       #{editingItem.orNumber || "-"}
                     </span>
                     <span style={{ fontSize: "0.68rem", opacity: 0.6 }}>{t.editModal.orLocked}</span>
@@ -2142,14 +2142,14 @@ const kpiCardStyle: React.CSSProperties = {
   flexDirection: "column",
   padding: "14px 18px",
   borderRadius: 14,
-  background: "var(--ice-card-bg, rgba(22, 27, 34, 0.6))",
-  border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.08))",
+  background: "var(--ice-card-bg)",
+  border: "1px solid var(--ice-border)",
 };
 
 const modalBackdrop: React.CSSProperties = {
   position: "fixed",
   inset: 0,
-  background: "rgba(0, 0, 0, 0.75)",
+  background: "var(--surface-sunken)",
   backdropFilter: "blur(6px)",
   display: "flex",
   alignItems: "center",
@@ -2159,8 +2159,8 @@ const modalBackdrop: React.CSSProperties = {
 };
 
 const modalBox: React.CSSProperties = {
-  background: "var(--ice-card-bg, #161b22)",
-  border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+  background: "var(--ice-card-bg)",
+  border: "1px solid var(--ice-border)",
   borderRadius: 16,
   padding: 24,
   width: "100%",
@@ -2183,9 +2183,9 @@ const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "8px 12px",
   borderRadius: 8,
-  border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-  background: "#161b22",
-  color: "#ffffff",
+  border: "1px solid var(--ice-border)",
+  background: "var(--surface)",
+  color: "var(--text-on-accent)",
   colorScheme: "dark",
   fontSize: "0.85rem",
   boxSizing: "border-box",
@@ -2195,9 +2195,9 @@ const selectStyle: React.CSSProperties = {
   width: "100%",
   padding: "8px 12px",
   borderRadius: 8,
-  border: "1px solid rgba(255, 255, 255, 0.2)",
-  background: "#161b22",
-  color: "#ffffff",
+  border: "1px solid var(--border)",
+  background: "var(--surface)",
+  color: "var(--text-on-accent)",
   colorScheme: "dark",
   fontSize: "0.85rem",
   boxSizing: "border-box",
@@ -2205,8 +2205,8 @@ const selectStyle: React.CSSProperties = {
 };
 
 const optionStyle: React.CSSProperties = {
-  backgroundColor: "#161b22",
-  color: "#ffffff",
+  backgroundColor: "var(--surface)",
+  color: "var(--text-on-accent)",
   padding: "8px 12px",
 };
 
@@ -2214,8 +2214,8 @@ const btnPrimary: React.CSSProperties = {
   padding: "9px 18px",
   borderRadius: 8,
   border: 0,
-  background: "linear-gradient(135deg, #c4a35a, #8b6914)",
-  color: "#111",
+  background: "var(--gold-solid)",
+  color: "var(--text-on-accent)",
   fontWeight: 700,
   fontSize: "0.875rem",
   cursor: "pointer",
@@ -2224,7 +2224,7 @@ const btnPrimary: React.CSSProperties = {
 const btnSecondary: React.CSSProperties = {
   padding: "9px 16px",
   borderRadius: 8,
-  border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+  border: "1px solid var(--ice-border)",
   background: "transparent",
   color: "var(--ice-text)",
   fontSize: "0.875rem",

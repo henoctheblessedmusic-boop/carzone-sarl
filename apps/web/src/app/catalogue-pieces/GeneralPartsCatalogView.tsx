@@ -260,7 +260,7 @@ export function GeneralPartsCatalogView({
             {filtered.map((part) => {
               const isSelected = selected.has(part.id);
               return (
-                <tr key={part.id} style={{ background: isSelected ? "rgba(56,189,248,0.07)" : undefined }}>
+                <tr key={part.id} style={{ background: isSelected ? "var(--info-soft)" : undefined }}>
                   <td><input type="checkbox" checked={isSelected} onChange={() => togglePart(part.id)} aria-label={`Sélectionner ${part.name}`} /></td>
                   <td>
                     <div style={{ fontFamily: "monospace", fontWeight: 700 }}>{part.reference}</div>
@@ -344,8 +344,8 @@ export function GeneralPartsCatalogView({
             <label style={{ display: "grid", gap: 4, fontSize: "0.78rem" }}><CalendarDays size={14} /> Date d&apos;arrivée prévue<input type="date" value={expectedAt} onChange={(event) => setExpectedAt(event.target.value)} className="ox-input" /></label>
             <label style={{ display: "grid", gap: 4, fontSize: "0.78rem" }}>Note<textarea value={notes} onChange={(event) => setNotes(event.target.value)} className="ox-input" style={{ minHeight: 40 }} /></label>
           </div>
-          {error && <p style={{ color: "#f87171", margin: 0, fontSize: "0.82rem" }}>{error}</p>}
-          {message && <p style={{ color: "#4ade80", margin: 0, fontSize: "0.82rem" }}>{message}</p>}
+          {error && <p style={{ color: "var(--danger-fg)", margin: 0, fontSize: "0.82rem" }}>{error}</p>}
+          {message && <p style={{ color: "var(--success-fg)", margin: 0, fontSize: "0.82rem" }}>{message}</p>}
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <button type="button" className="ox-btn ox-btn-primary" onClick={submitOrder} disabled={submitting || selectedLines.length === 0}>
               {submitting ? "Enregistrement..." : "Enregistrer la commande"}
@@ -378,8 +378,8 @@ export function GeneralPartsCatalogView({
                   </div>
                   <div style={{ display: "flex", gap: 4, flexWrap: "wrap", alignItems: "center" }}>
                     {TIMELINE.map((stage, index) => (
-                      <span key={stage} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "0.7rem", color: currentIndex >= index ? "#4ade80" : "var(--ice-text-muted)" }}>
-                        <span style={{ width: 7, height: 7, borderRadius: 999, background: currentIndex >= index ? "#4ade80" : "var(--ice-border)" }} />
+                      <span key={stage} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "0.7rem", color: currentIndex >= index ? "var(--success-fg)" : "var(--ice-text-muted)" }}>
+                        <span style={{ width: 7, height: 7, borderRadius: 999, background: currentIndex >= index ? "var(--success-solid)" : "var(--ice-border)" }} />
                         {STATUS_LABELS[stage]}
                       </span>
                     ))}

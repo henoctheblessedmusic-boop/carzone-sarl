@@ -141,8 +141,8 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
               display: "inline-block",
               padding: "2px 8px",
               borderRadius: 6,
-              background: "rgba(212, 175, 55, 0.15)",
-              color: "var(--gold, #d4af37)",
+              background: "var(--gold-soft)",
+              color: "var(--gold-fg)",
               fontWeight: 650,
               fontSize: "0.78rem",
             }}
@@ -164,8 +164,8 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
                 gap: 4,
                 padding: "4px 8px",
                 borderRadius: 6,
-                border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                background: "rgba(255, 255, 255, 0.06)",
+                border: "1px solid var(--ice-border)",
+                background: "var(--surface-soft)",
                 color: "var(--ice-text)",
                 fontSize: "0.75rem",
                 fontWeight: 600,
@@ -173,7 +173,7 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
               }}
               title={leadsCopy.actions.editTitle}
             >
-              <Edit2 size={12} color="var(--gold, #d4af37)" />
+              <Edit2 size={12} color="var(--gold-fg)" />
               <span>{leadsCopy.actions.edit}</span>
             </button>
 
@@ -201,7 +201,7 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.75)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "flex",
             alignItems: "center",
@@ -214,8 +214,8 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
             style={{
               width: "100%",
               maxWidth: 480,
-              background: "#161a20",
-              border: "1px solid rgba(212, 175, 55, 0.4)",
+              background: "var(--surface)",
+              border: "1px solid var(--gold)",
               borderRadius: 14,
               padding: 24,
               boxShadow: "0 20px 50px rgba(0, 0, 0, 0.6)",
@@ -351,7 +351,7 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
                   style={{
                     padding: "8px 16px",
                     borderRadius: 8,
-                    border: "1px solid rgba(255, 255, 255, 0.15)",
+                    border: "1px solid var(--border)",
                     background: "transparent",
                     color: "var(--ice-text)",
                     fontSize: "0.82rem",
@@ -366,8 +366,8 @@ export function LeadsView({ leads }: { leads: LeadItem[] }) {
                     padding: "8px 18px",
                     borderRadius: 8,
                     border: "none",
-                    background: "linear-gradient(135deg, #d4af37, #b48c1e)",
-                    color: "#000",
+                    background: "linear-gradient(135deg, var(--gold-solid), var(--gold-soft))",
+                    color: "var(--text-strong)",
                     fontWeight: 700,
                     fontSize: "0.82rem",
                     cursor: "pointer",
@@ -397,8 +397,8 @@ const btn: React.CSSProperties = {
   padding: "0.55rem 0.9rem",
   borderRadius: 8,
   border: 0,
-  background: "linear-gradient(135deg, #c4a35a, #8b6914)",
-  color: "#111",
+  background: "var(--gold-solid)",
+  color: "var(--text-strong)",
   fontWeight: 650,
   cursor: "pointer",
 };

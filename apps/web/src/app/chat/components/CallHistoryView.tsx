@@ -160,7 +160,7 @@ export function CallHistoryView({
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 18, flexWrap: "wrap", gap: 12 }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ color: "var(--gold, #d4af37)" }}>
+            <span style={{ color: "var(--gold-fg)" }}>
               <Clock size={24} />
             </span>
             <h2 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, color: "var(--ice-text)" }}>
@@ -178,8 +178,8 @@ export function CallHistoryView({
             style={{
               display: "flex",
               alignItems: "center",
-              background: "rgba(255, 255, 255, 0.05)",
-              border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.12))",
+              background: "var(--surface-soft)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 8,
               padding: 3,
             }}
@@ -191,8 +191,8 @@ export function CallHistoryView({
                 padding: "6px 12px",
                 borderRadius: 6,
                 border: "none",
-                background: scope === "me" ? "rgba(212, 175, 55, 0.2)" : "transparent",
-                color: scope === "me" ? "var(--gold, #d4af37)" : "var(--ice-text)",
+                background: scope === "me" ? "var(--gold-soft)" : "transparent",
+                color: scope === "me" ? "var(--gold-fg)" : "var(--ice-text)",
                 fontSize: "0.78rem",
                 fontWeight: scope === "me" ? 700 : 500,
                 cursor: "pointer",
@@ -210,8 +210,8 @@ export function CallHistoryView({
                 padding: "6px 12px",
                 borderRadius: 6,
                 border: "none",
-                background: scope === "all" ? "rgba(212, 175, 55, 0.2)" : "transparent",
-                color: scope === "all" ? "var(--gold, #d4af37)" : "var(--ice-text)",
+                background: scope === "all" ? "var(--gold-soft)" : "transparent",
+                color: scope === "all" ? "var(--gold-fg)" : "var(--ice-text)",
                 fontSize: "0.78rem",
                 fontWeight: scope === "all" ? 700 : 500,
                 cursor: "pointer",
@@ -229,19 +229,19 @@ export function CallHistoryView({
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 18 }}>
         <div
           style={{
-            background: "linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.03))",
-            border: "1px solid rgba(239, 68, 68, 0.25)",
+            background: "var(--danger-soft)",
+            border: "1px solid var(--danger)",
             borderRadius: 10,
             padding: "12px 14px",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", color: "#f87171" }}>
+            <span style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", color: "var(--danger-fg)" }}>
               {copy.kpi.missed}
             </span>
-            <PhoneMissed size={16} color="#ef4444" />
+            <PhoneMissed size={16} color="var(--danger-fg)" />
           </div>
-          <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "#f87171", marginTop: 4 }}>
+          <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--danger-fg)", marginTop: 4 }}>
             {missedCalls.length}
           </div>
           <div style={{ fontSize: "0.7rem", opacity: 0.75, marginTop: 2 }}>
@@ -251,17 +251,17 @@ export function CallHistoryView({
 
         <div
           style={{
-            background: "rgba(255, 255, 255, 0.04)",
-            border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+            background: "var(--surface-soft)",
+            border: "1px solid var(--ice-border)",
             borderRadius: 10,
             padding: "12px 14px",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", color: "#4ade80" }}>
+            <span style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", color: "var(--success-fg)" }}>
               {copy.kpi.direct}
             </span>
-            <PhoneIncoming size={16} color="#22c55e" />
+            <PhoneIncoming size={16} color="var(--success-fg)" />
           </div>
           <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--ice-text)", marginTop: 4 }}>
             {directCalls.length}
@@ -273,17 +273,17 @@ export function CallHistoryView({
 
         <div
           style={{
-            background: "rgba(255, 255, 255, 0.04)",
-            border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+            background: "var(--surface-soft)",
+            border: "1px solid var(--ice-border)",
             borderRadius: 10,
             padding: "12px 14px",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", color: "#a855f7" }}>
+            <span style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", color: "var(--purple-fg)" }}>
               {copy.kpi.conference}
             </span>
-            <Users size={16} color="#c084fc" />
+            <Users size={16} color="var(--purple-fg)" />
           </div>
           <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--ice-text)", marginTop: 4 }}>
             {conferenceCalls.length}
@@ -295,19 +295,19 @@ export function CallHistoryView({
 
         <div
           style={{
-            background: "linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(212, 175, 55, 0.03))",
-            border: "1px solid rgba(212, 175, 55, 0.3)",
+            background: "var(--gold-soft)",
+            border: "1px solid var(--gold)",
             borderRadius: 10,
             padding: "12px 14px",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", color: "var(--gold, #d4af37)" }}>
+            <span style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", color: "var(--gold-fg)" }}>
               {copy.kpi.total}
             </span>
-            <Clock size={16} color="var(--gold, #d4af37)" />
+            <Clock size={16} color="var(--gold-fg)" />
           </div>
-          <div style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--gold, #d4af37)", marginTop: 4 }}>
+          <div style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--gold-fg)", marginTop: 4 }}>
             {formatDuration(totalSeconds, copy)}
           </div>
           <div style={{ fontSize: "0.7rem", opacity: 0.7, marginTop: 2 }}>
@@ -325,9 +325,9 @@ export function CallHistoryView({
             style={{
               padding: "6px 12px",
               borderRadius: 6,
-              border: filter === "ALL" ? "1px solid var(--gold, #d4af37)" : "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
-              background: filter === "ALL" ? "rgba(212, 175, 55, 0.2)" : "rgba(255, 255, 255, 0.03)",
-              color: filter === "ALL" ? "var(--gold, #d4af37)" : "var(--ice-text)",
+              border: filter === "ALL" ? "1px solid var(--gold)" : "1px solid var(--ice-border)",
+              background: filter === "ALL" ? "var(--gold-soft)" : "var(--surface-soft)",
+              color: filter === "ALL" ? "var(--gold-fg)" : "var(--ice-text)",
               fontSize: "0.76rem",
               fontWeight: filter === "ALL" ? 700 : 500,
               cursor: "pointer",
@@ -342,9 +342,9 @@ export function CallHistoryView({
             style={{
               padding: "6px 12px",
               borderRadius: 6,
-              border: filter === "MISSED" ? "1px solid #ef4444" : "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
-              background: filter === "MISSED" ? "rgba(239, 68, 68, 0.2)" : "rgba(255, 255, 255, 0.03)",
-              color: filter === "MISSED" ? "#f87171" : "var(--ice-text)",
+              border: filter === "MISSED" ? "1px solid var(--danger)" : "1px solid var(--ice-border)",
+              background: filter === "MISSED" ? "var(--danger-soft)" : "var(--surface-soft)",
+              color: filter === "MISSED" ? "var(--danger-fg)" : "var(--ice-text)",
               fontSize: "0.76rem",
               fontWeight: filter === "MISSED" ? 700 : 500,
               cursor: "pointer",
@@ -359,9 +359,9 @@ export function CallHistoryView({
             style={{
               padding: "6px 12px",
               borderRadius: 6,
-              border: filter === "DIRECT" ? "1px solid #22c55e" : "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
-              background: filter === "DIRECT" ? "rgba(34, 197, 94, 0.2)" : "rgba(255, 255, 255, 0.03)",
-              color: filter === "DIRECT" ? "#4ade80" : "var(--ice-text)",
+              border: filter === "DIRECT" ? "1px solid var(--success)" : "1px solid var(--ice-border)",
+              background: filter === "DIRECT" ? "var(--success-soft)" : "var(--surface-soft)",
+              color: filter === "DIRECT" ? "var(--success-fg)" : "var(--ice-text)",
               fontSize: "0.76rem",
               fontWeight: filter === "DIRECT" ? 700 : 500,
               cursor: "pointer",
@@ -376,9 +376,9 @@ export function CallHistoryView({
             style={{
               padding: "6px 12px",
               borderRadius: 6,
-              border: filter === "CONFERENCE" ? "1px solid #a855f7" : "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
-              background: filter === "CONFERENCE" ? "rgba(168, 85, 247, 0.2)" : "rgba(255, 255, 255, 0.03)",
-              color: filter === "CONFERENCE" ? "#c084fc" : "var(--ice-text)",
+              border: filter === "CONFERENCE" ? "1px solid var(--purple)" : "1px solid var(--ice-border)",
+              background: filter === "CONFERENCE" ? "var(--purple-soft)" : "var(--surface-soft)",
+              color: filter === "CONFERENCE" ? "var(--purple-fg)" : "var(--ice-text)",
               fontSize: "0.76rem",
               fontWeight: filter === "CONFERENCE" ? 700 : 500,
               cursor: "pointer",
@@ -394,8 +394,8 @@ export function CallHistoryView({
             display: "flex",
             alignItems: "center",
             gap: 6,
-            background: "var(--ice-chat-input-bg, rgba(0, 0, 0, 0.25))",
-            border: "1px solid var(--ice-chat-input-border, rgba(255, 255, 255, 0.12))",
+            background: "var(--ice-chat-input-bg)",
+            border: "1px solid var(--ice-chat-input-border)",
             borderRadius: 6,
             padding: "5px 10px",
             minWidth: 200,
@@ -410,7 +410,7 @@ export function CallHistoryView({
             style={{
               background: "transparent",
               border: "none",
-              color: "var(--ice-chat-input-text, var(--ice-text))",
+              color: "var(--ice-chat-input-text)",
               outline: "none",
               fontSize: "0.78rem",
               width: "100%",
@@ -432,8 +432,8 @@ export function CallHistoryView({
               textAlign: "center",
               padding: "40px 20px",
               borderRadius: 12,
-              background: "rgba(255, 255, 255, 0.02)",
-              border: "1px dashed var(--ice-border, rgba(255, 255, 255, 0.1))",
+              background: "var(--surface-soft)",
+              border: "1px dashed var(--ice-border)",
               color: "var(--ice-text)",
               opacity: 0.7,
             }}
@@ -460,15 +460,15 @@ export function CallHistoryView({
                   padding: "12px 16px",
                   borderRadius: 10,
                   background: isMissed
-                    ? "linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.02))"
+                    ? "var(--danger-soft)"
                     : isConference
-                    ? "linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(168, 85, 247, 0.02))"
-                    : "rgba(255, 255, 255, 0.03)",
+                    ? "var(--purple-soft)"
+                    : "var(--surface-soft)",
                   border: isMissed
-                    ? "1px solid rgba(239, 68, 68, 0.35)"
+                    ? "1px solid var(--danger)"
                     : isConference
-                    ? "1px solid rgba(168, 85, 247, 0.25)"
-                    : "1px solid var(--ice-border, rgba(255, 255, 255, 0.08))",
+                    ? "1px solid var(--purple)"
+                    : "1px solid var(--ice-border)",
                   gap: 12,
                   transition: "background 0.15s ease",
                 }}
@@ -481,19 +481,19 @@ export function CallHistoryView({
                       height: 40,
                       borderRadius: "50%",
                       background: isMissed
-                        ? "rgba(239, 68, 68, 0.2)"
+                        ? "var(--danger-soft)"
                         : isConference
-                        ? "rgba(168, 85, 247, 0.2)"
+                        ? "var(--purple-soft)"
                         : isOutgoing
-                        ? "rgba(59, 130, 246, 0.2)"
-                        : "rgba(34, 197, 94, 0.2)",
+                        ? "var(--info-soft)"
+                        : "var(--success-soft)",
                       color: isMissed
-                        ? "#f87171"
+                        ? "var(--danger-fg)"
                         : isConference
-                        ? "#c084fc"
+                        ? "var(--purple-fg)"
                         : isOutgoing
-                        ? "#60a5fa"
-                        : "#4ade80",
+                        ? "var(--info-fg)"
+                        : "var(--success-fg)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -517,7 +517,7 @@ export function CallHistoryView({
                         style={{
                           fontSize: "0.9rem",
                           fontWeight: 700,
-                          color: isMissed ? "#f87171" : "var(--ice-text)",
+                          color: isMissed ? "var(--danger-fg)" : "var(--ice-text)",
                         }}
                       >
                         {isConference ? c.receiverName : isOutgoing ? copy.toName(c.receiverName) : copy.fromName(c.callerName)}
@@ -525,7 +525,7 @@ export function CallHistoryView({
 
                       {/* Rôle */}
                       {c.callerRole && (
-                        <span style={{ fontSize: "0.7rem", opacity: 0.6, background: "rgba(255,255,255,0.06)", padding: "1px 6px", borderRadius: 4 }}>
+                        <span style={{ fontSize: "0.7rem", opacity: 0.6, background: "var(--surface-soft)", padding: "1px 6px", borderRadius: 4 }}>
                           {ROLE_LABELS[c.callerRole as Role] || c.callerRole}
                         </span>
                       )}
@@ -538,9 +538,9 @@ export function CallHistoryView({
                             fontWeight: 800,
                             padding: "2px 7px",
                             borderRadius: 6,
-                            background: "rgba(239, 68, 68, 0.25)",
-                            color: "#ef4444",
-                            border: "1px solid rgba(239, 68, 68, 0.4)",
+                            background: "var(--danger-soft)",
+                            color: "var(--danger-fg)",
+                            border: "1px solid var(--danger)",
                           }}
                         >
                           {copy.missedBadge}
@@ -554,7 +554,7 @@ export function CallHistoryView({
                       <span
                         style={{
                           fontWeight: 650,
-                          color: isMissed ? "#ef4444" : "var(--gold, #d4af37)",
+                          color: isMissed ? "var(--danger-fg)" : "var(--gold-fg)",
                         }}
                       >
                         {isMissed ? copy.notAnswered : copy.duration(formatDuration(c.durationSeconds, copy))}
@@ -575,9 +575,9 @@ export function CallHistoryView({
                         gap: 6,
                         padding: "7px 12px",
                         borderRadius: 8,
-                        border: "1px solid rgba(168, 85, 247, 0.4)",
-                        background: "rgba(168, 85, 247, 0.15)",
-                        color: "#c084fc",
+                        border: "1px solid var(--purple)",
+                        background: "var(--purple-soft)",
+                        color: "var(--purple-fg)",
                         fontSize: "0.78rem",
                         fontWeight: 700,
                         cursor: "pointer",
@@ -597,12 +597,12 @@ export function CallHistoryView({
                         padding: "7px 14px",
                         borderRadius: 8,
                         border: isMissed
-                          ? "1px solid rgba(239, 68, 68, 0.5)"
-                          : "1px solid rgba(34, 197, 94, 0.4)",
+                          ? "1px solid var(--danger)"
+                          : "1px solid var(--success)",
                         background: isMissed
-                          ? "linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(185, 28, 28, 0.35))"
-                          : "linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(21, 128, 61, 0.3))",
-                        color: isMissed ? "#fca5a5" : "#4ade80",
+                          ? "var(--danger-soft)"
+                          : "var(--success-soft)",
+                        color: isMissed ? "var(--danger-fg)" : "var(--success-fg)",
                         fontSize: "0.78rem",
                         fontWeight: 700,
                         cursor: "pointer",

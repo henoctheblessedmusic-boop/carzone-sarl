@@ -167,12 +167,12 @@ export default async function ChargeRequestsPage() {
 
         <div
           className="ox-glass"
-          style={{ padding: "1.1rem", borderRadius: 12, borderLeft: "4px solid #f59e0b" }}
+          style={{ padding: "1.1rem", borderRadius: 12, borderLeft: "4px solid var(--warning)" }}
         >
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
             {t.kpi.pending.label}
           </div>
-          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#f59e0b", marginTop: 4 }}>
+          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--warning-fg)", marginTop: 4 }}>
             {pendingQuotes}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: 2 }}>
@@ -182,12 +182,12 @@ export default async function ChargeRequestsPage() {
 
         <div
           className="ox-glass"
-          style={{ padding: "1.1rem", borderRadius: 12, borderLeft: "4px solid #38bdf8" }}
+          style={{ padding: "1.1rem", borderRadius: 12, borderLeft: "4px solid var(--info)" }}
         >
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
             {t.kpi.received.label}
           </div>
-          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#38bdf8", marginTop: 4 }}>
+          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--info-fg)", marginTop: 4 }}>
             {quotesReceived}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: 2 }}>
@@ -197,12 +197,12 @@ export default async function ChargeRequestsPage() {
 
         <div
           className="ox-glass"
-          style={{ padding: "1.1rem", borderRadius: 12, borderLeft: "4px solid #10b981" }}
+          style={{ padding: "1.1rem", borderRadius: 12, borderLeft: "4px solid var(--success)" }}
         >
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
             {t.kpi.awarded.label}
           </div>
-          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#10b981", marginTop: 4 }}>
+          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--success-fg)", marginTop: 4 }}>
             {assignedProjects}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: 2 }}>
@@ -223,10 +223,10 @@ export default async function ChargeRequestsPage() {
             display: "flex",
             flexDirection: "column",
             gap: "1rem",
-            border: "1px solid rgba(197, 216, 228, 0.2)",
+            border: "1px solid var(--info)",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--gold)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--gold-fg)" }}>
             <Zap size={20} />
             <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700 }}>
               {t.form.title}
@@ -286,8 +286,8 @@ export default async function ChargeRequestsPage() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 8,
-                background: "linear-gradient(135deg, var(--gold) 0%, #b89130 100%)",
-                color: "#0a1622",
+                background: "linear-gradient(135deg, var(--gold) 0%, var(--gold-solid) 100%)",
+                color: "var(--text-strong)",
                 fontWeight: 700,
                 padding: "0.65rem 1.25rem",
               }}
@@ -310,7 +310,7 @@ export default async function ChargeRequestsPage() {
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "flex-start",
-                  borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                  borderBottom: "1px solid var(--border)",
                   paddingBottom: "1rem",
                   marginBottom: "1rem",
                   flexWrap: "wrap",
@@ -374,15 +374,15 @@ export default async function ChargeRequestsPage() {
                         key={q.id}
                         style={{
                           background: isSelected
-                            ? "rgba(16, 185, 129, 0.1)"
+                            ? "var(--success-soft)"
                             : isRejected
-                              ? "rgba(239, 68, 68, 0.05)"
-                              : "rgba(255, 255, 255, 0.03)",
+                              ? "var(--danger-soft)"
+                              : "var(--surface-soft)",
                           border: isSelected
-                            ? "2px solid #10b981"
+                            ? "2px solid var(--success)"
                             : isRejected
-                              ? "1px solid rgba(239, 68, 68, 0.2)"
-                              : "1px solid rgba(255, 255, 255, 0.08)",
+                              ? "1px solid var(--danger)"
+                              : "1px solid var(--border)",
                           borderRadius: 12,
                           padding: "1.1rem",
                           display: "flex",
@@ -398,8 +398,8 @@ export default async function ChargeRequestsPage() {
                               position: "absolute",
                               top: -10,
                               right: 12,
-                              background: "#10b981",
-                              color: "#fff",
+                              background: "var(--success-solid)",
+                              color: "var(--text-on-accent)",
                               fontSize: "0.72rem",
                               fontWeight: 800,
                               padding: "0.2rem 0.6rem",
@@ -425,7 +425,7 @@ export default async function ChargeRequestsPage() {
                           <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
                             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem" }}>
                               <span style={{ opacity: 0.7 }}>{t.quote.amount} :</span>
-                              <strong style={{ fontSize: "1.05rem", color: q.amountXof ? "#10b981" : "inherit" }}>
+                              <strong style={{ fontSize: "1.05rem", color: q.amountXof ? "var(--success-fg)" : "inherit" }}>
                                 {q.amountXof != null ? formatXof(q.amountXof) : t.quote.pendingAmount}
                               </strong>
                             </div>
@@ -444,7 +444,7 @@ export default async function ChargeRequestsPage() {
                         </div>
 
                         {/* Actions selon le rôle */}
-                        <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 8 }}>
+                        <div style={{ borderTop: "1px solid var(--border)", paddingTop: 8 }}>
                           {/* Cas 1 : L'installateur saisit son devis */}
                           {q.status === "EN_ATTENTE" && (user.role === "INSTALLATEUR" || user.role === "DG" || user.role === "BORNES_OPS") ? (
                             <form action={submitInstallerQuote} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -477,7 +477,7 @@ export default async function ChargeRequestsPage() {
                                 type="submit"
                                 className="ox-btn ox-btn-sm"
                                 style={{
-                                  background: "linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)",
+                                  background: "var(--info-solid)",
                                   fontWeight: 650,
                                 }}
                               >
@@ -497,7 +497,7 @@ export default async function ChargeRequestsPage() {
                                   alignItems: "center",
                                   justifyContent: "center",
                                   gap: 6,
-                                  background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                                  background: "var(--success-solid)",
                                   fontWeight: 700,
                                   padding: "0.6rem",
                                   fontSize: "0.88rem",
@@ -510,9 +510,9 @@ export default async function ChargeRequestsPage() {
                           ) : (
                             <div style={{ textAlign: "center", fontSize: "0.78rem", opacity: 0.65 }}>
                               {isSelected ? (
-                                <span style={{ color: "#10b981", fontWeight: 700 }}>{t.quote.won}</span>
+                                <span style={{ color: "var(--success-fg)", fontWeight: 700 }}>{t.quote.won}</span>
                               ) : isRejected ? (
-                                <span style={{ color: "#ef4444" }}>{t.quote.rejected}</span>
+                                <span style={{ color: "var(--danger-fg)" }}>{t.quote.rejected}</span>
                               ) : (
                                 t.quote.drafting
                               )}

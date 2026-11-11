@@ -60,8 +60,8 @@ export function ChangePasswordModal() {
           width: 36,
           height: 36,
           borderRadius: 8,
-          border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-          background: "var(--ice-card-bg, rgba(255, 255, 255, 0.05))",
+          border: "1px solid var(--ice-border)",
+          background: "var(--ice-card-bg)",
           color: "var(--ice-text)",
           cursor: "pointer",
           transition: "all 0.2s ease",
@@ -75,7 +75,7 @@ export function ChangePasswordModal() {
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.75)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "flex",
             alignItems: "center",
@@ -86,8 +86,8 @@ export function ChangePasswordModal() {
         >
           <div
             style={{
-              background: "var(--ice-card-bg, #161a20)",
-              border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+              background: "var(--ice-card-bg)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 16,
               width: "100%",
               maxWidth: 440,
@@ -102,8 +102,8 @@ export function ChangePasswordModal() {
                 justifyContent: "space-between",
                 alignItems: "center",
                 padding: "16px 20px",
-                borderBottom: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
-                background: "rgba(255, 255, 255, 0.02)",
+                borderBottom: "1px solid var(--ice-border)",
+                background: "var(--surface-soft)",
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -111,8 +111,8 @@ export function ChangePasswordModal() {
                   style={{
                     padding: 6,
                     borderRadius: 8,
-                    background: "rgba(212, 175, 55, 0.15)",
-                    color: "var(--gold, #d4af37)",
+                    background: "var(--gold-soft)",
+                    color: "var(--gold-fg)",
                     display: "flex",
                   }}
                 >
@@ -144,9 +144,9 @@ export function ChangePasswordModal() {
                   style={{
                     padding: "10px 14px",
                     borderRadius: 8,
-                    background: "rgba(34, 197, 94, 0.15)",
-                    border: "1px solid rgba(34, 197, 94, 0.3)",
-                    color: "#4ade80",
+                    background: "var(--success-soft)",
+                    border: "1px solid var(--success)",
+                    color: "var(--success-fg)",
                     fontSize: "0.82rem",
                   }}
                 >
@@ -159,9 +159,9 @@ export function ChangePasswordModal() {
                   style={{
                     padding: "10px 14px",
                     borderRadius: 8,
-                    background: "rgba(239, 68, 68, 0.15)",
-                    border: "1px solid rgba(239, 68, 68, 0.3)",
-                    color: "#f87171",
+                    background: "var(--danger-soft)",
+                    border: "1px solid var(--danger)",
+                    color: "var(--danger-fg)",
                     fontSize: "0.82rem",
                   }}
                 >
@@ -184,8 +184,8 @@ export function ChangePasswordModal() {
                       width: "100%",
                       padding: "9px 38px 9px 12px",
                       borderRadius: 8,
-                      border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                      background: "rgba(0, 0, 0, 0.2)",
+                      border: "1px solid var(--ice-border)",
+                      background: "var(--surface-soft)",
                       color: "var(--ice-text)",
                       fontSize: "0.875rem",
                       boxSizing: "border-box",
@@ -226,8 +226,8 @@ export function ChangePasswordModal() {
                     width: "100%",
                     padding: "9px 12px",
                     borderRadius: 8,
-                    border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                    background: "rgba(0, 0, 0, 0.2)",
+                    border: "1px solid var(--ice-border)",
+                    background: "var(--surface-soft)",
                     color: "var(--ice-text)",
                     fontSize: "0.875rem",
                     boxSizing: "border-box",
@@ -249,7 +249,7 @@ export function ChangePasswordModal() {
                   style={{
                     padding: "8px 14px",
                     borderRadius: 8,
-                    border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+                    border: "1px solid var(--ice-border)",
                     background: "transparent",
                     color: "var(--ice-text)",
                     fontSize: "0.85rem",
@@ -268,8 +268,8 @@ export function ChangePasswordModal() {
                     padding: "8px 16px",
                     borderRadius: 8,
                     border: "none",
-                    background: "linear-gradient(135deg, #d4af37, #b48c1e)",
-                    color: "#000",
+                    background: "linear-gradient(135deg, var(--gold-solid), var(--gold-soft))",
+                    color: "var(--text-strong)",
                     fontWeight: 750,
                     fontSize: "0.85rem",
                     cursor: "pointer",

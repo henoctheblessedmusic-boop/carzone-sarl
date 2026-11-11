@@ -165,7 +165,7 @@ export function HelpCenterModal({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "rgba(3, 7, 18, 0.75)",
+        background: "var(--surface-sunken)",
         backdropFilter: "blur(12px)",
         padding: "1rem",
         animation: "fadeIn 0.2s ease-out",
@@ -178,13 +178,13 @@ export function HelpCenterModal({
           maxWidth: 1060,
           height: "min(88vh, 760px)",
           borderRadius: 20,
-          background: "linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(9, 14, 26, 0.99) 100%)",
-          border: "1px solid rgba(225, 29, 72, 0.35)",
+          background: "var(--surface)",
+          border: "1px solid var(--accent)",
           boxShadow: "0 25px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(225, 29, 72, 0.15)",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
-          color: "#ffffff",
+          color: "var(--text-strong)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -192,8 +192,8 @@ export function HelpCenterModal({
         <div
           style={{
             padding: "1.2rem 1.6rem",
-            background: "linear-gradient(90deg, rgba(225, 29, 72, 0.15) 0%, rgba(15, 23, 42, 0.4) 100%)",
-            borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+            background: "linear-gradient(90deg, var(--accent-soft) 0%, var(--surface-sunken) 100%)",
+            borderBottom: "1px solid var(--border)",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
@@ -207,14 +207,14 @@ export function HelpCenterModal({
                 width: 42,
                 height: 42,
                 borderRadius: 12,
-                background: "linear-gradient(135deg, #e11d48 0%, #be123c 100%)",
+                background: "var(--accent)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 boxShadow: "0 4px 15px rgba(225, 29, 72, 0.4)",
               }}
             >
-              <HelpCircle size={24} color="#ffffff" />
+              <HelpCircle size={24} color="var(--text-on-accent)" />
             </div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -227,15 +227,15 @@ export function HelpCenterModal({
                     fontWeight: 750,
                     padding: "2px 8px",
                     borderRadius: 20,
-                    background: "rgba(225, 29, 72, 0.2)",
-                    color: "#fb7185",
-                    border: "1px solid rgba(225, 29, 72, 0.4)",
+                    background: "var(--accent-soft)",
+                    color: "var(--danger-fg)",
+                    border: "1px solid var(--accent)",
                   }}
                 >
                   {copy.header.versionBadge}
                 </span>
               </div>
-              <p style={{ margin: "2px 0 0", fontSize: "0.82rem", color: "#94a3b8" }}>
+              <p style={{ margin: "2px 0 0", fontSize: "0.82rem", color: "var(--text-muted)" }}>
                 {copy.header.subtitle}
               </p>
             </div>
@@ -252,9 +252,9 @@ export function HelpCenterModal({
                 gap: 6,
                 padding: "7px 13px",
                 borderRadius: 8,
-                background: "linear-gradient(135deg, rgba(225, 29, 72, 0.2) 0%, rgba(190, 18, 60, 0.25) 100%)",
-                border: "1px solid rgba(225, 29, 72, 0.4)",
-                color: "#fda4af",
+                background: "var(--accent-soft)",
+                border: "1px solid var(--accent)",
+                color: "var(--danger-fg)",
                 fontSize: "0.8rem",
                 fontWeight: 700,
                 cursor: "pointer",
@@ -262,7 +262,7 @@ export function HelpCenterModal({
               }}
               title={copy.header.relaunchTitle}
             >
-              <Compass size={14} style={{ color: "#f43f5e" }} />
+              <Compass size={14} style={{ color: "var(--danger-fg)" }} />
               <span>{copy.header.relaunchCta}</span>
             </button>
 
@@ -273,9 +273,9 @@ export function HelpCenterModal({
                 width: 32,
                 height: 32,
                 borderRadius: 8,
-                background: "rgba(255, 255, 255, 0.08)",
-                border: "1px solid rgba(255, 255, 255, 0.12)",
-                color: "#94a3b8",
+                background: "var(--surface-soft)",
+                border: "1px solid var(--border)",
+                color: "var(--text-muted)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -292,14 +292,14 @@ export function HelpCenterModal({
         <div
           style={{
             padding: "0.75rem 1.6rem",
-            background: "rgba(0, 0, 0, 0.25)",
-            borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+            background: "var(--surface-soft)",
+            borderBottom: "1px solid var(--border)",
             display: "flex",
             alignItems: "center",
             gap: 10,
           }}
         >
-          <Search size={17} style={{ color: "#64748b" }} />
+          <Search size={17} style={{ color: "var(--text-subtle)" }} />
           <input
             type="text"
             value={searchQuery}
@@ -310,7 +310,7 @@ export function HelpCenterModal({
               background: "transparent",
               border: "none",
               outline: "none",
-              color: "#ffffff",
+              color: "var(--text-strong)",
               fontSize: "0.88rem",
             }}
           />
@@ -321,7 +321,7 @@ export function HelpCenterModal({
               style={{
                 background: "none",
                 border: "none",
-                color: "#94a3b8",
+                color: "var(--text-muted)",
                 fontSize: "0.75rem",
                 cursor: "pointer",
                 padding: "2px 6px",
@@ -338,8 +338,8 @@ export function HelpCenterModal({
           <div
             style={{
               width: "min(320px, 35%)",
-              borderRight: "1px solid rgba(255, 255, 255, 0.08)",
-              background: "rgba(10, 15, 29, 0.5)",
+              borderRight: "1px solid var(--border)",
+              background: "var(--surface-sunken)",
               overflowY: "auto",
               padding: "0.75rem",
               display: "flex",
@@ -351,7 +351,7 @@ export function HelpCenterModal({
               style={{
                 fontSize: "0.7rem",
                 fontWeight: 750,
-                color: "#64748b",
+                color: "var(--text-subtle)",
                 textTransform: "uppercase",
                 letterSpacing: "0.06em",
                 padding: "6px 10px 4px",
@@ -377,19 +377,19 @@ export function HelpCenterModal({
                     padding: "9px 12px",
                     borderRadius: 10,
                     border: isActive
-                      ? "1px solid rgba(225, 29, 72, 0.4)"
+                      ? "1px solid var(--accent)"
                       : "1px solid transparent",
                     background: isActive
-                      ? "linear-gradient(135deg, rgba(225, 29, 72, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%)"
+                      ? "linear-gradient(135deg, var(--accent-soft) 0%, var(--surface) 100%)"
                       : "transparent",
-                    color: isActive ? "#ffffff" : "#94a3b8",
+                    color: isActive ? "var(--text-strong)" : "var(--text-muted)",
                     cursor: "pointer",
                     transition: "all 0.15s ease",
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
-                      e.currentTarget.style.color = "#ffffff";
+                      e.currentTarget.style.background = "var(--text-disabled)";
+                      e.currentTarget.style.color = "var(--text-strong)";
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -408,8 +408,8 @@ export function HelpCenterModal({
                       alignItems: "center",
                       justifyContent: "center",
                       flexShrink: 0,
-                      background: isActive ? "#e11d48" : "rgba(255, 255, 255, 0.07)",
-                      color: "#ffffff",
+                      background: isActive ? "var(--accent)" : "var(--surface-soft)",
+                      color: "var(--text-on-accent)",
                     }}
                   >
                     <Icon size={15} />
@@ -427,10 +427,10 @@ export function HelpCenterModal({
                     >
                       {topic.title}
                     </div>
-                    <div style={{ fontSize: "0.68rem", color: "#64748b" }}>{topic.badge}</div>
+                    <div style={{ fontSize: "0.68rem", color: "var(--text-subtle)" }}>{topic.badge}</div>
                   </div>
 
-                  {isActive && <ChevronRight size={14} style={{ color: "#fb7185", flexShrink: 0 }} />}
+                  {isActive && <ChevronRight size={14} style={{ color: "var(--danger-fg)", flexShrink: 0 }} />}
                 </button>
               );
             })}
@@ -442,7 +442,7 @@ export function HelpCenterModal({
               flex: 1,
               overflowY: "auto",
               padding: "1.5rem 2rem",
-              background: "rgba(15, 23, 42, 0.4)",
+              background: "var(--surface-sunken)",
             }}
           >
             {activeTopic ? (
@@ -455,9 +455,9 @@ export function HelpCenterModal({
                       fontWeight: 750,
                       padding: "2px 8px",
                       borderRadius: 20,
-                      background: "rgba(225, 29, 72, 0.15)",
-                      color: "#fb7185",
-                      border: "1px solid rgba(225, 29, 72, 0.3)",
+                      background: "var(--accent-soft)",
+                      color: "var(--danger-fg)",
+                      border: "1px solid var(--accent)",
                       textTransform: "uppercase",
                     }}
                   >
@@ -470,13 +470,13 @@ export function HelpCenterModal({
                     margin: 0,
                     fontSize: "1.4rem",
                     fontWeight: 800,
-                    color: "#ffffff",
+                    color: "var(--text-strong)",
                     letterSpacing: "-0.02em",
                   }}
                 >
                   {activeTopic.title}
                 </h3>
-                <p style={{ margin: "6px 0 1.25rem", fontSize: "0.9rem", color: "#94a3b8", lineHeight: 1.5 }}>
+                <p style={{ margin: "6px 0 1.25rem", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.5 }}>
                   {activeTopic.summary}
                 </p>
 
@@ -492,8 +492,8 @@ export function HelpCenterModal({
                         gap: 8,
                         padding: "8px 14px",
                         borderRadius: 8,
-                        background: "linear-gradient(135deg, #e11d48 0%, #be123c 100%)",
-                        color: "#ffffff",
+                        background: "var(--accent)",
+                        color: "var(--text-strong)",
                         textDecoration: "none",
                         fontSize: "0.82rem",
                         fontWeight: 750,
@@ -514,8 +514,8 @@ export function HelpCenterModal({
                       style={{
                         padding: "1.2rem 1.4rem",
                         borderRadius: 14,
-                        background: "rgba(30, 41, 59, 0.4)",
-                        border: "1px solid rgba(255, 255, 255, 0.08)",
+                        background: "var(--surface-sunken)",
+                        border: "1px solid var(--border)",
                       }}
                     >
                       <h4
@@ -523,12 +523,12 @@ export function HelpCenterModal({
                           margin: "0 0 8px",
                           fontSize: "1.02rem",
                           fontWeight: 750,
-                          color: "#ffffff",
+                          color: "var(--text-on-accent)",
                         }}
                       >
                         {sec.heading}
                       </h4>
-                      <p style={{ margin: 0, fontSize: "0.86rem", color: "#cbd5e1", lineHeight: 1.6 }}>
+                      <p style={{ margin: 0, fontSize: "0.86rem", color: "var(--text-muted)", lineHeight: 1.6 }}>
                         {sec.content}
                       </p>
 
@@ -537,7 +537,7 @@ export function HelpCenterModal({
                           style={{
                             marginTop: "1rem",
                             paddingTop: "0.85rem",
-                            borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+                            borderTop: "1px solid var(--border)",
                             display: "flex",
                             flexDirection: "column",
                             gap: 8,
@@ -551,11 +551,11 @@ export function HelpCenterModal({
                                 alignItems: "flex-start",
                                 gap: 8,
                                 fontSize: "0.82rem",
-                                color: "#e2e8f0",
+                                color: "var(--text-muted)",
                                 lineHeight: 1.5,
                               }}
                             >
-                              <div style={{ marginTop: 2, color: "#10b981", flexShrink: 0 }}>
+                              <div style={{ marginTop: 2, color: "var(--success-fg)", flexShrink: 0 }}>
                                 <CheckCircle2 size={14} />
                               </div>
                               <div>{tip}</div>
@@ -568,7 +568,7 @@ export function HelpCenterModal({
                 </div>
               </div>
             ) : (
-              <div style={{ textAlign: "center", padding: "3rem", color: "#94a3b8" }}>
+              <div style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>
                 {copy.reader.noResults}
               </div>
             )}

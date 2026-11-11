@@ -151,8 +151,8 @@ export function TechSheetActionBar({
         className="no-print"
         style={{
           padding: "0.85rem 1.5rem",
-          background: "#0f172a",
-          color: "#ffffff",
+          background: "var(--surface)",
+          color: "var(--text-on-accent)",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
@@ -170,8 +170,8 @@ export function TechSheetActionBar({
             href="/vehicles"
             className="ox-btn ox-btn-ghost"
             style={{
-              color: "#ffffff",
-              borderColor: "rgba(255,255,255,0.25)",
+              color: "var(--text-strong)",
+              borderColor: "var(--border)",
               display: "inline-flex",
               alignItems: "center",
               gap: "6px",
@@ -183,8 +183,8 @@ export function TechSheetActionBar({
           >
             ← Retour Stock
           </Link>
-          <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "#f8fafc" }}>
-            Fiche : <span style={{ color: "#38bdf8" }}>{sheetTitle}</span>
+          <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--text)" }}>
+            Fiche : <span style={{ color: "var(--info-fg)" }}>{sheetTitle}</span>
           </div>
 
           {/* Badge d'état BDD */}
@@ -194,9 +194,9 @@ export function TechSheetActionBar({
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "5px",
-                background: "rgba(16, 185, 129, 0.18)",
-                color: "#34d399",
-                border: "1px solid rgba(52, 211, 153, 0.4)",
+                background: "var(--success-soft)",
+                color: "var(--success-fg)",
+                border: "1px solid var(--success)",
                 padding: "3px 9px",
                 borderRadius: "20px",
                 fontSize: "0.78rem",
@@ -212,9 +212,9 @@ export function TechSheetActionBar({
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "5px",
-                background: "rgba(245, 158, 11, 0.18)",
-                color: "#fbbf24",
-                border: "1px solid rgba(251, 191, 36, 0.4)",
+                background: "var(--warning-soft)",
+                color: "var(--warning-fg)",
+                border: "1px solid var(--warning)",
                 padding: "3px 9px",
                 borderRadius: "20px",
                 fontSize: "0.78rem",
@@ -236,8 +236,8 @@ export function TechSheetActionBar({
               onClick={handleConfirm}
               disabled={isPending || isAiGenerating}
               style={{
-                background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                color: "#ffffff",
+                background: "var(--success-solid)",
+                color: "var(--text-strong)",
                 border: "none",
                 borderRadius: "8px",
                 padding: "0.55rem 1.1rem",
@@ -261,8 +261,8 @@ export function TechSheetActionBar({
               disabled={isPending}
               style={{
                 background: "transparent",
-                color: "#94a3b8",
-                border: "1px solid rgba(148, 163, 184, 0.3)",
+                color: "var(--text-muted)",
+                border: "1px solid var(--border-strong)",
                 borderRadius: "6px",
                 padding: "0.45rem 0.8rem",
                 fontSize: "0.78rem",
@@ -285,9 +285,9 @@ export function TechSheetActionBar({
               onClick={handleOpenAiModal}
               disabled={isPending || isAiGenerating}
               style={{
-                background: "rgba(30, 41, 59, 0.9)",
-                color: "#e2e8f0",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
+                background: "var(--surface)",
+                color: "var(--text-muted)",
+                border: "1px solid var(--border)",
                 borderRadius: "8px",
                 padding: "0.55rem 0.95rem",
                 fontSize: "0.85rem",
@@ -308,8 +308,8 @@ export function TechSheetActionBar({
             type="button"
             onClick={() => window.print()}
             style={{
-              background: "#3b82f6",
-              color: "#ffffff",
+              background: "var(--info-solid)",
+              color: "var(--text-on-accent)",
               border: "none",
               borderRadius: "8px",
               padding: "0.55rem 1rem",
@@ -336,22 +336,22 @@ export function TechSheetActionBar({
             padding: "0.75rem 1.5rem",
             background:
               feedback.type === "success"
-                ? "#ecfdf5"
+                ? "var(--surface)"
                 : feedback.type === "error"
-                ? "#fef2f2"
-                : "#eff6ff",
+                ? "var(--surface)"
+                : "var(--surface)",
             color:
               feedback.type === "success"
-                ? "#065f46"
+                ? "var(--success-fg)"
                 : feedback.type === "error"
-                ? "#991b1b"
-                : "#1e40af",
+                ? "var(--danger-fg)"
+                : "var(--info-fg)",
             borderBottom: `1px solid ${
               feedback.type === "success"
-                ? "#a7f3d0"
+                ? "var(--success)"
                 : feedback.type === "error"
-                ? "#fecaca"
-                : "#bfdbfe"
+                ? "var(--danger)"
+                : "var(--info)"
             }`,
             fontSize: "0.88rem",
             fontWeight: 600,
@@ -381,14 +381,14 @@ export function TechSheetActionBar({
       <div
         className="no-print"
         style={{
-          background: isConfirmed ? "#f0fdf4" : "#fffbeb",
-          borderBottom: `1px solid ${isConfirmed ? "#bbf7d0" : "#fde68a"}`,
+          background: isConfirmed ? "var(--surface)" : "var(--surface)",
+          borderBottom: `1px solid ${isConfirmed ? "var(--success)" : "var(--warning)"}`,
           padding: "0.6rem 1.5rem",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           fontSize: "0.82rem",
-          color: isConfirmed ? "#166534" : "#92400e",
+          color: isConfirmed ? "var(--success-fg)" : "var(--warning-fg)",
         }}
       >
         <div>
@@ -414,7 +414,7 @@ export function TechSheetActionBar({
             left: 0,
             right: 0,
             bottom: 0,
-            background: "rgba(0, 0, 0, 0.75)",
+            background: "var(--surface-sunken)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -424,8 +424,8 @@ export function TechSheetActionBar({
         >
           <div
             style={{
-              background: "#ffffff",
-              color: "#0f172a",
+              background: "var(--surface)",
+              color: "var(--text-on-accent)",
               borderRadius: "14px",
               padding: "1.8rem",
               maxWidth: "520px",
@@ -445,7 +445,7 @@ export function TechSheetActionBar({
                   border: "none",
                   fontSize: "1.2rem",
                   cursor: "pointer",
-                  color: "#64748b",
+                  color: "var(--text-subtle)",
                 }}
               >
                 ✕
@@ -454,13 +454,13 @@ export function TechSheetActionBar({
 
             <div
               style={{
-                background: "#fef3c7",
-                border: "1px solid #fde68a",
+                background: "var(--warning-solid)",
+                border: "1px solid var(--warning)",
                 borderRadius: "8px",
                 padding: "0.75rem 0.9rem",
                 marginBottom: "1rem",
                 fontSize: "0.82rem",
-                color: "#92400e",
+                color: "var(--warning-fg)",
                 lineHeight: 1.45,
               }}
             >
@@ -481,12 +481,12 @@ export function TechSheetActionBar({
                     width: "100%",
                     padding: "0.55rem 0.75rem",
                     borderRadius: "6px",
-                    border: "1px solid #cbd5e1",
+                    border: "1px solid var(--border-strong)",
                     fontSize: "0.85rem",
                     boxSizing: "border-box",
                   }}
                 />
-                <span style={{ fontSize: "0.74rem", color: "#64748b", display: "block", marginTop: "3px" }}>
+                <span style={{ fontSize: "0.74rem", color: "var(--text-subtle)", display: "block", marginTop: "3px" }}>
                   Si vous avez déjà configuré votre clé OpenAI dans les variables d&apos;environnement, laissez ce champ vide.
                 </span>
               </div>
@@ -499,12 +499,12 @@ export function TechSheetActionBar({
                 disabled={isAiGenerating}
                 style={{
                   background: "transparent",
-                  border: "1px solid #cbd5e1",
+                  border: "1px solid var(--border-strong)",
                   borderRadius: "6px",
                   padding: "0.5rem 0.9rem",
                   fontSize: "0.85rem",
                   cursor: "pointer",
-                  color: "#475569",
+                  color: "var(--text-subtle)",
                 }}
               >
                 Annuler
@@ -514,8 +514,8 @@ export function TechSheetActionBar({
                 onClick={handleLaunchAiGeneration}
                 disabled={isAiGenerating}
                 style={{
-                  background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
-                  color: "#ffffff",
+                  background: "var(--info-solid)",
+                  color: "var(--text-strong)",
                   border: "none",
                   borderRadius: "6px",
                   padding: "0.5rem 1.1rem",

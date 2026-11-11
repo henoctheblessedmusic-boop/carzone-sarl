@@ -172,7 +172,7 @@ export function StockImportView() {
       </section>
 
       {error && (
-        <div style={{ padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(225,29,72,0.4)", background: "rgba(225,29,72,0.1)", color: "#fda4af", fontSize: "0.85rem" }}>
+        <div style={{ padding: "10px 12px", borderRadius: 10, border: "1px solid var(--danger)", background: "var(--danger-soft)", color: "var(--danger-fg)", fontSize: "0.85rem" }}>
           {error}
         </div>
       )}
@@ -181,14 +181,14 @@ export function StockImportView() {
         <section className="ox-glass" style={{ padding: "1rem 1.2rem", borderRadius: 14 }}>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 12 }}>
             <strong>{prepared.length} lignes</strong>
-            <span style={{ color: "#86efac" }}>{validRows.length} valides</span>
-            <span style={{ color: "#fda4af" }}>{invalidRows} anomalies</span>
+            <span style={{ color: "var(--success-fg)" }}>{validRows.length} valides</span>
+            <span style={{ color: "var(--danger-fg)" }}>{invalidRows} anomalies</span>
             <span style={{ opacity: 0.7 }}>{incompleteRows} fiches incomplètes importables</span>
           </div>
-          <div style={{ maxHeight: 330, overflow: "auto", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10 }}>
+          <div style={{ maxHeight: 330, overflow: "auto", border: "1px solid var(--border)", borderRadius: 10 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.78rem" }}>
               <thead>
-                <tr style={{ textAlign: "left", background: "rgba(255,255,255,0.04)" }}>
+                <tr style={{ textAlign: "left", background: "var(--surface-soft)" }}>
                   <th style={{ padding: 6 }}>Ligne</th>
                   <th style={{ padding: 6 }}>VIN</th>
                   <th style={{ padding: 6 }}>Véhicule</th>
@@ -198,12 +198,12 @@ export function StockImportView() {
               </thead>
               <tbody>
                 {prepared.map((item) => (
-                  <tr key={`${item.row.excelRow}-${item.row.vin}`} style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+                  <tr key={`${item.row.excelRow}-${item.row.vin}`} style={{ borderTop: "1px solid var(--border)" }}>
                     <td style={{ padding: 6 }}>{item.row.excelRow}</td>
                     <td style={{ padding: 6 }}>{item.row.vin || "-"}</td>
                     <td style={{ padding: 6 }}>{item.row.brand} {item.row.model} {item.row.trim}</td>
                     <td style={{ padding: 6 }}>{item.row.site || "-"}</td>
-                    <td style={{ padding: 6, color: item.errors.length ? "#fda4af" : "#86efac" }}>
+                    <td style={{ padding: 6, color: item.errors.length ? "var(--danger-fg)" : "var(--success-fg)" }}>
                       {item.errors.length ? item.errors.join(" ; ") : "Prêt"}
                     </td>
                   </tr>
@@ -223,14 +223,14 @@ export function StockImportView() {
       {result && (
         <section className="ox-glass" style={{ padding: "1rem 1.2rem", borderRadius: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <CheckCircle2 size={18} style={{ color: "#4ade80" }} />
+            <CheckCircle2 size={18} style={{ color: "var(--success-fg)" }} />
             <strong>Import terminé</strong>
           </div>
           <p style={{ margin: 0, fontSize: "0.86rem" }}>
             {result.created} créés, {result.updated} mis à jour, {result.anomalies} anomalies.
           </p>
           {result.missingVins.length > 0 && (
-            <p style={{ margin: "8px 0 0", fontSize: "0.82rem", color: "#fcd34d" }}>
+            <p style={{ margin: "8px 0 0", fontSize: "0.82rem", color: "var(--warning-fg)" }}>
               {result.missingVins.length} VIN présents en base ne figurent pas dans le fichier. Ils n'ont pas été supprimés.
             </p>
           )}

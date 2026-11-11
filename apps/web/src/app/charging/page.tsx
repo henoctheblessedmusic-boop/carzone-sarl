@@ -138,7 +138,7 @@ const btn: React.CSSProperties = {
   padding: "0.55rem 0.9rem",
   borderRadius: 8,
   border: 0,
-  background: "linear-gradient(135deg, #c4a35a, #8b6914)",
-  color: "#111",
+  background: "var(--gold-solid)",
+  color: "var(--text-strong)",
   fontWeight: 650,
 };

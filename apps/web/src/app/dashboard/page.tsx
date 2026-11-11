@@ -240,41 +240,41 @@ export default async function DashboardPage() {
     {
       key: "COMMANDE",
       label: copy.stock.stageOrders,
-      color: "#f59e0b",
-      bg: "rgba(245, 158, 11, 0.12)",
-      border: "rgba(245, 158, 11, 0.35)",
+      color: "var(--warning-fg)",
+      bg: "var(--warning-soft)",
+      border: "var(--warning)",
       icon: ShoppingCart,
     },
     {
       key: "EN_PRODUCTION",
       label: copy.stock.stageProduction,
-      color: "#06b6d4",
-      bg: "rgba(6, 182, 212, 0.12)",
-      border: "rgba(6, 182, 212, 0.35)",
+      color: "var(--info-fg)",
+      bg: "var(--info-soft)",
+      border: "var(--info)",
       icon: Factory,
     },
     {
       key: "EN_TRANSIT",
       label: copy.stock.stageTransit,
-      color: "#8b5cf6",
-      bg: "rgba(139, 92, 246, 0.12)",
-      border: "rgba(139, 92, 246, 0.35)",
+      color: "var(--purple-fg)",
+      bg: "var(--purple-soft)",
+      border: "var(--purple)",
       icon: Ship,
     },
     {
       key: "AU_PORT",
       label: copy.stock.stagePort,
-      color: "#ec4899",
-      bg: "rgba(236, 72, 153, 0.12)",
-      border: "rgba(236, 72, 153, 0.35)",
+      color: "var(--purple-fg)",
+      bg: "var(--purple-soft)",
+      border: "var(--purple)",
       icon: Anchor,
     },
     {
       key: "EN_MAGASIN",
       label: copy.stock.stageShowroom,
-      color: "#10b981",
-      bg: "rgba(16, 185, 129, 0.12)",
-      border: "rgba(16, 185, 129, 0.35)",
+      color: "var(--success-fg)",
+      bg: "var(--success-soft)",
+      border: "var(--success)",
       icon: Store,
     },
   ] as const;
@@ -302,7 +302,7 @@ export default async function DashboardPage() {
             </div>
             <div className="ox-hero-card-sub">
               {copy.rolePrefix}{" "}
-              <strong style={{ color: "var(--gold)" }}>{messages.roles[user.role as Role] || user.role}</strong>
+              <strong style={{ color: "var(--gold-fg)" }}>{messages.roles[user.role as Role] || user.role}</strong>
               {" · "}
               {copy.hqLine}
             </div>
@@ -321,17 +321,17 @@ export default async function DashboardPage() {
                 </Link>
 
                 <Link href="/mailbox" className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <Mail size={16} color="var(--brand)" />
+                  <Mail size={16} color="var(--accent-fg)" />
                   {copy.shortcuts.adminClientMessages}
                 </Link>
 
                 <Link href="/clients" className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <Users size={16} color="#10b981" />
+                  <Users size={16} color="var(--success-fg)" />
                   {copy.shortcuts.adminClientDirectory}
                 </Link>
 
                 <Link href="/fleet" className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <Car size={16} color="#38bdf8" />
+                  <Car size={16} color="var(--info-fg)" />
                   {copy.shortcuts.adminFleet}
                 </Link>
               </>
@@ -343,22 +343,22 @@ export default async function DashboardPage() {
                 </Link>
 
                 <Link href="/users" className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <Users size={16} color="var(--brand)" />
+                  <Users size={16} color="var(--accent-fg)" />
                   {copy.shortcuts.devUsersRoles}
                 </Link>
 
                 <Link href="/invoices" className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <CreditCard size={16} color="#10b981" />
+                  <CreditCard size={16} color="var(--success-fg)" />
                   {copy.shortcuts.devBillingFinance}
                 </Link>
 
                 <Link href="/workshop" className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <Wrench size={16} color="#f59e0b" />
+                  <Wrench size={16} color="var(--warning-fg)" />
                   {copy.shortcuts.devWorkshop}
                 </Link>
 
                 <Link href="/mailbox" className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <Mail size={16} color="var(--brand)" />
+                  <Mail size={16} color="var(--accent-fg)" />
                   {copy.shortcuts.devMailbox}
                 </Link>
               </>
@@ -369,27 +369,27 @@ export default async function DashboardPage() {
                   Factures & encaissements
                 </Link>
                 <Link href="/quotes" className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <FileCheck size={16} color="#a78bfa" />
+                  <FileCheck size={16} color="var(--purple-fg)" />
                   Devis & proformas
                 </Link>
                 <Link href="/expenses" className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <Users size={16} color="#f59e0b" />
+                  <Users size={16} color="var(--warning-fg)" />
                   Dépenses & prestataires
                 </Link>
                 <Link href="/hr" className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <Users size={16} color="#10b981" />
+                  <Users size={16} color="var(--success-fg)" />
                   RH & paie
                 </Link>
                 <Link href="/imports" className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <Ship size={16} color="#38bdf8" />
+                  <Ship size={16} color="var(--info-fg)" />
                   Imports & logistique
                 </Link>
                 <Link href="/rentals" className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <Car size={16} color="#f472b6" />
+                  <Car size={16} color="var(--purple-fg)" />
                   Location
                 </Link>
                 <Link href="/audit" className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <ShieldCheck size={16} color="#fbbf24" />
+                  <ShieldCheck size={16} color="var(--warning-fg)" />
                   Journal d'audit
                 </Link>
               </>
@@ -401,17 +401,17 @@ export default async function DashboardPage() {
                 </Link>
 
                 <Link href="/invoices" className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <CreditCard size={16} color="#10b981" />
+                  <CreditCard size={16} color="var(--success-fg)" />
                   {copy.shortcuts.salesPaymentsInvoices}
                 </Link>
 
                 <Link href="/terminal" className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <Zap size={16} color="#38bdf8" />
+                  <Zap size={16} color="var(--info-fg)" />
                   {copy.shortcuts.salesTerminal}
                 </Link>
 
                 <Link href="/mailbox" className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <Mail size={16} color="var(--brand)" />
+                  <Mail size={16} color="var(--accent-fg)" />
                   {copy.shortcuts.salesMailbox}
                 </Link>
               </>
@@ -421,7 +421,7 @@ export default async function DashboardPage() {
 
         {/* 4 Indicateurs Financiers Clés */}
         <div className="ox-kpi-grid">
-          <div className="ox-glass ox-kpi-card" style={cssVars({ "--kpi-accent": "#38bdf8" })}>
+          <div className="ox-glass ox-kpi-card" style={cssVars({ "--kpi-accent": "var(--info)" })}>
             <div className="ox-kpi-label">{copy.kpi.totalInvoiced}</div>
             <div className="ox-kpi-value">{formatXof(totalInvoicedTtc)}</div>
             <div className="ox-kpi-hint">{copy.kpi.invoicedHint(activeInvoices.length)}</div>
@@ -430,9 +430,9 @@ export default async function DashboardPage() {
           <div
             className="ox-glass ox-kpi-card"
             style={cssVars({
-              "--kpi-accent": "#10b981",
-              "--kpi-value-color": "#10b981",
-              "--kpi-hint-color": "#10b981",
+              "--kpi-accent": "var(--success)",
+              "--kpi-value-color": "var(--success-fg)",
+              "--kpi-hint-color": "var(--success-fg)",
             })}
           >
             <div className="ox-kpi-label">{copy.kpi.totalCollected}</div>
@@ -446,7 +446,7 @@ export default async function DashboardPage() {
             className="ox-glass ox-kpi-card"
             style={cssVars({
               "--kpi-accent": "var(--gold)",
-              "--kpi-value-color": totalOutstanding > 0 ? "var(--gold)" : "#10b981",
+              "--kpi-value-color": totalOutstanding > 0 ? "var(--gold)" : "var(--success-fg)",
             })}
           >
             <div className="ox-kpi-label">{copy.kpi.outstanding}</div>
@@ -457,8 +457,8 @@ export default async function DashboardPage() {
           <div
             className="ox-glass ox-kpi-card"
             style={cssVars({
-              "--kpi-accent": "#a855f7",
-              "--kpi-value-color": "#a855f7",
+              "--kpi-accent": "var(--purple)",
+              "--kpi-value-color": "var(--purple-fg)",
               "--kpi-hint-color": "var(--gold)",
             })}
           >
@@ -472,9 +472,9 @@ export default async function DashboardPage() {
           <div
             className="ox-glass ox-kpi-card"
             style={cssVars({
-              "--kpi-accent": "#10b981",
-              "--kpi-value-color": rentalNetRevenue >= 0 ? "#10b981" : "#f43f5e",
-              "--kpi-hint-color": "#94a3b8",
+              "--kpi-accent": "var(--success)",
+              "--kpi-value-color": rentalNetRevenue >= 0 ? "var(--success-fg)" : "var(--danger-fg)",
+              "--kpi-hint-color": "var(--text-muted)",
             })}
           >
             <div className="ox-kpi-label">LOCATION - RECETTES ENCAISSÉES</div>
@@ -496,10 +496,10 @@ export default async function DashboardPage() {
                 <h3 className="ox-stock-title">{copy.stock.title}</h3>
                 <div className="ox-stock-meta">
                   {copy.stock.inventoryLabel}{" "}
-                  <strong style={{ color: "#fff" }}>{copy.stock.vehicleCount(totalStockCount)}</strong>
+                  <strong style={{ color: "var(--text-strong)" }}>{copy.stock.vehicleCount(totalStockCount)}</strong>
                   {" · "}
                   {copy.stock.marketValueLabel}{" "}
-                  <strong style={{ color: "var(--gold)" }}>{formatXof(totalStockValue)}</strong>
+                  <strong style={{ color: "var(--gold-fg)" }}>{formatXof(totalStockValue)}</strong>
                 </div>
               </div>
             </div>
@@ -555,7 +555,7 @@ export default async function DashboardPage() {
         <div className="ox-ops-grid">
           <div className="ox-glass ox-ops-card">
             <div className="ox-ops-label">
-              <Car size={16} color="var(--brand)" />
+              <Car size={16} color="var(--accent-fg)" />
               <span>{copy.ops.evInStock}</span>
             </div>
             <div className="ox-metric-val ox-ops-value">
@@ -566,7 +566,7 @@ export default async function DashboardPage() {
 
           <div className="ox-glass ox-ops-card">
             <div className="ox-ops-label">
-              <Users size={16} color="var(--gold)" />
+              <Users size={16} color="var(--gold-fg)" />
               <span>{copy.ops.clientsLeads}</span>
             </div>
             <div className="ox-metric-val ox-ops-value">
@@ -577,7 +577,7 @@ export default async function DashboardPage() {
 
           <div className="ox-glass ox-ops-card">
             <div className="ox-ops-label">
-              <Zap size={16} color="#10b981" />
+              <Zap size={16} color="var(--success-fg)" />
               <span>{copy.ops.publicCharging}</span>
             </div>
             <div className="ox-metric-val ox-ops-value">
@@ -590,7 +590,7 @@ export default async function DashboardPage() {
 
           <div className="ox-glass ox-ops-card">
             <div className="ox-ops-label">
-              <ShieldCheck size={16} color="#38bdf8" />
+              <ShieldCheck size={16} color="var(--info-fg)" />
               <span>{copy.ops.chargerSites}</span>
             </div>
             <div className="ox-metric-val ox-ops-value">
@@ -601,7 +601,7 @@ export default async function DashboardPage() {
 
           <div className="ox-glass ox-ops-card">
             <div className="ox-ops-label">
-              <Wrench size={16} color="#f59e0b" />
+              <Wrench size={16} color="var(--warning-fg)" />
               <span>{copy.ops.workshop}</span>
             </div>
             <div className="ox-metric-val ox-ops-value">
@@ -626,12 +626,12 @@ export default async function DashboardPage() {
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0 }}>
-                <CreditCard size={16} color="#10b981" />
+                <CreditCard size={16} color="var(--success-fg)" />
                 <h3 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "var(--ice-text-strong)" }}>
                   {copy.payments.title}
                 </h3>
               </div>
-              <Link href="/invoices" style={{ fontSize: "0.78rem", color: "var(--brand)", textDecoration: "none", fontWeight: 600, flexShrink: 0 }}>
+              <Link href="/invoices" style={{ fontSize: "0.78rem", color: "var(--accent-fg)", textDecoration: "none", fontWeight: 600, flexShrink: 0 }}>
                 {copy.payments.viewAll} →
               </Link>
             </div>
@@ -653,13 +653,13 @@ export default async function DashboardPage() {
                       </div>
                     </div>
                     <div className="ox-card-row-amount">
-                      <div style={{ fontWeight: 800, color: "#10b981", fontSize: "0.88rem" }}>
+                      <div style={{ fontWeight: 800, color: "var(--success-fg)", fontSize: "0.88rem" }}>
                         +{formatXof(p.amountXof)}
                       </div>
                       <Link
                         href={`/invoices/payments/${p.id}/receipt`}
                         target="_blank"
-                        style={{ fontSize: "0.7rem", color: "var(--gold)", textDecoration: "underline" }}
+                        style={{ fontSize: "0.7rem", color: "var(--gold-fg)", textDecoration: "underline" }}
                       >
                         {copy.payments.receipt}
                       </Link>
@@ -683,12 +683,12 @@ export default async function DashboardPage() {
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0 }}>
-                <FileCheck size={16} color="var(--brand)" />
+                <FileCheck size={16} color="var(--accent-fg)" />
                 <h3 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "var(--ice-text-strong)" }}>
                   {copy.invoices.title}
                 </h3>
               </div>
-              <Link href="/invoices" style={{ fontSize: "0.78rem", color: "var(--brand)", textDecoration: "none", fontWeight: 600, flexShrink: 0 }}>
+              <Link href="/invoices" style={{ fontSize: "0.78rem", color: "var(--accent-fg)", textDecoration: "none", fontWeight: 600, flexShrink: 0 }}>
                 {copy.invoices.manage} →
               </Link>
             </div>
@@ -736,7 +736,7 @@ export default async function DashboardPage() {
                           style={{
                             fontSize: "0.7rem",
                             fontWeight: 700,
-                            color: balanceDue === 0 ? "#10b981" : "var(--gold)",
+                            color: balanceDue === 0 ? "var(--success-fg)" : "var(--gold-fg)",
                           }}
                         >
                           {balanceDue === 0 ? copy.invoices.settled : copy.invoices.balanceDue(formatXof(balanceDue))}

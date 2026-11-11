@@ -13,8 +13,8 @@ export function PurchaseOrderPrintToolbar({ backHref }: { backHref: string }) {
         alignItems: "center",
         gap: 12,
         padding: "12px 20px",
-        background: "#0f172a",
-        color: "#e2e8f0",
+        background: "var(--surface)",
+        color: "var(--text-muted)",
         fontFamily: "'Segoe UI', Arial, sans-serif",
       }}
     >
@@ -24,7 +24,7 @@ export function PurchaseOrderPrintToolbar({ backHref }: { backHref: string }) {
           display: "inline-flex",
           alignItems: "center",
           gap: 6,
-          color: "#e2e8f0",
+          color: "var(--text-muted)",
           textDecoration: "none",
           fontSize: "0.85rem",
         }}
@@ -40,8 +40,8 @@ export function PurchaseOrderPrintToolbar({ backHref }: { backHref: string }) {
           gap: 6,
           border: "none",
           borderRadius: 8,
-          background: "#E11D48",
-          color: "#fff",
+          background: "var(--accent)",
+          color: "var(--text-on-accent)",
           padding: "8px 14px",
           fontWeight: 700,
           cursor: "pointer",

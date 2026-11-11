@@ -210,8 +210,8 @@ export function DeliveryNotesView({
                 className="ox-btn ox-btn-sm"
                 onClick={() => setActivityFilter(id)}
                 style={{
-                  background: activityFilter === id ? "rgba(197,216,228,0.25)" : "transparent",
-                  color: activityFilter === id ? "#fff" : "rgba(255,255,255,0.65)",
+                  background: activityFilter === id ? "var(--info-soft)" : "transparent",
+                  color: activityFilter === id ? "var(--text-on-accent)" : "var(--text-muted)",
                 }}
               >
                 {id === "ALL" ? copy.tabs.all : id === "SHOWROOM" ? copy.tabs.showroom : copy.tabs.garage}
@@ -226,8 +226,8 @@ export function DeliveryNotesView({
               className="ox-btn ox-btn-sm"
               onClick={() => setStatusFilter(id)}
               style={{
-                background: statusFilter === id ? "rgba(197,216,228,0.25)" : "transparent",
-                color: statusFilter === id ? "#fff" : "rgba(255,255,255,0.65)",
+                background: statusFilter === id ? "var(--info-soft)" : "transparent",
+                color: statusFilter === id ? "var(--text-on-accent)" : "var(--text-muted)",
               }}
             >
               {id === "ALL" ? copy.statusFilters.all : id === "EMIS" ? copy.statusFilters.issued : copy.statusFilters.cancelled}
@@ -240,7 +240,7 @@ export function DeliveryNotesView({
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.88rem" }}>
             <thead>
-              <tr style={{ background: "rgba(255,255,255,0.03)", textAlign: "left", opacity: 0.75 }}>
+              <tr style={{ background: "var(--surface-soft)", textAlign: "left", opacity: 0.75 }}>
                 <th style={{ padding: "0.85rem 1rem" }}>{copy.table.number}</th>
                 <th style={{ padding: "0.85rem 1rem" }}>{copy.table.activity}</th>
                 <th style={{ padding: "0.85rem 1rem" }}>{copy.table.customer}</th>
@@ -259,7 +259,7 @@ export function DeliveryNotesView({
                 </tr>
               ) : (
                 filteredNotes.map((n) => (
-                  <tr key={n.id} style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                  <tr key={n.id} style={{ borderTop: "1px solid var(--border)" }}>
                     <td style={{ padding: "0.7rem 1rem", fontWeight: 700 }}>{n.number}</td>
                     <td style={{ padding: "0.7rem 1rem" }}>{n.activity === "GARAGE" ? copy.tabs.garage : copy.tabs.showroom}</td>
                     <td style={{ padding: "0.7rem 1rem" }}>
@@ -273,8 +273,8 @@ export function DeliveryNotesView({
                           borderRadius: 999,
                           fontSize: "0.75rem",
                           fontWeight: 700,
-                          background: n.status === "EMIS" ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.15)",
-                          color: n.status === "EMIS" ? "#10b981" : "#ef4444",
+                          background: n.status === "EMIS" ? "var(--success-soft)" : "var(--danger-soft)",
+                          color: n.status === "EMIS" ? "var(--success-fg)" : "var(--danger-fg)",
                         }}
                       >
                         {n.status === "EMIS" ? copy.status.EMIS : copy.status.ANNULE}
@@ -397,7 +397,7 @@ export function DeliveryNotesView({
                 </div>
               </div>
 
-              {error && <div style={{ color: "#ef4444", fontSize: "0.85rem" }}>{error}</div>}
+              {error && <div style={{ color: "var(--danger-fg)", fontSize: "0.85rem" }}>{error}</div>}
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 8 }}>
                 <button className="ox-btn ox-btn-ghost" onClick={() => setShowCreate(false)}>
@@ -425,7 +425,7 @@ export function DeliveryNotesView({
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
             />
-            {error && <div style={{ color: "#ef4444", fontSize: "0.85rem", marginTop: 6 }}>{error}</div>}
+            {error && <div style={{ color: "var(--danger-fg)", fontSize: "0.85rem", marginTop: 6 }}>{error}</div>}
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 10 }}>
               <button className="ox-btn ox-btn-ghost" onClick={() => setCancelTarget(null)}>
                 {copy.createModal.cancel}

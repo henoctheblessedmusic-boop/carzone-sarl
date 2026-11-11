@@ -107,7 +107,7 @@ export function ServicesView({
             <span style={{ fontSize: "0.85rem", opacity: 0.7, fontWeight: 550 }}>
               {t.kpi.total.label}
             </span>
-            <Package size={18} style={{ color: "var(--brand)" }} />
+            <Package size={18} style={{ color: "var(--accent-fg)" }} />
           </div>
           <div style={{ fontSize: "1.85rem", fontWeight: 750, marginTop: 4 }}>
             {totalCount}
@@ -122,9 +122,9 @@ export function ServicesView({
             <span style={{ fontSize: "0.85rem", opacity: 0.7, fontWeight: 550 }}>
               {t.kpi.vehicles.label}
             </span>
-            <Car size={18} style={{ color: "var(--gold)" }} />
+            <Car size={18} style={{ color: "var(--gold-fg)" }} />
           </div>
-          <div style={{ fontSize: "1.85rem", fontWeight: 750, marginTop: 4, color: "var(--gold)" }}>
+          <div style={{ fontSize: "1.85rem", fontWeight: 750, marginTop: 4, color: "var(--gold-fg)" }}>
             {vehicleCount}
           </div>
           <div style={{ fontSize: "0.8rem", opacity: 0.65, marginTop: 2 }}>
@@ -277,7 +277,7 @@ export function ServicesView({
                     {art.description || "-"}
                   </td>
                   <td>
-                    <strong style={{ color: "var(--gold)", fontSize: "0.95rem" }}>
+                    <strong style={{ color: "var(--gold-fg)", fontSize: "0.95rem" }}>
                       {formatXof(art.unitPriceXof)}
                     </strong>
                   </td>
@@ -297,10 +297,10 @@ export function ServicesView({
                       style={{
                         background:
                           art.category === "VEHICULE"
-                            ? "rgba(196, 163, 90, 0.15)"
+                            ? "var(--gold-soft)"
                             : art.category === "ACCESSOIRE"
-                            ? "rgba(61, 186, 138, 0.15)"
-                            : "rgba(126, 200, 227, 0.12)",
+                            ? "var(--success-soft)"
+                            : "var(--info-soft)",
                         color:
                           art.category === "VEHICULE"
                             ? "var(--gold)"
@@ -361,7 +361,7 @@ export function ServicesView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.72)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "grid",
             placeItems: "center",
@@ -379,7 +379,7 @@ export function ServicesView({
               maxWidth: 500,
               borderRadius: 20,
               padding: "1.75rem",
-              background: "rgba(10, 24, 34, 0.95)",
+              background: "var(--surface)",
               border: "1px solid var(--ice-border)",
               boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
             }}
@@ -508,7 +508,7 @@ export function ServicesView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.72)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "grid",
             placeItems: "center",
@@ -526,7 +526,7 @@ export function ServicesView({
               maxWidth: 500,
               borderRadius: 20,
               padding: "1.75rem",
-              background: "rgba(10, 24, 34, 0.95)",
+              background: "var(--surface)",
               border: "1px solid var(--ice-border)",
               boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
             }}

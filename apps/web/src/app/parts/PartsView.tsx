@@ -206,8 +206,8 @@ export function PartsView({
           alignItems: "center",
           gap: "1rem",
           borderRadius: "16px",
-          background: "linear-gradient(135deg, rgba(225, 29, 72, 0.08) 0%, rgba(15, 23, 42, 0.4) 100%)",
-          border: "1px solid rgba(225, 29, 72, 0.2)",
+          background: "linear-gradient(135deg, var(--accent-soft) 0%, var(--surface-sunken) 100%)",
+          border: "1px solid var(--accent)",
         }}
       >
         <div>
@@ -220,8 +220,8 @@ export function PartsView({
                 width: 38,
                 height: 38,
                 borderRadius: "10px",
-                background: "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)",
-                color: "#fff",
+                background: "var(--accent)",
+                color: "var(--text-strong)",
                 boxShadow: "0 4px 12px rgba(225, 29, 72, 0.35)",
               }}
             >
@@ -254,7 +254,7 @@ export function PartsView({
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
-                background: "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)",
+                background: "var(--accent)",
                 border: "none",
                 fontWeight: 600,
                 boxShadow: "0 4px 14px rgba(225, 29, 72, 0.3)",
@@ -277,13 +277,13 @@ export function PartsView({
       >
         <div
           className="ox-glass"
-          style={{ padding: "1.2rem", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)" }}
+          style={{ padding: "1.2rem", borderRadius: "14px", border: "1px solid var(--border)" }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 600 }}>
             <span>{copy.kpiRefs}</span>
-            <Package size={16} color="#38bdf8" />
+            <Package size={16} color="var(--info-fg)" />
           </div>
-          <div style={{ fontSize: "1.8rem", fontWeight: 700, marginTop: "0.4rem", color: "#f8fafc" }}>
+          <div style={{ fontSize: "1.8rem", fontWeight: 700, marginTop: "0.4rem", color: "var(--text)" }}>
             {stats.totalRef}
           </div>
           <div style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", marginTop: "0.3rem" }}>
@@ -293,13 +293,13 @@ export function PartsView({
 
         <div
           className="ox-glass"
-          style={{ padding: "1.2rem", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)" }}
+          style={{ padding: "1.2rem", borderRadius: "14px", border: "1px solid var(--border)" }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 600 }}>
             <span>{copy.kpiCrossRefs}</span>
-            <ArrowRightLeft size={16} color="#a855f7" />
+            <ArrowRightLeft size={16} color="var(--purple-fg)" />
           </div>
-          <div style={{ fontSize: "1.8rem", fontWeight: 700, marginTop: "0.4rem", color: "#c084fc" }}>
+          <div style={{ fontSize: "1.8rem", fontWeight: 700, marginTop: "0.4rem", color: "var(--purple-fg)" }}>
             {stats.totalCrossRefs}
           </div>
           <div style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", marginTop: "0.3rem" }}>
@@ -309,13 +309,13 @@ export function PartsView({
 
         <div
           className="ox-glass"
-          style={{ padding: "1.2rem", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)" }}
+          style={{ padding: "1.2rem", borderRadius: "14px", border: "1px solid var(--border)" }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 600 }}>
             <span>{copy.kpiValue}</span>
-            <Boxes size={16} color="#34d399" />
+            <Boxes size={16} color="var(--success-fg)" />
           </div>
-          <div style={{ fontSize: "1.8rem", fontWeight: 700, marginTop: "0.4rem", color: "#34d399" }}>
+          <div style={{ fontSize: "1.8rem", fontWeight: 700, marginTop: "0.4rem", color: "var(--success-fg)" }}>
             {formatXof(stats.totalValueXof)}
           </div>
           <div style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", marginTop: "0.3rem" }}>
@@ -328,15 +328,15 @@ export function PartsView({
           style={{
             padding: "1.2rem",
             borderRadius: "14px",
-            border: stats.outOfStockCount > 0 ? "1px solid rgba(244, 63, 94, 0.4)" : "1px solid rgba(255,255,255,0.08)",
-            background: stats.outOfStockCount > 0 ? "rgba(244, 63, 94, 0.05)" : undefined,
+            border: stats.outOfStockCount > 0 ? "1px solid var(--danger)" : "1px solid var(--border)",
+            background: stats.outOfStockCount > 0 ? "var(--danger-soft)" : undefined,
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "var(--ice-text-muted)", fontSize: "0.82rem", fontWeight: 600 }}>
             <span>{copy.kpiAlerts}</span>
-            <AlertTriangle size={16} color={stats.outOfStockCount > 0 ? "#f43f5e" : "#fbbf24"} />
+            <AlertTriangle size={16} color={stats.outOfStockCount > 0 ? "var(--danger-fg)" : "var(--warning-fg)"} />
           </div>
-          <div style={{ fontSize: "1.8rem", fontWeight: 700, marginTop: "0.4rem", color: stats.outOfStockCount > 0 ? "#f43f5e" : "#fbbf24" }}>
+          <div style={{ fontSize: "1.8rem", fontWeight: 700, marginTop: "0.4rem", color: stats.outOfStockCount > 0 ? "var(--danger-fg)" : "var(--warning-fg)" }}>
             {stats.outOfStockCount} <span style={{ fontSize: "1rem", fontWeight: 500, color: "var(--ice-text-muted)" }}>{copy.kpiAlertsOut}</span> · {stats.lowStockCount} <span style={{ fontSize: "1rem", fontWeight: 500, color: "var(--ice-text-muted)" }}>{copy.kpiAlertsLow}</span>
           </div>
           <div style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)", marginTop: "0.3rem" }}>
@@ -351,19 +351,19 @@ export function PartsView({
         style={{
           padding: "0.9rem 1.25rem",
           borderRadius: "12px",
-          background: "rgba(15, 23, 42, 0.5)",
-          border: "1px solid rgba(56, 189, 248, 0.2)",
+          background: "var(--surface-sunken)",
+          border: "1px solid var(--info)",
           display: "flex",
           alignItems: "center",
           gap: "1rem",
           flexWrap: "wrap",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#38bdf8", fontWeight: 700, fontSize: "0.85rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--info-fg)", fontWeight: 700, fontSize: "0.85rem" }}>
           <Info size={16} />
           <span>{copy.guideTitle}</span>
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "1.2rem", fontSize: "0.82rem", color: "#cbd5e1" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "1.2rem", fontSize: "0.82rem", color: "var(--text-muted)" }}>
           <div><strong>{copy.guideFindTitle}</strong> {copy.guideFind}</div>
           <div><strong>{copy.guideCheckTitle}</strong> {copy.guideCheck}</div>
           <div><strong>{copy.guideActTitle}</strong> {copy.guideAct}</div>
@@ -375,7 +375,7 @@ export function PartsView({
         style={{
           display: "flex",
           gap: "0.5rem",
-          borderBottom: "1px solid rgba(255,255,255,0.1)",
+          borderBottom: "1px solid var(--border)",
           paddingBottom: "0.5rem",
           overflowX: "auto",
         }}
@@ -390,8 +390,8 @@ export function PartsView({
             padding: "0.6rem 1.2rem",
             borderRadius: "8px",
             border: "none",
-            background: activeTab === "inventory" ? "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)" : "transparent",
-            color: activeTab === "inventory" ? "#fff" : "var(--ice-text-muted)",
+            background: activeTab === "inventory" ? "var(--accent)" : "transparent",
+            color: activeTab === "inventory" ? "var(--text-strong)" : "var(--ice-text-muted)",
             fontWeight: 600,
             cursor: "pointer",
             transition: "all 0.2s ease",
@@ -411,8 +411,8 @@ export function PartsView({
             padding: "0.6rem 1.2rem",
             borderRadius: "8px",
             border: "none",
-            background: activeTab === "cross-ref" ? "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)" : "transparent",
-            color: activeTab === "cross-ref" ? "#fff" : "var(--ice-text-muted)",
+            background: activeTab === "cross-ref" ? "var(--accent)" : "transparent",
+            color: activeTab === "cross-ref" ? "var(--text-strong)" : "var(--ice-text-muted)",
             fontWeight: 600,
             cursor: "pointer",
             transition: "all 0.2s ease",
@@ -432,8 +432,8 @@ export function PartsView({
             padding: "0.6rem 1.2rem",
             borderRadius: "8px",
             border: "none",
-            background: activeTab === "movements" ? "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)" : "transparent",
-            color: activeTab === "movements" ? "#fff" : "var(--ice-text-muted)",
+            background: activeTab === "movements" ? "var(--accent)" : "transparent",
+            color: activeTab === "movements" ? "var(--text-strong)" : "var(--ice-text-muted)",
             fontWeight: 600,
             cursor: "pointer",
             transition: "all 0.2s ease",
@@ -455,8 +455,8 @@ export function PartsView({
             style={{
               padding: "1.5rem",
               borderRadius: "16px",
-              background: "linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%)",
-              border: "1px solid rgba(225, 29, 72, 0.25)",
+              background: "linear-gradient(180deg, var(--surface-sunken) 0%, var(--surface) 100%)",
+              border: "1px solid var(--accent)",
             }}
           >
             <div style={{ maxWidth: 750, margin: "0 auto", textAlign: "center" }}>
@@ -468,15 +468,15 @@ export function PartsView({
                   fontSize: "0.8rem",
                   padding: "0.25rem 0.75rem",
                   borderRadius: "20px",
-                  background: "rgba(225, 29, 72, 0.2)",
-                  color: "#fb7185",
+                  background: "var(--accent-soft)",
+                  color: "var(--danger-fg)",
                   fontWeight: 600,
                   marginBottom: "0.8rem",
                 }}
               >
                 <Sparkles size={14} /> {copy.crossBadge}
               </span>
-              <h2 style={{ fontSize: "1.4rem", margin: "0 0 0.5rem", color: "#f8fafc" }}>
+              <h2 style={{ fontSize: "1.4rem", margin: "0 0 0.5rem", color: "var(--text)" }}>
                 {copy.crossTitle}
               </h2>
               <p style={{ fontSize: "0.88rem", color: "var(--ice-text-muted)", margin: "0 0 1.2rem" }}>
@@ -491,7 +491,7 @@ export function PartsView({
                     left: "1rem",
                     top: "50%",
                     transform: "translateY(-50%)",
-                    color: "#94a3b8",
+                    color: "var(--text-muted)",
                   }}
                 />
                 <input
@@ -505,9 +505,9 @@ export function PartsView({
                     padding: "0.9rem 1rem 0.9rem 3rem",
                     fontSize: "1rem",
                     borderRadius: "12px",
-                    background: "rgba(15, 23, 42, 0.8)",
-                    border: "2px solid rgba(225, 29, 72, 0.35)",
-                    color: "#f8fafc",
+                    background: "var(--surface)",
+                    border: "2px solid var(--accent)",
+                    color: "var(--text)",
                     boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
                   }}
                 />
@@ -522,7 +522,7 @@ export function PartsView({
                       transform: "translateY(-50%)",
                       background: "none",
                       border: "none",
-                      color: "#94a3b8",
+                      color: "var(--text-muted)",
                       cursor: "pointer",
                     }}
                   >
@@ -561,9 +561,9 @@ export function PartsView({
                     style={{
                       padding: "0.2rem 0.6rem",
                       borderRadius: "6px",
-                      background: "rgba(255,255,255,0.06)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      color: "#cbd5e1",
+                      background: "var(--surface-soft)",
+                      border: "1px solid var(--border)",
+                      color: "var(--text-muted)",
                       cursor: "pointer",
                       fontSize: "0.75rem",
                     }}
@@ -596,8 +596,8 @@ export function PartsView({
                   color: "var(--ice-text-muted)",
                 }}
               >
-                <AlertTriangle size={36} color="#fbbf24" style={{ margin: "0 auto 1rem" }} />
-                <h4 style={{ color: "#f8fafc", margin: "0 0 0.5rem" }}>{copy.emptyTitle}</h4>
+                <AlertTriangle size={36} color="var(--warning-fg)" style={{ margin: "0 auto 1rem" }} />
+                <h4 style={{ color: "var(--text)", margin: "0 0 0.5rem" }}>{copy.emptyTitle}</h4>
                 <p style={{ fontSize: "0.9rem", margin: 0 }}>
                   {copy.emptyBody}
                 </p>
@@ -625,11 +625,11 @@ export function PartsView({
                       padding: "1.4rem",
                       borderRadius: "16px",
                       border: isOutOfStock
-                        ? "1px solid rgba(244, 63, 94, 0.4)"
-                        : "1px solid rgba(255,255,255,0.1)",
+                        ? "1px solid var(--danger)"
+                        : "1px solid var(--border)",
                       background: isOutOfStock
-                        ? "linear-gradient(180deg, rgba(244, 63, 94, 0.05) 0%, rgba(15, 23, 42, 0.5) 100%)"
-                        : "linear-gradient(180deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%)",
+                        ? "linear-gradient(180deg, var(--danger-soft) 0%, var(--surface-sunken) 100%)"
+                        : "var(--surface-sunken)",
                       display: "flex",
                       flexDirection: "column",
                       gap: "1rem",
@@ -651,7 +651,7 @@ export function PartsView({
                             style={{
                               fontSize: "1.15rem",
                               fontWeight: 700,
-                              color: "#f8fafc",
+                              color: "var(--text)",
                               letterSpacing: "0.02em",
                             }}
                           >
@@ -663,8 +663,8 @@ export function PartsView({
                                 fontSize: "0.82rem",
                                 padding: "0.2rem 0.5rem",
                                 borderRadius: "6px",
-                                background: "rgba(56, 189, 248, 0.15)",
-                                color: "#38bdf8",
+                                background: "var(--info-soft)",
+                                color: "var(--info-fg)",
                                 fontWeight: 600,
                               }}
                             >
@@ -676,7 +676,7 @@ export function PartsView({
                               fontSize: "0.78rem",
                               padding: "0.2rem 0.5rem",
                               borderRadius: "6px",
-                              background: "rgba(255,255,255,0.08)",
+                              background: "var(--surface-soft)",
                               color: "var(--ice-text-muted)",
                             }}
                           >
@@ -688,8 +688,8 @@ export function PartsView({
                                 fontSize: "0.78rem",
                                 padding: "0.2rem 0.5rem",
                                 borderRadius: "6px",
-                                background: "rgba(168, 85, 247, 0.15)",
-                                color: "#c084fc",
+                                background: "var(--purple-soft)",
+                                color: "var(--purple-fg)",
                                 fontWeight: 550,
                               }}
                             >
@@ -697,7 +697,7 @@ export function PartsView({
                             </span>
                           )}
                         </div>
-                        <h4 style={{ fontSize: "1.05rem", fontWeight: 600, margin: "0.4rem 0 0.2rem", color: "#f1f5f9" }}>
+                        <h4 style={{ fontSize: "1.05rem", fontWeight: 600, margin: "0.4rem 0 0.2rem", color: "var(--text)" }}>
                           {part.name}
                         </h4>
                         {part.description && (
@@ -711,7 +711,7 @@ export function PartsView({
                       <div style={{ display: "flex", alignItems: "center", gap: "1.2rem", textAlign: "right" }}>
                         <div>
                           <div style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)" }}>{copy.salePrice}</div>
-                          <div style={{ fontSize: "1.15rem", fontWeight: 700, color: "#f8fafc" }}>
+                          <div style={{ fontSize: "1.15rem", fontWeight: 700, color: "var(--text)" }}>
                             {formatXof(part.sellingPriceXof)}
                           </div>
                           <div style={{ fontSize: "0.74rem", color: "var(--ice-text-muted)" }}>
@@ -725,15 +725,15 @@ export function PartsView({
                             borderRadius: "10px",
                             textAlign: "center",
                             background: isOutOfStock
-                              ? "rgba(244, 63, 94, 0.15)"
+                              ? "var(--danger-soft)"
                               : isLowStock
-                              ? "rgba(251, 191, 36, 0.15)"
-                              : "rgba(34, 197, 94, 0.15)",
+                              ? "var(--warning-soft)"
+                              : "var(--success-soft)",
                             border: isOutOfStock
-                              ? "1px solid rgba(244, 63, 94, 0.3)"
+                              ? "1px solid var(--danger)"
                               : isLowStock
-                              ? "1px solid rgba(251, 191, 36, 0.3)"
-                              : "1px solid rgba(34, 197, 94, 0.3)",
+                              ? "1px solid var(--warning)"
+                              : "1px solid var(--success)",
                             minWidth: 100,
                           }}
                         >
@@ -741,7 +741,7 @@ export function PartsView({
                             style={{
                               fontSize: "1.2rem",
                               fontWeight: 700,
-                              color: isOutOfStock ? "#f43f5e" : isLowStock ? "#fbbf24" : "#4ade80",
+                              color: isOutOfStock ? "var(--danger-fg)" : isLowStock ? "var(--warning-fg)" : "var(--success-fg)",
                             }}
                           >
                             {part.stockQuantity} {partUnitLabel(copy, part.unit)}
@@ -750,7 +750,7 @@ export function PartsView({
                             style={{
                               fontSize: "0.72rem",
                               fontWeight: 600,
-                              color: isOutOfStock ? "#f43f5e" : isLowStock ? "#fbbf24" : "#4ade80",
+                              color: isOutOfStock ? "var(--danger-fg)" : isLowStock ? "var(--warning-fg)" : "var(--success-fg)",
                             }}
                           >
                             {isOutOfStock ? copy.stockOut : isLowStock ? copy.stockLow : copy.stockIn}
@@ -766,16 +766,16 @@ export function PartsView({
                         alignItems: "center",
                         gap: "0.5rem",
                         fontSize: "0.82rem",
-                        color: "#94a3b8",
-                        background: "rgba(0,0,0,0.2)",
+                        color: "var(--text-muted)",
+                        background: "var(--surface-soft)",
                         padding: "0.4rem 0.8rem",
                         borderRadius: "8px",
                         width: "fit-content",
                       }}
                     >
-                      <MapPin size={14} color="#f43f5e" />
+                      <MapPin size={14} color="var(--danger-fg)" />
                       <span>{copy.locationLabel}</span>
-                      <strong style={{ color: "#f8fafc" }}>{part.location || copy.locationNone}</strong>
+                      <strong style={{ color: "var(--text)" }}>{part.location || copy.locationNone}</strong>
                     </div>
 
                     <div
@@ -784,16 +784,16 @@ export function PartsView({
                         gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
                         gap: "1rem",
                         paddingTop: "0.5rem",
-                        borderTop: "1px solid rgba(255,255,255,0.06)",
+                        borderTop: "1px solid var(--border)",
                       }}
                     >
                       {/* BLOC 1: RÉFÉRENCES CROISÉES (CROSS-REFERENCES) */}
                       <div
                         style={{
-                          background: "rgba(15, 23, 42, 0.4)",
+                          background: "var(--surface-sunken)",
                           padding: "0.9rem",
                           borderRadius: "12px",
-                          border: "1px solid rgba(168, 85, 247, 0.2)",
+                          border: "1px solid var(--purple)",
                         }}
                       >
                         <div
@@ -804,7 +804,7 @@ export function PartsView({
                             marginBottom: "0.6rem",
                           }}
                         >
-                          <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#c084fc", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                          <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--purple-fg)", display: "flex", alignItems: "center", gap: "0.3rem" }}>
                             <ArrowRightLeft size={14} />
                             {copy.crossBlockTitle}
                           </span>
@@ -828,13 +828,13 @@ export function PartsView({
                                   gap: "0.4rem",
                                   padding: "0.35rem 0.65rem",
                                   borderRadius: "8px",
-                                  background: "rgba(168, 85, 247, 0.1)",
-                                  border: "1px solid rgba(168, 85, 247, 0.3)",
+                                  background: "var(--purple-soft)",
+                                  border: "1px solid var(--purple)",
                                   fontSize: "0.8rem",
                                 }}
                               >
-                                <span style={{ fontWeight: 700, color: "#e2e8f0" }}>{cr.brand}:</span>
-                                <span style={{ color: "#c084fc", fontFamily: "monospace", fontWeight: 600 }}>
+                                <span style={{ fontWeight: 700, color: "var(--text-muted)" }}>{cr.brand}:</span>
+                                <span style={{ color: "var(--purple-fg)", fontFamily: "monospace", fontWeight: 600 }}>
                                   {cr.crossReference}
                                 </span>
                                 {cr.notes && (
@@ -850,7 +850,7 @@ export function PartsView({
                                     style={{
                                       background: "none",
                                       border: "none",
-                                      color: "#f43f5e",
+                                      color: "var(--danger-fg)",
                                       cursor: "pointer",
                                       padding: 0,
                                       marginLeft: 4,
@@ -868,10 +868,10 @@ export function PartsView({
                       {/* BLOC 2: MODÈLES DE VOITURES COMPATIBLES (MULTI-MODÈLES) */}
                       <div
                         style={{
-                          background: "rgba(15, 23, 42, 0.4)",
+                          background: "var(--surface-sunken)",
                           padding: "0.9rem",
                           borderRadius: "12px",
-                          border: "1px solid rgba(56, 189, 248, 0.2)",
+                          border: "1px solid var(--info)",
                         }}
                       >
                         <div
@@ -882,7 +882,7 @@ export function PartsView({
                             marginBottom: "0.6rem",
                           }}
                         >
-                          <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#38bdf8", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                          <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--info-fg)", display: "flex", alignItems: "center", gap: "0.3rem" }}>
                             <Car size={14} />
                             {copy.compatBlockTitle}
                           </span>
@@ -906,20 +906,20 @@ export function PartsView({
                                   gap: "0.35rem",
                                   padding: "0.35rem 0.6rem",
                                   borderRadius: "8px",
-                                  background: "rgba(56, 189, 248, 0.1)",
-                                  border: "1px solid rgba(56, 189, 248, 0.3)",
+                                  background: "var(--info-soft)",
+                                  border: "1px solid var(--info)",
                                   fontSize: "0.8rem",
                                 }}
                               >
-                                <span style={{ fontWeight: 700, color: "#e2e8f0" }}>{c.vehicleBrand}</span>
-                                <span style={{ color: "#38bdf8", fontWeight: 600 }}>{c.vehicleModel}</span>
+                                <span style={{ fontWeight: 700, color: "var(--text-muted)" }}>{c.vehicleBrand}</span>
+                                <span style={{ color: "var(--info-fg)", fontWeight: 600 }}>{c.vehicleModel}</span>
                                 {c.engine && (
                                   <span style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)" }}>
                                     [{c.engine}]
                                   </span>
                                 )}
                                 {c.position && (
-                                  <span style={{ fontSize: "0.72rem", color: "#fbbf24" }}>
+                                  <span style={{ fontSize: "0.72rem", color: "var(--warning-fg)" }}>
                                     ({c.position})
                                   </span>
                                 )}
@@ -931,7 +931,7 @@ export function PartsView({
                                     style={{
                                       background: "none",
                                       border: "none",
-                                      color: "#f43f5e",
+                                      color: "var(--danger-fg)",
                                       cursor: "pointer",
                                       padding: 0,
                                       marginLeft: 3,
@@ -965,8 +965,8 @@ export function PartsView({
                         style={{
                           fontSize: "0.82rem",
                           padding: "0.4rem 0.8rem",
-                          background: "rgba(255,255,255,0.06)",
-                          border: "1px solid rgba(255,255,255,0.15)",
+                          background: "var(--surface-soft)",
+                          border: "1px solid var(--border)",
                           display: "flex",
                           alignItems: "center",
                           gap: "0.3rem",
@@ -982,9 +982,9 @@ export function PartsView({
                         style={{
                           fontSize: "0.82rem",
                           padding: "0.4rem 0.8rem",
-                          background: "rgba(34, 197, 94, 0.15)",
-                          border: "1px solid rgba(34, 197, 94, 0.3)",
-                          color: "#4ade80",
+                          background: "var(--success-soft)",
+                          border: "1px solid var(--success)",
+                          color: "var(--success-fg)",
                           display: "flex",
                           alignItems: "center",
                           gap: "0.3rem",
@@ -1001,9 +1001,9 @@ export function PartsView({
                           style={{
                             fontSize: "0.82rem",
                             padding: "0.4rem 0.8rem",
-                            background: "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)",
+                            background: "var(--accent)",
                             border: "none",
-                            color: "#fff",
+                            color: "var(--text-strong)",
                             display: "flex",
                             alignItems: "center",
                             gap: "0.3rem",
@@ -1041,7 +1041,7 @@ export function PartsView({
           >
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "center", width: "100%" }}>
               <div style={{ position: "relative", flex: "1 1 320px" }}>
-                <Search size={18} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                <Search size={18} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
                 <input
                   type="text"
                   placeholder={copy.filterSearchPlaceholder}
@@ -1061,7 +1061,7 @@ export function PartsView({
                       transform: "translateY(-50%)",
                       background: "none",
                       border: "none",
-                      color: "#94a3b8",
+                      color: "var(--text-muted)",
                       cursor: "pointer",
                     }}
                   >
@@ -1116,9 +1116,9 @@ export function PartsView({
                   style={{
                     padding: "0.2rem 0.55rem",
                     borderRadius: "6px",
-                    background: searchQuery === btn.query ? "rgba(225, 29, 72, 0.25)" : "rgba(255,255,255,0.06)",
-                    border: searchQuery === btn.query ? "1px solid rgba(225, 29, 72, 0.5)" : "1px solid rgba(255,255,255,0.1)",
-                    color: searchQuery === btn.query ? "#fb7185" : "#cbd5e1",
+                    background: searchQuery === btn.query ? "var(--accent-soft)" : "var(--surface-soft)",
+                    border: searchQuery === btn.query ? "1px solid var(--accent)" : "1px solid var(--border)",
+                    color: searchQuery === btn.query ? "var(--danger-fg)" : "var(--text-muted)",
                     fontSize: "0.75rem",
                     cursor: "pointer",
                     fontWeight: searchQuery === btn.query ? 700 : 500,
@@ -1134,9 +1134,9 @@ export function PartsView({
                   style={{
                     padding: "0.2rem 0.55rem",
                     borderRadius: "6px",
-                    background: "rgba(244, 63, 94, 0.15)",
-                    border: "1px solid rgba(244, 63, 94, 0.3)",
-                    color: "#fb7185",
+                    background: "var(--danger-soft)",
+                    border: "1px solid var(--danger)",
+                    color: "var(--danger-fg)",
                     fontSize: "0.75rem",
                     cursor: "pointer",
                     fontWeight: 600,
@@ -1172,10 +1172,10 @@ export function PartsView({
 
                   return (
                     <tr key={p.id}>
-                      <td style={{ fontWeight: 700, color: "#f8fafc", fontFamily: "monospace" }}>
+                      <td style={{ fontWeight: 700, color: "var(--text)", fontFamily: "monospace" }}>
                         {p.partNumber}
                       </td>
-                      <td style={{ color: "#38bdf8", fontFamily: "monospace" }}>
+                      <td style={{ color: "var(--info-fg)", fontFamily: "monospace" }}>
                         {p.oemNumber || "-"}
                       </td>
                       <td>
@@ -1187,11 +1187,11 @@ export function PartsView({
                         )}
                       </td>
                       <td>
-                        <span style={{ fontSize: "0.78rem", padding: "0.2rem 0.5rem", borderRadius: "6px", background: "rgba(255,255,255,0.06)" }}>
+                        <span style={{ fontSize: "0.78rem", padding: "0.2rem 0.5rem", borderRadius: "6px", background: "var(--surface-soft)" }}>
                           {partCategoryLabel(copy, p.category)}
                         </span>
                       </td>
-                      <td style={{ color: "#cbd5e1", fontSize: "0.85rem" }}>
+                      <td style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>
                         {p.location || copy.locationUndefined}
                       </td>
                       <td>
@@ -1206,8 +1206,8 @@ export function PartsView({
                                   fontSize: "0.72rem",
                                   padding: "0.15rem 0.4rem",
                                   borderRadius: "4px",
-                                  background: "rgba(168, 85, 247, 0.15)",
-                                  color: "#c084fc",
+                                  background: "var(--purple-soft)",
+                                  color: "var(--purple-fg)",
                                   fontFamily: "monospace",
                                 }}
                               >
@@ -1229,8 +1229,8 @@ export function PartsView({
                                   fontSize: "0.72rem",
                                   padding: "0.15rem 0.4rem",
                                   borderRadius: "4px",
-                                  background: "rgba(56, 189, 248, 0.15)",
-                                  color: "#38bdf8",
+                                  background: "var(--info-soft)",
+                                  color: "var(--info-fg)",
                                 }}
                               >
                                 {c.vehicleBrand} {c.vehicleModel}
@@ -1247,17 +1247,17 @@ export function PartsView({
                             borderRadius: "6px",
                             fontSize: "0.85rem",
                             background: isOutOfStock
-                              ? "rgba(244, 63, 94, 0.2)"
+                              ? "var(--danger-soft)"
                               : isLow
-                              ? "rgba(251, 191, 36, 0.2)"
-                              : "rgba(34, 197, 94, 0.2)",
-                            color: isOutOfStock ? "#f43f5e" : isLow ? "#fbbf24" : "#4ade80",
+                              ? "var(--warning-soft)"
+                              : "var(--success-soft)",
+                            color: isOutOfStock ? "var(--danger-fg)" : isLow ? "var(--warning-fg)" : "var(--success-fg)",
                           }}
                         >
                           {p.stockQuantity} {partUnitLabel(copy, p.unit)}
                         </span>
                       </td>
-                      <td style={{ fontWeight: 600, color: "#f8fafc" }}>
+                      <td style={{ fontWeight: 600, color: "var(--text)" }}>
                         {formatXof(p.sellingPriceXof)}
                       </td>
                       <td>
@@ -1269,9 +1269,9 @@ export function PartsView({
                             style={{
                               padding: "0.35rem 0.65rem",
                               borderRadius: "6px",
-                              background: "rgba(34, 197, 94, 0.15)",
-                              border: "1px solid rgba(34, 197, 94, 0.35)",
-                              color: "#4ade80",
+                              background: "var(--success-soft)",
+                              border: "1px solid var(--success)",
+                              color: "var(--success-fg)",
                               cursor: "pointer",
                               fontSize: "0.78rem",
                               fontWeight: 600,
@@ -1289,9 +1289,9 @@ export function PartsView({
                             style={{
                               padding: "0.35rem 0.65rem",
                               borderRadius: "6px",
-                              background: "rgba(56, 189, 248, 0.15)",
-                              border: "1px solid rgba(56, 189, 248, 0.35)",
-                              color: "#38bdf8",
+                              background: "var(--info-soft)",
+                              border: "1px solid var(--info)",
+                              color: "var(--info-fg)",
                               cursor: "pointer",
                               fontSize: "0.78rem",
                               fontWeight: 600,
@@ -1310,9 +1310,9 @@ export function PartsView({
                               style={{
                                 padding: "0.35rem 0.55rem",
                                 borderRadius: "6px",
-                                background: "rgba(255,255,255,0.06)",
-                                border: "1px solid rgba(255,255,255,0.15)",
-                                color: "#cbd5e1",
+                                background: "var(--surface-soft)",
+                                border: "1px solid var(--border)",
+                                color: "var(--text-muted)",
                                 cursor: "pointer",
                                 fontSize: "0.78rem",
                                 display: "inline-flex",
@@ -1390,7 +1390,7 @@ export function PartsView({
                           })}
                         </td>
                         <td>
-                          <div style={{ fontWeight: 700, fontFamily: "monospace", color: "#f8fafc" }}>
+                          <div style={{ fontWeight: 700, fontFamily: "monospace", color: "var(--text)" }}>
                             {m.partCode}
                           </div>
                           <div style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)" }}>
@@ -1404,23 +1404,23 @@ export function PartsView({
                               padding: "0.25rem 0.6rem",
                               borderRadius: "6px",
                               fontWeight: 600,
-                              background: isOut ? "rgba(244, 63, 94, 0.15)" : "rgba(34, 197, 94, 0.15)",
-                              color: isOut ? "#fb7185" : "#4ade80",
+                              background: isOut ? "var(--danger-soft)" : "var(--success-soft)",
+                              color: isOut ? "var(--danger-fg)" : "var(--success-fg)",
                             }}
                           >
                             {movementTypeLabel(copy, m.type)}
                           </span>
                         </td>
-                        <td style={{ fontWeight: 700, color: isOut ? "#fb7185" : "#4ade80" }}>
+                        <td style={{ fontWeight: 700, color: isOut ? "var(--danger-fg)" : "var(--success-fg)" }}>
                           {m.quantity > 0 ? `+${m.quantity}` : m.quantity}
                         </td>
                         <td style={{ fontWeight: 600 }}>
                           {formatXof(m.totalPriceXof)}
                         </td>
-                        <td style={{ color: "#38bdf8", fontWeight: 600 }}>
+                        <td style={{ color: "var(--info-fg)", fontWeight: 600 }}>
                           {m.referenceDoc || "-"}
                         </td>
-                        <td style={{ fontSize: "0.82rem", color: "#cbd5e1" }}>
+                        <td style={{ fontSize: "0.82rem", color: "var(--text-muted)" }}>
                           {m.reason || "-"}
                         </td>
                         <td style={{ fontSize: "0.78rem", color: "var(--ice-text-muted)" }}>
@@ -1445,7 +1445,7 @@ export function PartsView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.75)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "flex",
             alignItems: "center",
@@ -1463,8 +1463,8 @@ export function PartsView({
               overflowY: "auto",
               padding: "1.8rem",
               borderRadius: "18px",
-              background: "#0f172a",
-              border: "1px solid rgba(225, 29, 72, 0.3)",
+              background: "var(--surface)",
+              border: "1px solid var(--accent)",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.2rem" }}>
@@ -1474,7 +1474,7 @@ export function PartsView({
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(false)}
-                style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer" }}
+                style={{ background: "none", border: "none", color: "var(--surface-sunken)", cursor: "pointer" }}
               >
                 <X size={20} />
               </button>
@@ -1687,11 +1687,11 @@ export function PartsView({
                 style={{
                   padding: "0.9rem",
                   borderRadius: "10px",
-                  background: "rgba(168, 85, 247, 0.08)",
-                  border: "1px solid rgba(168, 85, 247, 0.25)",
+                  background: "var(--purple-soft)",
+                  border: "1px solid var(--purple)",
                 }}
               >
-                <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "#c084fc", marginBottom: "0.5rem" }}>
+                <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--purple-fg)", marginBottom: "0.5rem" }}>
                   {copy.createCrossRefTitle}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
@@ -1713,11 +1713,11 @@ export function PartsView({
                 style={{
                   padding: "0.9rem",
                   borderRadius: "10px",
-                  background: "rgba(56, 189, 248, 0.08)",
-                  border: "1px solid rgba(56, 189, 248, 0.25)",
+                  background: "var(--info-soft)",
+                  border: "1px solid var(--info)",
                 }}
               >
-                <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "#38bdf8", marginBottom: "0.5rem" }}>
+                <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--info-fg)", marginBottom: "0.5rem" }}>
                   {copy.createCompatTitle}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
@@ -1739,14 +1739,14 @@ export function PartsView({
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
                   className="ox-btn"
-                  style={{ background: "rgba(255,255,255,0.08)" }}
+                  style={{ background: "var(--surface-soft)" }}
                 >
                   {copy.cancel}
                 </button>
                 <button
                   type="submit"
                   className="ox-btn"
-                  style={{ background: "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)", border: "none" }}
+                  style={{ background: "var(--accent)", border: "none" }}
                 >
                   {copy.createSubmit}
                 </button>
@@ -1764,7 +1764,7 @@ export function PartsView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.75)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "flex",
             alignItems: "center",
@@ -1782,8 +1782,8 @@ export function PartsView({
               overflowY: "auto",
               padding: "1.8rem",
               borderRadius: "18px",
-              background: "#0f172a",
-              border: "1px solid rgba(168, 85, 247, 0.4)",
+              background: "var(--surface)",
+              border: "1px solid var(--purple)",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
@@ -1802,7 +1802,7 @@ export function PartsView({
               <button
                 type="button"
                 onClick={() => setSelectedPartForDetails(null)}
-                style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer" }}
+                style={{ background: "none", border: "none", color: "var(--surface-sunken)", cursor: "pointer" }}
               >
                 <X size={20} />
               </button>
@@ -1814,11 +1814,11 @@ export function PartsView({
                 style={{
                   padding: "1.2rem",
                   borderRadius: "12px",
-                  background: "rgba(168, 85, 247, 0.08)",
-                  border: "1px solid rgba(168, 85, 247, 0.25)",
+                  background: "var(--purple-soft)",
+                  border: "1px solid var(--purple)",
                 }}
               >
-                <h4 style={{ margin: "0 0 0.8rem", color: "#c084fc", fontSize: "0.95rem", fontWeight: 700 }}>
+                <h4 style={{ margin: "0 0 0.8rem", color: "var(--purple-fg)", fontSize: "0.95rem", fontWeight: 700 }}>
                   {copy.detailsAddCrossRefTitle}
                 </h4>
 
@@ -1877,7 +1877,7 @@ export function PartsView({
                     <button
                       type="submit"
                       className="ox-btn"
-                      style={{ background: "#9333ea", border: "none", fontSize: "0.85rem" }}
+                      style={{ background: "var(--purple-solid)", border: "none", fontSize: "0.85rem" }}
                     >
                       {copy.detailsAddCrossRefSubmit}
                     </button>
@@ -1890,11 +1890,11 @@ export function PartsView({
                 style={{
                   padding: "1.2rem",
                   borderRadius: "12px",
-                  background: "rgba(56, 189, 248, 0.08)",
-                  border: "1px solid rgba(56, 189, 248, 0.25)",
+                  background: "var(--info-soft)",
+                  border: "1px solid var(--info)",
                 }}
               >
-                <h4 style={{ margin: "0 0 0.8rem", color: "#38bdf8", fontSize: "0.95rem", fontWeight: 700 }}>
+                <h4 style={{ margin: "0 0 0.8rem", color: "var(--info-fg)", fontSize: "0.95rem", fontWeight: 700 }}>
                   {copy.detailsAddCompatTitle}
                 </h4>
 
@@ -1962,7 +1962,7 @@ export function PartsView({
                     <button
                       type="submit"
                       className="ox-btn"
-                      style={{ background: "#0284c7", border: "none", fontSize: "0.85rem" }}
+                      style={{ background: "var(--info-solid)", border: "none", fontSize: "0.85rem" }}
                     >
                       {copy.detailsAddCompatSubmit}
                     </button>
@@ -1992,7 +1992,7 @@ export function PartsView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.75)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "flex",
             alignItems: "center",
@@ -2008,8 +2008,8 @@ export function PartsView({
               maxWidth: 500,
               padding: "1.8rem",
               borderRadius: "18px",
-              background: "#0f172a",
-              border: "1px solid rgba(34, 197, 94, 0.3)",
+              background: "var(--surface)",
+              border: "1px solid var(--success)",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
@@ -2019,14 +2019,14 @@ export function PartsView({
               <button
                 type="button"
                 onClick={() => setMovementPart(null)}
-                style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer" }}
+                style={{ background: "none", border: "none", color: "var(--surface-sunken)", cursor: "pointer" }}
               >
                 <X size={20} />
               </button>
             </div>
 
             <div style={{ fontSize: "0.85rem", color: "var(--ice-text-muted)", marginBottom: "1rem" }}>
-              {copy.movementCurrentStock} <strong style={{ color: "#4ade80" }}>{movementPart.stockQuantity} {partUnitLabel(copy, movementPart.unit)}</strong>
+              {copy.movementCurrentStock} <strong style={{ color: "var(--success-fg)" }}>{movementPart.stockQuantity} {partUnitLabel(copy, movementPart.unit)}</strong>
             </div>
 
             <form
@@ -2094,14 +2094,14 @@ export function PartsView({
                   type="button"
                   onClick={() => setMovementPart(null)}
                   className="ox-btn"
-                  style={{ background: "rgba(255,255,255,0.08)" }}
+                  style={{ background: "var(--surface-soft)" }}
                 >
                   {copy.cancel}
                 </button>
                 <button
                   type="submit"
                   className="ox-btn"
-                  style={{ background: "#16a34a", border: "none" }}
+                  style={{ background: "var(--success-solid)", border: "none" }}
                 >
                   {copy.movementSubmit}
                 </button>
@@ -2119,7 +2119,7 @@ export function PartsView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.75)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "flex",
             alignItems: "center",
@@ -2135,8 +2135,8 @@ export function PartsView({
               maxWidth: 550,
               padding: "1.8rem",
               borderRadius: "18px",
-              background: "#0f172a",
-              border: "1px solid rgba(225, 29, 72, 0.4)",
+              background: "var(--surface)",
+              border: "1px solid var(--accent)",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
@@ -2146,7 +2146,7 @@ export function PartsView({
               <button
                 type="button"
                 onClick={() => setAssignPart(null)}
-                style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer" }}
+                style={{ background: "none", border: "none", color: "var(--surface-sunken)", cursor: "pointer" }}
               >
                 <X size={20} />
               </button>
@@ -2156,7 +2156,7 @@ export function PartsView({
               style={{
                 padding: "0.8rem",
                 borderRadius: "10px",
-                background: "rgba(255,255,255,0.06)",
+                background: "var(--surface-soft)",
                 marginBottom: "1rem",
                 fontSize: "0.85rem",
               }}
@@ -2221,14 +2221,14 @@ export function PartsView({
                   type="button"
                   onClick={() => setAssignPart(null)}
                   className="ox-btn"
-                  style={{ background: "rgba(255,255,255,0.08)" }}
+                  style={{ background: "var(--surface-soft)" }}
                 >
                   {copy.cancel}
                 </button>
                 <button
                   type="submit"
                   className="ox-btn"
-                  style={{ background: "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)", border: "none" }}
+                  style={{ background: "var(--accent)", border: "none" }}
                 >
                   {copy.assignSubmit}
                 </button>

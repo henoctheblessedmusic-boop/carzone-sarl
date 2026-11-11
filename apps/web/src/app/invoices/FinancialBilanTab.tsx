@@ -256,7 +256,7 @@ export function FinancialBilanTab({
       >
         <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <Calendar size={18} style={{ color: "var(--brand)" }} />
+            <Calendar size={18} style={{ color: "var(--accent-fg)" }} />
             <span style={{ fontSize: "0.9rem", fontWeight: 600 }}>{copy.bilan.periodLabel}</span>
           </div>
 
@@ -310,14 +310,14 @@ export function FinancialBilanTab({
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
               <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>{copy.bilan.kpi.revenueLabel}</div>
-              <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--brand)", marginTop: 4 }}>
+              <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--accent-fg)", marginTop: 4 }}>
                 {formatXof(totalInvoicedRevenue)}
               </div>
             </div>
             <div
               style={{
-                background: "rgba(0, 120, 212, 0.15)",
-                color: "var(--brand)",
+                background: "var(--info-soft)",
+                color: "var(--accent-fg)",
                 padding: 8,
                 borderRadius: 8,
               }}
@@ -326,23 +326,23 @@ export function FinancialBilanTab({
             </div>
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.7, marginTop: 8 }}>
-            {copy.bilan.kpi.collectedPrefix}<strong style={{ color: "#10b981" }}>{formatXof(totalCashCollected)}</strong>
+            {copy.bilan.kpi.collectedPrefix}<strong style={{ color: "var(--success-fg)" }}>{formatXof(totalCashCollected)}</strong>
           </div>
         </div>
 
         {/* COGS & Gross Profit */}
-        <div className="ox-card" style={{ padding: "1.3rem", borderLeft: "4px solid #38bdf8" }}>
+        <div className="ox-card" style={{ padding: "1.3rem", borderLeft: "4px solid var(--info)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
               <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>{copy.bilan.kpi.grossLabel}</div>
-              <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#38bdf8", marginTop: 4 }}>
+              <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--info-fg)", marginTop: 4 }}>
                 {formatXof(grossProfit)}
               </div>
             </div>
             <div
               style={{
-                background: "rgba(56, 189, 248, 0.15)",
-                color: "#38bdf8",
+                background: "var(--info-soft)",
+                color: "var(--info-fg)",
                 padding: 8,
                 borderRadius: 8,
               }}
@@ -366,7 +366,7 @@ export function FinancialBilanTab({
             </div>
             <div
               style={{
-                background: "rgba(210, 160, 40, 0.15)",
+                background: "var(--warning-soft)",
                 color: "var(--warn)",
                 padding: 8,
                 borderRadius: 8,
@@ -385,8 +385,8 @@ export function FinancialBilanTab({
           className="ox-card"
           style={{
             padding: "1.3rem",
-            borderLeft: `4px solid ${netProfit >= 0 ? "#10b981" : "var(--bad)"}`,
-            background: netProfit >= 0 ? "rgba(16, 185, 129, 0.05)" : "rgba(212, 90, 90, 0.05)",
+            borderLeft: `4px solid ${netProfit >= 0 ? "var(--success)" : "var(--bad)"}`,
+            background: netProfit >= 0 ? "var(--success-soft)" : "var(--danger-soft)",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -398,7 +398,7 @@ export function FinancialBilanTab({
                 style={{
                   fontSize: "1.5rem",
                   fontWeight: 800,
-                  color: netProfit >= 0 ? "#10b981" : "var(--bad)",
+                  color: netProfit >= 0 ? "var(--success-fg)" : "var(--bad)",
                   marginTop: 4,
                 }}
               >
@@ -407,8 +407,8 @@ export function FinancialBilanTab({
             </div>
             <div
               style={{
-                background: netProfit >= 0 ? "rgba(16, 185, 129, 0.15)" : "rgba(212, 90, 90, 0.15)",
-                color: netProfit >= 0 ? "#10b981" : "var(--bad)",
+                background: netProfit >= 0 ? "var(--success-soft)" : "var(--danger-soft)",
+                color: netProfit >= 0 ? "var(--success-fg)" : "var(--bad)",
                 padding: 8,
                 borderRadius: 8,
               }}
@@ -436,7 +436,7 @@ export function FinancialBilanTab({
               justifyContent: "space-between",
               alignItems: "center",
               padding: "0.85rem 1.1rem",
-              background: "rgba(0, 120, 212, 0.08)",
+              background: "var(--info-soft)",
               borderRadius: 8,
               borderLeft: "3px solid var(--brand)",
               fontWeight: 600,
@@ -451,8 +451,8 @@ export function FinancialBilanTab({
                   width: 26,
                   height: 26,
                   borderRadius: "50%",
-                  background: "rgba(0, 120, 212, 0.15)",
-                  color: "var(--brand)",
+                  background: "var(--info-soft)",
+                  color: "var(--accent-fg)",
                   flexShrink: 0,
                 }}
               >
@@ -469,7 +469,7 @@ export function FinancialBilanTab({
                 )}
               </div>
             </div>
-            <span style={{ color: "var(--brand)", fontSize: "1.05rem", fontWeight: 700 }}>
+            <span style={{ color: "var(--accent-fg)", fontSize: "1.05rem", fontWeight: 700 }}>
               {formatXof(totalInvoicedRevenue)}
             </span>
           </div>
@@ -481,7 +481,7 @@ export function FinancialBilanTab({
               justifyContent: "space-between",
               alignItems: "center",
               padding: "0.75rem 1.1rem",
-              background: "rgba(255, 255, 255, 0.02)",
+              background: "var(--surface-soft)",
               borderRadius: 8,
               paddingLeft: "2.2rem",
             }}
@@ -495,7 +495,7 @@ export function FinancialBilanTab({
                   width: 22,
                   height: 22,
                   borderRadius: "50%",
-                  background: "rgba(239, 68, 68, 0.1)",
+                  background: "var(--danger-soft)",
                   color: "var(--bad)",
                   flexShrink: 0,
                 }}
@@ -516,10 +516,10 @@ export function FinancialBilanTab({
               justifyContent: "space-between",
               alignItems: "center",
               padding: "0.85rem 1.1rem",
-              background: "rgba(56, 189, 248, 0.08)",
+              background: "var(--info-soft)",
               borderRadius: 8,
               fontWeight: 700,
-              borderLeft: "3px solid #38bdf8",
+              borderLeft: "3px solid var(--info)",
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
@@ -531,8 +531,8 @@ export function FinancialBilanTab({
                   width: 26,
                   height: 26,
                   borderRadius: "50%",
-                  background: "rgba(56, 189, 248, 0.18)",
-                  color: "#38bdf8",
+                  background: "var(--info-soft)",
+                  color: "var(--info-fg)",
                   flexShrink: 0,
                 }}
               >
@@ -547,8 +547,8 @@ export function FinancialBilanTab({
                     fontSize: "0.72rem",
                     padding: "2px 7px",
                     borderRadius: 4,
-                    background: "rgba(56, 189, 248, 0.18)",
-                    color: "#38bdf8",
+                    background: "var(--info-soft)",
+                    color: "var(--info-fg)",
                     fontWeight: 700,
                   }}
                 >
@@ -556,7 +556,7 @@ export function FinancialBilanTab({
                 </span>
               </div>
             </div>
-            <span style={{ color: "#38bdf8", fontSize: "1.05rem", fontWeight: 700 }}>
+            <span style={{ color: "var(--info-fg)", fontSize: "1.05rem", fontWeight: 700 }}>
               {formatXof(grossProfit)}
             </span>
           </div>
@@ -568,7 +568,7 @@ export function FinancialBilanTab({
               justifyContent: "space-between",
               alignItems: "center",
               padding: "0.75rem 1.1rem",
-              background: "rgba(255, 255, 255, 0.02)",
+              background: "var(--surface-soft)",
               borderRadius: 8,
               paddingLeft: "2.2rem",
             }}
@@ -582,7 +582,7 @@ export function FinancialBilanTab({
                   width: 22,
                   height: 22,
                   borderRadius: "50%",
-                  background: "rgba(239, 68, 68, 0.1)",
+                  background: "var(--danger-soft)",
                   color: "var(--bad)",
                   flexShrink: 0,
                 }}
@@ -603,7 +603,7 @@ export function FinancialBilanTab({
               justifyContent: "space-between",
               alignItems: "center",
               padding: "0.75rem 1.1rem",
-              background: "rgba(255, 255, 255, 0.02)",
+              background: "var(--surface-soft)",
               borderRadius: 8,
               paddingLeft: "2.2rem",
             }}
@@ -617,7 +617,7 @@ export function FinancialBilanTab({
                   width: 22,
                   height: 22,
                   borderRadius: "50%",
-                  background: "rgba(239, 68, 68, 0.1)",
+                  background: "var(--danger-soft)",
                   color: "var(--bad)",
                   flexShrink: 0,
                 }}
@@ -645,10 +645,10 @@ export function FinancialBilanTab({
               justifyContent: "space-between",
               alignItems: "center",
               padding: "1rem 1.2rem",
-              background: netProfit >= 0 ? "rgba(16, 185, 129, 0.12)" : "rgba(212, 90, 90, 0.12)",
+              background: netProfit >= 0 ? "var(--success-soft)" : "var(--danger-soft)",
               borderRadius: 10,
               fontWeight: 800,
-              border: `1.5px solid ${netProfit >= 0 ? "rgba(16, 185, 129, 0.4)" : "rgba(212, 90, 90, 0.4)"}`,
+              border: `1.5px solid ${netProfit >= 0 ? "var(--success)" : "var(--danger)"}`,
               marginTop: "0.5rem",
             }}
           >
@@ -661,8 +661,8 @@ export function FinancialBilanTab({
                   width: 28,
                   height: 28,
                   borderRadius: "50%",
-                  background: netProfit >= 0 ? "rgba(16, 185, 129, 0.2)" : "rgba(239, 68, 68, 0.2)",
-                  color: netProfit >= 0 ? "#10b981" : "var(--bad)",
+                  background: netProfit >= 0 ? "var(--success-soft)" : "var(--danger-soft)",
+                  color: netProfit >= 0 ? "var(--success-fg)" : "var(--bad)",
                   flexShrink: 0,
                 }}
               >
@@ -678,8 +678,8 @@ export function FinancialBilanTab({
                       fontSize: "0.7rem",
                       padding: "2px 7px",
                       borderRadius: 4,
-                      background: netProfit >= 0 ? "rgba(16, 185, 129, 0.2)" : "rgba(239, 68, 68, 0.2)",
-                      color: netProfit >= 0 ? "#10b981" : "var(--bad)",
+                      background: netProfit >= 0 ? "var(--success-soft)" : "var(--danger-soft)",
+                      color: netProfit >= 0 ? "var(--success-fg)" : "var(--bad)",
                       fontWeight: 700,
                     }}
                   >
@@ -690,7 +690,7 @@ export function FinancialBilanTab({
             </div>
             <span
               style={{
-                color: netProfit >= 0 ? "#10b981" : "var(--bad)",
+                color: netProfit >= 0 ? "var(--success-fg)" : "var(--bad)",
                 fontSize: "1.3rem",
                 fontWeight: 800,
               }}
@@ -723,16 +723,16 @@ export function FinancialBilanTab({
               {monthlyData.map((row) => (
                 <tr key={row.monthNum} style={{ borderTop: "1px solid var(--ice-border)" }}>
                   <td style={{ padding: "0.8rem 1rem", fontWeight: 600 }}>{row.monthName}</td>
-                  <td style={{ padding: "0.8rem 1rem", textAlign: "right", color: "var(--brand)" }}>
+                  <td style={{ padding: "0.8rem 1rem", textAlign: "right", color: "var(--accent-fg)" }}>
                     {formatXof(row.invoiced)}
                   </td>
-                  <td style={{ padding: "0.8rem 1rem", textAlign: "right", color: "#10b981" }}>
+                  <td style={{ padding: "0.8rem 1rem", textAlign: "right", color: "var(--success-fg)" }}>
                     {formatXof(row.collected)}
                   </td>
                   <td style={{ padding: "0.8rem 1rem", textAlign: "right", color: "var(--warn)" }}>
                     {formatXof(row.salaries)}
                   </td>
-                  <td style={{ padding: "0.8rem 1rem", textAlign: "right", color: "#8b5cf6" }}>
+                  <td style={{ padding: "0.8rem 1rem", textAlign: "right", color: "var(--purple-fg)" }}>
                     {formatXof(row.expenses)}
                   </td>
                   <td
@@ -740,7 +740,7 @@ export function FinancialBilanTab({
                       padding: "0.8rem 1rem",
                       textAlign: "right",
                       fontWeight: 700,
-                      color: row.net >= 0 ? "#10b981" : "var(--bad)",
+                      color: row.net >= 0 ? "var(--success-fg)" : "var(--bad)",
                     }}
                   >
                     {formatXof(row.net)}
@@ -753,20 +753,20 @@ export function FinancialBilanTab({
                 style={{
                   borderTop: "2px solid var(--brand)",
                   fontWeight: 800,
-                  background: "rgba(0, 120, 212, 0.05)",
+                  background: "var(--info-soft)",
                 }}
               >
                 <td style={{ padding: "1rem" }}>{copy.bilan.monthly.total(selectedYear)}</td>
-                <td style={{ padding: "1rem", textAlign: "right", color: "var(--brand)" }}>
+                <td style={{ padding: "1rem", textAlign: "right", color: "var(--accent-fg)" }}>
                   {formatXof(monthlyData.reduce((s, r) => s + r.invoiced, 0))}
                 </td>
-                <td style={{ padding: "1rem", textAlign: "right", color: "#10b981" }}>
+                <td style={{ padding: "1rem", textAlign: "right", color: "var(--success-fg)" }}>
                   {formatXof(monthlyData.reduce((s, r) => s + r.collected, 0))}
                 </td>
                 <td style={{ padding: "1rem", textAlign: "right", color: "var(--warn)" }}>
                   {formatXof(monthlyData.reduce((s, r) => s + r.salaries, 0))}
                 </td>
-                <td style={{ padding: "1rem", textAlign: "right", color: "#8b5cf6" }}>
+                <td style={{ padding: "1rem", textAlign: "right", color: "var(--purple-fg)" }}>
                   {formatXof(monthlyData.reduce((s, r) => s + r.expenses, 0))}
                 </td>
                 <td
@@ -774,7 +774,7 @@ export function FinancialBilanTab({
                     padding: "1rem",
                     textAlign: "right",
                     color:
-                      monthlyData.reduce((s, r) => s + r.net, 0) >= 0 ? "#10b981" : "var(--bad)",
+                      monthlyData.reduce((s, r) => s + r.net, 0) >= 0 ? "var(--success-fg)" : "var(--bad)",
                     fontSize: "1.05rem",
                   }}
                 >

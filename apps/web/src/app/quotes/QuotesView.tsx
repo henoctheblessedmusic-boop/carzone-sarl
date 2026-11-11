@@ -306,13 +306,13 @@ export function QuotesView({
             flexDirection: "column",
             gap: 6,
             borderRadius: 12,
-            borderLeft: "4px solid #38bdf8",
+            borderLeft: "4px solid var(--info)",
           }}
         >
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
             {copy.list.kpi.pendingLabel}
           </div>
-          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#38bdf8" }}>
+          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--info-fg)" }}>
             {pendingQuotes.length}
           </div>
           <div style={{ fontSize: "0.75rem", color: "var(--ice)", fontWeight: 600 }}>
@@ -334,10 +334,10 @@ export function QuotesView({
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
             {copy.list.kpi.confirmedLabel}
           </div>
-          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--gold)" }}>
+          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--gold-fg)" }}>
             {confirmedQuotes.length}
           </div>
-          <div style={{ fontSize: "0.75rem", color: "var(--gold)", fontWeight: 600 }}>
+          <div style={{ fontSize: "0.75rem", color: "var(--gold-fg)", fontWeight: 600 }}>
             {copy.list.kpi.confirmedHint(formatXof(confirmedRevenue))}
           </div>
         </div>
@@ -350,13 +350,13 @@ export function QuotesView({
             flexDirection: "column",
             gap: 6,
             borderRadius: 12,
-            borderLeft: "4px solid #4ade80",
+            borderLeft: "4px solid var(--success)",
           }}
         >
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
             {copy.list.kpi.invoicedLabel}
           </div>
-          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#4ade80" }}>
+          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--success-fg)" }}>
             {invoicedQuotes.length}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65 }}>
@@ -424,10 +424,10 @@ export function QuotesView({
                 style={{
                   background:
                     statusFilter === tab.id
-                      ? "rgba(197, 216, 228, 0.25)"
+                      ? "var(--info-soft)"
                       : "transparent",
-                  color: statusFilter === tab.id ? "#fff" : "rgba(255, 255, 255, 0.65)",
-                  border: statusFilter === tab.id ? "1px solid rgba(197, 216, 228, 0.4)" : "1px solid transparent",
+                  color: statusFilter === tab.id ? "var(--text-strong)" : "var(--text-muted)",
+                  border: statusFilter === tab.id ? "1px solid var(--info)" : "1px solid transparent",
                 }}
               >
                 {tab.label}
@@ -448,11 +448,11 @@ export function QuotesView({
                   className="ox-btn ox-btn-sm"
                   style={{
                     background:
-                      activityFilter === tab.id ? "rgba(197, 216, 228, 0.25)" : "transparent",
-                    color: activityFilter === tab.id ? "#fff" : "rgba(255, 255, 255, 0.65)",
+                      activityFilter === tab.id ? "var(--info-soft)" : "transparent",
+                    color: activityFilter === tab.id ? "var(--text-strong)" : "var(--text-muted)",
                     border:
                       activityFilter === tab.id
-                        ? "1px solid rgba(197, 216, 228, 0.4)"
+                        ? "1px solid var(--info)"
                         : "1px solid transparent",
                   }}
                 >
@@ -482,8 +482,8 @@ export function QuotesView({
             <thead>
               <tr
                 style={{
-                  background: "rgba(255, 255, 255, 0.03)",
-                  borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                  background: "var(--surface-soft)",
+                  borderBottom: "1px solid var(--border)",
                   textAlign: "left",
                   opacity: 0.75,
                 }}
@@ -522,14 +522,14 @@ export function QuotesView({
                     <tr
                       key={q.id}
                       style={{
-                        borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
+                        borderBottom: "1px solid var(--border)",
                         transition: "background 0.15s ease",
                       }}
                     >
                       {/* N° & Type */}
                       <td style={{ padding: "0.85rem 1rem" }}>
                         <div style={{ fontWeight: 700, color: "var(--ice-text-strong)", display: "flex", alignItems: "center", gap: 6 }}>
-                          <FileText size={15} color="var(--brand)" />
+                          <FileText size={15} color="var(--accent-fg)" />
                           {q.number}
                         </div>
                         <div style={{ fontSize: "0.72rem", opacity: 0.6, marginTop: 2 }}>
@@ -597,9 +597,9 @@ export function QuotesView({
                                   gap: 3,
                                   fontSize: "0.68rem",
                                   fontWeight: 700,
-                                  color: "var(--gold)",
-                                  background: "rgba(212, 175, 55, 0.12)",
-                                  border: "1px solid rgba(212, 175, 55, 0.3)",
+                                  color: "var(--gold-fg)",
+                                  background: "var(--gold-soft)",
+                                  border: "1px solid var(--gold)",
                                   padding: "1px 6px",
                                   borderRadius: 4,
                                 }}
@@ -633,28 +633,28 @@ export function QuotesView({
                             fontWeight: 650,
                             background:
                               q.status === "FACTURE_NORMALISEE" || q.status === "COMMANDE_CONFIRMEE"
-                                ? "rgba(74, 222, 128, 0.15)"
+                                ? "var(--success-soft)"
                                 : q.status === "ANNULEE_INTERNE"
-                                  ? "rgba(239, 68, 68, 0.15)"
+                                  ? "var(--danger-soft)"
                                   : q.status === "PROFORMA_ENVOYEE"
-                                    ? "rgba(56, 189, 248, 0.15)"
-                                    : "rgba(234, 179, 8, 0.15)",
+                                    ? "var(--info-soft)"
+                                    : "var(--warning-soft)",
                             color:
                               q.status === "FACTURE_NORMALISEE" || q.status === "COMMANDE_CONFIRMEE"
-                                ? "#4ade80"
+                                ? "var(--success-fg)"
                                 : q.status === "ANNULEE_INTERNE"
-                                  ? "#ef4444"
+                                  ? "var(--danger-fg)"
                                   : q.status === "PROFORMA_ENVOYEE"
-                                    ? "#38bdf8"
-                                    : "#eab308",
+                                    ? "var(--info-fg)"
+                                    : "var(--warning-fg)",
                             border: `1px solid ${
                               q.status === "FACTURE_NORMALISEE" || q.status === "COMMANDE_CONFIRMEE"
-                                ? "rgba(74, 222, 128, 0.3)"
+                                ? "var(--success)"
                                 : q.status === "ANNULEE_INTERNE"
-                                  ? "rgba(239, 68, 68, 0.3)"
+                                  ? "var(--danger)"
                                   : q.status === "PROFORMA_ENVOYEE"
-                                    ? "rgba(56, 189, 248, 0.3)"
-                                    : "rgba(234, 179, 8, 0.3)"
+                                    ? "var(--info)"
+                                    : "var(--warning)"
                             }`,
                           }}
                         >
@@ -702,8 +702,8 @@ export function QuotesView({
                                   display: "inline-flex",
                                   alignItems: "center",
                                   gap: 4,
-                                  color: "var(--brand)",
-                                  borderColor: "rgba(0, 120, 212, 0.3)",
+                                  color: "var(--accent-fg)",
+                                  borderColor: "var(--info)",
                                 }}
                                 title={copy.list.actions.ficheTitle}
                               >
@@ -723,9 +723,9 @@ export function QuotesView({
                                 display: "inline-flex",
                                 alignItems: "center",
                                 gap: 4,
-                                background: "rgba(56, 189, 248, 0.15)",
-                                color: "#38bdf8",
-                                border: "1px solid rgba(56, 189, 248, 0.35)",
+                                background: "var(--info-soft)",
+                                color: "var(--info-fg)",
+                                border: "1px solid var(--info)",
                               }}
                               title={copy.list.actions.editTitle}
                             >
@@ -741,9 +741,9 @@ export function QuotesView({
                                 fontSize: "0.72rem",
                                 padding: "0.2rem 0.5rem",
                                 borderRadius: 4,
-                                background: "rgba(255, 255, 255, 0.05)",
-                                color: "rgba(255, 255, 255, 0.5)",
-                                border: "1px solid rgba(255, 255, 255, 0.1)",
+                                background: "var(--surface-soft)",
+                                color: "var(--text-subtle)",
+                                border: "1px solid var(--border)",
                               }}
                               title={
                                 q.status === "COMMANDE_CONFIRMEE"
@@ -783,9 +783,9 @@ export function QuotesView({
                                   display: "inline-flex",
                                   alignItems: "center",
                                   gap: 4,
-                                  background: "rgba(212, 175, 55, 0.2)",
-                                  color: "var(--gold)",
-                                  border: "1px solid rgba(212, 175, 55, 0.4)",
+                                  background: "var(--gold-soft)",
+                                  color: "var(--gold-fg)",
+                                  border: "1px solid var(--gold)",
                                 }}
                                 title={copy.list.actions.confirmTitle}
                               >
@@ -806,9 +806,9 @@ export function QuotesView({
                                   display: "inline-flex",
                                   alignItems: "center",
                                   gap: 4,
-                                  background: "rgba(74, 222, 128, 0.2)",
-                                  color: "#4ade80",
-                                  border: "1px solid rgba(74, 222, 128, 0.4)",
+                                  background: "var(--success-soft)",
+                                  color: "var(--success-fg)",
+                                  border: "1px solid var(--success)",
                                 }}
                                 title={copy.list.actions.invoiceTitle}
                               >
@@ -828,9 +828,9 @@ export function QuotesView({
                                 display: "inline-flex",
                                 alignItems: "center",
                                 gap: 4,
-                                background: "rgba(56, 189, 248, 0.15)",
-                                color: "#38bdf8",
-                                border: "1px solid rgba(56, 189, 248, 0.35)",
+                                background: "var(--info-soft)",
+                                color: "var(--info-fg)",
+                                border: "1px solid var(--info)",
                               }}
                               title="Transcrire en BL interne ou en facture normalisée"
                             >
@@ -923,7 +923,7 @@ export function QuotesView({
             bottom: 0,
             width: "100vw",
             height: "100vh",
-            backgroundColor: "rgba(3, 8, 15, 0.88)",
+            backgroundColor: "var(--surface)",
             backdropFilter: "blur(10px)",
             WebkitBackdropFilter: "blur(10px)",
             display: "flex",
@@ -940,8 +940,8 @@ export function QuotesView({
             style={{
               width: "100%",
               maxWidth: 480,
-              background: "#161b22",
-              border: "1px solid rgba(239, 68, 68, 0.3)",
+              background: "var(--surface)",
+              border: "1px solid var(--danger)",
               borderRadius: 14,
               padding: "1.5rem",
               display: "flex",
@@ -951,13 +951,13 @@ export function QuotesView({
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#ef4444" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--danger-fg)" }}>
                 <AlertTriangle size={20} />
                 <h3 style={{ margin: 0, fontSize: "1.1rem" }}>{copy.list.voidModal.title}</h3>
               </div>
               <button
                 onClick={() => setVoidModalQuoteId(null)}
-                style={{ background: "transparent", border: "none", color: "#fff", opacity: 0.6, cursor: "pointer" }}
+                style={{ background: "transparent", border: "none", color: "var(--surface)", opacity: 0.6, cursor: "pointer" }}
               >
                 <X size={18} />
               </button>
@@ -1019,7 +1019,7 @@ export function QuotesView({
             bottom: 0,
             width: "100vw",
             height: "100vh",
-            backgroundColor: "rgba(3, 8, 15, 0.88)",
+            backgroundColor: "var(--surface)",
             backdropFilter: "blur(10px)",
             WebkitBackdropFilter: "blur(10px)",
             display: "flex",
@@ -1046,7 +1046,7 @@ export function QuotesView({
               flexDirection: "column",
               gap: "1.25rem",
               margin: "auto",
-              background: "rgba(10, 24, 34, 0.98)",
+              background: "var(--surface)",
               border: "1px solid var(--ice-border)",
               borderRadius: 18,
               boxShadow: "0 25px 65px rgba(0, 0, 0, 0.8)",
@@ -1063,7 +1063,7 @@ export function QuotesView({
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <Mail size={22} color="var(--gold)" />
+                <Mail size={22} color="var(--gold-fg)" />
                 <div>
                   <h3 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700, color: "var(--ice-text-strong)" }}>
                     {copy.list.emailModal.title}
@@ -1095,8 +1095,8 @@ export function QuotesView({
               style={{
                 padding: "0.75rem 1rem",
                 borderRadius: 8,
-                background: "rgba(0, 120, 212, 0.08)",
-                border: "1px solid rgba(0, 120, 212, 0.25)",
+                background: "var(--info-soft)",
+                border: "1px solid var(--info)",
                 fontSize: "0.82rem",
                 lineHeight: 1.5,
               }}

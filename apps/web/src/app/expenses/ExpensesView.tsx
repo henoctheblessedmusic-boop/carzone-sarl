@@ -102,15 +102,15 @@ const CATEGORY_STYLE: Record<
   ExpenseCategoryKey,
   { icon: React.ComponentType<{ size?: number }>; color: string }
 > = {
-  PRESTATAIRE_SERVICE: { icon: Wrench, color: "#0078d4" },
-  ELECTRICITE_SBEE: { icon: Zap, color: "#f59e0b" },
-  EAU_SONEB: { icon: Droplets, color: "#38bdf8" },
-  INTERNET_TELECOM: { icon: Wifi, color: "#8b5cf6" },
-  LOYER: { icon: Building2, color: "#10b981" },
-  CARBURANT: { icon: Truck, color: "#ec4899" },
-  FOURNITURES_BUREAU: { icon: FileText, color: "#64748b" },
-  OUTILLAGE_ATELIER: { icon: Wrench, color: "#d97706" },
-  AUTRE_CHARGE: { icon: DollarSign, color: "#94a3b8" },
+  PRESTATAIRE_SERVICE: { icon: Wrench, color: "var(--info-fg)" },
+  ELECTRICITE_SBEE: { icon: Zap, color: "var(--warning-fg)" },
+  EAU_SONEB: { icon: Droplets, color: "var(--info-fg)" },
+  INTERNET_TELECOM: { icon: Wifi, color: "var(--purple-fg)" },
+  LOYER: { icon: Building2, color: "var(--success-fg)" },
+  CARBURANT: { icon: Truck, color: "var(--purple-fg)" },
+  FOURNITURES_BUREAU: { icon: FileText, color: "var(--text-subtle)" },
+  OUTILLAGE_ATELIER: { icon: Wrench, color: "var(--warning-fg)" },
+  AUTRE_CHARGE: { icon: DollarSign, color: "var(--text-muted)" },
 };
 
 const EXPENSE_PAYMENT_METHODS = ["VIREMENT", "CHEQUE", "MOBILE_MONEY", "ESPECES"] as const;
@@ -418,11 +418,11 @@ export function ExpensesView({
                 width: 40,
                 height: 40,
                 borderRadius: 10,
-                background: "linear-gradient(135deg, rgba(0, 120, 212, 0.25), rgba(16, 185, 129, 0.25))",
+                background: "linear-gradient(135deg, var(--info-soft), var(--success-soft))",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "var(--brand)",
+                color: "var(--accent-fg)",
                 border: "1px solid var(--ice-border)",
               }}
             >
@@ -477,7 +477,7 @@ export function ExpensesView({
           <div style={{ fontSize: "0.8rem", opacity: 0.7, marginBottom: "0.4rem" }}>
             {expensesCopy.kpi.total(expenses.length)}
           </div>
-          <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "var(--brand)" }}>
+          <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "var(--accent-fg)" }}>
             {formatXof(expenses.reduce((s, e) => s + e.amountTtcXof, 0))}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: "0.2rem" }}>
@@ -485,11 +485,11 @@ export function ExpensesView({
           </div>
         </div>
 
-        <div className="ox-card" style={{ padding: "1.2rem", borderLeft: "4px solid #10b981" }}>
+        <div className="ox-card" style={{ padding: "1.2rem", borderLeft: "4px solid var(--success)" }}>
           <div style={{ fontSize: "0.8rem", opacity: 0.7, marginBottom: "0.4rem" }}>
             {expensesCopy.kpi.paid}
           </div>
-          <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "#10b981" }}>
+          <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "var(--success-fg)" }}>
             {formatXof(totalPaid)}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: "0.2rem" }}>
@@ -509,11 +509,11 @@ export function ExpensesView({
           </div>
         </div>
 
-        <div className="ox-card" style={{ padding: "1.2rem", borderLeft: "4px solid #8b5cf6" }}>
+        <div className="ox-card" style={{ padding: "1.2rem", borderLeft: "4px solid var(--purple)" }}>
           <div style={{ fontSize: "0.8rem", opacity: 0.7, marginBottom: "0.4rem" }}>
             {expensesCopy.kpi.providers}
           </div>
-          <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "#8b5cf6" }}>
+          <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "var(--purple-fg)" }}>
             {formatXof(totalProviders)}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: "0.2rem" }}>
@@ -522,11 +522,11 @@ export function ExpensesView({
         </div>
 
         {canViewPayroll && (
-          <div className="ox-card" style={{ padding: "1.2rem", borderLeft: "4px solid #0078d4" }}>
+          <div className="ox-card" style={{ padding: "1.2rem", borderLeft: "4px solid var(--info)" }}>
             <div style={{ fontSize: "0.8rem", opacity: 0.7, marginBottom: "0.4rem" }}>
               {expensesCopy.kpi.payroll(currentYear)}
             </div>
-            <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "var(--brand)" }}>
+            <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "var(--accent-fg)" }}>
               {formatXof(totalSalariesPaidYear)}
             </div>
             <div style={{ fontSize: "0.75rem", opacity: 0.65, marginTop: "0.2rem" }}>
@@ -592,7 +592,7 @@ export function ExpensesView({
         </div>
 
         <div style={{ fontSize: "0.85rem", opacity: 0.75 }}>
-          {expensesCopy.totalShown} : <strong style={{ color: "var(--brand)" }}>{formatXof(totalTtcFiltered)}</strong>{" "}
+          {expensesCopy.totalShown} : <strong style={{ color: "var(--accent-fg)" }}>{formatXof(totalTtcFiltered)}</strong>{" "}
           {expensesCopy.lines(filteredExpenses.length)}
         </div>
       </div>
@@ -642,7 +642,7 @@ export function ExpensesView({
                           style={{
                             fontFamily: "monospace",
                             fontSize: "0.75rem",
-                            color: "var(--brand)",
+                            color: "var(--accent-fg)",
                             marginTop: 2,
                             display: "inline-flex",
                             alignItems: "center",
@@ -689,7 +689,7 @@ export function ExpensesView({
                     <td style={{ padding: "0.8rem 1rem" }}>
                       <div style={{ fontWeight: 600, fontSize: "0.88rem" }}>{exp.supplierName}</div>
                       {exp.proformaRef && (
-                        <div style={{ fontSize: "0.75rem", opacity: 0.7, color: "var(--brand)" }}>
+                        <div style={{ fontSize: "0.75rem", opacity: 0.7, color: "var(--accent-fg)" }}>
                           {expensesCopy.proforma(exp.proformaRef)}
                         </div>
                       )}
@@ -714,9 +714,9 @@ export function ExpensesView({
                         <div>
                           <span
                             style={{
-                              background: "rgba(16, 185, 129, 0.15)",
-                              color: "#10b981",
-                              border: "1px solid rgba(16, 185, 129, 0.3)",
+                              background: "var(--success-soft)",
+                              color: "var(--success-fg)",
+                              border: "1px solid var(--success)",
                               padding: "2px 8px",
                               borderRadius: 4,
                               fontSize: "0.78rem",
@@ -741,9 +741,9 @@ export function ExpensesView({
                         <div>
                           <span
                             style={{
-                              background: "rgba(210, 160, 40, 0.15)",
+                              background: "var(--warning-soft)",
                               color: "var(--warn)",
-                              border: "1px solid rgba(210, 160, 40, 0.3)",
+                              border: "1px solid var(--warning)",
                               padding: "2px 8px",
                               borderRadius: 4,
                               fontSize: "0.78rem",
@@ -791,9 +791,9 @@ export function ExpensesView({
                             style={{
                               padding: "4px 8px",
                               fontSize: "0.78rem",
-                              background: "rgba(16, 185, 129, 0.15)",
-                              color: "#10b981",
-                              borderColor: "rgba(16, 185, 129, 0.3)",
+                              background: "var(--success-soft)",
+                              color: "var(--success-fg)",
+                              borderColor: "var(--success)",
                             }}
                           >
                             {expensesCopy.payButton}
@@ -827,7 +827,7 @@ export function ExpensesView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.78)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(8px)",
             WebkitBackdropFilter: "blur(8px)",
             display: "flex",
@@ -845,11 +845,11 @@ export function ExpensesView({
             className="ox-modal"
             style={{
               position: "relative",
-              background: "var(--ice-bg-mid, #0c1a24)",
-              border: "1px solid var(--ice-border, rgba(160, 210, 230, 0.25))",
+              background: "var(--ice-bg-mid)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 14,
               boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 120, 212, 0.2)",
-              color: "var(--ice-text, #e8f2f8)",
+              color: "var(--ice-text)",
               maxWidth: 680,
               width: "95%",
               maxHeight: "90vh",
@@ -905,8 +905,8 @@ export function ExpensesView({
               {/* Fournisseur & Proforma */}
               <div
                 style={{
-                  background: "rgba(0, 120, 212, 0.08)",
-                  border: "1px solid rgba(0, 120, 212, 0.2)",
+                  background: "var(--info-soft)",
+                  border: "1px solid var(--info)",
                   borderRadius: 10,
                   padding: "0.9rem",
                   display: "flex",
@@ -914,7 +914,7 @@ export function ExpensesView({
                   gap: "0.8rem",
                 }}
               >
-                <div style={{ fontWeight: 600, fontSize: "0.88rem", color: "var(--brand)" }}>
+                <div style={{ fontWeight: 600, fontSize: "0.88rem", color: "var(--accent-fg)" }}>
                   {expensesCopy.createModal.supplierSection}
                 </div>
 
@@ -1007,12 +1007,12 @@ export function ExpensesView({
 
               {formData.withPurchaseOrder ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
-                  <div style={{ fontSize: "0.8rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--brand)" }}>
+                  <div style={{ fontSize: "0.8rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--accent-fg)" }}>
                     Détail des biens et services commandés
                   </div>
 
                   <div style={{ border: "1px solid var(--ice-border)", borderRadius: 10, overflow: "hidden" }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "2.4fr 0.7fr 0.7fr 1fr 1fr 32px", gap: 0, background: "rgba(148,163,184,0.12)", padding: "0.5rem 0.6rem", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "2.4fr 0.7fr 0.7fr 1fr 1fr 32px", gap: 0, background: "var(--surface-soft)", padding: "0.5rem 0.6rem", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase" }}>
                       <span>Désignation</span>
                       <span>Qté</span>
                       <span>Unité</span>
@@ -1056,7 +1056,7 @@ export function ExpensesView({
                           <button
                             type="button"
                             className="ox-btn ox-btn-ghost"
-                            style={{ padding: 2, color: "#f87171" }}
+                            style={{ padding: 2, color: "var(--danger-fg)" }}
                             onClick={() => setPoLines((prev) => prev.length > 1 ? prev.filter((_, i) => i !== index) : prev)}
                             aria-label="Supprimer la ligne"
                           >
@@ -1099,7 +1099,7 @@ export function ExpensesView({
                         <span>TVA</span>
                         <strong>{formatXof(poTax)}</strong>
                       </div>
-                      <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid var(--ice-border)", paddingTop: 6, color: "var(--brand)", fontSize: "1rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid var(--ice-border)", paddingTop: 6, color: "var(--accent-fg)", fontSize: "1rem" }}>
                         <strong>Total TTC</strong>
                         <strong>{formatXof(poTotal)}</strong>
                       </div>
@@ -1129,9 +1129,9 @@ export function ExpensesView({
                     </div>
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", background: "rgba(0,120,212,0.08)", border: "1px solid rgba(0,120,212,0.2)", borderRadius: 10, padding: "0.8rem" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", background: "var(--info-soft)", border: "1px solid var(--info-soft)", borderRadius: 10, padding: "0.8rem" }}>
                     <div>
-                      <div style={{ fontSize: "0.72rem", textTransform: "uppercase", color: "#94a3b8", fontWeight: 700 }}>Autorisé par</div>
+                      <div style={{ fontSize: "0.72rem", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 700 }}>Autorisé par</div>
                       <div style={{ fontWeight: 700, marginTop: 2 }}>{currentUserName || "-"}</div>
                     </div>
                     <div>
@@ -1239,7 +1239,7 @@ export function ExpensesView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.78)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(8px)",
             WebkitBackdropFilter: "blur(8px)",
             display: "flex",
@@ -1257,11 +1257,11 @@ export function ExpensesView({
             className="ox-modal"
             style={{
               position: "relative",
-              background: "var(--ice-bg-mid, #0c1a24)",
-              border: "1px solid var(--ice-border, rgba(160, 210, 230, 0.25))",
+              background: "var(--ice-bg-mid)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 14,
               boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 120, 212, 0.2)",
-              color: "var(--ice-text, #e8f2f8)",
+              color: "var(--ice-text)",
               maxWidth: 480,
               width: "95%",
               maxHeight: "90vh",
@@ -1274,7 +1274,7 @@ export function ExpensesView({
             </h2>
             <div style={{ fontSize: "0.85rem", opacity: 0.8, marginBottom: "1rem" }}>
               {expensesCopy.payModal.expenseLabel} : <strong>{payingExpense.expenseNumber}</strong> · {payingExpense.title}
-              <div style={{ color: "#10b981", fontWeight: 700, fontSize: "1.1rem", marginTop: 4 }}>
+              <div style={{ color: "var(--success-fg)", fontWeight: 700, fontSize: "1.1rem", marginTop: 4 }}>
                 {expensesCopy.payModal.amountLabel} : {formatXof(payingExpense.amountTtcXof)}
               </div>
             </div>
@@ -1340,7 +1340,7 @@ export function ExpensesView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.78)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(8px)",
             WebkitBackdropFilter: "blur(8px)",
             display: "flex",
@@ -1358,8 +1358,8 @@ export function ExpensesView({
             className="ox-modal"
             style={{
               position: "relative",
-              background: "#e5e7eb",
-              border: "1px solid rgba(0,0,0,0.15)",
+              background: "var(--surface-sunken)",
+              border: "1px solid var(--border)",
               borderRadius: 14,
               boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85)",
               maxWidth: 920,
@@ -1379,7 +1379,7 @@ export function ExpensesView({
                 padding: "6px 4px 12px",
               }}
             >
-              <div style={{ fontSize: "0.85rem", color: "#334155", fontWeight: 600 }}>
+              <div style={{ fontSize: "0.85rem", color: "var(--text-strong)", fontWeight: 600 }}>
                 {expensesCopy.purchaseOrder.preview}
               </div>
               <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -1396,7 +1396,7 @@ export function ExpensesView({
                   type="button"
                   onClick={() => setViewingPO(null)}
                   className="ox-btn ox-btn-ghost"
-                  style={{ color: "#0f172a" }}
+                  style={{ color: "var(--text-strong)" }}
                 >
                   {copy.common.close}
                 </button>

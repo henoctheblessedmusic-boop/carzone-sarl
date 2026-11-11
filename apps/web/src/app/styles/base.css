@@ -1,0 +1,223 @@
+/* =========================================================================
+   CARZONE Ops - Socle : reset, typographie, controles natifs, focus, impression
+   Depend de styles/tokens.css.
+   ========================================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: var(--surface-base);
+  color: var(--text);
+  /* Garde-fou toutes largeurs : les conteneurs scrollables (.ox-content, .ox-table-wrap)
+     absorbent deja leur propre debordement horizontal ; ceci evite qu'un enfant mal contenu
+     ne fasse defiler le body entier (desktop large et mobile).
+     Important : "clip" et non "hidden", sinon le body devient un conteneur de defilement
+     et la barre laterale sticky se met a defiler avec la page. */
+  overflow-x: clip;
+}
+
+/* Focus clavier visible partout, meme sur les elements stylises en ligne. */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button {
+  cursor: pointer;
+  transition:
+    filter var(--dur) var(--ease),
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    background var(--dur) var(--ease);
+}
+
+button:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+  filter: brightness(0.97);
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+  filter: none;
+}
+
+a {
+  color: inherit;
+  transition: color var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--divider);
+  margin: 1rem 0;
+}
+
+code,
+kbd,
+pre {
+  font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+}
+
+::placeholder {
+  color: var(--text-subtle);
+  opacity: 1;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+
+/* --- Controles natifs ---------------------------------------------------
+   `color-scheme` est declare sur :root dans tokens.css et se transmet par
+   heritage aux controles natifs : la liste deroulante systeme (Windows,
+   Chrome, Edge, Brave) suit donc automatiquement le theme actif. On se
+   contente de fixer les couleurs du controle ferme et de ses options avec
+   les jetons, sans `!important` et sans forcer un theme.
+   ------------------------------------------------------------------------ */
+select,
+input,
+textarea {
+  font: inherit;
+  color: var(--text);
+}
+
+select {
+  background-color: var(--surface);
+}
+
+select option,
+select optgroup {
+  background-color: var(--surface-raised);
+  color: var(--text);
+}
+
+select optgroup {
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+select option:checked {
+  background-color: var(--accent-soft);
+  color: var(--accent-fg);
+  font-weight: 600;
+}
+
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"] {
+  accent-color: var(--accent);
+}
+
+/* Les champs natifs doivent rester visibles sous le header sticky au focus. */
+input,
+textarea,
+select {
+  scroll-margin-top: 96px;
+  scroll-margin-bottom: calc(96px + var(--carzone-safe-bottom));
+}
+
+/* Remplissage automatique du navigateur : garder la surface et le texte du theme. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
+  caret-color: var(--text);
+}
+
+/* --- Barres de defilement ---------------------------------------------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--text-subtle);
+  background-clip: content-box;
+}
+
+/* --- Mouvement reduit --------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --- Impression ---------------------------------------------------------
+   Les documents imprimes (factures, devis, bons, fiches) sont toujours
+   rendus sur papier blanc, quel que soit le theme ecran actif.
+   ------------------------------------------------------------------------ */
+@media print {
+  .ox-aside,
+  .ox-header,
+  .ox-onboarding,
+  .ox-onboarding-fab,
+  .ox-drawer-backdrop,
+  .no-print {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #fff;
+    color: #111;
+  }
+
+  .ox-layout {
+    display: block;
+    background: #fff;
+    color: #111;
+  }
+
+  .ox-content {
+    padding: 0;
+  }
+
+  .ox-glass,
+  .ox-table-wrap,
+  .ox-hero-card {
+    background: none;
+    border: 1px solid #ccc;
+    box-shadow: none;
+    backdrop-filter: none;
+    color: #111;
+  }
+}

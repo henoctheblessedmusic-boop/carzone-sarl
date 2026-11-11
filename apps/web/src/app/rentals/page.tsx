@@ -172,8 +172,8 @@ export default async function RentalsPage() {
                 alignSelf: "center",
                 padding: "3px 10px",
                 borderRadius: 999,
-                border: "1px solid rgba(148,163,184,0.4)",
-                background: "rgba(148,163,184,0.12)",
+                border: "1px solid var(--border-strong)",
+                background: "var(--surface-soft)",
                 fontSize: "0.78rem",
               }}
             >
@@ -198,22 +198,22 @@ export default async function RentalsPage() {
         )}
 
         <div className="ox-kpi-grid">
-          <div className="ox-kpi-card" style={{ borderLeft: "4px solid #38bdf8" }}>
+          <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--info)" }}>
             <div className="ox-kpi-label">Parc de location</div>
             <div className="ox-kpi-value">{rentalVehicles.length}</div>
             <div className="ox-kpi-hint">Véhicules dédiés à la location</div>
           </div>
-          <div className="ox-kpi-card" style={{ borderLeft: "4px solid #34d399" }}>
+          <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--success)" }}>
             <div className="ox-kpi-label">Disponibles</div>
             <div className="ox-kpi-value">{availableVehicles.length}</div>
             <div className="ox-kpi-hint">Prêts à être loués</div>
           </div>
-          <div className="ox-kpi-card" style={{ borderLeft: "4px solid #fbbf24" }}>
+          <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--warning)" }}>
             <div className="ox-kpi-label">Locations actives</div>
             <div className="ox-kpi-value">{activeRentals.length}</div>
             <div className="ox-kpi-hint">Contrats en cours</div>
           </div>
-          <div className="ox-kpi-card" style={{ borderLeft: "4px solid #a78bfa" }}>
+          <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--purple)" }}>
             <div className="ox-kpi-label">Contrats total</div>
             <div className="ox-kpi-value">{rentals.length}</div>
             <div className="ox-kpi-hint">Historique</div>
@@ -232,27 +232,27 @@ export default async function RentalsPage() {
             <DashboardAutoRefresh />
           </div>
           <div className="ox-kpi-grid">
-            <div className="ox-kpi-card" style={{ borderLeft: "4px solid #10b981" }}>
+            <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--success)" }}>
               <div className="ox-kpi-label">Recettes encaissées</div>
               <div className="ox-kpi-value">{formatXof(totalReceived)}</div>
               <div className="ox-kpi-hint">Total réel des loyers encaissés</div>
             </div>
-            <div className="ox-kpi-card" style={{ borderLeft: "4px solid #38bdf8" }}>
+            <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--info)" }}>
               <div className="ox-kpi-label">Encaissé ce mois</div>
               <div className="ox-kpi-value">{formatXof(receivedThisMonth)}</div>
               <div className="ox-kpi-hint">Mois en cours</div>
             </div>
-            <div className="ox-kpi-card" style={{ borderLeft: "4px solid #fbbf24" }}>
+            <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--warning)" }}>
               <div className="ox-kpi-label">Reste à encaisser</div>
               <div className="ox-kpi-value">{formatXof(totalBalance)}</div>
               <div className="ox-kpi-hint">Sur les contrats en cours</div>
             </div>
-            <div className="ox-kpi-card" style={{ borderLeft: "4px solid #f97316" }}>
+            <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--warning)" }}>
               <div className="ox-kpi-label">Entretien & garage</div>
               <div className="ox-kpi-value">{formatXof(maintenanceCost)}</div>
               <div className="ox-kpi-hint">Charges d'entretien du parc</div>
             </div>
-            <div className="ox-kpi-card" style={{ borderLeft: "4px solid #a78bfa" }}>
+            <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--purple)" }}>
               <div className="ox-kpi-label">Bénéfice net location</div>
               <div className="ox-kpi-value">{formatXof(netRentalRevenue)}</div>
               <div className="ox-kpi-hint">Recettes moins entretien</div>
@@ -325,12 +325,12 @@ export default async function RentalsPage() {
                             width: 58,
                             height: 38,
                             borderRadius: 6,
-                            background: "radial-gradient(ellipse at center, #1e293b 0%, #0f172a 100%)",
+                            background: "var(--surface)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             overflow: "hidden",
-                            border: "1px solid rgba(0,0,0,0.15)",
+                            border: "1px solid var(--border)",
                             flexShrink: 0,
                             padding: 2,
                           }}
@@ -344,8 +344,8 @@ export default async function RentalsPage() {
                             width: 58,
                             height: 38,
                             borderRadius: 6,
-                            background: "rgba(255,255,255,0.05)",
-                            border: "1px dashed var(--ice-border, rgba(255,255,255,0.2))",
+                            background: "var(--surface-soft)",
+                            border: "1px dashed var(--ice-border)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -369,7 +369,7 @@ export default async function RentalsPage() {
                     VEHICLE_TYPE_LABELS[vehicle.vehicleType || ""] || vehicle.vehicleType || "-",
                     ENERGY_LABELS[vehicle.energy] || vehicle.energy || "-",
                     vehicle.supplier?.name || "Constructeurs partenaires",
-                    <span key={`site-${vehicle.id}`} style={{ color: vehicle.site?.code === "ATELIER_SAV" ? "#f59e0b" : "var(--brand, #0078d4)", fontWeight: 600 }}>
+                    <span key={`site-${vehicle.id}`} style={{ color: vehicle.site?.code === "ATELIER_SAV" ? "var(--warning-fg)" : "var(--accent-fg)", fontWeight: 600 }}>
                       📍 {vehicle.site?.name || "Showroom CARZONE SARL"}
                     </span>,
                     formatXof(vehicle.priceXof),
@@ -555,7 +555,7 @@ export default async function RentalsPage() {
                     <td>{rental.type}</td>
                     <td>{rental.customer.contactName}</td>
                     <td>
-                      <a href={`/rentals/${rental.vehicle.id}/fiche-technique`} style={{ color: "var(--brand)", textDecoration: "underline" }}>
+                      <a href={`/rentals/${rental.vehicle.id}/fiche-technique`} style={{ color: "var(--accent-fg)", textDecoration: "underline" }}>
                         {rental.vehicle.brand} {rental.vehicle.model}{rental.vehicle.registrationNumber ? ` (${rental.vehicle.registrationNumber})` : ""}
                       </a>
                     </td>

@@ -187,7 +187,7 @@ export function MailboxView({
                     padding: "0.15rem 0.5rem",
                     borderRadius: 999,
                     background: "var(--brand)",
-                    color: "#fff",
+                    color: "var(--text-on-accent)",
                     fontWeight: 700,
                   }}
                 >
@@ -231,14 +231,14 @@ export function MailboxView({
                 borderRadius: 10,
                 border: 0,
                 background: activeFolder === "STARRED" ? "var(--ice-highlight-soft)" : "transparent",
-                color: activeFolder === "STARRED" ? "var(--gold)" : "var(--ice-text)",
+                color: activeFolder === "STARRED" ? "var(--gold-fg)" : "var(--ice-text)",
                 fontWeight: activeFolder === "STARRED" ? 650 : 500,
                 cursor: "pointer",
                 textAlign: "left",
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <Star size={16} style={{ color: "var(--gold)" }} />
+                <Star size={16} style={{ color: "var(--gold-fg)" }} />
                 <span>{copy.folders.STARRED}</span>
               </div>
               <span style={{ fontSize: "0.78rem", opacity: 0.6 }}>{starredCount}</span>
@@ -410,7 +410,7 @@ export function MailboxView({
                 gap: 16,
                 padding: "0.8rem 1rem",
                 borderRadius: 12,
-                background: "rgba(255,255,255,0.03)",
+                background: "var(--surface-soft)",
                 border: "1px solid var(--ice-border)",
                 marginBottom: 20,
                 fontSize: "0.85rem",
@@ -460,7 +460,7 @@ export function MailboxView({
                       style={{
                         cursor: "pointer",
                         fontWeight: mail.isRead ? 400 : 700,
-                        background: mail.isRead ? "transparent" : "rgba(126, 200, 227, 0.05)",
+                        background: mail.isRead ? "transparent" : "var(--info-soft)",
                       }}
                     >
                       {/* Star */}
@@ -473,10 +473,10 @@ export function MailboxView({
                             border: 0,
                             cursor: "pointer",
                             padding: 0,
-                            color: mail.starred ? "var(--gold)" : "rgba(255,255,255,0.25)",
+                            color: mail.starred ? "var(--gold-fg)" : "var(--text-disabled)",
                           }}
                         >
-                          <Star size={16} fill={mail.starred ? "var(--gold)" : "transparent"} />
+                          <Star size={16} fill={mail.starred ? "var(--gold-fg)" : "transparent"} />
                         </button>
                       </td>
 
@@ -488,7 +488,7 @@ export function MailboxView({
                               width: 26,
                               height: 26,
                               borderRadius: "50%",
-                              background: "rgba(126, 200, 227, 0.15)",
+                              background: "var(--info-soft)",
                               color: "var(--ice-highlight)",
                               display: "grid",
                               placeItems: "center",
@@ -552,7 +552,7 @@ export function MailboxView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.72)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "grid",
             placeItems: "center",
@@ -570,7 +570,7 @@ export function MailboxView({
               maxWidth: 560,
               borderRadius: 20,
               padding: "1.75rem",
-              background: "rgba(10, 24, 34, 0.96)",
+              background: "var(--surface)",
               border: "1px solid var(--ice-border)",
               boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
             }}

@@ -215,7 +215,7 @@ export function HRView({
     name: "",
     code: "",
     description: "",
-    color: "#0078d4",
+    color: "var(--info-fg)",
   });
 
   // Form states - Leave Type
@@ -224,7 +224,7 @@ export function HRView({
     code: "",
     daysAllowedPerYear: 24,
     isPaid: true,
-    color: "#38bdf8",
+    color: "var(--info-fg)",
   });
 
   // Open Add Employee Modal
@@ -494,11 +494,11 @@ export function HRView({
                 width: 40,
                 height: 40,
                 borderRadius: 10,
-                background: "linear-gradient(135deg, #0078d4, #005a9e)",
+                background: "var(--info-solid)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#fff",
+                color: "var(--text-strong)",
                 boxShadow: "0 4px 12px rgba(0, 120, 212, 0.35)",
               }}
             >
@@ -551,9 +551,9 @@ export function HRView({
               onClick={handleSeedStandardBase}
               className="ox-btn"
               style={{
-                background: "linear-gradient(135deg, rgba(196, 163, 90, 0.2), rgba(196, 163, 90, 0.35))",
-                borderColor: "rgba(196, 163, 90, 0.6)",
-                color: "var(--gold)",
+                background: "var(--gold-soft)",
+                borderColor: "var(--gold)",
+                color: "var(--gold-fg)",
                 display: "flex",
                 alignItems: "center",
                 gap: "0.4rem",
@@ -583,8 +583,8 @@ export function HRView({
               width: 36,
               height: 36,
               borderRadius: 8,
-              background: "rgba(0, 120, 212, 0.15)",
-              color: "var(--brand)",
+              background: "var(--info-soft)",
+              color: "var(--accent-fg)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -607,7 +607,7 @@ export function HRView({
               width: 36,
               height: 36,
               borderRadius: 8,
-              background: "rgba(61, 186, 138, 0.15)",
+              background: "var(--success-soft)",
               color: "var(--ok)",
               display: "flex",
               alignItems: "center",
@@ -631,7 +631,7 @@ export function HRView({
               width: 36,
               height: 36,
               borderRadius: 8,
-              background: "rgba(210, 160, 40, 0.15)",
+              background: "var(--warning-soft)",
               color: "var(--warn)",
               display: "flex",
               alignItems: "center",
@@ -655,7 +655,7 @@ export function HRView({
               width: 36,
               height: 36,
               borderRadius: 8,
-              background: "rgba(126, 200, 227, 0.15)",
+              background: "var(--info-soft)",
               color: "var(--ice-highlight)",
               display: "flex",
               alignItems: "center",
@@ -687,7 +687,7 @@ export function HRView({
             border: "none",
             borderBottom: activeTab === "personnel" ? "2px solid var(--brand)" : "2px solid transparent",
             padding: "0.6rem 0.2rem",
-            color: activeTab === "personnel" ? "var(--brand)" : "inherit",
+            color: activeTab === "personnel" ? "var(--accent-fg)" : "inherit",
             fontWeight: activeTab === "personnel" ? 600 : 500,
             cursor: "pointer",
             display: "flex",
@@ -706,7 +706,7 @@ export function HRView({
             border: "none",
             borderBottom: activeTab === "conges" ? "2px solid var(--brand)" : "2px solid transparent",
             padding: "0.6rem 0.2rem",
-            color: activeTab === "conges" ? "var(--brand)" : "inherit",
+            color: activeTab === "conges" ? "var(--accent-fg)" : "inherit",
             fontWeight: activeTab === "conges" ? 600 : 500,
             cursor: "pointer",
             display: "flex",
@@ -721,7 +721,7 @@ export function HRView({
             <span
               style={{
                 background: "var(--warn)",
-                color: "#000",
+                color: "var(--text-strong)",
                 fontSize: "0.7rem",
                 fontWeight: 700,
                 borderRadius: 999,
@@ -741,7 +741,7 @@ export function HRView({
               border: "none",
               borderBottom: activeTab === "paie" ? "2px solid var(--brand)" : "2px solid transparent",
               padding: "0.6rem 0.2rem",
-              color: activeTab === "paie" ? "var(--brand)" : "inherit",
+              color: activeTab === "paie" ? "var(--accent-fg)" : "inherit",
               fontWeight: activeTab === "paie" ? 600 : 500,
               cursor: "pointer",
               display: "flex",
@@ -761,7 +761,7 @@ export function HRView({
             border: "none",
             borderBottom: activeTab === "config" ? "2px solid var(--brand)" : "2px solid transparent",
             padding: "0.6rem 0.2rem",
-            color: activeTab === "config" ? "var(--brand)" : "inherit",
+            color: activeTab === "config" ? "var(--accent-fg)" : "inherit",
             fontWeight: activeTab === "config" ? 600 : 500,
             cursor: "pointer",
             display: "flex",
@@ -889,7 +889,7 @@ export function HRView({
                         <span
                           style={{
                             fontFamily: "monospace",
-                            background: "rgba(255,255,255,0.06)",
+                            background: "var(--surface-soft)",
                             padding: "2px 6px",
                             borderRadius: 4,
                           }}
@@ -905,7 +905,7 @@ export function HRView({
                           <div
                             style={{
                               fontSize: "0.75rem",
-                              color: "var(--brand)",
+                              color: "var(--accent-fg)",
                               display: "flex",
                               alignItems: "center",
                               gap: 4,
@@ -919,7 +919,7 @@ export function HRView({
                       <td style={{ padding: "0.8rem 1rem" }}>
                         <span
                           style={{
-                            background: "rgba(126, 200, 227, 0.12)",
+                            background: "var(--info-soft)",
                             color: "var(--ice-highlight)",
                             padding: "3px 8px",
                             borderRadius: 6,
@@ -932,7 +932,7 @@ export function HRView({
                       <td style={{ padding: "0.8rem 1rem" }}>
                         <span
                           style={{
-                            background: "rgba(255,255,255,0.08)",
+                            background: "var(--surface-soft)",
                             padding: "2px 8px",
                             borderRadius: 4,
                             fontSize: "0.8rem",
@@ -966,10 +966,10 @@ export function HRView({
                             fontWeight: 600,
                             background:
                               emp.status === "ACTIF"
-                                ? "rgba(61, 186, 138, 0.15)"
+                                ? "var(--success-soft)"
                                 : emp.status === "CONGE"
-                                ? "rgba(210, 160, 40, 0.15)"
-                                : "rgba(212, 90, 90, 0.15)",
+                                ? "var(--warning-soft)"
+                                : "var(--danger-soft)",
                             color:
                               emp.status === "ACTIF"
                                 ? "var(--ok)"
@@ -1063,8 +1063,8 @@ export function HRView({
                         <td style={{ padding: "0.8rem 1rem" }}>
                           <span
                             style={{
-                              background: "rgba(0, 120, 212, 0.12)",
-                              color: "var(--brand)",
+                              background: "var(--info-soft)",
+                              color: "var(--accent-fg)",
                               padding: "2px 8px",
                               borderRadius: 4,
                               fontSize: "0.8rem",
@@ -1099,12 +1099,12 @@ export function HRView({
                               fontWeight: 600,
                               background:
                                 req.status === "APPROUVE"
-                                  ? "rgba(61, 186, 138, 0.15)"
+                                  ? "var(--success-soft)"
                                   : req.status === "EN_ATTENTE"
-                                  ? "rgba(210, 160, 40, 0.15)"
+                                  ? "var(--warning-soft)"
                                   : req.status === "REFUSE"
-                                  ? "rgba(212, 90, 90, 0.15)"
-                                  : "rgba(255,255,255,0.08)",
+                                  ? "var(--danger-soft)"
+                                  : "var(--surface-soft)",
                               color:
                                 req.status === "APPROUVE"
                                   ? "var(--ok)"
@@ -1127,7 +1127,7 @@ export function HRView({
                                 className="ox-btn"
                                 style={{
                                   padding: "4px 8px",
-                                  background: "rgba(61, 186, 138, 0.2)",
+                                  background: "var(--success-soft)",
                                   color: "var(--ok)",
                                   borderColor: "var(--ok)",
                                 }}
@@ -1140,7 +1140,7 @@ export function HRView({
                                 className="ox-btn"
                                 style={{
                                   padding: "4px 8px",
-                                  background: "rgba(212, 90, 90, 0.2)",
+                                  background: "var(--danger-soft)",
                                   color: "var(--bad)",
                                   borderColor: "var(--bad)",
                                 }}
@@ -1245,7 +1245,7 @@ export function HRView({
               <button
                 onClick={() => {
                   setEditingDept(null);
-                  setDeptForm({ name: "", code: "", description: "", color: "#0078d4" });
+                  setDeptForm({ name: "", code: "", description: "", color: "var(--info-fg)" });
                   setShowDeptModal(true);
                 }}
                 className="ox-btn ox-btn-ghost"
@@ -1265,7 +1265,7 @@ export function HRView({
                     alignItems: "center",
                     padding: "0.8rem",
                     borderRadius: 8,
-                    background: "rgba(255,255,255,0.03)",
+                    background: "var(--surface-soft)",
                     border: "1px solid var(--ice-border)",
                   }}
                 >
@@ -1276,8 +1276,8 @@ export function HRView({
                         <span
                           style={{
                             fontSize: "0.75rem",
-                            background: "rgba(0, 120, 212, 0.15)",
-                            color: "var(--brand)",
+                            background: "var(--info-soft)",
+                            color: "var(--accent-fg)",
                             padding: "1px 5px",
                             borderRadius: 4,
                           }}
@@ -1302,7 +1302,7 @@ export function HRView({
                           name: dept.name,
                           code: dept.code,
                           description: dept.description || "",
-                          color: dept.color || "#0078d4",
+                          color: dept.color || "var(--info-fg)",
                         });
                         setShowDeptModal(true);
                       }}
@@ -1337,7 +1337,7 @@ export function HRView({
               <button
                 onClick={() => {
                   setEditingLeaveType(null);
-                  setLtForm({ name: "", code: "", daysAllowedPerYear: 24, isPaid: true, color: "#38bdf8" });
+                  setLtForm({ name: "", code: "", daysAllowedPerYear: 24, isPaid: true, color: "var(--info-fg)" });
                   setShowLeaveTypeModal(true);
                 }}
                 className="ox-btn ox-btn-ghost"
@@ -1357,7 +1357,7 @@ export function HRView({
                     alignItems: "center",
                     padding: "0.8rem",
                     borderRadius: 8,
-                    background: "rgba(255,255,255,0.03)",
+                    background: "var(--surface-soft)",
                     border: "1px solid var(--ice-border)",
                   }}
                 >
@@ -1367,7 +1367,7 @@ export function HRView({
                       <span
                         style={{
                           fontSize: "0.75rem",
-                          background: lt.isPaid ? "rgba(61, 186, 138, 0.15)" : "rgba(255,255,255,0.08)",
+                          background: lt.isPaid ? "var(--success-soft)" : "var(--surface-soft)",
                           color: lt.isPaid ? "var(--ok)" : "inherit",
                           padding: "1px 5px",
                           borderRadius: 4,
@@ -1390,7 +1390,7 @@ export function HRView({
                           code: lt.code,
                           daysAllowedPerYear: lt.daysAllowedPerYear,
                           isPaid: lt.isPaid,
-                          color: lt.color || "#38bdf8",
+                          color: lt.color || "var(--info-fg)",
                         });
                         setShowLeaveTypeModal(true);
                       }}
@@ -1440,7 +1440,7 @@ export function HRView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.78)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(8px)",
             WebkitBackdropFilter: "blur(8px)",
             display: "flex",
@@ -1458,11 +1458,11 @@ export function HRView({
             className="ox-modal"
             style={{
               position: "relative",
-              background: "var(--ice-bg-mid, #0c1a24)",
-              border: "1px solid var(--ice-border, rgba(160, 210, 230, 0.25))",
+              background: "var(--ice-bg-mid)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 14,
               boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 120, 212, 0.2)",
-              color: "var(--ice-text, #e8f2f8)",
+              color: "var(--ice-text)",
               maxWidth: 720,
               width: "95%",
               maxHeight: "90vh",
@@ -1746,7 +1746,7 @@ export function HRView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.78)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(8px)",
             WebkitBackdropFilter: "blur(8px)",
             display: "flex",
@@ -1764,11 +1764,11 @@ export function HRView({
             className="ox-modal"
             style={{
               position: "relative",
-              background: "var(--ice-bg-mid, #0c1a24)",
-              border: "1px solid var(--ice-border, rgba(160, 210, 230, 0.25))",
+              background: "var(--ice-bg-mid)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 14,
               boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 120, 212, 0.2)",
-              color: "var(--ice-text, #e8f2f8)",
+              color: "var(--ice-text)",
               maxWidth: 680,
               width: "95%",
               maxHeight: "90vh",
@@ -1781,8 +1781,8 @@ export function HRView({
                 <span
                   style={{
                     fontFamily: "monospace",
-                    background: "rgba(0, 120, 212, 0.15)",
-                    color: "var(--brand)",
+                    background: "var(--info-soft)",
+                    color: "var(--accent-fg)",
                     padding: "2px 6px",
                     borderRadius: 4,
                     fontSize: "0.8rem",
@@ -1806,7 +1806,7 @@ export function HRView({
               {/* Contract Card */}
               <div
                 style={{
-                  background: "rgba(255,255,255,0.03)",
+                  background: "var(--surface-soft)",
                   border: "1px solid var(--ice-border)",
                   borderRadius: 8,
                   padding: "0.8rem 1rem",
@@ -1840,7 +1840,7 @@ export function HRView({
               {/* Compliance Card */}
               <div
                 style={{
-                  background: "rgba(255,255,255,0.03)",
+                  background: "var(--surface-soft)",
                   border: "1px solid var(--ice-border)",
                   borderRadius: 8,
                   padding: "0.8rem 1rem",
@@ -1860,7 +1860,7 @@ export function HRView({
               {/* Contact Card */}
               <div
                 style={{
-                  background: "rgba(255,255,255,0.03)",
+                  background: "var(--surface-soft)",
                   border: "1px solid var(--ice-border)",
                   borderRadius: 8,
                   padding: "0.8rem 1rem",
@@ -1881,13 +1881,13 @@ export function HRView({
               {/* Leave balances */}
               <div
                 style={{
-                  background: "rgba(255,255,255,0.03)",
+                  background: "var(--surface-soft)",
                   border: "1px solid var(--ice-border)",
                   borderRadius: 8,
                   padding: "0.8rem 1rem",
                 }}
               >
-                <div style={{ fontWeight: 600, marginBottom: "0.5rem", color: "var(--gold)" }}>
+                <div style={{ fontWeight: 600, marginBottom: "0.5rem", color: "var(--gold-fg)" }}>
                   {hrCopy.detail.leavesTitle(currentYear)}
                 </div>
                 {viewingEmployee.leaveBalances && viewingEmployee.leaveBalances.length > 0 ? (
@@ -1899,7 +1899,7 @@ export function HRView({
                           display: "flex",
                           justifyContent: "space-between",
                           padding: "4px 0",
-                          borderBottom: "1px dashed rgba(255,255,255,0.06)",
+                          borderBottom: "1px dashed var(--border)",
                         }}
                       >
                         <span>{hrCopy.detail.leaveLine(b.leaveTypeCode)}</span>
@@ -1945,7 +1945,7 @@ export function HRView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.78)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(8px)",
             WebkitBackdropFilter: "blur(8px)",
             display: "flex",
@@ -1963,11 +1963,11 @@ export function HRView({
             className="ox-modal"
             style={{
               position: "relative",
-              background: "var(--ice-bg-mid, #0c1a24)",
-              border: "1px solid var(--ice-border, rgba(160, 210, 230, 0.25))",
+              background: "var(--ice-bg-mid)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 14,
               boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 120, 212, 0.2)",
-              color: "var(--ice-text, #e8f2f8)",
+              color: "var(--ice-text)",
               maxWidth: 540,
               width: "95%",
               maxHeight: "90vh",
@@ -1989,8 +1989,8 @@ export function HRView({
                   <div
                     style={{
                       padding: "0.8rem",
-                      background: "rgba(210, 160, 40, 0.12)",
-                      border: "1px solid rgba(210, 160, 40, 0.3)",
+                      background: "var(--warning-soft)",
+                      border: "1px solid var(--warning)",
                       borderRadius: 8,
                       fontSize: "0.85rem",
                       color: "var(--warn)",
@@ -2022,8 +2022,8 @@ export function HRView({
                   <div
                     style={{
                       padding: "0.8rem",
-                      background: "rgba(210, 160, 40, 0.12)",
-                      border: "1px solid rgba(210, 160, 40, 0.3)",
+                      background: "var(--warning-soft)",
+                      border: "1px solid var(--warning)",
                       borderRadius: 8,
                       fontSize: "0.85rem",
                       color: "var(--warn)",
@@ -2042,7 +2042,7 @@ export function HRView({
                         fontSize: "0.8rem",
                         padding: "5px 12px",
                         background: "var(--brand)",
-                        color: "#fff",
+                        color: "var(--text-on-accent)",
                         display: "inline-flex",
                         alignItems: "center",
                         gap: 4,
@@ -2144,7 +2144,7 @@ export function HRView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.78)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(8px)",
             WebkitBackdropFilter: "blur(8px)",
             display: "flex",
@@ -2165,11 +2165,11 @@ export function HRView({
             className="ox-modal"
             style={{
               position: "relative",
-              background: "var(--ice-bg-mid, #0c1a24)",
-              border: "1px solid var(--ice-border, rgba(160, 210, 230, 0.25))",
+              background: "var(--ice-bg-mid)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 14,
               boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 120, 212, 0.2)",
-              color: "var(--ice-text, #e8f2f8)",
+              color: "var(--ice-text)",
               maxWidth: 480,
               width: "95%",
               maxHeight: "90vh",
@@ -2210,7 +2210,7 @@ export function HRView({
                 disabled={!rejectionReasonText.trim() || isPending}
                 onClick={handleRejectLeave}
                 className="ox-btn"
-                style={{ background: "var(--bad)", color: "#fff", borderColor: "var(--bad)" }}
+                style={{ background: "var(--bad)", color: "var(--surface)", borderColor: "var(--bad)" }}
               >
                 {hrCopy.rejectModal.confirm}
               </button>
@@ -2228,7 +2228,7 @@ export function HRView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.78)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(8px)",
             WebkitBackdropFilter: "blur(8px)",
             display: "flex",
@@ -2246,11 +2246,11 @@ export function HRView({
             className="ox-modal"
             style={{
               position: "relative",
-              background: "var(--ice-bg-mid, #0c1a24)",
-              border: "1px solid var(--ice-border, rgba(160, 210, 230, 0.25))",
+              background: "var(--ice-bg-mid)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 14,
               boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 120, 212, 0.2)",
-              color: "var(--ice-text, #e8f2f8)",
+              color: "var(--ice-text)",
               maxWidth: 480,
               width: "95%",
               maxHeight: "90vh",
@@ -2343,7 +2343,7 @@ export function HRView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.78)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(8px)",
             WebkitBackdropFilter: "blur(8px)",
             display: "flex",
@@ -2361,11 +2361,11 @@ export function HRView({
             className="ox-modal"
             style={{
               position: "relative",
-              background: "var(--ice-bg-mid, #0c1a24)",
-              border: "1px solid var(--ice-border, rgba(160, 210, 230, 0.25))",
+              background: "var(--ice-bg-mid)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 14,
               boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 120, 212, 0.2)",
-              color: "var(--ice-text, #e8f2f8)",
+              color: "var(--ice-text)",
               maxWidth: 480,
               width: "95%",
               maxHeight: "90vh",

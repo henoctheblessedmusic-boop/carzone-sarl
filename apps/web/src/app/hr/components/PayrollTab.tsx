@@ -315,8 +315,8 @@ export function PayrollTab({
             onClick={() => setShowBulkModal(true)}
             className="ox-btn"
             style={{
-              background: "linear-gradient(135deg, rgba(61, 186, 138, 0.2), rgba(61, 186, 138, 0.35))",
-              borderColor: "rgba(61, 186, 138, 0.6)",
+              background: "var(--success-soft)",
+              borderColor: "var(--success)",
               color: "var(--ok)",
               display: "flex",
               alignItems: "center",
@@ -344,8 +344,8 @@ export function PayrollTab({
                 width: 32,
                 height: 32,
                 borderRadius: 8,
-                background: "rgba(0, 120, 212, 0.15)",
-                color: "var(--brand)",
+                background: "var(--info-soft)",
+                color: "var(--accent-fg)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -370,7 +370,7 @@ export function PayrollTab({
                 width: 32,
                 height: 32,
                 borderRadius: 8,
-                background: "rgba(61, 186, 138, 0.15)",
+                background: "var(--success-soft)",
                 color: "var(--ok)",
                 display: "flex",
                 alignItems: "center",
@@ -396,7 +396,7 @@ export function PayrollTab({
                 width: 32,
                 height: 32,
                 borderRadius: 8,
-                background: "rgba(210, 160, 40, 0.15)",
+                background: "var(--warning-soft)",
                 color: "var(--warn)",
                 display: "flex",
                 alignItems: "center",
@@ -540,7 +540,7 @@ export function PayrollTab({
                               display: "inline-flex",
                               alignItems: "center",
                               gap: 4,
-                              background: "rgba(61, 186, 138, 0.15)",
+                              background: "var(--success-soft)",
                               color: "var(--ok)",
                               padding: "3px 8px",
                               borderRadius: 999,
@@ -556,7 +556,7 @@ export function PayrollTab({
                               display: "inline-flex",
                               alignItems: "center",
                               gap: 4,
-                              background: "rgba(210, 160, 40, 0.15)",
+                              background: "var(--warning-soft)",
                               color: "var(--warn)",
                               padding: "3px 8px",
                               borderRadius: 999,
@@ -641,7 +641,7 @@ export function PayrollTab({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.78)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(8px)",
             WebkitBackdropFilter: "blur(8px)",
             display: "flex",
@@ -660,8 +660,8 @@ export function PayrollTab({
               width: "100%",
               maxHeight: "90vh",
               overflowY: "auto",
-              background: "var(--ice-bg-mid, #0c1a24)",
-              border: "1px solid var(--ice-border, rgba(160, 210, 230, 0.25))",
+              background: "var(--ice-bg-mid)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 14,
               boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 120, 212, 0.15)",
               padding: "1.5rem",
@@ -682,14 +682,14 @@ export function PayrollTab({
             <form onSubmit={handleSubmitPay} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div
                 style={{
-                  background: "rgba(0, 120, 212, 0.08)",
-                  border: "1px solid rgba(0, 120, 212, 0.25)",
+                  background: "var(--info-soft)",
+                  border: "1px solid var(--info)",
                   padding: "0.8rem",
                   borderRadius: 8,
                 }}
               >
                 <div style={{ fontSize: "0.78rem", opacity: 0.8 }}>{payrollCopy.payModal.periodLabel} :</div>
-                <div style={{ fontSize: "1rem", fontWeight: 700, color: "var(--brand)" }}>
+                <div style={{ fontSize: "1rem", fontWeight: 700, color: "var(--accent-fg)" }}>
                   {selectedMonthName} {selectedYear}
                 </div>
                 {payingEmployee.bankName && (
@@ -776,7 +776,7 @@ export function PayrollTab({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.78)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(8px)",
             WebkitBackdropFilter: "blur(8px)",
             display: "flex",
@@ -795,8 +795,8 @@ export function PayrollTab({
               width: "100%",
               maxHeight: "90vh",
               overflowY: "auto",
-              background: "var(--ice-bg-mid, #0c1a24)",
-              border: "1px solid var(--ice-border, rgba(160, 210, 230, 0.25))",
+              background: "var(--ice-bg-mid)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 14,
               boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 120, 212, 0.15)",
               padding: "1.5rem",
@@ -873,7 +873,7 @@ export function PayrollTab({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.78)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(8px)",
             WebkitBackdropFilter: "blur(8px)",
             display: "flex",
@@ -892,64 +892,64 @@ export function PayrollTab({
               width: "100%",
               maxHeight: "90vh",
               overflowY: "auto",
-              background: "#ffffff",
-              color: "#111827",
+              background: "var(--surface)",
+              color: "var(--text-on-accent)",
               borderRadius: 14,
               boxShadow: "0 25px 60px rgba(0, 0, 0, 0.85)",
               padding: "2rem",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", borderBottom: "2px solid #e2e8f0", paddingBottom: "1rem", marginBottom: "1.2rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", borderBottom: "2px solid var(--border-strong)", paddingBottom: "1rem", marginBottom: "1.2rem" }}>
               <div>
-                <h2 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 800, color: "#0078d4" }}>
+                <h2 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 800, color: "var(--info-fg)" }}>
                   CARZONE SARL BÉNIN
                 </h2>
-                <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                <div style={{ fontSize: "0.75rem", color: "var(--text-subtle)" }}>
                   {payrollCopy.receipt.title}
                 </div>
               </div>
-              <button onClick={() => setViewingReceipt(null)} className="ox-btn ox-btn-ghost" style={{ padding: 4, color: "#64748b" }}>
+              <button onClick={() => setViewingReceipt(null)} className="ox-btn ox-btn-ghost" style={{ padding: 4, color: "var(--text-subtle)" }}>
                 <XCircle size={20} />
               </button>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.2rem", fontSize: "0.85rem" }}>
               <div>
-                <div style={{ color: "#64748b", fontSize: "0.75rem" }}>{payrollCopy.receipt.employeeLabel} :</div>
+                <div style={{ color: "var(--text-subtle)", fontSize: "0.75rem" }}>{payrollCopy.receipt.employeeLabel} :</div>
                 <div style={{ fontWeight: 700 }}>{viewingReceipt.employee.firstName} {viewingReceipt.employee.lastName}</div>
                 <div>{payrollCopy.receipt.staffIdLabel} : <strong>{viewingReceipt.employee.employeeNumber}</strong></div>
                 <div>{payrollCopy.receipt.jobLabel} : {viewingReceipt.employee.jobTitle}</div>
               </div>
               <div>
-                <div style={{ color: "#64748b", fontSize: "0.75rem" }}>{payrollCopy.receipt.periodLabel} :</div>
+                <div style={{ color: "var(--text-subtle)", fontSize: "0.75rem" }}>{payrollCopy.receipt.periodLabel} :</div>
                 <div style={{ fontWeight: 700 }}>{selectedMonthName} {selectedYear}</div>
                 <div>{payrollCopy.receipt.paymentDateLabel} : {viewingReceipt.payment.paymentDate.slice(0, 10)}</div>
                 <div>{payrollCopy.receipt.methodLabel} : <strong>{paymentMethodLabel(copy, viewingReceipt.payment.paymentMethod)}</strong></div>
               </div>
             </div>
 
-            <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, padding: "1rem", marginBottom: "1.2rem" }}>
+            <div style={{ background: "var(--surface-soft)", border: "1px solid var(--surface-sunken)", borderRadius: 8, padding: "1rem", marginBottom: "1.2rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                 <span>{payrollCopy.receipt.gross}</span>
                 <strong>{formatXof(viewingReceipt.payment.amountXof)}</strong>
               </div>
               {viewingReceipt.payment.reference && (
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem", color: "#64748b" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem", color: "var(--text-subtle)" }}>
                   <span>{payrollCopy.receipt.referenceLabel} :</span>
                   <span>{viewingReceipt.payment.reference}</span>
                 </div>
               )}
-              <div style={{ borderTop: "2px solid #cbd5e1", marginTop: 8, paddingTop: 8, display: "flex", justifyContent: "space-between", fontSize: "1.1rem", fontWeight: 800, color: "#10b981" }}>
+              <div style={{ borderTop: "2px solid var(--border-strong)", marginTop: 8, paddingTop: 8, display: "flex", justifyContent: "space-between", fontSize: "1.1rem", fontWeight: 800, color: "var(--success-fg)" }}>
                 <span>{payrollCopy.receipt.net}</span>
                 <span>{formatXof(viewingReceipt.payment.amountXof)}</span>
               </div>
             </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
-              <button onClick={() => window.print()} className="ox-btn" style={{ background: "#0078d4", color: "#fff", display: "flex", alignItems: "center", gap: 4 }}>
+              <button onClick={() => window.print()} className="ox-btn" style={{ background: "var(--info-solid)", color: "var(--surface)", display: "flex", alignItems: "center", gap: 4 }}>
                 <Printer size={15} /> {payrollCopy.receipt.print}
               </button>
-              <button onClick={() => setViewingReceipt(null)} className="ox-btn ox-btn-ghost" style={{ color: "#64748b" }}>
+              <button onClick={() => setViewingReceipt(null)} className="ox-btn ox-btn-ghost" style={{ color: "var(--text-subtle)" }}>
                 {copy.common.close}
               </button>
             </div>

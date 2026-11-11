@@ -82,37 +82,37 @@ export type VehicleItem = {
 export const STOCK_STAGES = [
   {
     key: "COMMANDE",
-    color: "#f59e0b",
-    bg: "rgba(245, 158, 11, 0.12)",
-    border: "rgba(245, 158, 11, 0.35)",
+    color: "var(--warning-fg)",
+    bg: "var(--warning-soft)",
+    border: "var(--warning)",
     icon: ShoppingCart,
   },
   {
     key: "EN_PRODUCTION",
-    color: "#06b6d4",
-    bg: "rgba(6, 182, 212, 0.12)",
-    border: "rgba(6, 182, 212, 0.35)",
+    color: "var(--info-fg)",
+    bg: "var(--info-soft)",
+    border: "var(--info)",
     icon: Factory,
   },
   {
     key: "EN_TRANSIT",
-    color: "#8b5cf6",
-    bg: "rgba(139, 92, 246, 0.12)",
-    border: "rgba(139, 92, 246, 0.35)",
+    color: "var(--purple-fg)",
+    bg: "var(--purple-soft)",
+    border: "var(--purple)",
     icon: Ship,
   },
   {
     key: "AU_PORT",
-    color: "#ec4899",
-    bg: "rgba(236, 72, 153, 0.12)",
-    border: "rgba(236, 72, 153, 0.35)",
+    color: "var(--purple-fg)",
+    bg: "var(--purple-soft)",
+    border: "var(--purple)",
     icon: Anchor,
   },
   {
     key: "EN_MAGASIN",
-    color: "#10b981",
-    bg: "rgba(16, 185, 129, 0.12)",
-    border: "rgba(16, 185, 129, 0.35)",
+    color: "var(--success-fg)",
+    bg: "var(--success-soft)",
+    border: "var(--success)",
     icon: Store,
   },
 ] as const;
@@ -230,8 +230,8 @@ export function VehiclesView({
           padding: "1.4rem",
           borderRadius: "16px",
           marginBottom: "1.5rem",
-          background: "linear-gradient(135deg, rgba(225, 29, 72, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%)",
-          border: "1px solid rgba(225, 29, 72, 0.25)",
+          background: "linear-gradient(135deg, var(--accent-soft) 0%, var(--surface-sunken) 100%)",
+          border: "1px solid var(--accent)",
         }}
       >
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
@@ -245,13 +245,13 @@ export function VehiclesView({
                   width: 32,
                   height: 32,
                   borderRadius: "8px",
-                  background: "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)",
-                  color: "#fff",
+                  background: "var(--accent)",
+                  color: "var(--text-strong)",
                 }}
               >
                 <Layers size={18} />
               </span>
-              <h2 style={{ fontSize: "1.35rem", fontWeight: 700, margin: 0, color: "#f8fafc" }}>
+              <h2 style={{ fontSize: "1.35rem", fontWeight: 700, margin: 0, color: "var(--text)" }}>
                 {copy.pipeline.title}
               </h2>
             </div>
@@ -267,8 +267,8 @@ export function VehiclesView({
                 onClick={() => setIsCreateModalOpen(true)}
                 className="ox-btn"
                 style={{
-                  background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                  color: "#ffffff",
+                  background: "var(--success-solid)",
+                  color: "var(--text-strong)",
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "0.45rem",
@@ -290,10 +290,10 @@ export function VehiclesView({
             <div
               style={{
                 display: "inline-flex",
-                background: "rgba(0,0,0,0.3)",
+                background: "var(--surface-soft)",
                 padding: "0.3rem",
                 borderRadius: "10px",
-                border: "1px solid rgba(255,255,255,0.08)",
+                border: "1px solid var(--border)",
               }}
             >
               <button
@@ -303,8 +303,8 @@ export function VehiclesView({
                   padding: "0.45rem 0.9rem",
                   borderRadius: "7px",
                   border: "none",
-                  background: viewMode === "pipeline" ? "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)" : "transparent",
-                  color: viewMode === "pipeline" ? "#fff" : "var(--ice-text-muted)",
+                  background: viewMode === "pipeline" ? "var(--accent)" : "transparent",
+                  color: viewMode === "pipeline" ? "var(--text-on-accent)" : "var(--ice-text-muted)",
                   fontSize: "0.82rem",
                   fontWeight: 600,
                   cursor: "pointer",
@@ -319,8 +319,8 @@ export function VehiclesView({
                   padding: "0.45rem 0.9rem",
                   borderRadius: "7px",
                   border: "none",
-                  background: viewMode === "table" ? "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)" : "transparent",
-                  color: viewMode === "table" ? "#fff" : "var(--ice-text-muted)",
+                  background: viewMode === "table" ? "var(--accent)" : "transparent",
+                  color: viewMode === "table" ? "var(--text-strong)" : "var(--ice-text-muted)",
                   fontSize: "0.82rem",
                   fontWeight: 600,
                   cursor: "pointer",
@@ -364,7 +364,7 @@ export function VehiclesView({
                   </span>
                   <Icon size={15} color={stg.color} />
                 </div>
-                <div style={{ fontSize: "1.4rem", fontWeight: 800, color: "#f8fafc" }}>
+                <div style={{ fontSize: "1.4rem", fontWeight: 800, color: "var(--text)" }}>
                   {data.count} <span style={{ fontSize: "0.8rem", fontWeight: 500, color: "var(--ice-text-muted)" }}>{copy.pipeline.unitShort}</span>
                 </div>
                 <div style={{ fontSize: "0.75rem", color: "var(--ice-text-muted)" }}>
@@ -387,7 +387,7 @@ export function VehiclesView({
             left: 0,
             right: 0,
             bottom: 0,
-            background: "rgba(15, 23, 42, 0.8)",
+            background: "var(--surface)",
             backdropFilter: "blur(8px)",
             display: "flex",
             alignItems: "center",
@@ -401,8 +401,8 @@ export function VehiclesView({
         >
           <div
             style={{
-              background: "#0f172a",
-              border: "1.5px solid rgba(225, 29, 72, 0.35)",
+              background: "var(--surface)",
+              border: "1.5px solid var(--accent)",
               borderRadius: "18px",
               padding: "1.75rem",
               width: "100%",
@@ -421,7 +421,7 @@ export function VehiclesView({
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "flex-start",
-                borderBottom: "1px solid rgba(255,255,255,0.1)",
+                borderBottom: "1px solid var(--border)",
                 paddingBottom: "1rem",
               }}
             >
@@ -429,8 +429,8 @@ export function VehiclesView({
                 <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
                   <span
                     style={{
-                      background: "rgba(16, 185, 129, 0.15)",
-                      color: "#10b981",
+                      background: "var(--success-soft)",
+                      color: "var(--success-fg)",
                       borderRadius: "8px",
                       padding: "0.35rem",
                       display: "flex",
@@ -440,7 +440,7 @@ export function VehiclesView({
                   >
                     <PlusCircle size={22} />
                   </span>
-                  <h3 style={{ fontSize: "1.25rem", fontWeight: 800, margin: 0, color: "#f8fafc" }}>
+                  <h3 style={{ fontSize: "1.25rem", fontWeight: 800, margin: 0, color: "var(--text)" }}>
                     {copy.createModal.title}
                   </h3>
                 </div>
@@ -453,10 +453,10 @@ export function VehiclesView({
                 type="button"
                 onClick={() => setIsCreateModalOpen(false)}
                 style={{
-                  background: "rgba(255,255,255,0.08)",
+                  background: "var(--surface-soft)",
                   border: "none",
                   borderRadius: "8px",
-                  color: "#cbd5e1",
+                  color: "var(--text-muted)",
                   width: 32,
                   height: 32,
                   display: "flex",
@@ -495,13 +495,13 @@ export function VehiclesView({
               {/* SECTION 1 : VÉHICULE & MODÈLE */}
               <div
                 style={{
-                  background: "rgba(30, 41, 59, 0.4)",
+                  background: "var(--surface-sunken)",
                   padding: "1rem",
                   borderRadius: "12px",
-                  border: "1px solid rgba(255,255,255,0.06)",
+                  border: "1px solid var(--border)",
                 }}
               >
-                <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.6rem" }}>
+                <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--info-fg)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.6rem" }}>
                   {copy.createModal.section1}
                 </div>
                 <BrandModelSelect brands={catalog} energyFieldId="modal-vehicle-energy" />
@@ -532,13 +532,13 @@ export function VehiclesView({
               {/* SECTION 2 : ÉTAPE LOGISTIQUE & SHOWROOM */}
               <div
                 style={{
-                  background: "rgba(30, 41, 59, 0.4)",
+                  background: "var(--surface-sunken)",
                   padding: "1rem",
                   borderRadius: "12px",
-                  border: "1px solid rgba(255,255,255,0.06)",
+                  border: "1px solid var(--border)",
                 }}
               >
-                <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#f59e0b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.6rem" }}>
+                <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--warning-fg)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.6rem" }}>
                   {copy.createModal.section2}
                 </div>
                 <div className="ox-form-row">
@@ -547,7 +547,7 @@ export function VehiclesView({
                     defaultValue="EN_MAGASIN"
                     className="ox-select"
                     title={copy.createModal.statusTitle}
-                    style={{ fontWeight: 700, color: "#34d399", background: "rgba(15,23,42,0.8)" }}
+                    style={{ fontWeight: 700, color: "var(--success-fg)", background: "var(--text-strong)" }}
                   >
                     <option value="COMMANDE">{copy.statusOption.COMMANDE}</option>
                     <option value="EN_PRODUCTION">{copy.statusOption.EN_PRODUCTION}</option>
@@ -580,13 +580,13 @@ export function VehiclesView({
               {/* SECTION 3 : EXPÉDITION & CHÂSSIS VIN */}
               <div
                 style={{
-                  background: "rgba(30, 41, 59, 0.4)",
+                  background: "var(--surface-sunken)",
                   padding: "1rem",
                   borderRadius: "12px",
-                  border: "1px solid rgba(255,255,255,0.06)",
+                  border: "1px solid var(--border)",
                 }}
               >
-                <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#8b5cf6", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.6rem" }}>
+                <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--purple-fg)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.6rem" }}>
                   {copy.createModal.section3}
                 </div>
                 <div className="ox-form-row">
@@ -618,13 +618,13 @@ export function VehiclesView({
               {/* SECTION 4 : PRIX DE VENTE & VALIDATION */}
               <div
                 style={{
-                  background: "rgba(30, 41, 59, 0.4)",
+                  background: "var(--surface-sunken)",
                   padding: "1rem",
                   borderRadius: "12px",
-                  border: "1px solid rgba(255,255,255,0.06)",
+                  border: "1px solid var(--border)",
                 }}
               >
-                <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#ec4899", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.6rem" }}>
+                <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--purple-fg)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.6rem" }}>
                   {copy.createModal.section4}
                 </div>
                 <div className="ox-form-row">
@@ -648,7 +648,7 @@ export function VehiclesView({
                     required
                     className="ox-input"
                     title={copy.createModal.priceTitle}
-                    style={{ fontWeight: 800, fontSize: "1.05rem", color: "#34d399", minWidth: 260 }}
+                    style={{ fontWeight: 800, fontSize: "1.05rem", color: "var(--success-fg)", minWidth: 260 }}
                   />
                 </div>
                 <p style={{ margin: "8px 0 0", fontSize: "0.76rem", color: "var(--ice-text-muted)", lineHeight: 1.5 }}>
@@ -663,7 +663,7 @@ export function VehiclesView({
                   justifyContent: "flex-end",
                   gap: "0.8rem",
                   marginTop: "0.5rem",
-                  borderTop: "1px solid rgba(255,255,255,0.1)",
+                  borderTop: "1px solid var(--border)",
                   paddingTop: "1rem",
                 }}
               >
@@ -671,7 +671,7 @@ export function VehiclesView({
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
                   className="ox-btn ox-btn-ghost"
-                  style={{ color: "#cbd5e1" }}
+                  style={{ color: "var(--text-muted)" }}
                 >
                   {copy.createModal.cancel}
                 </button>
@@ -679,7 +679,7 @@ export function VehiclesView({
                   type="submit"
                   className="ox-btn"
                   style={{
-                    background: "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)",
+                    background: "var(--accent)",
                     border: "none",
                     padding: "0.6rem 1.4rem",
                     fontWeight: 800,
@@ -709,7 +709,7 @@ export function VehiclesView({
               <Link
                 key={zone}
                 href={`/vehicles?zone=${encodeURIComponent(zone)}`}
-                style={{ textDecoration: "none", color: "inherit", padding: "8px 10px", borderRadius: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+                style={{ textDecoration: "none", color: "inherit", padding: "8px 10px", borderRadius: 8, background: "var(--surface-soft)", border: "1px solid var(--border)" }}
               >
                 <div style={{ fontSize: "0.72rem", opacity: 0.65 }}>{zone}</div>
                 <div style={{ fontSize: "1.2rem", fontWeight: 800 }}>{count}</div>
@@ -718,7 +718,7 @@ export function VehiclesView({
           })}
           <Link
             href="/vehicles?incomplete=1"
-            style={{ textDecoration: "none", color: "#fcd34d", padding: "8px 10px", borderRadius: 8, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)" }}
+            style={{ textDecoration: "none", color: "var(--warning-fg)", padding: "8px 10px", borderRadius: 8, background: "var(--warning-soft)", border: "1px solid var(--warning)" }}
           >
             <div style={{ fontSize: "0.72rem", opacity: 0.8 }}>Fiches à compléter</div>
             <div style={{ fontSize: "1.2rem", fontWeight: 800 }}>{stockSummary.incomplete}</div>
@@ -735,7 +735,7 @@ export function VehiclesView({
             </thead>
             <tbody>
               {stockSummary.modelZone.map((row) => (
-                <tr key={row.model} style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+                <tr key={row.model} style={{ borderTop: "1px solid var(--border)" }}>
                   <td style={{ padding: "4px 6px" }}>{row.model}</td>
                   {stockSummary.zones.map((zone) => <td key={zone} style={{ padding: "4px 6px" }}>{row.counts[zone] ?? 0}</td>)}
                   <td style={{ padding: "4px 6px", fontWeight: 700 }}>{row.total}</td>
@@ -746,23 +746,23 @@ export function VehiclesView({
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
           {stockSummary.byBrand.map(([brand, count]) => (
-            <span key={`brand-${brand}`} style={{ fontSize: "0.74rem", padding: "3px 8px", borderRadius: 999, background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.25)" }}>
+            <span key={`brand-${brand}`} style={{ fontSize: "0.74rem", padding: "3px 8px", borderRadius: 999, background: "var(--info-soft)", border: "1px solid var(--info-soft)" }}>
               {brand}: {count}
             </span>
           ))}
           {stockSummary.byEnergy.map(([energy, count]) => (
-            <span key={`energy-${energy}`} style={{ fontSize: "0.74rem", padding: "3px 8px", borderRadius: 999, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)" }}>
+            <span key={`energy-${energy}`} style={{ fontSize: "0.74rem", padding: "3px 8px", borderRadius: 999, background: "var(--success-soft)", border: "1px solid var(--success-soft)" }}>
               {energyLabel(copy, energy)}: {count}
             </span>
           ))}
           {stockSummary.byColor.map(([color, count]) => (
-            <span key={`color-${color}`} style={{ fontSize: "0.74rem", padding: "3px 8px", borderRadius: 999, background: "rgba(148,163,184,0.1)", border: "1px solid rgba(148,163,184,0.25)", display: "inline-flex", alignItems: "center", gap: 5 }}>
-              <span style={{ width: 9, height: 9, borderRadius: 999, background: vehicleColorHex(color), border: "1px solid rgba(255,255,255,0.3)" }} />
+            <span key={`color-${color}`} style={{ fontSize: "0.74rem", padding: "3px 8px", borderRadius: 999, background: "var(--surface-soft)", border: "1px solid var(--surface-raised)", display: "inline-flex", alignItems: "center", gap: 5 }}>
+              <span style={{ width: 9, height: 9, borderRadius: 999, background: vehicleColorHex(color), border: "1px solid var(--surface-raised)" }} />
               {color}: {count}
             </span>
           ))}
           {stockSummary.byStatus.map(([status, count]) => (
-            <span key={`status-${status}`} style={{ fontSize: "0.74rem", padding: "3px 8px", borderRadius: 999, background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)" }}>
+            <span key={`status-${status}`} style={{ fontSize: "0.74rem", padding: "3px 8px", borderRadius: 999, background: "var(--warning-soft)", border: "1px solid var(--warning-soft)" }}>
               {statusLabel(copy, status)}: {count}
             </span>
           ))}
@@ -850,7 +850,7 @@ export function VehiclesView({
               <div
                 key={stage.key}
                 style={{
-                  background: "rgba(15, 23, 42, 0.6)",
+                  background: "var(--surface-sunken)",
                   borderRadius: "14px",
                   border: `1px solid ${stage.border}`,
                   padding: "0.85rem",
@@ -883,7 +883,7 @@ export function VehiclesView({
                   <span
                     style={{
                       background: stage.color,
-                      color: "#000",
+                      color: "var(--text-strong)",
                       fontWeight: 800,
                       borderRadius: "12px",
                       padding: "0.15rem 0.5rem",
@@ -916,11 +916,11 @@ export function VehiclesView({
                         style={{
                           padding: "0.85rem",
                           borderRadius: "12px",
-                          border: "1px solid rgba(255,255,255,0.08)",
+                          border: "1px solid var(--border)",
                           display: "flex",
                           flexDirection: "column",
                           gap: "0.5rem",
-                          background: "rgba(30, 41, 59, 0.4)",
+                          background: "var(--surface-sunken)",
                         }}
                       >
                         {/* PHOTO & MARQUE (STUDIO CADRÉ SANS AUCUN ROGNAGE) */}
@@ -931,12 +931,12 @@ export function VehiclesView({
                                 width: 56,
                                 height: 38,
                                 borderRadius: 6,
-                                background: "radial-gradient(ellipse at center, #1e293b 0%, #0f172a 100%)",
+                                background: "var(--surface)",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
                                 overflow: "hidden",
-                                border: "1px solid rgba(255,255,255,0.1)",
+                                border: "1px solid var(--border)",
                                 flexShrink: 0,
                                 padding: "2px",
                               }}
@@ -955,7 +955,7 @@ export function VehiclesView({
                                 width: 56,
                                 height: 38,
                                 borderRadius: 6,
-                                background: "radial-gradient(ellipse at center, #1e293b 0%, #0f172a 100%)",
+                                background: "var(--surface)",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
@@ -963,7 +963,7 @@ export function VehiclesView({
                               }}
                               title="Photo du véhicule à ajouter"
                             >
-                              <Car size={22} color="#64748b" />
+                              <Car size={22} color="var(--text-subtle)" />
                             </div>
                           )}
                           <div style={{ flex: 1, minWidth: 0 }}>
@@ -982,19 +982,19 @@ export function VehiclesView({
                         </div>
 
                         {/* CARACTÉRISTIQUES */}
-                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.74rem", color: "#cbd5e1" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.74rem", color: "var(--text-muted)" }}>
                           <span>{energyLabel(copy, v.energy)}</span>
                           <span>{vehicleTypeLabel(copy, v.vehicleType || "SUV")}</span>
                           <span>{v.year || 2026}</span>
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: "0.73rem", color: "var(--ice-text-muted)" }}>
-                          <span style={{ width: 9, height: 9, borderRadius: 999, background: vehicleColorHex(v.exteriorColorShade || v.exteriorColorBase || v.color), border: "1px solid rgba(255,255,255,0.3)" }} />
+                          <span style={{ width: 9, height: 9, borderRadius: 999, background: vehicleColorHex(v.exteriorColorShade || v.exteriorColorBase || v.color), border: "1px solid var(--surface-raised)" }} />
                           <span>Couleur : {v.exteriorColorShade || v.exteriorColorBase || v.color || "à confirmer"}</span>
                           {v.interiorColor ? <span style={{ opacity: 0.65 }}>· int. {v.interiorColor}</span> : null}
                         </div>
 
                         {/* PRIX */}
-                        <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "#34d399" }}>
+                        <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--success-fg)" }}>
                           {displayPrice(v)}
                         </div>
 
@@ -1006,7 +1006,7 @@ export function VehiclesView({
                               color: "var(--ice-text-muted)",
                               padding: "0.3rem 0.5rem",
                               borderRadius: "6px",
-                              background: "rgba(0,0,0,0.25)",
+                              background: "var(--surface-soft)",
                               display: "flex",
                               flexDirection: "column",
                               gap: 2,
@@ -1027,7 +1027,7 @@ export function VehiclesView({
                             alignItems: "center",
                             marginTop: "0.3rem",
                             paddingTop: "0.4rem",
-                            borderTop: "1px solid rgba(255,255,255,0.06)",
+                            borderTop: "1px solid var(--border)",
                           }}
                         >
                           <div style={{ display: "flex", gap: "0.3rem" }}>
@@ -1038,7 +1038,7 @@ export function VehiclesView({
                               style={{
                                 background: "none",
                                 border: "none",
-                                color: "#cbd5e1",
+                                color: "var(--text-muted)",
                                 cursor: "pointer",
                                 padding: "2px",
                               }}
@@ -1057,7 +1057,7 @@ export function VehiclesView({
                                 style={{
                                   background: "none",
                                   border: "none",
-                                  color: "#f87171",
+                                  color: "var(--danger-fg)",
                                   cursor: "pointer",
                                   padding: "2px",
                                 }}
@@ -1073,7 +1073,7 @@ export function VehiclesView({
                                   : copy.card.sheetPendingTitle
                               }
                               style={{
-                                color: v.techSheetConfirmed ? "#10b981" : "#f59e0b",
+                                color: v.techSheetConfirmed ? "var(--success-fg)" : "var(--warning-fg)",
                                 padding: "2px",
                                 display: "inline-flex",
                                 alignItems: "center",
@@ -1104,9 +1104,9 @@ export function VehiclesView({
                                   fontWeight: 600,
                                   padding: "0.25rem 0.55rem",
                                   borderRadius: "6px",
-                                  background: "rgba(255,255,255,0.1)",
-                                  border: "1px solid rgba(255,255,255,0.2)",
-                                  color: "#f8fafc",
+                                  background: "var(--surface-soft)",
+                                  border: "1px solid var(--border)",
+                                  color: "var(--text)",
                                   cursor: "pointer",
                                 }}
                               >
@@ -1148,12 +1148,12 @@ export function VehiclesView({
                     width: 58,
                     height: 38,
                     borderRadius: 6,
-                    background: "radial-gradient(ellipse at center, #1e293b 0%, #0f172a 100%)",
+                    background: "var(--surface)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     overflow: "hidden",
-                    border: "1px solid rgba(0,0,0,0.15)",
+                    border: "1px solid var(--border)",
                     boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
                     flexShrink: 0,
                     padding: "2px",
@@ -1180,7 +1180,7 @@ export function VehiclesView({
                 </div>
                 {v.variant && <div style={{ fontSize: "0.78rem", opacity: 0.7 }}>{v.variant}</div>}
                 {v.isIncompleteSheet && (
-                  <div style={{ fontSize: "0.72rem", color: "#fcd34d" }}>Fiche incomplète</div>
+                  <div style={{ fontSize: "0.72rem", color: "var(--warning-fg)" }}>Fiche incomplète</div>
                 )}
               </div>
             </div>,
@@ -1188,7 +1188,7 @@ export function VehiclesView({
             energyLabel(copy, v.energy),
             <div key={`color-${v.id}`} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontWeight: 600 }}>
-                <span style={{ width: 10, height: 10, borderRadius: 999, background: vehicleColorHex(v.exteriorColorShade || v.exteriorColorBase || v.color), border: "1px solid rgba(255,255,255,0.3)" }} />
+                <span style={{ width: 10, height: 10, borderRadius: 999, background: vehicleColorHex(v.exteriorColorShade || v.exteriorColorBase || v.color), border: "1px solid var(--surface-raised)" }} />
                 {v.exteriorColorShade || v.exteriorColorBase || v.color || "-"}
               </span>
               {v.exteriorColorBase && v.exteriorColorShade && v.exteriorColorBase !== v.exteriorColorShade ? (
@@ -1206,7 +1206,7 @@ export function VehiclesView({
                   gap: 5,
                   fontSize: "0.82rem",
                   fontWeight: 550,
-                  color: v.site.code === "ATELIER_SAV" ? "#f59e0b" : "var(--brand, #0078d4)",
+                  color: v.site.code === "ATELIER_SAV" ? "var(--warning-fg)" : "var(--accent-fg)",
                 }}
                 title={v.site.name}
               >
@@ -1243,12 +1243,12 @@ export function VehiclesView({
                   padding: "4px 8px",
                   borderRadius: 6,
                   border: v.techSheetConfirmed
-                    ? "1px solid rgba(16, 185, 129, 0.4)"
-                    : "1px solid rgba(245, 158, 11, 0.4)",
+                    ? "1px solid var(--success)"
+                    : "1px solid var(--warning)",
                   background: v.techSheetConfirmed
-                    ? "rgba(16, 185, 129, 0.12)"
-                    : "rgba(245, 158, 11, 0.12)",
-                  color: v.techSheetConfirmed ? "#10b981" : "#f59e0b",
+                    ? "var(--success-soft)"
+                    : "var(--warning-soft)",
+                  color: v.techSheetConfirmed ? "var(--success-fg)" : "var(--warning-fg)",
                   fontSize: "0.75rem",
                   fontWeight: 700,
                   textDecoration: "none",
@@ -1272,8 +1272,8 @@ export function VehiclesView({
                   gap: 4,
                   padding: "4px 8px",
                   borderRadius: 6,
-                  border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                  background: "rgba(255, 255, 255, 0.06)",
+                  border: "1px solid var(--ice-border)",
+                  background: "var(--surface-soft)",
                   color: "var(--ice-text)",
                   fontSize: "0.75rem",
                   fontWeight: 600,
@@ -1281,7 +1281,7 @@ export function VehiclesView({
                 }}
                 title={copy.table.editTitle}
               >
-                <Edit2 size={12} color="var(--gold, #d4af37)" />
+                <Edit2 size={12} color="var(--gold-fg)" />
                 <span>{copy.table.edit}</span>
               </button>
               {canDelete && (
@@ -1299,9 +1299,9 @@ export function VehiclesView({
                     gap: 4,
                     padding: "4px 8px",
                     borderRadius: 6,
-                    border: "1px solid rgba(239, 68, 68, 0.35)",
-                    background: "rgba(239, 68, 68, 0.1)",
-                    color: "#f87171",
+                    border: "1px solid var(--danger)",
+                    background: "var(--danger-soft)",
+                    color: "var(--danger-fg)",
                     fontSize: "0.75rem",
                     fontWeight: 600,
                     cursor: "pointer",
@@ -1323,7 +1323,7 @@ export function VehiclesView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.75)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "flex",
             alignItems: "center",
@@ -1336,8 +1336,8 @@ export function VehiclesView({
             style={{
               width: "100%",
               maxWidth: 580,
-              background: "#161a20",
-              border: "1px solid rgba(212, 175, 55, 0.4)",
+              background: "var(--surface)",
+              border: "1px solid var(--gold)",
               borderRadius: 14,
               padding: 24,
               boxShadow: "0 20px 50px rgba(0, 0, 0, 0.6)",
@@ -1395,7 +1395,7 @@ export function VehiclesView({
                     name="status"
                     defaultValue={editingVehicle.status === "EN_STOCK" ? "EN_MAGASIN" : editingVehicle.status}
                     className="ox-select"
-                    style={{ width: "100%", fontWeight: 600, color: "#38bdf8" }}
+                    style={{ width: "100%", fontWeight: 600, color: "var(--info-fg)" }}
                   >
                     <option value="COMMANDE">{copy.statusOption.COMMANDE}</option>
                     <option value="EN_PRODUCTION">{copy.statusOption.EN_PRODUCTION}</option>
@@ -1597,7 +1597,7 @@ export function VehiclesView({
                 </div>
               </div>
 
-              <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 12, display: "grid", gap: 10 }}>
+              <div style={{ borderTop: "1px solid var(--border)", paddingTop: 12, display: "grid", gap: 10 }}>
                 <div style={{ fontSize: "0.78rem", fontWeight: 700 }}>Photos du véhicule réel</div>
                 <div style={{ fontSize: "0.72rem", opacity: 0.65 }}>
                   Utilisez les photos du véhicule livré, pas une illustration d&apos;un autre modèle ou d&apos;une autre finition.
@@ -1644,9 +1644,9 @@ export function VehiclesView({
                       gap: 6,
                       padding: "8px 12px",
                       borderRadius: 8,
-                      border: "1px solid rgba(239, 68, 68, 0.4)",
-                      background: "rgba(239, 68, 68, 0.12)",
-                      color: "#f87171",
+                      border: "1px solid var(--danger)",
+                      background: "var(--danger-soft)",
+                      color: "var(--danger-fg)",
                       fontSize: "0.8rem",
                       fontWeight: 600,
                       cursor: "pointer",
@@ -1665,7 +1665,7 @@ export function VehiclesView({
                     style={{
                       padding: "8px 16px",
                       borderRadius: 8,
-                      border: "1px solid rgba(255, 255, 255, 0.15)",
+                      border: "1px solid var(--border)",
                       background: "transparent",
                       color: "var(--ice-text)",
                       fontSize: "0.82rem",
@@ -1680,8 +1680,8 @@ export function VehiclesView({
                       padding: "8px 18px",
                       borderRadius: 8,
                       border: "none",
-                      background: "linear-gradient(135deg, #d4af37, #b48c1e)",
-                      color: "#000",
+                      background: "linear-gradient(135deg, var(--gold-solid), var(--gold-soft))",
+                      color: "var(--text-strong)",
                       fontWeight: 700,
                       fontSize: "0.82rem",
                       cursor: "pointer",
@@ -1702,7 +1702,7 @@ export function VehiclesView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.78)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(8px)",
             display: "flex",
             alignItems: "center",
@@ -1715,8 +1715,8 @@ export function VehiclesView({
             style={{
               width: "100%",
               maxWidth: 480,
-              background: "#121820",
-              border: "1px solid rgba(239, 68, 68, 0.4)",
+              background: "var(--surface)",
+              border: "1px solid var(--danger)",
               borderRadius: 14,
               padding: 24,
               boxShadow: "0 24px 60px rgba(0, 0, 0, 0.75)",
@@ -1729,19 +1729,19 @@ export function VehiclesView({
                   width: 42,
                   height: 42,
                   borderRadius: 10,
-                  background: "rgba(239, 68, 68, 0.15)",
-                  border: "1px solid rgba(239, 68, 68, 0.35)",
+                  background: "var(--danger-soft)",
+                  border: "1px solid var(--danger)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "#ef4444",
+                  color: "var(--danger-fg)",
                   flexShrink: 0,
                 }}
               >
                 <AlertTriangle size={22} />
               </div>
               <div style={{ flex: 1 }}>
-                <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 700, color: "#f87171" }}>
+                <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 700, color: "var(--danger-fg)" }}>
                   {copy.deleteModal.title}
                 </h3>
                 <p style={{ margin: "4px 0 0", fontSize: "0.8rem", opacity: 0.75 }}>
@@ -1766,8 +1766,8 @@ export function VehiclesView({
 
             <div
               style={{
-                background: "rgba(0, 0, 0, 0.3)",
-                border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+                background: "var(--surface-soft)",
+                border: "1px solid var(--ice-border)",
                 borderRadius: 8,
                 padding: "12px 14px",
                 marginBottom: 16,
@@ -1786,7 +1786,7 @@ export function VehiclesView({
               {deletingVehicle.vin && (
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ opacity: 0.65 }}>{copy.deleteModal.vinLabel}</span>
-                  <code style={{ fontSize: "0.8rem", color: "var(--gold, #d4af37)" }}>{deletingVehicle.vin}</code>
+                  <code style={{ fontSize: "0.8rem", color: "var(--gold-fg)" }}>{deletingVehicle.vin}</code>
                 </div>
               )}
               <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -1795,7 +1795,7 @@ export function VehiclesView({
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ opacity: 0.65 }}>{copy.deleteModal.priceLabel}</span>
-                <strong style={{ color: "#22c55e" }}>{formatXof(deletingVehicle.priceXof)}</strong>
+                <strong style={{ color: "var(--success-fg)" }}>{formatXof(deletingVehicle.priceXof)}</strong>
               </div>
             </div>
 
@@ -1803,9 +1803,9 @@ export function VehiclesView({
               <div
                 style={{
                   fontSize: "0.8rem",
-                  color: "#f87171",
-                  background: "rgba(239, 68, 68, 0.15)",
-                  border: "1px solid rgba(239, 68, 68, 0.4)",
+                  color: "var(--danger-fg)",
+                  background: "var(--danger-soft)",
+                  border: "1px solid var(--danger)",
                   padding: "8px 12px",
                   borderRadius: 8,
                   marginBottom: 16,
@@ -1818,8 +1818,8 @@ export function VehiclesView({
             {deleteError && (
               <div
                 style={{
-                  border: "1px solid rgba(245, 158, 11, 0.45)",
-                  background: "rgba(245, 158, 11, 0.08)",
+                  border: "1px solid var(--warning)",
+                  background: "var(--warning-soft)",
                   borderRadius: 10,
                   padding: "12px 14px",
                   marginBottom: 16,
@@ -1827,7 +1827,7 @@ export function VehiclesView({
                   gap: 10,
                 }}
               >
-                <strong style={{ color: "#fbbf24", fontSize: "0.88rem" }}>
+                <strong style={{ color: "var(--warning-fg)", fontSize: "0.88rem" }}>
                   {copy.deleteModal.forceTitle}
                 </strong>
                 <p style={{ margin: 0, fontSize: "0.78rem", opacity: 0.8 }}>
@@ -1869,8 +1869,8 @@ export function VehiclesView({
                     padding: "8px 16px",
                     borderRadius: 8,
                     border: "none",
-                    background: "linear-gradient(135deg, #b45309, #92400e)",
-                    color: "#fff",
+                    background: "var(--warning-solid)",
+                    color: "var(--text-strong)",
                     fontWeight: 700,
                     fontSize: "0.8rem",
                     cursor: isForceConfirmed && !isForceDeleting ? "pointer" : "not-allowed",
@@ -1895,7 +1895,7 @@ export function VehiclesView({
                 style={{
                   padding: "8px 16px",
                   borderRadius: 8,
-                  border: "1px solid rgba(255, 255, 255, 0.15)",
+                  border: "1px solid var(--border)",
                   background: "transparent",
                   color: "var(--ice-text)",
                   fontSize: "0.82rem",
@@ -1928,8 +1928,8 @@ export function VehiclesView({
                   padding: "8px 18px",
                   borderRadius: 8,
                   border: "none",
-                  background: "linear-gradient(135deg, #dc2626, #b91c1c)",
-                  color: "#ffffff",
+                  background: "var(--danger-solid)",
+                  color: "var(--text-strong)",
                   fontWeight: 700,
                   fontSize: "0.82rem",
                   cursor: isDeleting ? "not-allowed" : "pointer",

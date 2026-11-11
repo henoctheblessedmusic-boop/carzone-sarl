@@ -49,19 +49,19 @@ const COST_STATUS_LABEL: Record<string, string> = {
 
 const COST_STATUS_STYLE: Record<string, { bg: string; color: string; border: string }> = {
   BROUILLON: {
-    bg: "rgba(148,163,184,0.12)",
-    color: "#cbd5e1",
-    border: "rgba(148,163,184,0.3)",
+    bg: "var(--text-disabled)",
+    color: "var(--text-muted)",
+    border: "var(--border-strong)",
   },
   A_VALIDER: {
-    bg: "rgba(245,158,11,0.12)",
-    color: "#fbbf24",
-    border: "rgba(245,158,11,0.35)",
+    bg: "var(--warning)",
+    color: "var(--warning-fg)",
+    border: "var(--warning)",
   },
   VALIDE: {
-    bg: "rgba(16,185,129,0.12)",
-    color: "#34d399",
-    border: "rgba(16,185,129,0.35)",
+    bg: "var(--success)",
+    color: "var(--success-fg)",
+    border: "var(--success)",
   },
 };
 
@@ -145,22 +145,22 @@ export function GarageSupervisionView({
       </div>
 
       <div className="ox-kpi-grid">
-        <div className="ox-kpi-card" style={{ borderLeft: "4px solid #38bdf8" }}>
+        <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--info)" }}>
           <div className="ox-kpi-label">Interventions suivies</div>
           <div className="ox-kpi-value">{entries.length}</div>
           <div className="ox-kpi-hint">{summary.pending} coût(s) à valider</div>
         </div>
-        <div className="ox-kpi-card" style={{ borderLeft: "4px solid #fbbf24" }}>
+        <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--warning)" }}>
           <div className="ox-kpi-label">Coût main-d&apos;œuvre</div>
           <div className="ox-kpi-value">{formatXof(summary.labor)}</div>
           <div className="ox-kpi-hint">Cumul des interventions</div>
         </div>
-        <div className="ox-kpi-card" style={{ borderLeft: "4px solid #a78bfa" }}>
+        <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--purple)" }}>
           <div className="ox-kpi-label">Coût pièces</div>
           <div className="ox-kpi-value">{formatXof(summary.parts)}</div>
           <div className="ox-kpi-hint">Pièces détachées</div>
         </div>
-        <div className="ox-kpi-card" style={{ borderLeft: "4px solid #34d399" }}>
+        <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--success)" }}>
           <div className="ox-kpi-label">Coût total interventions</div>
           <div className="ox-kpi-value">{formatXof(summary.total)}</div>
           <div className="ox-kpi-hint">{summary.validated} coût(s) validé(s)</div>
@@ -172,9 +172,9 @@ export function GarageSupervisionView({
           style={{
             padding: "0.7rem 0.9rem",
             borderRadius: 10,
-            border: "1px solid rgba(239,68,68,0.4)",
-            background: "rgba(239,68,68,0.12)",
-            color: "#fca5a5",
+            border: "1px solid var(--danger)",
+            background: "var(--danger-soft)",
+            color: "var(--danger-fg)",
             fontSize: "0.86rem",
           }}
         >
@@ -261,7 +261,7 @@ export function GarageSupervisionView({
                           href={`/workshop/${entry.id}/fiche-intervention`}
                           target="_blank"
                           title="Fiche d'intervention"
-                          style={{ color: "#38bdf8" }}
+                          style={{ color: "var(--info-fg)" }}
                         >
                           <FileText size={15} />
                         </Link>
@@ -269,7 +269,7 @@ export function GarageSupervisionView({
                           href={`/workshop/${entry.id}/fiche-entretien`}
                           target="_blank"
                           title="Fiche d'entretien"
-                          style={{ color: "#a78bfa" }}
+                          style={{ color: "var(--purple-fg)" }}
                         >
                           <Printer size={15} />
                         </Link>
@@ -315,7 +315,7 @@ export function GarageSupervisionView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.72)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "grid",
             placeItems: "center",

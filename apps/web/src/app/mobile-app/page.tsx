@@ -58,8 +58,8 @@ export default async function MobileAppPage() {
                 borderRadius: 12,
                 display: "grid",
                 placeItems: "center",
-                background: "rgba(212, 175, 55, 0.16)",
-                color: "#d4af37",
+                background: "var(--gold-soft)",
+                color: "var(--gold-fg)",
                 flexShrink: 0,
               }}
             >
@@ -96,9 +96,9 @@ export default async function MobileAppPage() {
               alignItems: "flex-start",
               padding: "10px 12px",
               borderRadius: 10,
-              background: "rgba(34, 197, 94, 0.1)",
-              border: "1px solid rgba(34, 197, 94, 0.3)",
-              color: "#86efac",
+              background: "var(--success-soft)",
+              border: "1px solid var(--success)",
+              color: "var(--success-fg)",
               fontSize: "0.82rem",
               lineHeight: 1.5,
             }}
@@ -113,7 +113,7 @@ export default async function MobileAppPage() {
 
         <section className="ox-glass" style={{ padding: "1.25rem 1.35rem", borderRadius: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-            <Settings size={18} style={{ color: "#d4af37" }} />
+            <Settings size={18} style={{ color: "var(--gold-fg)" }} />
             <h2 style={{ margin: 0, fontSize: "1rem" }}>Installer sans Play Store</h2>
           </div>
 
@@ -135,9 +135,9 @@ export default async function MobileAppPage() {
           style={{
             padding: "1rem 1.2rem",
             borderRadius: 14,
-            border: "1px solid rgba(245, 158, 11, 0.35)",
-            background: "rgba(245, 158, 11, 0.08)",
-            color: "#fcd34d",
+            border: "1px solid var(--warning)",
+            background: "var(--warning-soft)",
+            color: "var(--warning-fg)",
             fontSize: "0.84rem",
             lineHeight: 1.6,
             display: "flex",
@@ -155,7 +155,7 @@ export default async function MobileAppPage() {
 
         <section className="ox-glass" style={{ padding: "1rem 1.2rem", borderRadius: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <Info size={17} style={{ color: "#60a5fa" }} />
+            <Info size={17} style={{ color: "var(--info-fg)" }} />
             <h2 style={{ margin: 0, fontSize: "0.95rem" }}>Vérification du fichier</h2>
           </div>
           <p style={{ margin: "0 0 8px", fontSize: "0.82rem", color: "var(--ice-text-muted)" }}>
@@ -166,8 +166,8 @@ export default async function MobileAppPage() {
               display: "block",
               padding: "10px 12px",
               borderRadius: 8,
-              background: "rgba(0,0,0,0.25)",
-              border: "1px solid var(--ice-border, rgba(255,255,255,0.12))",
+              background: "var(--surface-soft)",
+              border: "1px solid var(--ice-border)",
               color: "var(--ice-text)",
               fontSize: "0.72rem",
               overflowWrap: "anywhere",
@@ -181,7 +181,7 @@ export default async function MobileAppPage() {
         </section>
 
         <section style={{ display: "flex", gap: 8, alignItems: "center", color: "var(--ice-text-muted)", fontSize: "0.82rem" }}>
-          <CheckCircle2 size={16} style={{ color: "#4ade80", flexShrink: 0 }} />
+          <CheckCircle2 size={16} style={{ color: "var(--success-fg)", flexShrink: 0 }} />
           <span>
             En cas de difficulté, contactez l&apos;administrateur CARZONE avec le modèle de téléphone et la
             version Android.

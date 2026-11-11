@@ -349,7 +349,7 @@ export async function RoleDashboard({ user }: { user: SessionUser }) {
           <div>
             <div className="ox-hero-card-title">Bonjour {user.fullName}, bienvenue sur CARZONE Ops</div>
             <div className="ox-hero-card-sub">
-              Votre espace : <strong style={{ color: "var(--gold)" }}>{roleLabel}</strong> · Zone Maro-Militaire,
+              Votre espace : <strong style={{ color: "var(--gold-fg)" }}>{roleLabel}</strong> · Zone Maro-Militaire,
               Gbèdomidji · Cotonou
             </div>
           </div>
@@ -358,7 +358,7 @@ export async function RoleDashboard({ user }: { user: SessionUser }) {
               const Icon = action.icon;
               return (
                 <Link key={action.href} href={action.href} className="ox-btn ox-btn-ghost ox-quick-btn">
-                  <Icon size={16} color="var(--gold)" />
+                  <Icon size={16} color="var(--gold-fg)" />
                   {action.label}
                 </Link>
               );
@@ -384,7 +384,7 @@ export async function RoleDashboard({ user }: { user: SessionUser }) {
 
         <div className="ox-glass" style={{ padding: "1.1rem 1.2rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-            <CheckCircle2 size={18} color="#34d399" />
+            <CheckCircle2 size={18} color="var(--success-fg)" />
             <strong>Votre espace est limité à votre périmètre</strong>
           </div>
           <p style={{ margin: 0, opacity: 0.75, fontSize: "0.88rem" }}>

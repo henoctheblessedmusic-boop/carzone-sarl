@@ -570,8 +570,8 @@ export function QuoteCreator({
           display: "inline-flex",
           alignItems: "center",
           gap: "0.5rem",
-          background: "linear-gradient(135deg, var(--gold) 0%, #b89130 100%)",
-          color: "#0a1622",
+          background: "linear-gradient(135deg, var(--gold) 0%, var(--gold-solid) 100%)",
+          color: "var(--text-strong)",
           fontWeight: 650,
           padding: "0.65rem 1.25rem",
           borderRadius: "8px",
@@ -594,7 +594,7 @@ export function QuoteCreator({
             bottom: 0,
             width: "100vw",
             height: "100vh",
-            backgroundColor: "rgba(3, 8, 15, 0.88)",
+            backgroundColor: "var(--surface)",
             backdropFilter: "blur(12px)",
             WebkitBackdropFilter: "blur(12px)",
             display: "flex",
@@ -625,7 +625,7 @@ export function QuoteCreator({
               flexDirection: "column",
               gap: "1rem",
               margin: "auto",
-              background: "rgba(10, 24, 34, 0.98)",
+              background: "var(--surface)",
               border: "1px solid var(--ice-border)",
               borderRadius: 18,
               boxShadow: "0 25px 65px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(126, 200, 227, 0.15)",
@@ -643,7 +643,7 @@ export function QuoteCreator({
             >
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <ShoppingCart size={22} color="var(--gold)" />
+                  <ShoppingCart size={22} color="var(--gold-fg)" />
                   <h2 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 700, color: "var(--ice-text-strong)" }}>
                     {isGarageScope ? "Devis proforma - Garage / Atelier" : copy.creator.title}
                   </h2>
@@ -674,10 +674,10 @@ export function QuoteCreator({
               <div
                 style={{
                   padding: "0.75rem 1rem",
-                  background: "rgba(239, 68, 68, 0.15)",
-                  border: "1px solid rgba(239, 68, 68, 0.3)",
+                  background: "var(--danger-soft)",
+                  border: "1px solid var(--danger)",
                   borderRadius: 8,
-                  color: "#fca5a5",
+                  color: "var(--danger-fg)",
                   display: "flex",
                   alignItems: "center",
                   gap: 8,
@@ -695,10 +695,10 @@ export function QuoteCreator({
                 display: "flex",
                 flexDirection: "column",
                 gap: "0.85rem",
-                background: "rgba(255,255,255,0.02)",
+                background: "var(--surface-soft)",
                 padding: "1rem",
                 borderRadius: 10,
-                border: "1px solid rgba(255,255,255,0.06)",
+                border: "1px solid var(--border)",
               }}
             >
               {/* Ligne 1 : Client & Opportunité */}
@@ -714,7 +714,7 @@ export function QuoteCreator({
                       style={{
                         background: "none",
                         border: "none",
-                        color: "var(--gold)",
+                        color: "var(--gold-fg)",
                         fontSize: "0.78rem",
                         fontWeight: 650,
                         cursor: "pointer",
@@ -774,8 +774,8 @@ export function QuoteCreator({
                   style={{
                     padding: "0.45rem 0.75rem",
                     borderRadius: 6,
-                    background: "rgba(255, 255, 255, 0.04)",
-                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                    background: "var(--surface-soft)",
+                    border: "1px solid var(--border)",
                     fontSize: "0.78rem",
                     display: "flex",
                     flexWrap: "wrap",
@@ -801,13 +801,13 @@ export function QuoteCreator({
                   style={{
                     padding: "0.75rem 0.9rem",
                     borderRadius: 10,
-                    border: "1px solid rgba(56, 189, 248, 0.3)",
-                    background: "rgba(56, 189, 248, 0.06)",
+                    border: "1px solid var(--info)",
+                    background: "var(--info-soft)",
                     display: "grid",
                     gap: 10,
                   }}
                 >
-                  <strong style={{ fontSize: "0.86rem", color: "#7dd3fc" }}>
+                  <strong style={{ fontSize: "0.86rem", color: "var(--info-fg)" }}>
                     Véhicule client - dossier atelier
                   </strong>
                   <div
@@ -964,14 +964,14 @@ export function QuoteCreator({
                 display: "flex",
                 flexDirection: "column",
                 gap: "0.6rem",
-                background: "rgba(212, 175, 55, 0.04)",
+                background: "var(--gold-soft)",
                 padding: "0.75rem 1rem",
                 borderRadius: 10,
-                border: "1px dashed rgba(212, 175, 55, 0.3)",
+                border: "1px dashed var(--gold)",
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
-                <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--gold)" }}>
+                <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--gold-fg)" }}>
                   {copy.creator.quickAdd.title}
                 </span>
                 <button
@@ -1010,7 +1010,7 @@ export function QuoteCreator({
                       type="button"
                       onClick={() => setShowLaborForm((prev) => !prev)}
                       className="ox-btn ox-btn-ghost"
-                      style={{ width: "100%", fontSize: "0.83rem", border: "1px dashed rgba(52,211,153,0.5)" }}
+                      style={{ width: "100%", fontSize: "0.83rem", border: "1px dashed var(--success)" }}
                       disabled={isPending}
                     >
                       + Main-d&apos;œuvre (heures × taux)
@@ -1076,15 +1076,15 @@ export function QuoteCreator({
               {isGarageScope && showLaborForm && (
                 <div
                   style={{
-                    background: "rgba(16, 185, 129, 0.06)",
-                    border: "1px solid rgba(52, 211, 153, 0.35)",
+                    background: "var(--success-soft)",
+                    border: "1px solid var(--success)",
                     borderRadius: 8,
                     padding: "0.8rem 1rem",
                     display: "grid",
                     gap: 8,
                   }}
                 >
-                  <strong style={{ fontSize: "0.84rem", color: "#6ee7b7" }}>
+                  <strong style={{ fontSize: "0.84rem", color: "var(--success-fg)" }}>
                     Ligne de main-d&apos;œuvre
                   </strong>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,160px),1fr))", gap: 8 }}>
@@ -1123,7 +1123,7 @@ export function QuoteCreator({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                     <span style={{ fontSize: "0.8rem", opacity: 0.8 }}>
                       Total main-d&apos;œuvre :{" "}
-                      <strong style={{ color: "#6ee7b7" }}>
+                      <strong style={{ color: "var(--success-fg)" }}>
                         {formatXof(Math.round((Number(laborHours) || 0) * (Number(laborRate) || 0)))}
                       </strong>
                     </span>
@@ -1144,7 +1144,7 @@ export function QuoteCreator({
               {stagedItem && (
                 <div
                   style={{
-                    background: "rgba(10, 24, 34, 0.95)",
+                    background: "var(--surface)",
                     border: "1px solid var(--gold)",
                     borderRadius: 8,
                     padding: "0.85rem 1rem",
@@ -1160,7 +1160,7 @@ export function QuoteCreator({
                         style={{
                           fontSize: "0.72rem",
                           background: "var(--gold)",
-                          color: "#0a1622",
+                          color: "var(--text-on-accent)",
                           fontWeight: 750,
                           padding: "2px 8px",
                           borderRadius: 4,
@@ -1195,7 +1195,7 @@ export function QuoteCreator({
                           alignItems: "center",
                           border: "1px solid var(--ice-border)",
                           borderRadius: 6,
-                          background: "rgba(0,0,0,0.3)",
+                          background: "var(--surface-soft)",
                         }}
                       >
                         <button
@@ -1260,7 +1260,7 @@ export function QuoteCreator({
                           {copy.creator.staged.unitPriceLabel}
                         </label>
                         {stagedItem.unitPriceXof !== stagedItem.catalogPriceXof && (
-                          <span style={{ fontSize: "0.7rem", color: "var(--gold)" }}>
+                          <span style={{ fontSize: "0.7rem", color: "var(--gold-fg)" }}>
                             {copy.creator.staged.catalogBase(formatXof(stagedItem.catalogPriceXof))}
                           </span>
                         )}
@@ -1297,7 +1297,7 @@ export function QuoteCreator({
                     <div style={{ display: "flex", alignItems: "flex-end", gap: 12, marginLeft: "auto" }}>
                       <div style={{ textAlign: "right", marginRight: 6 }}>
                         <div style={{ fontSize: "0.7rem", opacity: 0.65 }}>{copy.creator.staged.lineCalc}</div>
-                        <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--gold)" }}>
+                        <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--gold-fg)" }}>
                           {formatXof(stagedItem.quantity * stagedItem.unitPriceXof)}
                         </div>
                       </div>
@@ -1315,8 +1315,8 @@ export function QuoteCreator({
                         }}
                         className="ox-btn"
                         style={{
-                          background: "linear-gradient(135deg, var(--gold) 0%, #b89130 100%)",
-                          color: "#0a1622",
+                          background: "linear-gradient(135deg, var(--gold) 0%, var(--gold-solid) 100%)",
+                          color: "var(--text-strong)",
                           fontWeight: 700,
                           padding: "0.6rem 1.15rem",
                           display: "inline-flex",
@@ -1338,10 +1338,10 @@ export function QuoteCreator({
               <div
                 style={{
                   padding: "0.6rem 1rem",
-                  background: "rgba(16, 185, 129, 0.15)",
-                  border: "1px solid rgba(16, 185, 129, 0.4)",
+                  background: "var(--success-soft)",
+                  border: "1px solid var(--success)",
                   borderRadius: 8,
-                  color: "#6ee7b7",
+                  color: "var(--success-fg)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
@@ -1356,7 +1356,7 @@ export function QuoteCreator({
                 <button
                   type="button"
                   onClick={() => setFeedbackMessage(null)}
-                  style={{ background: "none", border: "none", color: "#6ee7b7", cursor: "pointer", opacity: 0.8 }}
+                  style={{ background: "none", border: "none", color: "var(--success-solid)", cursor: "pointer", opacity: 0.8 }}
                 >
                   <X size={14} />
                 </button>
@@ -1367,16 +1367,16 @@ export function QuoteCreator({
             <div
               style={{
                 borderRadius: 12,
-                border: "1px solid rgba(255, 255, 255, 0.08)",
-                background: "rgba(0, 0, 0, 0.2)",
+                border: "1px solid var(--border)",
+                background: "var(--surface-soft)",
                 overflow: "hidden",
               }}
             >
               <div
                 style={{
                   padding: "0.6rem 1rem",
-                  background: "rgba(255, 255, 255, 0.03)",
-                  borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                  background: "var(--surface-soft)",
+                  borderBottom: "1px solid var(--border)",
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
@@ -1406,7 +1406,7 @@ export function QuoteCreator({
                   <thead>
                     <tr
                       style={{
-                        borderBottom: "2px solid rgba(255,255,255,0.1)",
+                        borderBottom: "2px solid var(--border)",
                         textAlign: "left",
                         opacity: 0.7,
                       }}
@@ -1426,8 +1426,8 @@ export function QuoteCreator({
                         <tr
                           key={line.id}
                           style={{
-                            borderBottom: "1px solid rgba(255,255,255,0.05)",
-                            background: isHighlighted ? "rgba(212, 175, 55, 0.12)" : undefined,
+                            borderBottom: "1px solid var(--border)",
+                            background: isHighlighted ? "var(--gold-soft)" : undefined,
                             transition: "background 0.3s ease",
                           }}
                         >
@@ -1449,7 +1449,7 @@ export function QuoteCreator({
                                 alignItems: "center",
                                 border: "1px solid var(--ice-border)",
                                 borderRadius: 6,
-                                background: "rgba(0,0,0,0.25)",
+                                background: "var(--surface-soft)",
                               }}
                             >
                               <button
@@ -1546,7 +1546,7 @@ export function QuoteCreator({
                               style={{
                                 background: "transparent",
                                 border: "none",
-                                color: "#ef4444",
+                                color: "var(--danger-fg)",
                                 cursor: "pointer",
                                 opacity: 0.7,
                               }}
@@ -1567,8 +1567,8 @@ export function QuoteCreator({
             {/* Conditions Générales de Vente (CGV Page 2 Imprimée) */}
             <div
               style={{
-                background: "rgba(0, 120, 212, 0.04)",
-                border: "1px solid rgba(0, 120, 212, 0.18)",
+                background: "var(--info-soft)",
+                border: "1px solid var(--info)",
                 borderRadius: 8,
                 padding: "0.6rem 0.85rem",
                 display: "flex",
@@ -1597,7 +1597,7 @@ export function QuoteCreator({
                         fontWeight: 650,
                         borderRadius: 6,
                         background: "var(--brand)",
-                        color: "#fff",
+                        color: "var(--text-on-accent)",
                       }}
                     >
                       🔧 {copy.creator.cgv.workshop}
@@ -1620,8 +1620,8 @@ export function QuoteCreator({
                           fontWeight: 650,
                           border: "none",
                           cursor: "pointer",
-                          background: cgvType === "VEHICULE" ? "var(--brand)" : "rgba(255,255,255,0.05)",
-                          color: cgvType === "VEHICULE" ? "#fff" : "var(--ice-text)",
+                          background: cgvType === "VEHICULE" ? "var(--brand)" : "var(--surface-soft)",
+                          color: cgvType === "VEHICULE" ? "var(--text-on-accent)" : "var(--ice-text)",
                         }}
                       >
                         🚗 {copy.creator.cgv.vehicle}
@@ -1635,8 +1635,8 @@ export function QuoteCreator({
                           fontWeight: 650,
                           border: "none",
                           cursor: "pointer",
-                          background: cgvType === "ATELIER" ? "var(--brand)" : "rgba(255,255,255,0.05)",
-                          color: cgvType === "ATELIER" ? "#fff" : "var(--ice-text)",
+                          background: cgvType === "ATELIER" ? "var(--brand)" : "var(--surface-soft)",
+                          color: cgvType === "ATELIER" ? "var(--text-on-accent)" : "var(--ice-text)",
                         }}
                       >
                         🔧 {copy.creator.cgv.workshop}
@@ -1684,7 +1684,7 @@ export function QuoteCreator({
                         style={{
                           background: "none",
                           border: "none",
-                          color: "var(--gold)",
+                          color: "var(--gold-fg)",
                           cursor: "pointer",
                           fontSize: "0.74rem",
                           fontWeight: 600,
@@ -1717,8 +1717,8 @@ export function QuoteCreator({
             {/* Stratégie Commerciale / Remise Accordée */}
             <div
               style={{
-                background: "linear-gradient(135deg, rgba(212, 175, 55, 0.06), rgba(0, 120, 212, 0.03))",
-                border: "1px solid rgba(212, 175, 55, 0.28)",
+                background: "linear-gradient(135deg, var(--gold-soft), var(--info-soft))",
+                border: "1px solid var(--gold)",
                 borderRadius: 8,
                 padding: "0.65rem 0.85rem",
                 display: "flex",
@@ -1728,8 +1728,8 @@ export function QuoteCreator({
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <Tag size={16} color="var(--gold)" />
-                  <span style={{ fontWeight: 700, fontSize: "0.82rem", color: "var(--gold)" }}>
+                  <Tag size={16} color="var(--gold-fg)" />
+                  <span style={{ fontWeight: 700, fontSize: "0.82rem", color: "var(--gold-fg)" }}>
                     {copy.creator.discount.title}
                   </span>
                 </div>
@@ -1755,8 +1755,8 @@ export function QuoteCreator({
                       fontWeight: 650,
                       border: "none",
                       cursor: "pointer",
-                      background: discountType === "NONE" ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.25)",
-                      color: discountType === "NONE" ? "#fff" : "var(--ice-text-muted)",
+                      background: discountType === "NONE" ? "var(--surface-soft)" : "var(--surface-soft)",
+                      color: discountType === "NONE" ? "var(--text-on-accent)" : "var(--ice-text-muted)",
                     }}
                   >
                     {copy.creator.discount.none}
@@ -1773,8 +1773,8 @@ export function QuoteCreator({
                       fontWeight: 650,
                       border: "none",
                       cursor: "pointer",
-                      background: discountType === "PERCENT" ? "var(--brand)" : "rgba(0,0,0,0.25)",
-                      color: discountType === "PERCENT" ? "#fff" : "var(--ice-text-muted)",
+                      background: discountType === "PERCENT" ? "var(--brand)" : "var(--surface-soft)",
+                      color: discountType === "PERCENT" ? "var(--text-on-accent)" : "var(--ice-text-muted)",
                     }}
                   >
                     {copy.creator.discount.percent}
@@ -1791,8 +1791,8 @@ export function QuoteCreator({
                       fontWeight: 650,
                       border: "none",
                       cursor: "pointer",
-                      background: discountType === "AMOUNT" ? "var(--gold)" : "rgba(0,0,0,0.25)",
-                      color: discountType === "AMOUNT" ? "#0a1622" : "var(--ice-text-muted)",
+                      background: discountType === "AMOUNT" ? "var(--gold)" : "var(--surface-soft)",
+                      color: discountType === "AMOUNT" ? "var(--text-on-accent)" : "var(--ice-text-muted)",
                     }}
                   >
                     {copy.creator.discount.fixed}
@@ -1813,9 +1813,9 @@ export function QuoteCreator({
                         fontSize: "0.78rem",
                         fontWeight: 700,
                         borderRadius: 6,
-                        border: discountValue === pct ? "1px solid var(--gold)" : "1px solid rgba(255,255,255,0.1)",
-                        background: discountValue === pct ? "rgba(212, 175, 55, 0.25)" : "rgba(255,255,255,0.04)",
-                        color: discountValue === pct ? "var(--gold)" : "var(--ice-text)",
+                        border: discountValue === pct ? "1px solid var(--gold)" : "1px solid var(--border)",
+                        background: discountValue === pct ? "var(--gold-soft)" : "var(--surface-soft)",
+                        color: discountValue === pct ? "var(--gold-fg)" : "var(--ice-text)",
                         cursor: "pointer",
                       }}
                     >
@@ -1842,7 +1842,7 @@ export function QuoteCreator({
                     </div>
                   </div>
 
-                  <div style={{ width: "100%", fontSize: "0.82rem", color: "var(--gold)", fontWeight: 650 }}>
+                  <div style={{ width: "100%", fontSize: "0.82rem", color: "var(--gold-fg)", fontWeight: 650 }}>
                     ✨ {copy.creator.discount.granted(formatXof(discountAmount))}
                   </div>
                 </div>
@@ -1866,7 +1866,7 @@ export function QuoteCreator({
                     </span>
                   </div>
 
-                  <div style={{ fontSize: "0.82rem", color: "var(--gold)", fontWeight: 650, marginLeft: "auto" }}>
+                  <div style={{ fontSize: "0.82rem", color: "var(--gold-fg)", fontWeight: 650, marginLeft: "auto" }}>
                     ✨ {copy.creator.discount.deducted(formatXof(discountAmount), (grossTotal > 0 ? ((discountAmount / grossTotal) * 100).toFixed(1) : "0"))}
                   </div>
                 </div>
@@ -1899,8 +1899,8 @@ export function QuoteCreator({
 
               <div
                 style={{
-                  background: "rgba(0, 0, 0, 0.25)",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: "var(--surface-soft)",
+                  border: "1px solid var(--border)",
                   borderRadius: 10,
                   padding: "1rem",
                   display: "flex",
@@ -1914,7 +1914,7 @@ export function QuoteCreator({
                 </div>
 
                 {totals.discountXof > 0 && (
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem", color: "var(--gold)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem", color: "var(--gold-fg)" }}>
                     <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
                       <Tag size={13} />
                       {copy.creator.totals.commercialDiscount(
@@ -1931,7 +1931,7 @@ export function QuoteCreator({
                       display: "flex",
                       justifyContent: "space-between",
                       fontSize: "0.9rem",
-                      borderTop: "1px dashed rgba(255,255,255,0.1)",
+                      borderTop: "1px dashed var(--border)",
                       paddingTop: 4,
                     }}
                   >
@@ -1955,7 +1955,7 @@ export function QuoteCreator({
                     marginTop: 4,
                   }}
                 >
-                  <span style={{ fontWeight: 700, fontSize: "1.05rem", color: "var(--gold)" }}>
+                  <span style={{ fontWeight: 700, fontSize: "1.05rem", color: "var(--gold-fg)" }}>
                     {copy.creator.totals.totalTtc(taxMode)}
                   </span>
                   <span style={{ fontWeight: 800, fontSize: "1.35rem", color: "var(--ice-text-strong)" }}>
@@ -1967,9 +1967,9 @@ export function QuoteCreator({
                   style={{
                     marginTop: 6,
                     paddingTop: 8,
-                    borderTop: "1px dashed rgba(255,255,255,0.1)",
+                    borderTop: "1px dashed var(--border)",
                     fontSize: "0.78rem",
-                    color: "rgba(255,255,255,0.7)",
+                    color: "var(--text-muted)",
                     fontStyle: "italic",
                     lineHeight: 1.4,
                   }}
@@ -2037,7 +2037,7 @@ export function QuoteCreator({
             bottom: 0,
             width: "100vw",
             height: "100vh",
-            backgroundColor: "rgba(3, 8, 15, 0.9)",
+            backgroundColor: "var(--surface)",
             backdropFilter: "blur(10px)",
             WebkitBackdropFilter: "blur(10px)",
             display: "flex",
@@ -2064,7 +2064,7 @@ export function QuoteCreator({
               flexDirection: "column",
               gap: "1.1rem",
               margin: "auto",
-              background: "rgba(10, 24, 34, 0.98)",
+              background: "var(--surface)",
               border: "1px solid var(--ice-border)",
               borderRadius: 16,
               boxShadow: "0 25px 65px rgba(0, 0, 0, 0.8)",
@@ -2107,10 +2107,10 @@ export function QuoteCreator({
               <div
                 style={{
                   padding: "0.6rem 0.8rem",
-                  background: "rgba(239, 68, 68, 0.15)",
-                  border: "1px solid rgba(239, 68, 68, 0.3)",
+                  background: "var(--danger-soft)",
+                  border: "1px solid var(--danger)",
                   borderRadius: 6,
-                  color: "#fca5a5",
+                  color: "var(--danger-fg)",
                   fontSize: "0.85rem",
                 }}
               >
@@ -2252,7 +2252,7 @@ export function QuoteCreator({
                     alignItems: "center",
                     gap: 6,
                     background: "var(--brand)",
-                    color: "#fff",
+                    color: "var(--text-on-accent)",
                   }}
                 >
                   {isCreatingClient

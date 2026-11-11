@@ -103,8 +103,8 @@ export function TechSheetAIActions({
         disabled={loading}
         className="ox-btn"
         style={{
-          background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-          color: "#ffffff",
+          background: "var(--success-solid)",
+          color: "var(--text-strong)",
           display: "inline-flex",
           alignItems: "center",
           gap: "8px",
@@ -126,8 +126,8 @@ export function TechSheetAIActions({
         onClick={() => setShowModal(true)}
         className="ox-btn ox-btn-ghost"
         style={{
-          color: "#cbd5e1",
-          borderColor: "rgba(255,255,255,0.2)",
+          color: "var(--text-muted)",
+          borderColor: "var(--border)",
           fontSize: "0.82rem",
           padding: "0.45rem 0.75rem",
         }}
@@ -145,7 +145,7 @@ export function TechSheetAIActions({
             left: 0,
             right: 0,
             bottom: 0,
-            background: "rgba(0,0,0,0.7)",
+            background: "var(--surface-sunken)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -155,8 +155,8 @@ export function TechSheetAIActions({
         >
           <div
             style={{
-              background: "#ffffff",
-              color: "#0f172a",
+              background: "var(--surface)",
+              color: "var(--text-on-accent)",
               borderRadius: "14px",
               padding: "1.8rem",
               maxWidth: "520px",
@@ -175,14 +175,14 @@ export function TechSheetAIActions({
                   border: "none",
                   fontSize: "1.2rem",
                   cursor: "pointer",
-                  color: "#64748b",
+                  color: "var(--text-subtle)",
                 }}
               >
                 ✕
               </button>
             </div>
 
-            <p style={{ fontSize: "0.88rem", color: "#475569", lineHeight: 1.5, marginBottom: "1.2rem" }}>
+            <p style={{ fontSize: "0.88rem", color: "var(--text-subtle)", lineHeight: 1.5, marginBottom: "1.2rem" }}>
               Configurez votre clé OpenAI pour que l&apos;intelligence artificielle inspecte, traduise et garantisse
               l&apos;exactitude des fiches techniques constructeur pour <strong>{brand} {model}</strong>.
             </p>
@@ -190,12 +190,12 @@ export function TechSheetAIActions({
             {isConfigured && (
               <div
                 style={{
-                  background: "#f0fdf4",
-                  border: "1px solid #bbf7d0",
+                  background: "var(--surface)",
+                  border: "1px solid var(--success)",
                   padding: "0.6rem 0.9rem",
                   borderRadius: "8px",
                   fontSize: "0.82rem",
-                  color: "#166534",
+                  color: "var(--success-fg)",
                   marginBottom: "1rem",
                 }}
               >
@@ -216,12 +216,12 @@ export function TechSheetAIActions({
                   width: "100%",
                   padding: "0.6rem 0.8rem",
                   borderRadius: "8px",
-                  border: "1.5px solid #cbd5e1",
+                  border: "1.5px solid var(--border-strong)",
                   fontSize: "0.9rem",
                   boxSizing: "border-box",
                 }}
               />
-              <span style={{ fontSize: "0.74rem", color: "#64748b", marginTop: "4px", display: "block" }}>
+              <span style={{ fontSize: "0.74rem", color: "var(--text-subtle)", marginTop: "4px", display: "block" }}>
                 La clé est chiffrée et stockée de manière sécurisée sur votre plateforme web.
               </span>
             </div>
@@ -233,9 +233,9 @@ export function TechSheetAIActions({
                   borderRadius: "8px",
                   fontSize: "0.82rem",
                   marginBottom: "1rem",
-                  background: feedback.isError ? "#fef2f2" : "#f0fdf4",
-                  border: `1px solid ${feedback.isError ? "#fecaca" : "#bbf7d0"}`,
-                  color: feedback.isError ? "#991b1b" : "#166534",
+                  background: feedback.isError ? "var(--surface)" : "var(--surface)",
+                  border: `1px solid ${feedback.isError ? "var(--danger)" : "var(--success)"}`,
+                  color: feedback.isError ? "var(--danger-fg)" : "var(--success-fg)",
                 }}
               >
                 {feedback.text}
@@ -246,7 +246,7 @@ export function TechSheetAIActions({
               <button
                 onClick={() => setShowModal(false)}
                 className="ox-btn ox-btn-ghost"
-                style={{ border: "1px solid #cbd5e1", color: "#475569" }}
+                style={{ border: "1px solid var(--border-strong)", color: "var(--border-strong)" }}
               >
                 Fermer
               </button>
@@ -255,7 +255,7 @@ export function TechSheetAIActions({
                   onClick={handleSaveKeyAndGenerate}
                   disabled={loading}
                   className="ox-btn"
-                  style={{ background: "#2563eb", color: "#ffffff", fontWeight: 700 }}
+                  style={{ background: "var(--info-solid)", color: "var(--surface)", fontWeight: 700 }}
                 >
                   {loading ? "Vérification..." : "Enregistrer & Lancer l'analyse"}
                 </button>
@@ -264,7 +264,7 @@ export function TechSheetAIActions({
                   onClick={() => handleGenerate()}
                   disabled={loading}
                   className="ox-btn"
-                  style={{ background: "#10b981", color: "#ffffff", fontWeight: 700 }}
+                  style={{ background: "var(--success-solid)", color: "var(--surface)", fontWeight: 700 }}
                 >
                   {loading ? "Génération en cours..." : "Lancer l'analyse avec la clé active"}
                 </button>

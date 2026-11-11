@@ -113,7 +113,7 @@ export function PaymentModal({
       style={{
         position: "fixed",
         inset: 0,
-        backgroundColor: "rgba(5, 12, 20, 0.8)",
+        backgroundColor: "var(--surface)",
         backdropFilter: "blur(6px)",
         display: "flex",
         alignItems: "center",
@@ -152,11 +152,11 @@ export function PaymentModal({
                 width: 36,
                 height: 36,
                 borderRadius: 8,
-                background: "rgba(74, 222, 128, 0.15)",
+                background: "var(--success-soft)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#16a34a",
+                color: "var(--success-fg)",
               }}
             >
               <CreditCard size={20} />
@@ -183,10 +183,10 @@ export function PaymentModal({
           <div
             style={{
               padding: "0.75rem 1rem",
-              background: "rgba(239, 68, 68, 0.15)",
-              border: "1px solid rgba(239, 68, 68, 0.3)",
+              background: "var(--danger-soft)",
+              border: "1px solid var(--danger)",
               borderRadius: 8,
-              color: "#fca5a5",
+              color: "var(--danger-fg)",
               display: "flex",
               alignItems: "center",
               gap: 8,
@@ -242,13 +242,13 @@ export function PaymentModal({
             </div>
             <div>
               <div style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)" }}>{copy.paymentModal.alreadyCollected}</div>
-              <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "#16a34a" }}>
+              <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--success-fg)" }}>
                 {formatXof(activeInvoice.paidXof)}
               </div>
             </div>
             <div>
               <div style={{ fontSize: "0.72rem", color: "var(--ice-text-muted)" }}>{copy.paymentModal.balanceRemaining}</div>
-              <div style={{ fontWeight: 800, fontSize: "1.05rem", color: remainingXof > 0 ? "var(--gold)" : "#16a34a" }}>
+              <div style={{ fontWeight: 800, fontSize: "1.05rem", color: remainingXof > 0 ? "var(--gold-fg)" : "var(--success-fg)" }}>
                 {formatXof(remainingXof)}
               </div>
             </div>
@@ -363,7 +363,7 @@ export function PaymentModal({
             display: "flex",
             justifyContent: "flex-end",
             gap: "0.75rem",
-            borderTop: "1px solid rgba(255,255,255,0.08)",
+            borderTop: "1px solid var(--border)",
             paddingTop: "1rem",
           }}
         >
@@ -387,8 +387,8 @@ export function PaymentModal({
               fontWeight: 650,
               minWidth: 160,
               justifyContent: "center",
-              background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-              color: "#fff",
+              background: "var(--success-solid)",
+              color: "var(--text-strong)",
               border: "none",
             }}
           >

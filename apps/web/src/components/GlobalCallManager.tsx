@@ -948,8 +948,8 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
             transform: "translateX(-50%)",
             width: "calc(100vw - 32px)",
             maxWidth: 360,
-            background: "linear-gradient(135deg, #181d24, #12151a)",
-            border: "1px solid rgba(212, 175, 55, 0.4)",
+            background: "var(--surface)",
+            border: "1px solid var(--gold)",
             borderRadius: 16,
             boxShadow: "0 20px 50px rgba(0, 0, 0, 0.6), 0 0 25px rgba(212, 175, 55, 0.2)",
             zIndex: 100000,
@@ -965,20 +965,20 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
               width: 58,
               height: 58,
               borderRadius: "50%",
-              background: "rgba(34, 197, 94, 0.15)",
-              color: "#4ade80",
+              background: "var(--success-soft)",
+              color: "var(--success-fg)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               marginBottom: 12,
-              border: "1px solid rgba(34, 197, 94, 0.4)",
+              border: "1px solid var(--success)",
               boxShadow: "0 0 20px rgba(34, 197, 94, 0.3)",
             }}
           >
             <PhoneIncoming size={28} />
           </div>
 
-          <div style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--gold, #d4af37)", fontWeight: 700 }}>
+          <div style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--gold-fg)", fontWeight: 700 }}>
             Appel Audio Entrant
           </div>
 
@@ -1001,9 +1001,9 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                 gap: 6,
                 padding: "10px",
                 borderRadius: 8,
-                border: "1px solid rgba(239, 68, 68, 0.4)",
-                background: "rgba(239, 68, 68, 0.15)",
-                color: "#f87171",
+                border: "1px solid var(--danger)",
+                background: "var(--danger-soft)",
+                color: "var(--danger-fg)",
                 fontWeight: 650,
                 fontSize: "0.82rem",
                 cursor: "pointer",
@@ -1024,8 +1024,8 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                 padding: "10px",
                 borderRadius: 8,
                 border: "none",
-                background: "linear-gradient(135deg, #22c55e, #16a34a)",
-                color: "#fff",
+                background: "var(--success-solid)",
+                color: "var(--text-strong)",
                 fontWeight: 700,
                 fontSize: "0.82rem",
                 cursor: "pointer",
@@ -1051,9 +1051,9 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
             transform: "translateX(-50%)",
             width: "calc(100vw - 32px)",
             maxWidth: 420,
-            background: "rgba(22, 26, 32, 0.95)",
+            background: "var(--surface)",
             backdropFilter: "blur(10px)",
-            border: "1px solid rgba(212, 175, 55, 0.4)",
+            border: "1px solid var(--gold)",
             borderRadius: 30,
             boxShadow: "0 10px 40px rgba(0, 0, 0, 0.6)",
             zIndex: 100000,
@@ -1069,7 +1069,7 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
               display: "flex",
               alignItems: "center",
               gap: 8,
-              color: activeCall.status === "CONNECTED" ? "#4ade80" : "var(--gold, #d4af37)",
+              color: activeCall.status === "CONNECTED" ? "var(--success-fg)" : "var(--gold-fg)",
             }}
           >
             <span
@@ -1077,7 +1077,7 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                 width: 10,
                 height: 10,
                 borderRadius: "50%",
-                background: activeCall.status === "CONNECTED" ? "#22c55e" : "#eab308",
+                background: activeCall.status === "CONNECTED" ? "var(--success-solid)" : "var(--warning-solid)",
                 boxShadow: "0 0 8px currentColor",
               }}
             />
@@ -1107,8 +1107,8 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                   height: 36,
                   borderRadius: "50%",
                   border: "none",
-                  background: isMuted ? "rgba(239, 68, 68, 0.2)" : "rgba(255, 255, 255, 0.1)",
-                  color: isMuted ? "#f87171" : "var(--ice-text)",
+                  background: isMuted ? "var(--danger-soft)" : "var(--surface-soft)",
+                  color: isMuted ? "var(--danger-fg)" : "var(--ice-text)",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
@@ -1129,8 +1129,8 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                 height: 38,
                 borderRadius: "50%",
                 border: "none",
-                background: "#ef4444",
-                color: "#fff",
+                background: "var(--danger-solid)",
+                color: "var(--text-on-accent)",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
@@ -1152,7 +1152,7 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.78)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(8px)",
             display: "flex",
             alignItems: "center",
@@ -1163,8 +1163,8 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
         >
           <div
             style={{
-              background: "#161a20",
-              border: "1px solid rgba(212, 175, 55, 0.35)",
+              background: "var(--surface)",
+              border: "1px solid var(--gold)",
               borderRadius: 20,
               width: "100%",
               maxWidth: 480,
@@ -1189,7 +1189,7 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                   fontWeight: 700,
                   textTransform: "uppercase",
                   letterSpacing: "0.06em",
-                  color: "var(--gold, #d4af37)",
+                  color: "var(--gold-fg)",
                 }}
               >
                 Audio & Téléphonie d&apos;Entreprise
@@ -1221,26 +1221,26 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                   borderRadius: "50%",
                   background:
                     micModal.state === "GRANTED"
-                      ? "rgba(34, 197, 94, 0.15)"
+                      ? "var(--success-soft)"
                       : micModal.state === "DENIED"
-                      ? "rgba(239, 68, 68, 0.15)"
-                      : "rgba(212, 175, 55, 0.15)",
+                      ? "var(--danger-soft)"
+                      : "var(--gold-soft)",
                   color:
                     micModal.state === "GRANTED"
-                      ? "#4ade80"
+                      ? "var(--success-fg)"
                       : micModal.state === "DENIED"
-                      ? "#f87171"
-                      : "var(--gold, #d4af37)",
+                      ? "var(--danger-fg)"
+                      : "var(--gold)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   marginBottom: 16,
                   border:
                     micModal.state === "GRANTED"
-                      ? "1px solid rgba(34, 197, 94, 0.4)"
+                      ? "1px solid var(--success)"
                       : micModal.state === "DENIED"
-                      ? "1px solid rgba(239, 68, 68, 0.4)"
-                      : "1px solid rgba(212, 175, 55, 0.4)",
+                      ? "1px solid var(--danger)"
+                      : "1px solid var(--gold)",
                   boxShadow:
                     micModal.state === "GRANTED"
                       ? "0 0 20px rgba(34, 197, 94, 0.2)"
@@ -1282,8 +1282,8 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                 <div
                   style={{
                     width: "100%",
-                    background: "rgba(0, 0, 0, 0.35)",
-                    border: "1px solid rgba(239, 68, 68, 0.25)",
+                    background: "var(--surface-sunken)",
+                    border: "1px solid var(--danger)",
                     borderRadius: 12,
                     padding: "14px 16px",
                     textAlign: "left",
@@ -1292,7 +1292,7 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                     marginBottom: 20,
                   }}
                 >
-                  <div style={{ fontWeight: 700, color: "#fca5a5", marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ fontWeight: 700, color: "var(--danger-fg)", marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
                     <Lock size={14} />
                     Comment débloquer le micro (Brave, Chrome, Edge) :
                   </div>
@@ -1302,7 +1302,7 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                   <div style={{ opacity: 0.85, marginTop: 4 }}>
                     2. Repérez <strong>Microphone</strong> et vérifiez qu&apos;il est bien sur <strong>Autoriser</strong>.
                   </div>
-                  <div style={{ opacity: 0.95, marginTop: 8, background: "rgba(34, 197, 94, 0.12)", padding: "8px 10px", borderRadius: 8, border: "1px solid rgba(34, 197, 94, 0.3)", color: "#bbf7d0" }}>
+                  <div style={{ opacity: 0.95, marginTop: 8, background: "var(--success-soft)", padding: "8px 10px", borderRadius: 8, border: "1px solid var(--success-soft)", color: "var(--success-solid)" }}>
                     💡 <strong>Important :</strong> Si le bouton Micro est déjà activé dans le cadenas (comme sur votre écran), le navigateur <em>exige</em> une <strong>actualisation de la page</strong> pour recharger la permission. Cliquez sur le bouton vert ci-dessous !
                   </div>
                 </div>
@@ -1313,13 +1313,13 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                 <div style={{ width: "100%", marginBottom: 20 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", marginBottom: 6, opacity: 0.7 }}>
                     <span>Niveau sonore détecté :</span>
-                    <span style={{ fontWeight: 700, color: "#4ade80" }}>{micAudioLevel > 3 ? "Parole détectée" : "Prêt"}</span>
+                    <span style={{ fontWeight: 700, color: "var(--success-fg)" }}>{micAudioLevel > 3 ? "Parole détectée" : "Prêt"}</span>
                   </div>
                   <div
                     style={{
                       width: "100%",
                       height: 10,
-                      background: "rgba(255, 255, 255, 0.08)",
+                      background: "var(--surface-soft)",
                       borderRadius: 6,
                       overflow: "hidden",
                     }}
@@ -1328,7 +1328,7 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                       style={{
                         height: "100%",
                         width: `${Math.max(8, micAudioLevel)}%`,
-                        background: micAudioLevel > 60 ? "#ef4444" : micAudioLevel > 30 ? "#eab308" : "#22c55e",
+                        background: micAudioLevel > 60 ? "var(--danger-solid)" : micAudioLevel > 30 ? "var(--warning-solid)" : "var(--success-solid)",
                         transition: "width 0.1s ease",
                         borderRadius: 6,
                       }}
@@ -1357,8 +1357,8 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                         padding: "10px 20px",
                         borderRadius: 10,
                         border: "none",
-                        background: "linear-gradient(135deg, #22c55e, #16a34a)",
-                        color: "#fff",
+                        background: "var(--success-solid)",
+                        color: "var(--text-strong)",
                         fontWeight: 700,
                         fontSize: "0.88rem",
                         cursor: "pointer",
@@ -1378,8 +1378,8 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                         padding: "10px 24px",
                         borderRadius: 10,
                         border: "none",
-                        background: "linear-gradient(135deg, #22c55e, #16a34a)",
-                        color: "#fff",
+                        background: "var(--success-solid)",
+                        color: "var(--text-strong)",
                         fontWeight: 700,
                         fontSize: "0.88rem",
                         cursor: "pointer",
@@ -1399,7 +1399,7 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                       style={{
                         padding: "10px 16px",
                         borderRadius: 10,
-                        border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+                        border: "1px solid var(--ice-border)",
                         background: "transparent",
                         color: "var(--ice-text)",
                         fontSize: "0.85rem",
@@ -1434,8 +1434,8 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                         padding: "10px 20px",
                         borderRadius: 10,
                         border: "none",
-                        background: "linear-gradient(135deg, #22c55e, #15803d)",
-                        color: "#fff",
+                        background: "var(--success-solid)",
+                        color: "var(--text-strong)",
                         fontWeight: 750,
                         fontSize: "0.88rem",
                         cursor: "pointer",
@@ -1457,8 +1457,8 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                         gap: 6,
                         padding: "10px 16px",
                         borderRadius: 10,
-                        border: "1px solid rgba(255, 255, 255, 0.2)",
-                        background: "rgba(255, 255, 255, 0.05)",
+                        border: "1px solid var(--border)",
+                        background: "var(--surface-soft)",
                         color: "var(--ice-text)",
                         fontWeight: 650,
                         fontSize: "0.82rem",
@@ -1480,7 +1480,7 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                       style={{
                         padding: "10px 18px",
                         borderRadius: 10,
-                        border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+                        border: "1px solid var(--ice-border)",
                         background: "transparent",
                         color: "var(--ice-text)",
                         fontSize: "0.85rem",
@@ -1501,8 +1501,8 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
                         padding: "10px 22px",
                         borderRadius: 10,
                         border: "none",
-                        background: "linear-gradient(135deg, #d4af37, #b48c1e)",
-                        color: "#000",
+                        background: "linear-gradient(135deg, var(--gold-solid), var(--gold-soft))",
+                        color: "var(--text-strong)",
                         fontWeight: 750,
                         fontSize: "0.88rem",
                         cursor: "pointer",
@@ -1533,9 +1533,9 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
             right: 18,
             width: "calc(100vw - 32px)",
             maxWidth: 380,
-            background: "linear-gradient(135deg, rgba(22, 26, 32, 0.98), rgba(15, 20, 26, 0.98))",
+            background: "var(--surface)",
             backdropFilter: "blur(12px)",
-            border: "1px solid rgba(212, 175, 55, 0.45)",
+            border: "1px solid var(--gold)",
             borderRadius: 14,
             boxShadow: "0 10px 35px rgba(0, 0, 0, 0.5), 0 0 15px rgba(212, 175, 55, 0.2)",
             zIndex: 1000001,
@@ -1550,8 +1550,8 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
               width: 38,
               height: 38,
               borderRadius: "50%",
-              background: "rgba(212, 175, 55, 0.2)",
-              color: "var(--gold, #d4af37)",
+              background: "var(--gold-soft)",
+              color: "var(--gold-fg)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -1570,7 +1570,7 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--gold, #d4af37)", textTransform: "uppercase" }}>
+              <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--gold-fg)", textTransform: "uppercase" }}>
                 {messageToast.isBroadcast ? "📢 Diffusion Direction" : "Nouveau Message"}
               </span>
             </div>
@@ -1592,9 +1592,9 @@ export function GlobalCallManager({ currentUserId }: { currentUserId: string }) 
               style={{
                 padding: "5px 10px",
                 borderRadius: 6,
-                background: "linear-gradient(135deg, #d4af37, #b48c1e)",
+                background: "linear-gradient(135deg, var(--gold-solid), var(--gold-soft))",
                 border: "none",
-                color: "#000",
+                color: "var(--text-strong)",
                 fontSize: "0.75rem",
                 fontWeight: 700,
                 cursor: "pointer",

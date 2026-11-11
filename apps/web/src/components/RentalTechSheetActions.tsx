@@ -72,7 +72,7 @@ export function RentalTechSheetActions({
           ? "Fiche technique approuvée et sauvegardée pour ce modèle de véhicule."
           : "Fiche générée. Vérifiez les informations puis validez-la pour la sauvegarder définitivement pour ce modèle."}
       </div>
-      {shareState && <div style={{ marginTop: 6, fontSize: "0.8rem", color: "var(--success, #10b981)" }}>{shareState}</div>}
+      {shareState && <div style={{ marginTop: 6, fontSize: "0.8rem", color: "var(--success-fg)" }}>{shareState}</div>}
     </div>
   );
 }

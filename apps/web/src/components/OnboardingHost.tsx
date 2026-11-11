@@ -90,11 +90,11 @@ export function OnboardingHost({
         width: "min(420px, calc(100vw - 2rem))",
         zIndex: 90,
         borderRadius: 16,
-        background: "linear-gradient(145deg, rgba(15, 23, 42, 0.96) 0%, rgba(9, 14, 26, 0.98) 100%)",
-        border: "1px solid rgba(225, 29, 72, 0.4)",
+        background: "var(--surface)",
+        border: "1px solid var(--accent)",
         boxShadow: "0 20px 50px rgba(0, 0, 0, 0.6), 0 0 25px rgba(225, 29, 72, 0.15)",
         backdropFilter: "blur(20px)",
-        color: "#ffffff",
+        color: "var(--text-strong)",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
@@ -106,8 +106,8 @@ export function OnboardingHost({
       <div
         style={{
           padding: "1rem 1.2rem",
-          background: "linear-gradient(90deg, rgba(225, 29, 72, 0.18) 0%, rgba(15, 23, 42, 0.4) 100%)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+          background: "linear-gradient(90deg, var(--accent-soft) 0%, var(--surface-sunken) 100%)",
+          borderBottom: "1px solid var(--border)",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-start",
@@ -125,15 +125,15 @@ export function OnboardingHost({
                 borderRadius: 20,
                 fontSize: "0.68rem",
                 fontWeight: 750,
-                background: "linear-gradient(135deg, #e11d48 0%, #be123c 100%)",
-                color: "#ffffff",
+                background: "var(--accent)",
+                color: "var(--text-on-accent)",
                 textTransform: "uppercase",
                 letterSpacing: "0.05em",
               }}
             >
               <Compass size={11} /> Premiers pas
             </span>
-            <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>
+            <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
               {roleLabel(messages, role)}
             </span>
           </div>
@@ -144,12 +144,12 @@ export function OnboardingHost({
               fontSize: "1.05rem",
               fontWeight: 800,
               letterSpacing: "-0.01em",
-              color: "#ffffff",
+              color: "var(--text-strong)",
             }}
           >
             Bienvenue, {userName}
           </h3>
-          <p style={{ margin: "2px 0 0", fontSize: "0.78rem", color: "#94a3b8" }}>
+          <p style={{ margin: "2px 0 0", fontSize: "0.78rem", color: "var(--text-muted)" }}>
             Voici votre parcours guidé adapté aux dernières fonctionnalités de CARZONE Ops.
           </p>
         </div>
@@ -159,9 +159,9 @@ export function OnboardingHost({
           onClick={dismiss}
           title="Fermer définitivement pour ce compte"
           style={{
-            background: "rgba(255, 255, 255, 0.08)",
-            border: "1px solid rgba(255, 255, 255, 0.12)",
-            color: "#94a3b8",
+            background: "var(--surface-soft)",
+            border: "1px solid var(--border)",
+            color: "var(--text-muted)",
             width: 28,
             height: 28,
             borderRadius: "50%",
@@ -173,12 +173,12 @@ export function OnboardingHost({
             transition: "all 0.15s ease",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = "#ffffff";
-            e.currentTarget.style.background = "rgba(225, 29, 72, 0.4)";
+            e.currentTarget.style.color = "var(--danger-fg)";
+            e.currentTarget.style.background = "var(--danger-soft)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = "#94a3b8";
-            e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
+            e.currentTarget.style.color = "var(--text-muted)";
+            e.currentTarget.style.background = "var(--surface-soft)";
           }}
         >
           <X size={15} />
@@ -186,17 +186,17 @@ export function OnboardingHost({
       </div>
 
       {/* Barre de progression */}
-      <div style={{ padding: "0.65rem 1.2rem", background: "rgba(0, 0, 0, 0.2)", borderBottom: "1px solid rgba(255, 255, 255, 0.05)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", color: "#94a3b8", marginBottom: 5 }}>
+      <div style={{ padding: "0.65rem 1.2rem", background: "var(--surface-soft)", borderBottom: "1px solid var(--surface-soft)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", color: "var(--text-muted)", marginBottom: 5 }}>
           <span>Progression de découverte</span>
-          <strong style={{ color: pct === 100 ? "#10b981" : "#e11d48" }}>{completed}/{steps.length} ({pct}%)</strong>
+          <strong style={{ color: pct === 100 ? "var(--success-fg)" : "var(--accent-fg)" }}>{completed}/{steps.length} ({pct}%)</strong>
         </div>
-        <div style={{ height: 5, borderRadius: 3, background: "rgba(255, 255, 255, 0.1)", overflow: "hidden" }}>
+        <div style={{ height: 5, borderRadius: 3, background: "var(--surface-sunken)", overflow: "hidden" }}>
           <div
             style={{
               height: "100%",
               width: `${pct}%`,
-              background: pct === 100 ? "linear-gradient(90deg, #10b981, #059669)" : "linear-gradient(90deg, #e11d48, #fb7185)",
+              background: pct === 100 ? "var(--success-solid)" : "linear-gradient(90deg, var(--accent), var(--danger-solid))",
               transition: "width 0.3s ease",
             }}
           />
@@ -227,19 +227,19 @@ export function OnboardingHost({
                 gap: 10,
                 padding: "8px 10px",
                 borderRadius: 10,
-                background: isDone ? "rgba(16, 185, 129, 0.06)" : "rgba(255, 255, 255, 0.03)",
-                border: isDone ? "1px solid rgba(16, 185, 129, 0.2)" : "1px solid rgba(255, 255, 255, 0.06)",
+                background: isDone ? "var(--success-soft)" : "var(--surface-soft)",
+                border: isDone ? "1px solid var(--success)" : "1px solid var(--border)",
                 textDecoration: "none",
                 color: "inherit",
                 transition: "all 0.15s ease",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = isDone ? "rgba(16, 185, 129, 0.12)" : "rgba(225, 29, 72, 0.1)";
-                e.currentTarget.style.borderColor = isDone ? "rgba(16, 185, 129, 0.4)" : "rgba(225, 29, 72, 0.3)";
+                e.currentTarget.style.background = isDone ? "var(--success-soft)" : "var(--accent-soft)";
+                e.currentTarget.style.borderColor = isDone ? "var(--success)" : "var(--accent)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = isDone ? "rgba(16, 185, 129, 0.06)" : "rgba(255, 255, 255, 0.03)";
-                e.currentTarget.style.borderColor = isDone ? "rgba(16, 185, 129, 0.2)" : "rgba(255, 255, 255, 0.06)";
+                e.currentTarget.style.background = isDone ? "var(--success-soft)" : "var(--surface-soft)";
+                e.currentTarget.style.borderColor = isDone ? "var(--success)" : "var(--border)";
               }}
             >
               <div
@@ -252,8 +252,8 @@ export function OnboardingHost({
                   justifyContent: "center",
                   flexShrink: 0,
                   marginTop: 2,
-                  background: isDone ? "#10b981" : "rgba(255, 255, 255, 0.1)",
-                  color: "#ffffff",
+                  background: isDone ? "var(--success-solid)" : "var(--surface-sunken)",
+                  color: isDone ? "var(--text-on-accent)" : "var(--text)",
                   fontSize: "0.7rem",
                   fontWeight: 800,
                 }}
@@ -266,19 +266,19 @@ export function OnboardingHost({
                   style={{
                     fontSize: "0.85rem",
                     fontWeight: 700,
-                    color: isDone ? "#94a3b8" : "#ffffff",
+                    color: isDone ? "var(--text-muted)" : "var(--text-strong)",
                     textDecoration: isDone ? "line-through" : "none",
                     lineHeight: 1.3,
                   }}
                 >
                   {step.label}
                 </div>
-                <div style={{ fontSize: "0.72rem", color: "#64748b", marginTop: 2 }}>
+                <div style={{ fontSize: "0.72rem", color: "var(--text-subtle)", marginTop: 2 }}>
                   {step.hint}
                 </div>
               </div>
 
-              <ExternalLink size={13} style={{ color: "#64748b", flexShrink: 0, marginTop: 4 }} />
+              <ExternalLink size={13} style={{ color: "var(--text-subtle)", flexShrink: 0, marginTop: 4 }} />
             </Link>
           );
         })}
@@ -288,8 +288,8 @@ export function OnboardingHost({
       <div
         style={{
           padding: "0.75rem 1rem",
-          background: "rgba(0, 0, 0, 0.35)",
-          borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+          background: "var(--surface-sunken)",
+          borderTop: "1px solid var(--border)",
           display: "flex",
           flexDirection: "column",
           gap: 6,
@@ -303,8 +303,8 @@ export function OnboardingHost({
             padding: "8px 12px",
             borderRadius: 8,
             border: "none",
-            background: "linear-gradient(135deg, #e11d48 0%, #be123c 100%)",
-            color: "#ffffff",
+            background: "var(--accent)",
+            color: "var(--text-on-accent)",
             fontSize: "0.82rem",
             fontWeight: 700,
             cursor: "pointer",
@@ -319,14 +319,14 @@ export function OnboardingHost({
         </button>
 
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 4, marginTop: 2 }}>
-          <span style={{ fontSize: "0.7rem", color: "#64748b" }}>Besoin de revoir ce guide ?</span>
+          <span style={{ fontSize: "0.7rem", color: "var(--text-subtle)" }}>Besoin de revoir ce guide ?</span>
           <button
             type="button"
             onClick={openHelpCenter}
             style={{
               background: "none",
               border: "none",
-              color: "#f43f5e",
+              color: "var(--danger-fg)",
               fontSize: "0.7rem",
               fontWeight: 700,
               cursor: "pointer",

@@ -27,9 +27,9 @@ export function DeleteImportButton({
       style={{
         padding: "0.35rem 0.6rem",
         fontSize: "0.8rem",
-        background: "rgba(225, 29, 72, 0.14)",
-        border: "1px solid rgba(225, 29, 72, 0.45)",
-        color: "#fda4af",
+        background: "var(--accent-soft)",
+        border: "1px solid var(--accent)",
+        color: "var(--danger-fg)",
       }}
     >
       {pending ? "..." : label}

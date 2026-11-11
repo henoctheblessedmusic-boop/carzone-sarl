@@ -273,13 +273,13 @@ export function ConferenceRoomView({
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflowY: "auto", background: "rgba(10, 14, 20, 0.6)" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflowY: "auto", background: "var(--surface-sunken)" }}>
       {/* Top Header */}
       <div
         style={{
           padding: "16px 22px",
-          borderBottom: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
-          background: "linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent)",
+          borderBottom: "1px solid var(--ice-border)",
+          background: "linear-gradient(180deg, var(--surface-soft), transparent)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -293,13 +293,13 @@ export function ConferenceRoomView({
               width: 44,
               height: 44,
               borderRadius: 12,
-              background: "rgba(212, 175, 55, 0.15)",
-              color: "var(--gold, #d4af37)",
+              background: "var(--gold-soft)",
+              color: "var(--gold-fg)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               fontSize: "1.4rem",
-              border: "1px solid rgba(212, 175, 55, 0.3)",
+              border: "1px solid var(--gold)",
             }}
           >
             {roomInfo.icon}
@@ -315,9 +315,9 @@ export function ConferenceRoomView({
                   fontWeight: 800,
                   padding: "2px 8px",
                   borderRadius: 6,
-                  background: isJoined ? "rgba(34, 197, 94, 0.2)" : "rgba(212, 175, 55, 0.2)",
-                  color: isJoined ? "#4ade80" : "var(--gold, #d4af37)",
-                  border: isJoined ? "1px solid rgba(34, 197, 94, 0.3)" : "1px solid rgba(212, 175, 55, 0.3)",
+                  background: isJoined ? "var(--success-soft)" : "var(--gold-soft)",
+                  color: isJoined ? "var(--success-fg)" : "var(--gold-fg)",
+                  border: isJoined ? "1px solid var(--success)" : "1px solid var(--gold)",
                 }}
               >
                 {isJoined ? copy.live : copy.open}
@@ -339,9 +339,9 @@ export function ConferenceRoomView({
                 gap: 6,
                 padding: "6px 12px",
                 borderRadius: 8,
-                background: "rgba(0, 0, 0, 0.4)",
-                border: "1px solid rgba(212, 175, 55, 0.35)",
-                color: "var(--gold, #d4af37)",
+                background: "var(--surface-sunken)",
+                border: "1px solid var(--gold)",
+                color: "var(--gold-fg)",
                 fontSize: "0.88rem",
                 fontWeight: 750,
                 letterSpacing: "0.04em",
@@ -362,9 +362,9 @@ export function ConferenceRoomView({
                 style={{
                   padding: "6px 10px",
                   borderRadius: 6,
-                  border: r.id === roomId ? "1px solid var(--gold, #d4af37)" : "1px solid rgba(255, 255, 255, 0.08)",
-                  background: r.id === roomId ? "rgba(212, 175, 55, 0.2)" : "rgba(255, 255, 255, 0.03)",
-                  color: r.id === roomId ? "var(--gold, #d4af37)" : "var(--ice-text)",
+                  border: r.id === roomId ? "1px solid var(--gold)" : "1px solid var(--border)",
+                  background: r.id === roomId ? "var(--gold-soft)" : "var(--surface-soft)",
+                  color: r.id === roomId ? "var(--gold-fg)" : "var(--ice-text)",
                   fontSize: "0.76rem",
                   cursor: "pointer",
                   fontWeight: r.id === roomId ? 700 : 400,
@@ -388,8 +388,8 @@ export function ConferenceRoomView({
               width: "100%",
               padding: "32px 28px",
               borderRadius: 16,
-              background: "linear-gradient(135deg, rgba(22, 26, 32, 0.9), rgba(15, 20, 26, 0.95))",
-              border: "1px solid rgba(212, 175, 55, 0.3)",
+              background: "var(--surface)",
+              border: "1px solid var(--gold)",
               boxShadow: "0 15px 40px rgba(0, 0, 0, 0.5)",
               textAlign: "center",
             }}
@@ -405,11 +405,11 @@ export function ConferenceRoomView({
             {/* Participants déjà en ligne */}
             <div
               style={{
-                background: "rgba(0, 0, 0, 0.3)",
+                background: "var(--surface-soft)",
                 borderRadius: 10,
                 padding: "12px",
                 marginBottom: 24,
-                border: "1px solid rgba(255, 255, 255, 0.08)",
+                border: "1px solid var(--border)",
               }}
             >
               <div style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", opacity: 0.7, marginBottom: 8 }}>
@@ -427,9 +427,9 @@ export function ConferenceRoomView({
                       style={{
                         padding: "4px 9px",
                         borderRadius: 6,
-                        background: "rgba(34, 197, 94, 0.15)",
-                        border: "1px solid rgba(34, 197, 94, 0.3)",
-                        color: "#4ade80",
+                        background: "var(--success-soft)",
+                        border: "1px solid var(--success)",
+                        color: "var(--success-fg)",
                         fontSize: "0.75rem",
                         fontWeight: 600,
                       }}
@@ -449,8 +449,8 @@ export function ConferenceRoomView({
                 padding: "13px 24px",
                 borderRadius: 10,
                 border: "none",
-                background: "linear-gradient(135deg, #22c55e, #16a34a)",
-                color: "#ffffff",
+                background: "var(--success-solid)",
+                color: "var(--text-strong)",
                 fontSize: "0.95rem",
                 fontWeight: 750,
                 cursor: "pointer",
@@ -481,11 +481,11 @@ export function ConferenceRoomView({
               {/* Carte utilisateur local */}
               <div
                 style={{
-                  background: "linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(212, 175, 55, 0.04))",
+                  background: "var(--gold-soft)",
                   border:
                     audioLevel > 18 && !isMuted
-                      ? "2px solid #22c55e"
-                      : "1px solid rgba(212, 175, 55, 0.3)",
+                      ? "2px solid var(--success)"
+                      : "1px solid var(--gold)",
                   borderRadius: 14,
                   padding: "18px",
                   display: "flex",
@@ -505,14 +505,14 @@ export function ConferenceRoomView({
                     width: 64,
                     height: 64,
                     borderRadius: "50%",
-                    background: "rgba(212, 175, 55, 0.2)",
-                    border: "2px solid var(--gold, #d4af37)",
+                    background: "var(--gold-soft)",
+                    border: "2px solid var(--gold)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     fontSize: "1.4rem",
                     fontWeight: 800,
-                    color: "var(--gold, #d4af37)",
+                    color: "var(--gold-fg)",
                     marginBottom: 10,
                   }}
                 >
@@ -534,8 +534,8 @@ export function ConferenceRoomView({
                       gap: 5,
                       padding: "4px 9px",
                       borderRadius: 12,
-                      background: isMuted ? "rgba(239, 68, 68, 0.2)" : "rgba(34, 197, 94, 0.2)",
-                      color: isMuted ? "#f87171" : "#4ade80",
+                      background: isMuted ? "var(--danger-soft)" : "var(--success-soft)",
+                      color: isMuted ? "var(--danger-fg)" : "var(--success-fg)",
                       fontSize: "0.72rem",
                       fontWeight: 700,
                     }}
@@ -553,8 +553,8 @@ export function ConferenceRoomView({
                   <div
                     key={p.id}
                     style={{
-                      background: "rgba(255, 255, 255, 0.04)",
-                      border: p.isSpeaking ? "2px solid #22c55e" : "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+                      background: "var(--surface-soft)",
+                      border: p.isSpeaking ? "2px solid var(--success)" : "1px solid var(--ice-border)",
                       borderRadius: 14,
                       padding: "18px",
                       display: "flex",
@@ -570,8 +570,8 @@ export function ConferenceRoomView({
                         width: 64,
                         height: 64,
                         borderRadius: "50%",
-                        background: "rgba(255, 255, 255, 0.08)",
-                        border: "2px solid rgba(255, 255, 255, 0.2)",
+                        background: "var(--surface-soft)",
+                        border: "2px solid var(--border)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -599,8 +599,8 @@ export function ConferenceRoomView({
                           gap: 5,
                           padding: "4px 9px",
                           borderRadius: 12,
-                          background: p.isMuted ? "rgba(239, 68, 68, 0.15)" : "rgba(34, 197, 94, 0.15)",
-                          color: p.isMuted ? "#f87171" : "#4ade80",
+                          background: p.isMuted ? "var(--danger-soft)" : "var(--success-soft)",
+                          color: p.isMuted ? "var(--danger-fg)" : "var(--success-fg)",
                           fontSize: "0.72rem",
                           fontWeight: 700,
                         }}
@@ -622,8 +622,8 @@ export function ConferenceRoomView({
                 gap: 12,
                 padding: "14px 20px",
                 borderRadius: 14,
-                background: "linear-gradient(135deg, rgba(22, 26, 32, 0.95), rgba(15, 20, 26, 0.95))",
-                border: "1px solid rgba(212, 175, 55, 0.35)",
+                background: "var(--surface)",
+                border: "1px solid var(--gold)",
                 boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
                 flexWrap: "wrap",
               }}
@@ -638,9 +638,9 @@ export function ConferenceRoomView({
                   gap: 8,
                   padding: "10px 20px",
                   borderRadius: 10,
-                  border: isMuted ? "1px solid #ef4444" : "1px solid #22c55e",
-                  background: isMuted ? "rgba(239, 68, 68, 0.2)" : "rgba(34, 197, 94, 0.2)",
-                  color: isMuted ? "#fca5a5" : "#86efac",
+                  border: isMuted ? "1px solid var(--danger)" : "1px solid var(--success)",
+                  background: isMuted ? "var(--danger-soft)" : "var(--success-soft)",
+                  color: isMuted ? "var(--danger-fg)" : "var(--success-fg)",
                   fontSize: "0.85rem",
                   fontWeight: 750,
                   cursor: "pointer",
@@ -660,9 +660,9 @@ export function ConferenceRoomView({
                   gap: 8,
                   padding: "10px 18px",
                   borderRadius: 10,
-                  border: "1px solid rgba(212, 175, 55, 0.4)",
-                  background: "rgba(212, 175, 55, 0.15)",
-                  color: "var(--gold, #d4af37)",
+                  border: "1px solid var(--gold)",
+                  background: "var(--gold-soft)",
+                  color: "var(--gold-fg)",
                   fontSize: "0.85rem",
                   fontWeight: 700,
                   cursor: "pointer",
@@ -683,8 +683,8 @@ export function ConferenceRoomView({
                   padding: "10px 20px",
                   borderRadius: 10,
                   border: "none",
-                  background: "rgba(239, 68, 68, 0.8)",
-                  color: "#fff",
+                  background: "var(--danger-soft)",
+                  color: "var(--text-on-accent)",
                   fontSize: "0.85rem",
                   fontWeight: 750,
                   cursor: "pointer",
@@ -705,9 +705,9 @@ export function ConferenceRoomView({
                     gap: 6,
                     padding: "10px 16px",
                     borderRadius: 10,
-                    border: "1px solid rgba(239, 68, 68, 0.4)",
-                    background: "rgba(239, 68, 68, 0.15)",
-                    color: "#f87171",
+                    border: "1px solid var(--danger)",
+                    background: "var(--danger-soft)",
+                    color: "var(--danger-fg)",
                     fontSize: "0.8rem",
                     fontWeight: 700,
                     cursor: "pointer",
@@ -729,7 +729,7 @@ export function ConferenceRoomView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.75)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             zIndex: 999999,
             display: "flex",
@@ -742,8 +742,8 @@ export function ConferenceRoomView({
             style={{
               width: "100%",
               maxWidth: 420,
-              background: "#161a20",
-              border: "1px solid rgba(212, 175, 55, 0.4)",
+              background: "var(--surface)",
+              border: "1px solid var(--gold)",
               borderRadius: 14,
               padding: 20,
               boxShadow: "0 20px 50px rgba(0, 0, 0, 0.6)",
@@ -780,8 +780,8 @@ export function ConferenceRoomView({
                         justifyContent: "space-between",
                         padding: "8px 12px",
                         borderRadius: 8,
-                        background: "rgba(255, 255, 255, 0.04)",
-                        border: "1px solid rgba(255, 255, 255, 0.08)",
+                        background: "var(--surface-soft)",
+                        border: "1px solid var(--border)",
                       }}
                     >
                       <div>
@@ -801,8 +801,8 @@ export function ConferenceRoomView({
                           padding: "5px 12px",
                           borderRadius: 6,
                           border: "none",
-                          background: isInvited ? "rgba(34, 197, 94, 0.2)" : "rgba(212, 175, 55, 0.2)",
-                          color: isInvited ? "#4ade80" : "var(--gold, #d4af37)",
+                          background: isInvited ? "var(--success-soft)" : "var(--gold-soft)",
+                          color: isInvited ? "var(--success-fg)" : "var(--gold-fg)",
                           fontSize: "0.74rem",
                           fontWeight: 700,
                           cursor: isInvited ? "default" : "pointer",
@@ -822,7 +822,7 @@ export function ConferenceRoomView({
                 style={{
                   padding: "8px 16px",
                   borderRadius: 8,
-                  border: "1px solid rgba(255, 255, 255, 0.15)",
+                  border: "1px solid var(--border)",
                   background: "transparent",
                   color: "var(--ice-text)",
                   fontSize: "0.8rem",

@@ -385,8 +385,8 @@ export function UsersView({
           alignItems: "center",
           flexWrap: "wrap",
           gap: 16,
-          background: "var(--ice-card-bg, rgba(255, 255, 255, 0.03))",
-          border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+          background: "var(--ice-card-bg)",
+          border: "1px solid var(--ice-border)",
           borderRadius: 16,
           padding: "22px 26px",
         }}
@@ -398,8 +398,8 @@ export function UsersView({
                 display: "inline-flex",
                 padding: "8px",
                 borderRadius: "10px",
-                background: "rgba(212, 175, 55, 0.15)",
-                color: "var(--gold, #d4af37)",
+                background: "var(--gold-soft)",
+                color: "var(--gold-fg)",
               }}
             >
               <Users size={24} />
@@ -419,8 +419,8 @@ export function UsersView({
                 fontSize: "0.75rem",
                 padding: "2px 8px",
                 borderRadius: 6,
-                background: "rgba(212, 175, 55, 0.15)",
-                color: "var(--gold, #d4af37)",
+                background: "var(--gold-soft)",
+                color: "var(--gold-fg)",
                 fontWeight: 600,
               }}
             >
@@ -449,10 +449,10 @@ export function UsersView({
               gap: 8,
               padding: "10px 18px",
               borderRadius: 10,
-              border: "1px solid rgba(212, 175, 55, 0.5)",
+              border: "1px solid var(--gold)",
               background:
-                "linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(180, 140, 30, 0.35))",
-              color: "var(--gold, #d4af37)",
+                "var(--gold-soft)",
+              color: "var(--gold-fg)",
               fontWeight: 700,
               fontSize: "0.9rem",
               cursor: "pointer",
@@ -476,8 +476,8 @@ export function UsersView({
       >
         <div
           style={{
-            background: "var(--ice-card-bg, rgba(255, 255, 255, 0.03))",
-            border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+            background: "var(--ice-card-bg)",
+            border: "1px solid var(--ice-border)",
             borderRadius: 12,
             padding: "16px 18px",
             display: "flex",
@@ -489,8 +489,8 @@ export function UsersView({
             style={{
               padding: 10,
               borderRadius: 10,
-              background: "rgba(59, 130, 246, 0.15)",
-              color: "#60a5fa",
+              background: "var(--info-soft)",
+              color: "var(--info-fg)",
             }}
           >
             <Users size={22} />
@@ -505,8 +505,8 @@ export function UsersView({
 
         <div
           style={{
-            background: "var(--ice-card-bg, rgba(255, 255, 255, 0.03))",
-            border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+            background: "var(--ice-card-bg)",
+            border: "1px solid var(--ice-border)",
             borderRadius: 12,
             padding: "16px 18px",
             display: "flex",
@@ -518,8 +518,8 @@ export function UsersView({
             style={{
               padding: 10,
               borderRadius: 10,
-              background: "rgba(34, 197, 94, 0.15)",
-              color: "#4ade80",
+              background: "var(--success-soft)",
+              color: "var(--success-fg)",
             }}
           >
             <UserCheck size={22} />
@@ -534,8 +534,8 @@ export function UsersView({
 
         <div
           style={{
-            background: "var(--ice-card-bg, rgba(255, 255, 255, 0.03))",
-            border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+            background: "var(--ice-card-bg)",
+            border: "1px solid var(--ice-border)",
             borderRadius: 12,
             padding: "16px 18px",
             display: "flex",
@@ -547,8 +547,8 @@ export function UsersView({
             style={{
               padding: 10,
               borderRadius: 10,
-              background: "rgba(168, 85, 247, 0.15)",
-              color: "#c084fc",
+              background: "var(--purple-soft)",
+              color: "var(--purple-fg)",
             }}
           >
             <Shield size={22} />
@@ -563,8 +563,8 @@ export function UsersView({
 
         <div
           style={{
-            background: "var(--ice-card-bg, rgba(255, 255, 255, 0.03))",
-            border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+            background: "var(--ice-card-bg)",
+            border: "1px solid var(--ice-border)",
             borderRadius: 12,
             padding: "16px 18px",
             display: "flex",
@@ -576,8 +576,8 @@ export function UsersView({
             style={{
               padding: 10,
               borderRadius: 10,
-              background: "rgba(212, 175, 55, 0.15)",
-              color: "var(--gold, #d4af37)",
+              background: "var(--gold-soft)",
+              color: "var(--gold-fg)",
             }}
           >
             <Sliders size={22} />
@@ -598,8 +598,8 @@ export function UsersView({
           gap: 12,
           flexWrap: "wrap",
           alignItems: "center",
-          background: "var(--ice-card-bg, rgba(255, 255, 255, 0.03))",
-          border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+          background: "var(--ice-card-bg)",
+          border: "1px solid var(--ice-border)",
           borderRadius: 12,
           padding: "12px 16px",
         }}
@@ -611,8 +611,8 @@ export function UsersView({
             alignItems: "center",
             gap: 8,
             flex: "1 1 240px",
-            background: "rgba(0, 0, 0, 0.15)",
-            border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+            background: "var(--surface-soft)",
+            border: "1px solid var(--ice-border)",
             borderRadius: 8,
             padding: "8px 12px",
           }}
@@ -658,8 +658,8 @@ export function UsersView({
             style={{
               padding: "7px 12px",
               borderRadius: 8,
-              border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-              background: "var(--ice-card-bg, #1a1e24)",
+              border: "1px solid var(--ice-border)",
+              background: "var(--ice-card-bg)",
               color: "var(--ice-text)",
               fontSize: "0.85rem",
               cursor: "pointer",
@@ -683,8 +683,8 @@ export function UsersView({
             style={{
               padding: "7px 12px",
               borderRadius: 8,
-              border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-              background: "var(--ice-card-bg, #1a1e24)",
+              border: "1px solid var(--ice-border)",
+              background: "var(--ice-card-bg)",
               color: "var(--ice-text)",
               fontSize: "0.85rem",
               cursor: "pointer",
@@ -704,8 +704,8 @@ export function UsersView({
       {/* Users Fleet Table */}
       <div
         style={{
-          background: "var(--ice-card-bg, rgba(255, 255, 255, 0.03))",
-          border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+          background: "var(--ice-card-bg)",
+          border: "1px solid var(--ice-border)",
           borderRadius: 14,
           overflow: "hidden",
         }}
@@ -722,8 +722,8 @@ export function UsersView({
             <thead>
               <tr
                 style={{
-                  background: "rgba(255, 255, 255, 0.04)",
-                  borderBottom: "1px solid var(--ice-border, rgba(255, 255, 255, 0.12))",
+                  background: "var(--surface-soft)",
+                  borderBottom: "1px solid var(--ice-border)",
                   color: "var(--ice-text)",
                   fontSize: "0.78rem",
                   textTransform: "uppercase",
@@ -754,7 +754,7 @@ export function UsersView({
                   <tr
                     key={u.id}
                     style={{
-                      borderBottom: "1px solid var(--ice-border, rgba(255, 255, 255, 0.06))",
+                      borderBottom: "1px solid var(--ice-border)",
                       transition: "background 0.15s ease",
                     }}
                   >
@@ -766,14 +766,14 @@ export function UsersView({
                             width: 38,
                             height: 38,
                             borderRadius: "50%",
-                            background: "linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(180, 140, 30, 0.3))",
-                            color: "var(--gold, #d4af37)",
+                            background: "var(--gold-soft)",
+                            color: "var(--gold-fg)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             fontWeight: 700,
                             fontSize: "0.95rem",
-                            border: "1px solid rgba(212, 175, 55, 0.3)",
+                            border: "1px solid var(--gold)",
                           }}
                         >
                           {u.fullName.charAt(0).toUpperCase()}
@@ -800,16 +800,16 @@ export function UsersView({
                           borderRadius: 6,
                           background:
                             u.role === "PDG" || u.role === "SG" || u.role === "DG"
-                              ? "rgba(212, 175, 55, 0.18)"
-                              : "rgba(59, 130, 246, 0.12)",
+                              ? "var(--gold-soft)"
+                              : "var(--info-soft)",
                           color:
                             u.role === "PDG" || u.role === "SG" || u.role === "DG"
-                              ? "var(--gold, #d4af37)"
-                              : "#60a5fa",
+                              ? "var(--gold)"
+                              : "var(--info-fg)",
                           border:
                             u.role === "PDG" || u.role === "SG" || u.role === "DG"
-                              ? "1px solid rgba(212, 175, 55, 0.35)"
-                              : "1px solid rgba(59, 130, 246, 0.25)",
+                              ? "1px solid var(--gold)"
+                              : "1px solid var(--info)",
                           fontSize: "0.8rem",
                           fontWeight: 650,
                         }}
@@ -830,12 +830,12 @@ export function UsersView({
                             padding: "3px 8px",
                             borderRadius: 6,
                             background: hasCustom
-                              ? "rgba(168, 85, 247, 0.15)"
-                              : "rgba(255, 255, 255, 0.06)",
-                            color: hasCustom ? "#c084fc" : "var(--ice-text)",
+                              ? "var(--purple-soft)"
+                              : "var(--surface-soft)",
+                            color: hasCustom ? "var(--purple-fg)" : "var(--ice-text)",
                             border: hasCustom
-                              ? "1px solid rgba(168, 85, 247, 0.3)"
-                              : "1px solid rgba(255, 255, 255, 0.1)",
+                              ? "1px solid var(--purple)"
+                              : "1px solid var(--border)",
                             fontSize: "0.78rem",
                             fontWeight: 600,
                           }}
@@ -849,8 +849,8 @@ export function UsersView({
                               fontSize: "0.72rem",
                               padding: "2px 6px",
                               borderRadius: 4,
-                              background: "rgba(234, 179, 8, 0.15)",
-                              color: "#eab308",
+                              background: "var(--warning-soft)",
+                              color: "var(--warning-fg)",
                             }}
                           >
                             {teamCopy.customized}
@@ -877,9 +877,9 @@ export function UsersView({
                               fontSize: "0.76rem",
                               padding: "4px 8px",
                               borderRadius: 6,
-                              background: "rgba(16, 185, 129, 0.1)",
-                              border: "1px solid rgba(52, 211, 153, 0.3)",
-                              color: "#34d399",
+                              background: "var(--success-soft)",
+                              border: "1px solid var(--success)",
+                              color: "var(--success-fg)",
                               display: "inline-flex",
                               alignItems: "center",
                               gap: 5,
@@ -899,9 +899,9 @@ export function UsersView({
                             style={{
                               padding: "4px 8px",
                               borderRadius: 6,
-                              border: "1px solid rgba(212, 175, 55, 0.35)",
-                              background: "rgba(212, 175, 55, 0.1)",
-                              color: "var(--gold, #d4af37)",
+                              border: "1px solid var(--gold)",
+                              background: "var(--gold-soft)",
+                              color: "var(--gold-fg)",
                               fontSize: "0.75rem",
                               fontWeight: 650,
                               cursor: "pointer",
@@ -949,9 +949,9 @@ export function UsersView({
                           borderRadius: 20,
                           border: "none",
                           background: u.active
-                            ? "rgba(34, 197, 94, 0.15)"
-                            : "rgba(239, 68, 68, 0.15)",
-                          color: u.active ? "#4ade80" : "#f87171",
+                            ? "var(--success-soft)"
+                            : "var(--danger-soft)",
+                          color: u.active ? "var(--success-fg)" : "var(--danger-fg)",
                           fontSize: "0.78rem",
                           fontWeight: 650,
                           cursor: isSelf ? "not-allowed" : "pointer",
@@ -991,9 +991,9 @@ export function UsersView({
                               gap: 6,
                               padding: "6px 12px",
                               borderRadius: 8,
-                              border: "1px solid rgba(212, 175, 55, 0.35)",
-                              background: "rgba(212, 175, 55, 0.1)",
-                              color: "var(--gold, #d4af37)",
+                              border: "1px solid var(--gold)",
+                              background: "var(--gold-soft)",
+                              color: "var(--gold-fg)",
                               fontSize: "0.8rem",
                               fontWeight: 650,
                               cursor: "pointer",
@@ -1013,9 +1013,9 @@ export function UsersView({
                             style={{
                               padding: "6px 9px",
                               borderRadius: 8,
-                              border: "1px solid rgba(239, 68, 68, 0.3)",
-                              background: "rgba(239, 68, 68, 0.08)",
-                              color: "#f87171",
+                              border: "1px solid var(--danger)",
+                              background: "var(--danger-soft)",
+                              color: "var(--danger-fg)",
                               cursor: "pointer",
                               display: "inline-flex",
                               alignItems: "center",
@@ -1058,7 +1058,7 @@ export function UsersView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.75)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "flex",
             alignItems: "center",
@@ -1069,8 +1069,8 @@ export function UsersView({
         >
           <div
             style={{
-              background: "var(--ice-card-bg, #161a20)",
-              border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+              background: "var(--ice-card-bg)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 16,
               width: "100%",
               maxWidth: 920,
@@ -1088,8 +1088,8 @@ export function UsersView({
                 justifyContent: "space-between",
                 alignItems: "center",
                 padding: "18px 24px",
-                borderBottom: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
-                background: "rgba(255, 255, 255, 0.02)",
+                borderBottom: "1px solid var(--ice-border)",
+                background: "var(--surface-soft)",
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -1098,8 +1098,8 @@ export function UsersView({
                     display: "inline-flex",
                     padding: "7px",
                     borderRadius: "8px",
-                    background: "rgba(212, 175, 55, 0.15)",
-                    color: "var(--gold, #d4af37)",
+                    background: "var(--gold-soft)",
+                    color: "var(--gold-fg)",
                   }}
                 >
                   <UserPlus size={20} />
@@ -1148,8 +1148,8 @@ export function UsersView({
                   gap: 16,
                   padding: "16px",
                   borderRadius: 12,
-                  background: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.08))",
+                  background: "var(--surface-soft)",
+                  border: "1px solid var(--ice-border)",
                 }}
               >
                 <div>
@@ -1166,8 +1166,8 @@ export function UsersView({
                       width: "100%",
                       padding: "9px 12px",
                       borderRadius: 8,
-                      border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                      background: "rgba(0, 0, 0, 0.2)",
+                      border: "1px solid var(--ice-border)",
+                      background: "var(--surface-soft)",
                       color: "var(--ice-text)",
                       fontSize: "0.875rem",
                       boxSizing: "border-box",
@@ -1189,8 +1189,8 @@ export function UsersView({
                       width: "100%",
                       padding: "9px 12px",
                       borderRadius: 8,
-                      border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                      background: "rgba(0, 0, 0, 0.2)",
+                      border: "1px solid var(--ice-border)",
+                      background: "var(--surface-soft)",
                       color: "var(--ice-text)",
                       fontSize: "0.875rem",
                       boxSizing: "border-box",
@@ -1209,8 +1209,8 @@ export function UsersView({
                       width: "100%",
                       padding: "9px 12px",
                       borderRadius: 8,
-                      border: "1px solid rgba(212, 175, 55, 0.4)",
-                      background: "var(--ice-card-bg, #1a1e24)",
+                      border: "1px solid var(--gold)",
+                      background: "var(--ice-card-bg)",
                       color: "var(--ice-text)",
                       fontSize: "0.875rem",
                       fontWeight: 600,
@@ -1238,8 +1238,8 @@ export function UsersView({
                       width: "100%",
                       padding: "9px 12px",
                       borderRadius: 8,
-                      border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                      background: "rgba(0, 0, 0, 0.2)",
+                      border: "1px solid var(--ice-border)",
+                      background: "var(--surface-soft)",
                       color: "var(--ice-text)",
                       fontSize: "0.875rem",
                       boxSizing: "border-box",
@@ -1269,8 +1269,8 @@ export function UsersView({
                         fontSize: "0.75rem",
                         padding: "2px 8px",
                         borderRadius: 6,
-                        background: "rgba(212, 175, 55, 0.15)",
-                        color: "var(--gold, #d4af37)",
+                        background: "var(--gold-soft)",
+                        color: "var(--gold-fg)",
                         fontWeight: 650,
                       }}
                     >
@@ -1285,8 +1285,8 @@ export function UsersView({
                       display: "inline-flex",
                       alignItems: "center",
                       gap: 6,
-                      background: "rgba(255, 255, 255, 0.05)",
-                      border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+                      background: "var(--surface-soft)",
+                      border: "1px solid var(--ice-border)",
                       color: "var(--ice-text)",
                       padding: "5px 10px",
                       borderRadius: 6,
@@ -1321,7 +1321,7 @@ export function UsersView({
                   alignItems: "center",
                   gap: 12,
                   paddingTop: 14,
-                  borderTop: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+                  borderTop: "1px solid var(--ice-border)",
                 }}
               >
                 <button
@@ -1330,7 +1330,7 @@ export function UsersView({
                   style={{
                     padding: "9px 16px",
                     borderRadius: 8,
-                    border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+                    border: "1px solid var(--ice-border)",
                     background: "transparent",
                     color: "var(--ice-text)",
                     fontSize: "0.85rem",
@@ -1349,8 +1349,8 @@ export function UsersView({
                     padding: "9px 20px",
                     borderRadius: 8,
                     border: "none",
-                    background: "linear-gradient(135deg, #d4af37, #b48c1e)",
-                    color: "#000",
+                    background: "linear-gradient(135deg, var(--gold-solid), var(--gold-soft))",
+                    color: "var(--text-strong)",
                     fontWeight: 750,
                     fontSize: "0.875rem",
                     cursor: "pointer",
@@ -1374,7 +1374,7 @@ export function UsersView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.75)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "flex",
             alignItems: "center",
@@ -1385,8 +1385,8 @@ export function UsersView({
         >
           <div
             style={{
-              background: "var(--ice-card-bg, #161a20)",
-              border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+              background: "var(--ice-card-bg)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 16,
               width: "100%",
               maxWidth: 920,
@@ -1404,8 +1404,8 @@ export function UsersView({
                 justifyContent: "space-between",
                 alignItems: "center",
                 padding: "18px 24px",
-                borderBottom: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
-                background: "rgba(255, 255, 255, 0.02)",
+                borderBottom: "1px solid var(--ice-border)",
+                background: "var(--surface-soft)",
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -1414,8 +1414,8 @@ export function UsersView({
                     display: "inline-flex",
                     padding: "7px",
                     borderRadius: "8px",
-                    background: "rgba(212, 175, 55, 0.15)",
-                    color: "var(--gold, #d4af37)",
+                    background: "var(--gold-soft)",
+                    color: "var(--gold-fg)",
                   }}
                 >
                   <Sliders size={20} />
@@ -1464,8 +1464,8 @@ export function UsersView({
                   gap: 14,
                   padding: "16px",
                   borderRadius: 12,
-                  background: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.08))",
+                  background: "var(--surface-soft)",
+                  border: "1px solid var(--ice-border)",
                 }}
               >
                 <div>
@@ -1481,8 +1481,8 @@ export function UsersView({
                       width: "100%",
                       padding: "8px 12px",
                       borderRadius: 8,
-                      border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                      background: "rgba(0, 0, 0, 0.2)",
+                      border: "1px solid var(--ice-border)",
+                      background: "var(--surface-soft)",
                       color: "var(--ice-text)",
                       fontSize: "0.875rem",
                       boxSizing: "border-box",
@@ -1502,8 +1502,8 @@ export function UsersView({
                       width: "100%",
                       padding: "8px 12px",
                       borderRadius: 8,
-                      border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
-                      background: "rgba(255, 255, 255, 0.04)",
+                      border: "1px solid var(--ice-border)",
+                      background: "var(--surface-soft)",
                       color: "var(--ice-text)",
                       fontSize: "0.875rem",
                       boxSizing: "border-box",
@@ -1525,8 +1525,8 @@ export function UsersView({
                       width: "100%",
                       padding: "8px 12px",
                       borderRadius: 8,
-                      border: "1px solid rgba(212, 175, 55, 0.4)",
-                      background: "var(--ice-card-bg, #1a1e24)",
+                      border: "1px solid var(--gold)",
+                      background: "var(--ice-card-bg)",
                       color: "var(--ice-text)",
                       fontSize: "0.875rem",
                       fontWeight: 650,
@@ -1565,8 +1565,8 @@ export function UsersView({
                         fontSize: "0.75rem",
                         padding: "2px 8px",
                         borderRadius: 6,
-                        background: "rgba(212, 175, 55, 0.15)",
-                        color: "var(--gold, #d4af37)",
+                        background: "var(--gold-soft)",
+                        color: "var(--gold-fg)",
                         fontWeight: 650,
                       }}
                     >
@@ -1582,8 +1582,8 @@ export function UsersView({
                         display: "inline-flex",
                         alignItems: "center",
                         gap: 6,
-                        background: "rgba(255, 255, 255, 0.05)",
-                        border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+                        background: "var(--surface-soft)",
+                        border: "1px solid var(--ice-border)",
                         color: "var(--ice-text)",
                         padding: "5px 10px",
                         borderRadius: 6,
@@ -1619,7 +1619,7 @@ export function UsersView({
                   alignItems: "center",
                   gap: 12,
                   paddingTop: 14,
-                  borderTop: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+                  borderTop: "1px solid var(--ice-border)",
                 }}
               >
                 <div style={{ fontSize: "0.78rem", opacity: 0.65 }}>
@@ -1632,7 +1632,7 @@ export function UsersView({
                     style={{
                       padding: "9px 16px",
                       borderRadius: 8,
-                      border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+                      border: "1px solid var(--ice-border)",
                       background: "transparent",
                       color: "var(--ice-text)",
                       fontSize: "0.85rem",
@@ -1651,8 +1651,8 @@ export function UsersView({
                       padding: "9px 20px",
                       borderRadius: 8,
                       border: "none",
-                      background: "linear-gradient(135deg, #d4af37, #b48c1e)",
-                      color: "#000",
+                      background: "linear-gradient(135deg, var(--gold-solid), var(--gold-soft))",
+                      color: "var(--text-strong)",
                       fontWeight: 750,
                       fontSize: "0.875rem",
                       cursor: "pointer",
@@ -1676,7 +1676,7 @@ export function UsersView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.75)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "flex",
             alignItems: "center",
@@ -1687,8 +1687,8 @@ export function UsersView({
         >
           <div
             style={{
-              background: "var(--ice-card-bg, #161a20)",
-              border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+              background: "var(--ice-card-bg)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 16,
               width: "100%",
               maxWidth: 460,
@@ -1703,8 +1703,8 @@ export function UsersView({
                 justifyContent: "space-between",
                 alignItems: "center",
                 padding: "18px 22px",
-                borderBottom: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
-                background: "rgba(255, 255, 255, 0.02)",
+                borderBottom: "1px solid var(--ice-border)",
+                background: "var(--surface-soft)",
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -1713,8 +1713,8 @@ export function UsersView({
                     display: "inline-flex",
                     padding: "7px",
                     borderRadius: 8,
-                    background: "rgba(212, 175, 55, 0.15)",
-                    color: "var(--gold, #d4af37)",
+                    background: "var(--gold-soft)",
+                    color: "var(--gold-fg)",
                   }}
                 >
                   <Key size={18} />
@@ -1750,9 +1750,9 @@ export function UsersView({
                   style={{
                     padding: "10px 14px",
                     borderRadius: 8,
-                    background: "rgba(239, 68, 68, 0.15)",
-                    border: "1px solid rgba(239, 68, 68, 0.3)",
-                    color: "#f87171",
+                    background: "var(--danger-soft)",
+                    border: "1px solid var(--danger)",
+                    color: "var(--danger-fg)",
                     fontSize: "0.82rem",
                   }}
                 >
@@ -1765,9 +1765,9 @@ export function UsersView({
                   style={{
                     padding: "10px 14px",
                     borderRadius: 8,
-                    background: "rgba(34, 197, 94, 0.15)",
-                    border: "1px solid rgba(34, 197, 94, 0.3)",
-                    color: "#4ade80",
+                    background: "var(--success-soft)",
+                    border: "1px solid var(--success)",
+                    color: "var(--success-fg)",
                     fontSize: "0.82rem",
                   }}
                 >
@@ -1791,8 +1791,8 @@ export function UsersView({
                       width: "100%",
                       padding: "10px 38px 10px 12px",
                       borderRadius: 8,
-                      border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                      background: "rgba(0, 0, 0, 0.2)",
+                      border: "1px solid var(--ice-border)",
+                      background: "var(--surface-soft)",
                       color: "var(--ice-text)",
                       fontSize: "0.875rem",
                       boxSizing: "border-box",
@@ -1830,7 +1830,7 @@ export function UsersView({
                   style={{
                     padding: "8px 14px",
                     borderRadius: 8,
-                    border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+                    border: "1px solid var(--ice-border)",
                     background: "transparent",
                     color: "var(--ice-text)",
                     fontSize: "0.85rem",
@@ -1849,8 +1849,8 @@ export function UsersView({
                     padding: "8px 18px",
                     borderRadius: 8,
                     border: "none",
-                    background: "linear-gradient(135deg, #d4af37, #b48c1e)",
-                    color: "#000",
+                    background: "linear-gradient(135deg, var(--gold-solid), var(--gold-soft))",
+                    color: "var(--text-strong)",
                     fontWeight: 750,
                     fontSize: "0.85rem",
                     cursor: "pointer",
@@ -1889,10 +1889,10 @@ function CapabilitiesTable({
   return (
     <div
       style={{
-        border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.12))",
+        border: "1px solid var(--ice-border)",
         borderRadius: 10,
         overflow: "hidden",
-        background: "var(--ice-card-bg, rgba(255, 255, 255, 0.02))",
+        background: "var(--ice-card-bg)",
       }}
     >
       <table
@@ -1906,8 +1906,8 @@ function CapabilitiesTable({
         <thead>
           <tr
             style={{
-              background: "rgba(255, 255, 255, 0.05)",
-              borderBottom: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+              background: "var(--surface-soft)",
+              borderBottom: "1px solid var(--ice-border)",
             }}
           >
             <th
@@ -1946,7 +1946,7 @@ function CapabilitiesTable({
                 style={{
                   borderBottom:
                     idx < FEATURE_GROUPS.length - 1
-                      ? "1px solid var(--ice-border, rgba(255, 255, 255, 0.08))"
+                      ? "1px solid var(--ice-border)"
                       : "none",
                   verticalAlign: "top",
                 }}
@@ -1955,8 +1955,8 @@ function CapabilitiesTable({
                 <td
                   style={{
                     padding: "16px 16px",
-                    borderRight: "1px solid var(--ice-border, rgba(255, 255, 255, 0.08))",
-                    background: "rgba(0, 0, 0, 0.04)",
+                    borderRight: "1px solid var(--ice-border)",
+                    background: "var(--surface-soft)",
                   }}
                 >
                   <div style={{ fontWeight: 700, fontSize: "0.9rem", color: "var(--ice-text)" }}>
@@ -1975,11 +1975,11 @@ function CapabilitiesTable({
                         fontSize: "0.72rem",
                         padding: "2px 8px",
                         borderRadius: 4,
-                        border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+                        border: "1px solid var(--ice-border)",
                         background: allChecked
-                          ? "rgba(239, 68, 68, 0.1)"
-                          : "rgba(34, 197, 94, 0.1)",
-                        color: allChecked ? "#f87171" : "#4ade80",
+                          ? "var(--danger-soft)"
+                          : "var(--success-soft)",
+                        color: allChecked ? "var(--danger-fg)" : "var(--success-fg)",
                         cursor: "pointer",
                         fontWeight: 600,
                       }}
@@ -2012,7 +2012,7 @@ function CapabilitiesTable({
                             cursor: readOnly ? "not-allowed" : "pointer",
                             userSelect: "none",
                             fontSize: "0.85rem",
-                            color: isChecked ? "var(--ice-text)" : "rgba(255, 255, 255, 0.55)",
+                            color: isChecked ? "var(--ice-text)" : "var(--text-muted)",
                           }}
                         >
                           <input

@@ -80,12 +80,12 @@ export default async function DailyAuditPage({
       <style>{`
         @media print {
           @page { size: A4 landscape; margin: 10mm; }
-          html, body { background: #fff !important; color: #111827 !important; }
+          html, body { background: var(--surface) !important; color: var(--surface) !important; }
           .ox-aside, .ox-topbar, .ox-drawer-backdrop, .audit-print-hidden { display: none !important; }
           .ox-main { padding: 0 !important; }
-          .audit-daily-sheet { box-shadow: none !important; border: none !important; background: #fff !important; color: #111827 !important; }
-          .audit-daily-sheet table { color: #111827 !important; }
-          .audit-daily-sheet th, .audit-daily-sheet td { border-color: #cbd5e1 !important; }
+          .audit-daily-sheet { box-shadow: none !important; border: none !important; background: var(--border) !important; color: var(--border) !important; }
+          .audit-daily-sheet table { color: var(--text-on-accent) !important; }
+          .audit-daily-sheet th, .audit-daily-sheet td { border-color: var(--text-muted) !important; }
         }
       `}</style>
 

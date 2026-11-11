@@ -393,12 +393,12 @@ export function ChatView({
         <div
           style={{
             padding: "16px 18px",
-            borderBottom: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+            borderBottom: "1px solid var(--ice-border)",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ color: "var(--gold, #d4af37)" }}>
+              <span style={{ color: "var(--gold-fg)" }}>
                 <MessageSquare size={20} />
               </span>
               <h2 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 700, color: "var(--ice-text)" }}>
@@ -418,9 +418,9 @@ export function ChatView({
                   gap: 5,
                   padding: "5px 9px",
                   borderRadius: 6,
-                  border: "1px solid rgba(212, 175, 55, 0.4)",
-                  background: "rgba(212, 175, 55, 0.15)",
-                  color: "var(--gold, #d4af37)",
+                  border: "1px solid var(--gold)",
+                  background: "var(--gold-soft)",
+                  color: "var(--gold-fg)",
                   fontSize: "0.72rem",
                   fontWeight: 700,
                   cursor: "pointer",
@@ -458,11 +458,11 @@ export function ChatView({
                 border: "none",
                 background:
                   activeTab === "CHANNEL" && selectedChannel === "GENERAL"
-                    ? "rgba(212, 175, 55, 0.15)"
+                    ? "var(--gold-soft)"
                     : "transparent",
                 color:
                   activeTab === "CHANNEL" && selectedChannel === "GENERAL"
-                    ? "var(--gold, #d4af37)"
+                    ? "var(--gold)"
                     : "var(--ice-text)",
                 fontWeight: activeTab === "CHANNEL" && selectedChannel === "GENERAL" ? 650 : 400,
                 cursor: "pointer",
@@ -491,11 +491,11 @@ export function ChatView({
                 border: "none",
                 background:
                   activeTab === "CHANNEL" && selectedChannel === "WORKSHOP"
-                    ? "rgba(212, 175, 55, 0.15)"
+                    ? "var(--gold-soft)"
                     : "transparent",
                 color:
                   activeTab === "CHANNEL" && selectedChannel === "WORKSHOP"
-                    ? "var(--gold, #d4af37)"
+                    ? "var(--gold)"
                     : "var(--ice-text)",
                 fontWeight: activeTab === "CHANNEL" && selectedChannel === "WORKSHOP" ? 650 : 400,
                 cursor: "pointer",
@@ -524,11 +524,11 @@ export function ChatView({
                 border: "none",
                 background:
                   activeTab === "CHANNEL" && selectedChannel === "COMMERCIAL"
-                    ? "rgba(212, 175, 55, 0.15)"
+                    ? "var(--gold-soft)"
                     : "transparent",
                 color:
                   activeTab === "CHANNEL" && selectedChannel === "COMMERCIAL"
-                    ? "var(--gold, #d4af37)"
+                    ? "var(--gold)"
                     : "var(--ice-text)",
                 fontWeight: activeTab === "CHANNEL" && selectedChannel === "COMMERCIAL" ? 650 : 400,
                 cursor: "pointer",
@@ -558,11 +558,11 @@ export function ChatView({
                 border: "none",
                 background:
                   activeTab === "BROADCAST"
-                    ? "rgba(212, 175, 55, 0.2)"
+                    ? "var(--gold-soft)"
                     : "transparent",
                 color:
                   activeTab === "BROADCAST"
-                    ? "var(--gold, #d4af37)"
+                    ? "var(--gold)"
                     : "var(--ice-text)",
                 fontWeight: activeTab === "BROADCAST" ? 700 : 400,
                 cursor: "pointer",
@@ -580,8 +580,8 @@ export function ChatView({
                     minWidth: 18,
                     height: 18,
                     borderRadius: 9,
-                    background: "#ef4444",
-                    color: "#ffffff",
+                    background: "var(--danger-solid)",
+                    color: "var(--text-on-accent)",
                     fontSize: "0.68rem",
                     fontWeight: 800,
                     display: "flex",
@@ -599,7 +599,7 @@ export function ChatView({
           </div>
 
           {/* Section Conférences & Historique Appels */}
-          <div style={{ padding: "6px 14px 10px 14px", borderBottom: "1px solid var(--ice-border, rgba(255, 255, 255, 0.08))" }}>
+          <div style={{ padding: "6px 14px 10px 14px", borderBottom: "1px solid var(--ice-border)" }}>
             <div style={{ fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", opacity: 0.55, marginBottom: 8 }}>
               {copy.callsSectionTitle}
             </div>
@@ -621,11 +621,11 @@ export function ChatView({
                 border: "none",
                 background:
                   activeTab === "CALL_HISTORY"
-                    ? "rgba(212, 175, 55, 0.2)"
+                    ? "var(--gold-soft)"
                     : "transparent",
                 color:
                   activeTab === "CALL_HISTORY"
-                    ? "var(--gold, #d4af37)"
+                    ? "var(--gold)"
                     : "var(--ice-text)",
                 fontWeight: activeTab === "CALL_HISTORY" ? 700 : 400,
                 cursor: "pointer",
@@ -644,8 +644,8 @@ export function ChatView({
                     minWidth: 18,
                     height: 18,
                     borderRadius: 9,
-                    background: "#ef4444",
-                    color: "#ffffff",
+                    background: "var(--danger-solid)",
+                    color: "var(--text-on-accent)",
                     fontSize: "0.68rem",
                     fontWeight: 800,
                     display: "flex",
@@ -683,8 +683,8 @@ export function ChatView({
                     padding: "7px 12px",
                     borderRadius: 8,
                     border: "none",
-                    background: isSelected ? "rgba(168, 85, 247, 0.2)" : "transparent",
-                    color: isSelected ? "#c084fc" : "var(--ice-text)",
+                    background: isSelected ? "var(--purple-soft)" : "transparent",
+                    color: isSelected ? "var(--purple-fg)" : "var(--ice-text)",
                     fontWeight: isSelected ? 700 : 400,
                     cursor: "pointer",
                     textAlign: "left",
@@ -703,9 +703,9 @@ export function ChatView({
                       style={{
                         padding: "2px 6px",
                         borderRadius: 8,
-                        background: "rgba(34, 197, 94, 0.2)",
-                        border: "1px solid rgba(34, 197, 94, 0.35)",
-                        color: "#4ade80",
+                        background: "var(--success-soft)",
+                        border: "1px solid var(--success)",
+                        color: "var(--success-fg)",
                         fontSize: "0.65rem",
                         fontWeight: 750,
                         flexShrink: 0,
@@ -731,8 +731,8 @@ export function ChatView({
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
-                background: "var(--ice-chat-input-bg, rgba(0, 0, 0, 0.2))",
-                border: "1px solid var(--ice-chat-input-border, rgba(255, 255, 255, 0.1))",
+                background: "var(--ice-chat-input-bg)",
+                border: "1px solid var(--ice-chat-input-border)",
                 borderRadius: 6,
                 padding: "5px 10px",
                 marginBottom: 8,
@@ -747,7 +747,7 @@ export function ChatView({
                 style={{
                   background: "transparent",
                   border: "none",
-                  color: "var(--ice-chat-input-text, var(--ice-text))",
+                  color: "var(--ice-chat-input-text)",
                   outline: "none",
                   fontSize: "0.78rem",
                   width: "100%",
@@ -791,8 +791,8 @@ export function ChatView({
                       padding: "8px 10px",
                       borderRadius: 8,
                       border: "none",
-                      background: isSelected ? "rgba(212, 175, 55, 0.15)" : "transparent",
-                      color: isSelected ? "var(--gold, #d4af37)" : "var(--ice-text)",
+                      background: isSelected ? "var(--gold-soft)" : "transparent",
+                      color: isSelected ? "var(--gold-fg)" : "var(--ice-text)",
                       cursor: "pointer",
                       textAlign: "left",
                       transition: "background 0.12s ease",
@@ -804,7 +804,7 @@ export function ChatView({
                         width: 34,
                         height: 34,
                         borderRadius: "50%",
-                        background: "rgba(255, 255, 255, 0.08)",
+                        background: "var(--surface-soft)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -823,7 +823,7 @@ export function ChatView({
                           height: 9,
                           borderRadius: "50%",
                           background: statusColor,
-                          border: "1.5px solid #161a20",
+                          border: "1.5px solid var(--border)",
                           boxShadow:
                             colleague.status === "ONLINE"
                               ? "0 0 6px #22c55e"
@@ -842,7 +842,7 @@ export function ChatView({
                           overflow: "hidden",
                           textOverflow: "ellipsis",
                           whiteSpace: "nowrap",
-                          color: unreadCount > 0 && !isSelected ? "#ffffff" : undefined,
+                          color: unreadCount > 0 && !isSelected ? "var(--text-strong)" : undefined,
                         }}
                       >
                         {colleague.fullName}
@@ -878,8 +878,8 @@ export function ChatView({
                           minWidth: 18,
                           height: 18,
                           borderRadius: 9,
-                          background: "#ef4444",
-                          color: "#ffffff",
+                          background: "var(--danger-solid)",
+                          color: "var(--text-on-accent)",
                           fontSize: "0.68rem",
                           fontWeight: 800,
                           display: "flex",
@@ -969,8 +969,8 @@ export function ChatView({
                       width: 34,
                       height: 34,
                       borderRadius: 8,
-                      border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                      background: "rgba(255, 255, 255, 0.05)",
+                      border: "1px solid var(--ice-border)",
+                      background: "var(--surface-soft)",
                       color: "var(--ice-text)",
                       cursor: "pointer",
                       flexShrink: 0,
@@ -999,8 +999,8 @@ export function ChatView({
                               fontSize: "0.72rem",
                               padding: "2px 7px",
                               borderRadius: 5,
-                              background: "rgba(212, 175, 55, 0.15)",
-                              color: "var(--gold, #d4af37)",
+                              background: "var(--gold-soft)",
+                              color: "var(--gold-fg)",
                               fontWeight: 650,
                             }}
                           >
@@ -1063,15 +1063,15 @@ export function ChatView({
                         gap: 5,
                         padding: "7px 10px",
                         borderRadius: 8,
-                        border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                        background: "rgba(255, 255, 255, 0.05)",
+                        border: "1px solid var(--ice-border)",
+                        background: "var(--surface-soft)",
                         color: "var(--ice-text)",
                         fontSize: "0.78rem",
                         fontWeight: 600,
                         cursor: "pointer",
                       }}
                     >
-                      <Mic size={14} color="var(--gold, #d4af37)" />
+                      <Mic size={14} color="var(--gold-fg)" />
                       <span>{copy.mic}</span>
                     </button>
 
@@ -1095,17 +1095,17 @@ export function ChatView({
                         borderRadius: 8,
                         border:
                           !canCallSelectedPeer
-                            ? "1px solid rgba(148, 163, 184, 0.35)"
+                            ? "1px solid var(--border-strong)"
                             : peerStatus === "OFFLINE"
-                              ? "1px solid rgba(239, 68, 68, 0.4)"
-                              : "1px solid rgba(34, 197, 94, 0.4)",
+                              ? "1px solid var(--danger)"
+                              : "1px solid var(--success)",
                         background:
                           !canCallSelectedPeer
-                            ? "rgba(148, 163, 184, 0.12)"
+                            ? "var(--surface-soft)"
                             : peerStatus === "OFFLINE"
-                              ? "rgba(239, 68, 68, 0.12)"
-                              : "linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(21, 128, 61, 0.3))",
-                        color: !canCallSelectedPeer ? "#94a3b8" : peerStatus === "OFFLINE" ? "#f87171" : "#4ade80",
+                              ? "var(--danger-soft)"
+                              : "var(--success-soft)",
+                        color: !canCallSelectedPeer ? "var(--text-muted)" : peerStatus === "OFFLINE" ? "var(--danger-fg)" : "var(--success-fg)",
                         fontSize: "0.8rem",
                         fontWeight: 650,
                         cursor: !canCallSelectedPeer ? "not-allowed" : "pointer",
@@ -1172,18 +1172,18 @@ export function ChatView({
                       padding: "10px 14px",
                       borderRadius: 14,
                       background: m.isBroadcast
-                        ? "linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(180, 140, 30, 0.35))"
+                        ? "var(--gold-soft)"
                         : isMe
-                        ? "var(--ice-chat-bubble-me-bg, linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(180, 140, 30, 0.25)))"
-                        : "var(--ice-chat-bubble-peer-bg, #ffffff)",
+                        ? "var(--ice-chat-bubble-me-bg)"
+                        : "var(--ice-chat-bubble-peer-bg)",
                       border: m.isBroadcast
-                        ? "1px solid rgba(212, 175, 55, 0.5)"
+                        ? "1px solid var(--gold)"
                         : isMe
-                        ? "1px solid var(--ice-chat-bubble-me-border, rgba(212, 175, 55, 0.3))"
-                        : "1px solid var(--ice-chat-bubble-peer-border, #e2e8f0)",
+                        ? "1px solid var(--ice-chat-bubble-me-border)"
+                        : "1px solid var(--ice-chat-bubble-peer-border)",
                       color: isMe
-                        ? "var(--ice-chat-bubble-me-text, #ffffff)"
-                        : "var(--ice-chat-bubble-peer-text, var(--ice-text))",
+                        ? "var(--ice-chat-bubble-me-text)"
+                        : "var(--ice-chat-bubble-peer-text)",
                       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
                     }}
                   >
@@ -1196,8 +1196,8 @@ export function ChatView({
                           gap: 6,
                           fontSize: "0.72rem",
                           fontWeight: 750,
-                          color: "var(--gold, #d4af37)",
-                          background: "rgba(0, 0, 0, 0.35)",
+                          color: "var(--gold-fg)",
+                          background: "var(--surface-sunken)",
                           padding: "3px 9px",
                           borderRadius: 6,
                           marginBottom: 6,
@@ -1251,7 +1251,7 @@ export function ChatView({
                           minute: "2-digit",
                         })}
                       </span>
-                      {isMe && <CheckCheck size={12} color="#4ade80" />}
+                      {isMe && <CheckCheck size={12} color="var(--success-fg)" />}
                     </div>
                   </div>
 
@@ -1281,11 +1281,11 @@ export function ChatView({
                             padding: "2px 6px",
                             borderRadius: 12,
                             border: hasReacted
-                              ? "1px solid rgba(212, 175, 55, 0.4)"
-                              : "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
+                              ? "1px solid var(--gold)"
+                              : "1px solid var(--ice-border)",
                             background: hasReacted
-                              ? "rgba(212, 175, 55, 0.15)"
-                              : "rgba(255, 255, 255, 0.04)",
+                              ? "var(--gold-soft)"
+                              : "var(--surface-soft)",
                             color: "var(--ice-text)",
                             fontSize: "0.75rem",
                             cursor: "pointer",
@@ -1330,8 +1330,8 @@ export function ChatView({
           <div
             style={{
               padding: "12px 16px",
-              background: "var(--ice-chat-header-bg, #ffffff)",
-              borderTop: "1px solid var(--ice-chat-sidebar-border, rgba(255, 255, 255, 0.1))",
+              background: "var(--ice-chat-header-bg)",
+              borderTop: "1px solid var(--ice-chat-sidebar-border)",
               display: "flex",
               flexWrap: "wrap",
               gap: 8,
@@ -1347,8 +1347,8 @@ export function ChatView({
                   gap: 6,
                   padding: "6px 10px",
                   borderRadius: 8,
-                  border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                  background: "rgba(255, 255, 255, 0.04)",
+                  border: "1px solid var(--ice-border)",
+                  background: "var(--surface-soft)",
                   color: "var(--ice-text)",
                   cursor: "pointer",
                   fontSize: "0.85rem",
@@ -1371,7 +1371,7 @@ export function ChatView({
             style={{
               background: "none",
               border: "none",
-              color: showStickerPicker ? "var(--gold, #d4af37)" : "var(--ice-text)",
+              color: showStickerPicker ? "var(--gold-fg)" : "var(--ice-text)",
               cursor: "pointer",
               padding: 6,
               opacity: showStickerPicker ? 1 : 0.7,
@@ -1402,9 +1402,9 @@ export function ChatView({
               flex: 1,
               padding: "10px 14px",
               borderRadius: 10,
-              border: "1px solid var(--ice-chat-input-border, rgba(255, 255, 255, 0.15))",
-              background: "var(--ice-chat-input-bg, #ffffff)",
-              color: "var(--ice-chat-input-text, var(--ice-text))",
+              border: "1px solid var(--ice-chat-input-border)",
+              background: "var(--ice-chat-input-bg)",
+              color: "var(--ice-chat-input-text)",
               fontSize: "0.875rem",
               outline: "none",
             }}
@@ -1424,9 +1424,9 @@ export function ChatView({
               borderRadius: 10,
               border: "none",
               background: inputText.trim()
-                ? "linear-gradient(135deg, #d4af37, #b48c1e)"
-                : "rgba(255, 255, 255, 0.08)",
-              color: inputText.trim() ? "#000" : "var(--ice-text)",
+                ? "linear-gradient(135deg, var(--gold-solid), var(--gold-soft))"
+                : "var(--surface-soft)",
+              color: inputText.trim() ? "var(--text-strong)" : "var(--ice-text)",
               cursor: inputText.trim() ? "pointer" : "not-allowed",
               boxShadow: inputText.trim()
                 ? "0 2px 8px rgba(212, 175, 55, 0.3)"
@@ -1448,7 +1448,7 @@ export function ChatView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.75)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "flex",
             alignItems: "center",
@@ -1459,8 +1459,8 @@ export function ChatView({
         >
           <div
             style={{
-              background: "var(--ice-card-bg, #161a20)",
-              border: "1px solid rgba(212, 175, 55, 0.4)",
+              background: "var(--ice-card-bg)",
+              border: "1px solid var(--gold)",
               borderRadius: 16,
               width: "100%",
               maxWidth: 580,
@@ -1475,8 +1475,8 @@ export function ChatView({
                 justifyContent: "space-between",
                 alignItems: "center",
                 padding: "16px 20px",
-                borderBottom: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
-                background: "rgba(212, 175, 55, 0.08)",
+                borderBottom: "1px solid var(--ice-border)",
+                background: "var(--gold-soft)",
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -1484,8 +1484,8 @@ export function ChatView({
                   style={{
                     padding: 6,
                     borderRadius: 8,
-                    background: "rgba(212, 175, 55, 0.2)",
-                    color: "var(--gold, #d4af37)",
+                    background: "var(--gold-soft)",
+                    color: "var(--gold-fg)",
                     display: "flex",
                   }}
                 >
@@ -1557,8 +1557,8 @@ export function ChatView({
                       style={{
                         padding: "4px 8px",
                         borderRadius: 6,
-                        border: "1px solid rgba(255, 255, 255, 0.15)",
-                        background: "rgba(255, 255, 255, 0.05)",
+                        border: "1px solid var(--border)",
+                        background: "var(--surface-soft)",
                         color: "var(--ice-text)",
                         fontSize: "0.74rem",
                         cursor: "pointer",
@@ -1578,8 +1578,8 @@ export function ChatView({
                       style={{
                         padding: "4px 8px",
                         borderRadius: 6,
-                        border: "1px solid rgba(255, 255, 255, 0.15)",
-                        background: "rgba(255, 255, 255, 0.05)",
+                        border: "1px solid var(--border)",
+                        background: "var(--surface-soft)",
                         color: "var(--ice-text)",
                         fontSize: "0.74rem",
                         cursor: "pointer",
@@ -1599,8 +1599,8 @@ export function ChatView({
                       style={{
                         padding: "4px 8px",
                         borderRadius: 6,
-                        border: "1px solid rgba(255, 255, 255, 0.15)",
-                        background: "rgba(255, 255, 255, 0.05)",
+                        border: "1px solid var(--border)",
+                        background: "var(--surface-soft)",
                         color: "var(--ice-text)",
                         fontSize: "0.74rem",
                         cursor: "pointer",
@@ -1620,9 +1620,9 @@ export function ChatView({
                       style={{
                         padding: "4px 8px",
                         borderRadius: 6,
-                        border: "1px solid rgba(212, 175, 55, 0.4)",
-                        background: "rgba(212, 175, 55, 0.1)",
-                        color: "var(--gold, #d4af37)",
+                        border: "1px solid var(--gold)",
+                        background: "var(--gold-soft)",
+                        color: "var(--gold-fg)",
                         fontSize: "0.74rem",
                         cursor: "pointer",
                       }}
@@ -1639,13 +1639,13 @@ export function ChatView({
                   style={{
                     maxHeight: 180,
                     overflowY: "auto",
-                    border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.12))",
+                    border: "1px solid var(--ice-border)",
                     borderRadius: 8,
                     padding: "8px 12px",
                     display: "flex",
                     flexDirection: "column",
                     gap: 6,
-                    background: "rgba(0, 0, 0, 0.2)",
+                    background: "var(--surface-soft)",
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
@@ -1664,7 +1664,7 @@ export function ChatView({
                       style={{
                         background: "none",
                         border: "none",
-                        color: "var(--gold, #d4af37)",
+                        color: "var(--gold-fg)",
                         fontSize: "0.72rem",
                         cursor: "pointer",
                       }}
@@ -1723,8 +1723,8 @@ export function ChatView({
                     width: "100%",
                     padding: "10px 12px",
                     borderRadius: 8,
-                    border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                    background: "rgba(0, 0, 0, 0.2)",
+                    border: "1px solid var(--ice-border)",
+                    background: "var(--surface-soft)",
                     color: "var(--ice-text)",
                     fontSize: "0.875rem",
                     boxSizing: "border-box",
@@ -1748,7 +1748,7 @@ export function ChatView({
                   style={{
                     padding: "8px 14px",
                     borderRadius: 8,
-                    border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+                    border: "1px solid var(--ice-border)",
                     background: "transparent",
                     color: "var(--ice-text)",
                     fontSize: "0.85rem",
@@ -1767,8 +1767,8 @@ export function ChatView({
                     padding: "8px 18px",
                     borderRadius: 8,
                     border: "none",
-                    background: "linear-gradient(135deg, #d4af37, #b48c1e)",
-                    color: "#000",
+                    background: "linear-gradient(135deg, var(--gold-solid), var(--gold-soft))",
+                    color: "var(--text-strong)",
                     fontWeight: 750,
                     fontSize: "0.85rem",
                     cursor: "pointer",
@@ -1797,7 +1797,7 @@ export function ChatView({
             alignItems: "center",
             justifyContent: "center",
             padding: 16,
-            background: "rgba(0, 0, 0, 0.75)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
           }}
         >
@@ -1805,8 +1805,8 @@ export function ChatView({
             style={{
               maxWidth: 440,
               width: "100%",
-              background: "#181d24",
-              border: "1px solid rgba(239, 68, 68, 0.4)",
+              background: "var(--surface)",
+              border: "1px solid var(--danger)",
               borderRadius: 16,
               padding: "24px",
               boxShadow: "0 20px 50px rgba(0, 0, 0, 0.6)",
@@ -1818,8 +1818,8 @@ export function ChatView({
                   width: 44,
                   height: 44,
                   borderRadius: "50%",
-                  background: "rgba(239, 68, 68, 0.15)",
-                  color: "#f87171",
+                  background: "var(--danger-soft)",
+                  color: "var(--danger-fg)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -1834,14 +1834,14 @@ export function ChatView({
                 <span
                   style={{
                     fontSize: "0.75rem",
-                    color: "#f87171",
+                    color: "var(--danger-fg)",
                     fontWeight: 700,
                     display: "inline-flex",
                     alignItems: "center",
                     gap: 4,
                   }}
                 >
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#ef4444" }} />
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--danger-solid)" }} />
                   {copy.offlineModal.status}
                 </span>
               </div>
@@ -1858,7 +1858,7 @@ export function ChatView({
                 style={{
                   padding: "9px 16px",
                   borderRadius: 8,
-                  border: "1px solid rgba(255, 255, 255, 0.15)",
+                  border: "1px solid var(--border)",
                   background: "transparent",
                   color: "var(--ice-text)",
                   fontSize: "0.82rem",
@@ -1879,8 +1879,8 @@ export function ChatView({
                   padding: "9px 18px",
                   borderRadius: 8,
                   border: "none",
-                  background: "linear-gradient(135deg, #22c55e, #16a34a)",
-                  color: "#fff",
+                  background: "var(--success-solid)",
+                  color: "var(--text-strong)",
                   fontSize: "0.82rem",
                   fontWeight: 700,
                   cursor: "pointer",

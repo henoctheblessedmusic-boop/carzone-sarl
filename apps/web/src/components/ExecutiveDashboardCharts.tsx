@@ -66,8 +66,8 @@ export function ExecutiveDashboardCharts({
         style={{
           padding: "1.2rem 1.4rem",
           borderRadius: 16,
-          background: "linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(10, 15, 29, 0.95) 100%)",
-          border: "1px solid rgba(225, 29, 72, 0.25)",
+          background: "var(--surface)",
+          border: "1px solid var(--accent)",
           boxShadow: "0 10px 30px rgba(0, 0, 0, 0.4)",
           display: "flex",
           flexDirection: "column",
@@ -89,7 +89,7 @@ export function ExecutiveDashboardCharts({
                 margin: 0,
                 fontSize: "1.25rem",
                 fontWeight: 800,
-                color: "#ffffff",
+                color: "var(--text-strong)",
                 letterSpacing: "-0.02em",
               }}
             >
@@ -99,7 +99,7 @@ export function ExecutiveDashboardCharts({
               style={{
                 margin: "4px 0 0",
                 fontSize: "0.83rem",
-                color: "#94a3b8",
+                color: "var(--text-muted)",
               }}
             >
               {exec.header.subtitle}
@@ -112,17 +112,17 @@ export function ExecutiveDashboardCharts({
               display: "flex",
               alignItems: "center",
               gap: 6,
-              background: "rgba(30, 41, 59, 0.8)",
+              background: "var(--surface)",
               padding: "4px 6px",
               borderRadius: 12,
-              border: "1px solid rgba(255, 255, 255, 0.1)",
+              border: "1px solid var(--border)",
             }}
           >
             <span
               style={{
                 fontSize: "0.75rem",
                 fontWeight: 700,
-                color: "#64748b",
+                color: "var(--text-subtle)",
                 padding: "0 6px",
                 display: "inline-flex",
                 alignItems: "center",
@@ -140,8 +140,8 @@ export function ExecutiveDashboardCharts({
                   type="button"
                   onClick={() => setPeriod(pKey)}
                   style={{
-                    background: isActive ? "linear-gradient(135deg, #e11d48 0%, #be123c 100%)" : "transparent",
-                    color: isActive ? "#ffffff" : "#cbd5e1",
+                    background: isActive ? "var(--accent)" : "transparent",
+                    color: isActive ? "var(--text-strong)" : "var(--text-muted)",
                     border: "none",
                     borderRadius: 8,
                     padding: "6px 12px",
@@ -165,7 +165,7 @@ export function ExecutiveDashboardCharts({
             display: "flex",
             gap: "8px",
             flexWrap: "wrap",
-            borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+            borderTop: "1px solid var(--border)",
             paddingTop: "0.85rem",
           }}
         >
@@ -181,12 +181,12 @@ export function ExecutiveDashboardCharts({
                   flex: "1 1 auto",
                   minWidth: "150px",
                   background: isTabActive
-                    ? "rgba(225, 29, 72, 0.18)"
-                    : "rgba(30, 41, 59, 0.5)",
-                  color: isTabActive ? "#fb7185" : "#94a3b8",
+                    ? "var(--accent-soft)"
+                    : "var(--surface-sunken)",
+                  color: isTabActive ? "var(--danger-fg)" : "var(--text-muted)",
                   border: isTabActive
-                    ? "1px solid rgba(225, 29, 72, 0.5)"
-                    : "1px solid rgba(255, 255, 255, 0.06)",
+                    ? "1px solid var(--accent)"
+                    : "1px solid var(--border)",
                   borderRadius: 10,
                   padding: "8px 12px",
                   textAlign: "left",
@@ -194,10 +194,10 @@ export function ExecutiveDashboardCharts({
                   transition: "all 0.15s ease",
                 }}
               >
-                <div style={{ fontWeight: 800, fontSize: "0.84rem", color: isTabActive ? "#ffffff" : "#cbd5e1" }}>
+                <div style={{ fontWeight: 800, fontSize: "0.84rem", color: isTabActive ? "var(--text-strong)" : "var(--text-muted)" }}>
                   {tab.label}
                 </div>
-                <div style={{ fontSize: "0.72rem", color: isTabActive ? "#fda4af" : "#64748b", marginTop: 2 }}>
+                <div style={{ fontSize: "0.72rem", color: isTabActive ? "var(--danger-fg)" : "var(--text-subtle)", marginTop: 2 }}>
                   {tab.desc}
                 </div>
               </button>
@@ -220,21 +220,21 @@ export function ExecutiveDashboardCharts({
           style={{
             padding: "1rem 1.2rem",
             borderRadius: 14,
-            background: "linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%)",
-            border: "1px solid rgba(56, 189, 248, 0.25)",
+            background: "linear-gradient(135deg, var(--surface-sunken) 0%, var(--surface) 100%)",
+            border: "1px solid var(--info)",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase" }}>
+            <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--info-fg)", textTransform: "uppercase" }}>
               {exec.summary.salesLabel}
             </span>
-            <DollarSign size={16} color="#38bdf8" />
+            <DollarSign size={16} color="var(--info-fg)" />
           </div>
-          <div style={{ fontSize: "1.3rem", fontWeight: 800, color: "#ffffff", marginTop: 6 }}>
+          <div style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-strong)", marginTop: 6 }}>
             {formatXof(summary.totalSalesInvoiced)}
           </div>
-          <div style={{ fontSize: "0.76rem", color: "#94a3b8", marginTop: 4, display: "flex", gap: 6 }}>
-            <span>{exec.summary.collectedInline} <strong style={{ color: "#34d399" }}>{formatXof(summary.totalSalesCollected)}</strong></span>
+          <div style={{ fontSize: "0.76rem", color: "var(--text-muted)", marginTop: 4, display: "flex", gap: 6 }}>
+            <span>{exec.summary.collectedInline} <strong style={{ color: "var(--success-fg)" }}>{formatXof(summary.totalSalesCollected)}</strong></span>
           </div>
         </div>
 
@@ -244,20 +244,20 @@ export function ExecutiveDashboardCharts({
           style={{
             padding: "1rem 1.2rem",
             borderRadius: 14,
-            background: "linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%)",
-            border: "1px solid rgba(245, 158, 11, 0.25)",
+            background: "linear-gradient(135deg, var(--surface-sunken) 0%, var(--surface) 100%)",
+            border: "1px solid var(--warning)",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#f59e0b", textTransform: "uppercase" }}>
+            <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--warning-fg)", textTransform: "uppercase" }}>
               {exec.summary.expensesLabel}
             </span>
-            <Receipt size={16} color="#f59e0b" />
+            <Receipt size={16} color="var(--warning-fg)" />
           </div>
-          <div style={{ fontSize: "1.3rem", fontWeight: 800, color: "#ffffff", marginTop: 6 }}>
+          <div style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-strong)", marginTop: 6 }}>
             {formatXof(summary.totalExpenses)}
           </div>
-          <div style={{ fontSize: "0.76rem", color: "#94a3b8", marginTop: 4 }}>
+          <div style={{ fontSize: "0.76rem", color: "var(--text-muted)", marginTop: 4 }}>
             {exec.summary.expensesHint}
           </div>
         </div>
@@ -268,20 +268,20 @@ export function ExecutiveDashboardCharts({
           style={{
             padding: "1rem 1.2rem",
             borderRadius: 14,
-            background: "linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%)",
-            border: "1px solid rgba(139, 92, 246, 0.25)",
+            background: "linear-gradient(135deg, var(--surface-sunken) 0%, var(--surface) 100%)",
+            border: "1px solid var(--purple)",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#a78bfa", textTransform: "uppercase" }}>
+            <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--purple-fg)", textTransform: "uppercase" }}>
               {exec.summary.salariesLabel}
             </span>
-            <PieChart size={16} color="#a78bfa" />
+            <PieChart size={16} color="var(--purple-fg)" />
           </div>
-          <div style={{ fontSize: "1.3rem", fontWeight: 800, color: "#ffffff", marginTop: 6 }}>
+          <div style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-strong)", marginTop: 6 }}>
             {formatXof(summary.totalSalaries)}
           </div>
-          <div style={{ fontSize: "0.76rem", color: "#94a3b8", marginTop: 4 }}>
+          <div style={{ fontSize: "0.76rem", color: "var(--text-muted)", marginTop: 4 }}>
             {exec.summary.salariesHint}
           </div>
         </div>
@@ -294,12 +294,12 @@ export function ExecutiveDashboardCharts({
             borderRadius: 14,
             background:
               summary.netProfit >= 0
-                ? "linear-gradient(135deg, rgba(6, 78, 59, 0.5) 0%, rgba(15, 23, 42, 0.9) 100%)"
-                : "linear-gradient(135deg, rgba(127, 29, 29, 0.5) 0%, rgba(15, 23, 42, 0.9) 100%)",
+                ? "linear-gradient(135deg, var(--success-soft) 0%, var(--surface) 100%)"
+                : "linear-gradient(135deg, var(--danger-soft) 0%, var(--surface) 100%)",
             border:
               summary.netProfit >= 0
-                ? "1px solid rgba(52, 211, 153, 0.45)"
-                : "1px solid rgba(239, 68, 68, 0.45)",
+                ? "1px solid var(--success)"
+                : "1px solid var(--danger)",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -307,29 +307,29 @@ export function ExecutiveDashboardCharts({
               style={{
                 fontSize: "0.75rem",
                 fontWeight: 800,
-                color: summary.netProfit >= 0 ? "#34d399" : "#f87171",
+                color: summary.netProfit >= 0 ? "var(--success-fg)" : "var(--danger-fg)",
                 textTransform: "uppercase",
               }}
             >
               {exec.summary.netLabel}
             </span>
             {summary.netProfit >= 0 ? (
-              <ArrowUpRight size={18} color="#34d399" />
+              <ArrowUpRight size={18} color="var(--success-fg)" />
             ) : (
-              <ArrowDownRight size={18} color="#f87171" />
+              <ArrowDownRight size={18} color="var(--danger-fg)" />
             )}
           </div>
           <div
             style={{
               fontSize: "1.35rem",
               fontWeight: 900,
-              color: summary.netProfit >= 0 ? "#34d399" : "#f87171",
+              color: summary.netProfit >= 0 ? "var(--success-fg)" : "var(--danger-fg)",
               marginTop: 6,
             }}
           >
             {formatXof(summary.netProfit)}
           </div>
-          <div style={{ fontSize: "0.76rem", color: "#cbd5e1", marginTop: 4, display: "flex", gap: 6 }}>
+          <div style={{ fontSize: "0.76rem", color: "var(--text-muted)", marginTop: 4, display: "flex", gap: 6 }}>
             <span>{exec.summary.marginInline} <strong>{formatPct(summary.netMarginPct)}</strong></span>
             <span>· {exec.summary.costsInline} {formatXof(summary.totalCosts)}</span>
           </div>
@@ -367,8 +367,8 @@ export function ExecutiveDashboardCharts({
           style={{
             padding: "1rem 1.4rem",
             borderRadius: 14,
-            background: "rgba(15, 23, 42, 0.9)",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
@@ -378,40 +378,40 @@ export function ExecutiveDashboardCharts({
           }}
         >
           <div>
-            <div style={{ color: "#94a3b8", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 700 }}>
+            <div style={{ color: "var(--text-muted)", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 700 }}>
               {exec.hover.heading}
             </div>
-            <div style={{ color: "#ffffff", fontSize: "1.1rem", fontWeight: 800 }}>
+            <div style={{ color: "var(--text-on-accent)", fontSize: "1.1rem", fontWeight: 800 }}>
               {exec.months.long(hoveredPoint.year, hoveredPoint.monthIndex)}
             </div>
           </div>
 
           <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap", alignItems: "center" }}>
             <div>
-              <div style={{ color: "#38bdf8", fontSize: "0.74rem", fontWeight: 700 }}>{exec.hover.invoiced}</div>
-              <div style={{ color: "#ffffff", fontWeight: 700 }}>{formatXof(hoveredPoint.salesInvoicedXof)}</div>
+              <div style={{ color: "var(--info-fg)", fontSize: "0.74rem", fontWeight: 700 }}>{exec.hover.invoiced}</div>
+              <div style={{ color: "var(--text-strong)", fontWeight: 700 }}>{formatXof(hoveredPoint.salesInvoicedXof)}</div>
             </div>
             <div>
-              <div style={{ color: "#34d399", fontSize: "0.74rem", fontWeight: 700 }}>{exec.hover.collected}</div>
-              <div style={{ color: "#ffffff", fontWeight: 700 }}>{formatXof(hoveredPoint.salesCollectedXof)}</div>
+              <div style={{ color: "var(--success-fg)", fontSize: "0.74rem", fontWeight: 700 }}>{exec.hover.collected}</div>
+              <div style={{ color: "var(--text-strong)", fontWeight: 700 }}>{formatXof(hoveredPoint.salesCollectedXof)}</div>
             </div>
             <div>
-              <div style={{ color: "#f59e0b", fontSize: "0.74rem", fontWeight: 700 }}>{exec.hover.expenses}</div>
-              <div style={{ color: "#ffffff", fontWeight: 700 }}>{formatXof(hoveredPoint.expensesTotalXof)}</div>
+              <div style={{ color: "var(--warning-fg)", fontSize: "0.74rem", fontWeight: 700 }}>{exec.hover.expenses}</div>
+              <div style={{ color: "var(--text-strong)", fontWeight: 700 }}>{formatXof(hoveredPoint.expensesTotalXof)}</div>
             </div>
             <div>
-              <div style={{ color: "#a78bfa", fontSize: "0.74rem", fontWeight: 700 }}>{exec.hover.salaries}</div>
-              <div style={{ color: "#ffffff", fontWeight: 700 }}>{formatXof(hoveredPoint.salariesTotalXof)}</div>
+              <div style={{ color: "var(--purple-fg)", fontSize: "0.74rem", fontWeight: 700 }}>{exec.hover.salaries}</div>
+              <div style={{ color: "var(--text-strong)", fontWeight: 700 }}>{formatXof(hoveredPoint.salariesTotalXof)}</div>
             </div>
             <div
               style={{
                 paddingLeft: "1rem",
-                borderLeft: "1px solid rgba(255, 255, 255, 0.15)",
+                borderLeft: "1px solid var(--border)",
               }}
             >
               <div
                 style={{
-                  color: hoveredPoint.netProfitXof >= 0 ? "#34d399" : "#f87171",
+                  color: hoveredPoint.netProfitXof >= 0 ? "var(--success-fg)" : "var(--danger-fg)",
                   fontSize: "0.74rem",
                   fontWeight: 800,
                   textTransform: "uppercase",
@@ -421,7 +421,7 @@ export function ExecutiveDashboardCharts({
               </div>
               <div
                 style={{
-                  color: hoveredPoint.netProfitXof >= 0 ? "#34d399" : "#f87171",
+                  color: hoveredPoint.netProfitXof >= 0 ? "var(--success-fg)" : "var(--danger-fg)",
                   fontSize: "1.05rem",
                   fontWeight: 900,
                 }}
@@ -487,8 +487,8 @@ function ProfitChartCard({
       style={{
         padding: "1.4rem",
         borderRadius: 16,
-        background: "linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 29, 0.95) 100%)",
-        border: "1px solid rgba(52, 211, 153, 0.3)",
+        background: "var(--surface)",
+        border: "1px solid var(--success)",
         boxShadow: "0 8px 30px rgba(0, 0, 0, 0.35)",
       }}
     >
@@ -496,20 +496,20 @@ function ProfitChartCard({
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ fontSize: "1.1rem" }}>💎</span>
-            <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800, color: "#ffffff" }}>
+            <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800, color: "var(--text-on-accent)" }}>
               {copy.charts.profit.title}
             </h3>
           </div>
-          <p style={{ margin: "3px 0 0", fontSize: "0.78rem", color: "#94a3b8" }}>
+          <p style={{ margin: "3px 0 0", fontSize: "0.78rem", color: "var(--text-muted)" }}>
             {copy.charts.profit.desc}
           </p>
         </div>
         <div style={{ display: "flex", gap: "10px", fontSize: "0.75rem", fontWeight: 700 }}>
-          <span style={{ color: "#34d399", display: "inline-flex", alignItems: "center", gap: 4 }}>
-            <span style={{ width: 10, height: 10, borderRadius: 2, background: "#10b981" }} /> {copy.charts.profit.legendProfit}
+          <span style={{ color: "var(--success-fg)", display: "inline-flex", alignItems: "center", gap: 4 }}>
+            <span style={{ width: 10, height: 10, borderRadius: 2, background: "var(--success-solid)" }} /> {copy.charts.profit.legendProfit}
           </span>
-          <span style={{ color: "#f87171", display: "inline-flex", alignItems: "center", gap: 4 }}>
-            <span style={{ width: 10, height: 10, borderRadius: 2, background: "#ef4444" }} /> {copy.charts.profit.legendLoss}
+          <span style={{ color: "var(--danger-fg)", display: "inline-flex", alignItems: "center", gap: 4 }}>
+            <span style={{ width: 10, height: 10, borderRadius: 2, background: "var(--danger-solid)" }} /> {copy.charts.profit.legendLoss}
           </span>
         </div>
       </div>
@@ -526,14 +526,14 @@ function ProfitChartCard({
             y1={zeroY}
             x2={width - paddingX}
             y2={zeroY}
-            stroke="rgba(255, 255, 255, 0.25)"
+            stroke="var(--border)"
             strokeWidth={1.5}
             strokeDasharray="4 4"
           />
           <text
             x={paddingX - 10}
             y={zeroY + 4}
-            fill="#94a3b8"
+            fill="var(--text-muted)"
             fontSize={10}
             fontWeight={700}
             textAnchor="end"
@@ -566,7 +566,7 @@ function ProfitChartCard({
                     y1={paddingY}
                     x2={x}
                     y2={height - paddingY}
-                    stroke="rgba(255, 255, 255, 0.2)"
+                    stroke="var(--border)"
                     strokeWidth={1}
                   />
                 )}
@@ -578,7 +578,7 @@ function ProfitChartCard({
                   width={barWidth}
                   height={Math.max(barHeight, 2)}
                   rx={3}
-                  fill={isProfit ? (isHovered ? "#34d399" : "#10b981") : (isHovered ? "#f87171" : "#ef4444")}
+                  fill={isProfit ? (isHovered ? "var(--success-fg)" : "var(--success-fg)") : (isHovered ? "var(--danger-fg)" : "var(--danger-fg)")}
                   fillOpacity={isHovered ? 1 : 0.85}
                   style={{ transition: "all 0.15s ease" }}
                 />
@@ -587,7 +587,7 @@ function ProfitChartCard({
                 <text
                   x={x}
                   y={height - paddingY + 18}
-                  fill={isHovered ? "#ffffff" : "#94a3b8"}
+                  fill={isHovered ? "var(--text-strong)" : "var(--text-muted)"}
                   fontSize={10}
                   fontWeight={isHovered ? 800 : 600}
                   textAnchor="middle"
@@ -650,8 +650,8 @@ function SalesChartCard({
       style={{
         padding: "1.4rem",
         borderRadius: 16,
-        background: "linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 29, 0.95) 100%)",
-        border: "1px solid rgba(225, 29, 72, 0.25)",
+        background: "var(--surface)",
+        border: "1px solid var(--accent)",
         boxShadow: "0 8px 30px rgba(0, 0, 0, 0.35)",
       }}
     >
@@ -659,20 +659,20 @@ function SalesChartCard({
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ fontSize: "1.1rem" }}>💰</span>
-            <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800, color: "#ffffff" }}>
+            <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800, color: "var(--text-on-accent)" }}>
               {copy.charts.sales.title}
             </h3>
           </div>
-          <p style={{ margin: "3px 0 0", fontSize: "0.78rem", color: "#94a3b8" }}>
+          <p style={{ margin: "3px 0 0", fontSize: "0.78rem", color: "var(--text-muted)" }}>
             {copy.charts.sales.desc}
           </p>
         </div>
         <div style={{ display: "flex", gap: "10px", fontSize: "0.75rem", fontWeight: 700 }}>
-          <span style={{ color: "#e11d48", display: "inline-flex", alignItems: "center", gap: 4 }}>
-            <span style={{ width: 10, height: 3, background: "#e11d48" }} /> {copy.charts.sales.legendInvoiced}
+          <span style={{ color: "var(--accent-fg)", display: "inline-flex", alignItems: "center", gap: 4 }}>
+            <span style={{ width: 10, height: 3, background: "var(--accent)" }} /> {copy.charts.sales.legendInvoiced}
           </span>
-          <span style={{ color: "#34d399", display: "inline-flex", alignItems: "center", gap: 4 }}>
-            <span style={{ width: 10, height: 3, background: "#34d399" }} /> {copy.charts.sales.legendCollected}
+          <span style={{ color: "var(--success-fg)", display: "inline-flex", alignItems: "center", gap: 4 }}>
+            <span style={{ width: 10, height: 3, background: "var(--success-solid)" }} /> {copy.charts.sales.legendCollected}
           </span>
         </div>
       </div>
@@ -684,8 +684,8 @@ function SalesChartCard({
             const y = height - paddingY - pct * graphHeight;
             return (
               <g key={idx}>
-                <line x1={paddingX} y1={y} x2={width - paddingX} y2={y} stroke="rgba(255, 255, 255, 0.08)" strokeDasharray="3 3" />
-                <text x={paddingX - 10} y={y + 3} fill="#64748b" fontSize={9} textAnchor="end">
+                <line x1={paddingX} y1={y} x2={width - paddingX} y2={y} stroke="var(--border)" strokeDasharray="3 3" />
+                <text x={paddingX - 10} y={y + 3} fill="var(--text-subtle)" fontSize={9} textAnchor="end">
                   {formatXof(maxSales * pct)}
                 </text>
               </g>
@@ -693,8 +693,8 @@ function SalesChartCard({
           })}
 
           {/* Courbes */}
-          {invoicedPath && <path d={invoicedPath} fill="none" stroke="#e11d48" strokeWidth={2.5} />}
-          {collectedPath && <path d={collectedPath} fill="none" stroke="#10b981" strokeWidth={2.5} />}
+          {invoicedPath && <path d={invoicedPath} fill="none" stroke="var(--accent-fg)" strokeWidth={2.5} />}
+          {collectedPath && <path d={collectedPath} fill="none" stroke="var(--success-fg)" strokeWidth={2.5} />}
 
           {/* Points interactifs */}
           {points.map((p, i) => {
@@ -705,10 +705,10 @@ function SalesChartCard({
 
             return (
               <g key={p.key} onMouseEnter={() => onHover(p.key)} onMouseLeave={() => onHover(null)} style={{ cursor: "pointer" }}>
-                {isHovered && <line x1={x} y1={paddingY} x2={x} y2={height - paddingY} stroke="rgba(255, 255, 255, 0.2)" strokeWidth={1} />}
-                <circle cx={x} cy={yInv} r={isHovered ? 5 : 3.5} fill="#e11d48" stroke="#ffffff" strokeWidth={1.5} />
-                <circle cx={x} cy={yCol} r={isHovered ? 5 : 3.5} fill="#10b981" stroke="#ffffff" strokeWidth={1.5} />
-                <text x={x} y={height - paddingY + 16} fill={isHovered ? "#ffffff" : "#94a3b8"} fontSize={10} fontWeight={isHovered ? 800 : 600} textAnchor="middle">
+                {isHovered && <line x1={x} y1={paddingY} x2={x} y2={height - paddingY} stroke="var(--border)" strokeWidth={1} />}
+                <circle cx={x} cy={yInv} r={isHovered ? 5 : 3.5} fill="var(--accent-fg)" stroke="var(--text-strong)" strokeWidth={1.5} />
+                <circle cx={x} cy={yCol} r={isHovered ? 5 : 3.5} fill="var(--success-fg)" stroke="var(--text-strong)" strokeWidth={1.5} />
+                <text x={x} y={height - paddingY + 16} fill={isHovered ? "var(--text-strong)" : "var(--text-muted)"} fontSize={10} fontWeight={isHovered ? 800 : 600} textAnchor="middle">
                   {copy.months.short(p.year, p.monthIndex)}
                 </text>
               </g>
@@ -765,8 +765,8 @@ function ExpensesChartCard({
       style={{
         padding: "1.4rem",
         borderRadius: 16,
-        background: "linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 29, 0.95) 100%)",
-        border: "1px solid rgba(245, 158, 11, 0.25)",
+        background: "var(--surface)",
+        border: "1px solid var(--warning)",
         boxShadow: "0 8px 30px rgba(0, 0, 0, 0.35)",
       }}
     >
@@ -774,16 +774,16 @@ function ExpensesChartCard({
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ fontSize: "1.1rem" }}>💸</span>
-            <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800, color: "#ffffff" }}>
+            <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800, color: "var(--text-on-accent)" }}>
               {copy.charts.expenses.title}
             </h3>
           </div>
-          <p style={{ margin: "3px 0 0", fontSize: "0.78rem", color: "#94a3b8" }}>
+          <p style={{ margin: "3px 0 0", fontSize: "0.78rem", color: "var(--text-muted)" }}>
             {copy.charts.expenses.desc}
           </p>
         </div>
-        <div style={{ color: "#f59e0b", fontSize: "0.75rem", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 4 }}>
-          <span style={{ width: 10, height: 3, background: "#f59e0b" }} /> {copy.charts.expenses.legendTotal}
+        <div style={{ color: "var(--warning-fg)", fontSize: "0.75rem", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 4 }}>
+          <span style={{ width: 10, height: 3, background: "var(--warning-solid)" }} /> {copy.charts.expenses.legendTotal}
         </div>
       </div>
 
@@ -794,8 +794,8 @@ function ExpensesChartCard({
             const y = height - paddingY - pct * graphHeight;
             return (
               <g key={idx}>
-                <line x1={paddingX} y1={y} x2={width - paddingX} y2={y} stroke="rgba(255, 255, 255, 0.08)" strokeDasharray="3 3" />
-                <text x={paddingX - 10} y={y + 3} fill="#64748b" fontSize={9} textAnchor="end">
+                <line x1={paddingX} y1={y} x2={width - paddingX} y2={y} stroke="var(--border)" strokeDasharray="3 3" />
+                <text x={paddingX - 10} y={y + 3} fill="var(--text-subtle)" fontSize={9} textAnchor="end">
                   {formatXof(maxExpense * pct)}
                 </text>
               </g>
@@ -805,10 +805,10 @@ function ExpensesChartCard({
           {closedExpPath && (
             <path
               d={closedExpPath}
-              fill="rgba(245, 158, 11, 0.12)"
+              fill="var(--warning-fg)"
             />
           )}
-          {expPath && <path d={expPath} fill="none" stroke="#f59e0b" strokeWidth={2.5} />}
+          {expPath && <path d={expPath} fill="none" stroke="var(--warning-fg)" strokeWidth={2.5} />}
 
           {points.map((p, i) => {
             const x = getX(i);
@@ -816,9 +816,9 @@ function ExpensesChartCard({
             const isHovered = hoveredKey === p.key;
             return (
               <g key={p.key} onMouseEnter={() => onHover(p.key)} onMouseLeave={() => onHover(null)} style={{ cursor: "pointer" }}>
-                {isHovered && <line x1={x} y1={paddingY} x2={x} y2={height - paddingY} stroke="rgba(255, 255, 255, 0.2)" strokeWidth={1} />}
-                <circle cx={x} cy={y} r={isHovered ? 5 : 3.5} fill="#f59e0b" stroke="#ffffff" strokeWidth={1.5} />
-                <text x={x} y={height - paddingY + 16} fill={isHovered ? "#ffffff" : "#94a3b8"} fontSize={10} fontWeight={isHovered ? 800 : 600} textAnchor="middle">
+                {isHovered && <line x1={x} y1={paddingY} x2={x} y2={height - paddingY} stroke="var(--border)" strokeWidth={1} />}
+                <circle cx={x} cy={y} r={isHovered ? 5 : 3.5} fill="var(--warning-fg)" stroke="var(--text-strong)" strokeWidth={1.5} />
+                <text x={x} y={height - paddingY + 16} fill={isHovered ? "var(--text-strong)" : "var(--text-muted)"} fontSize={10} fontWeight={isHovered ? 800 : 600} textAnchor="middle">
                   {copy.months.short(p.year, p.monthIndex)}
                 </text>
               </g>
@@ -874,8 +874,8 @@ function ActivityChartCard({
       style={{
         padding: "1.4rem",
         borderRadius: 16,
-        background: "linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 29, 0.95) 100%)",
-        border: "1px solid rgba(139, 92, 246, 0.25)",
+        background: "var(--surface)",
+        border: "1px solid var(--purple)",
         boxShadow: "0 8px 30px rgba(0, 0, 0, 0.35)",
       }}
     >
@@ -883,16 +883,16 @@ function ActivityChartCard({
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ fontSize: "1.1rem" }}>⚡</span>
-            <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800, color: "#ffffff" }}>
+            <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800, color: "var(--text-on-accent)" }}>
               {copy.charts.activity.title}
             </h3>
           </div>
-          <p style={{ margin: "3px 0 0", fontSize: "0.78rem", color: "#94a3b8" }}>
+          <p style={{ margin: "3px 0 0", fontSize: "0.78rem", color: "var(--text-muted)" }}>
             {copy.charts.activity.desc}
           </p>
         </div>
-        <div style={{ color: "#a78bfa", fontSize: "0.75rem", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 4 }}>
-          <span style={{ width: 10, height: 3, background: "#a78bfa" }} /> {copy.charts.activity.legendScore}
+        <div style={{ color: "var(--purple-fg)", fontSize: "0.75rem", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 4 }}>
+          <span style={{ width: 10, height: 3, background: "var(--purple-solid)" }} /> {copy.charts.activity.legendScore}
         </div>
       </div>
 
@@ -902,15 +902,15 @@ function ActivityChartCard({
             const y = height - paddingY - pct * graphHeight;
             return (
               <g key={idx}>
-                <line x1={paddingX} y1={y} x2={width - paddingX} y2={y} stroke="rgba(255, 255, 255, 0.08)" strokeDasharray="3 3" />
-                <text x={paddingX - 10} y={y + 3} fill="#64748b" fontSize={9} textAnchor="end">
+                <line x1={paddingX} y1={y} x2={width - paddingX} y2={y} stroke="var(--border)" strokeDasharray="3 3" />
+                <text x={paddingX - 10} y={y + 3} fill="var(--text-subtle)" fontSize={9} textAnchor="end">
                   {`${Math.round(maxAct * pct)}${copy.charts.activity.axisSuffix}`}
                 </text>
               </g>
             );
           })}
 
-          {actPath && <path d={actPath} fill="none" stroke="#a78bfa" strokeWidth={2.5} />}
+          {actPath && <path d={actPath} fill="none" stroke="var(--purple-fg)" strokeWidth={2.5} />}
 
           {points.map((p, i) => {
             const x = getX(i);
@@ -918,9 +918,9 @@ function ActivityChartCard({
             const isHovered = hoveredKey === p.key;
             return (
               <g key={p.key} onMouseEnter={() => onHover(p.key)} onMouseLeave={() => onHover(null)} style={{ cursor: "pointer" }}>
-                {isHovered && <line x1={x} y1={paddingY} x2={x} y2={height - paddingY} stroke="rgba(255, 255, 255, 0.2)" strokeWidth={1} />}
-                <circle cx={x} cy={y} r={isHovered ? 5 : 3.5} fill="#a78bfa" stroke="#ffffff" strokeWidth={1.5} />
-                <text x={x} y={height - paddingY + 16} fill={isHovered ? "#ffffff" : "#94a3b8"} fontSize={10} fontWeight={isHovered ? 800 : 600} textAnchor="middle">
+                {isHovered && <line x1={x} y1={paddingY} x2={x} y2={height - paddingY} stroke="var(--border)" strokeWidth={1} />}
+                <circle cx={x} cy={y} r={isHovered ? 5 : 3.5} fill="var(--purple-fg)" stroke="var(--text-strong)" strokeWidth={1.5} />
+                <text x={x} y={height - paddingY + 16} fill={isHovered ? "var(--text-strong)" : "var(--text-muted)"} fontSize={10} fontWeight={isHovered ? 800 : 600} textAnchor="middle">
                   {copy.months.short(p.year, p.monthIndex)}
                 </text>
               </g>

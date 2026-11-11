@@ -267,7 +267,7 @@ export function QuoteEditorModal({
       style={{
         position: "fixed",
         inset: 0,
-        background: "rgba(0, 0, 0, 0.75)",
+        background: "var(--surface-sunken)",
         backdropFilter: "blur(6px)",
         zIndex: 99999,
         display: "flex",
@@ -284,8 +284,8 @@ export function QuoteEditorModal({
           overflowY: "auto",
           overflowX: "hidden",
           boxSizing: "border-box",
-          background: "#161a20",
-          border: "1px solid rgba(212, 175, 55, 0.45)",
+          background: "var(--surface)",
+          border: "1px solid var(--gold)",
           borderRadius: 16,
           padding: "20px 24px",
           boxShadow: "0 25px 60px rgba(0, 0, 0, 0.6)",
@@ -315,9 +315,9 @@ export function QuoteEditorModal({
             style={{
               padding: "10px 14px",
               borderRadius: 8,
-              background: "rgba(239, 68, 68, 0.15)",
-              border: "1px solid rgba(239, 68, 68, 0.35)",
-              color: "#f87171",
+              background: "var(--danger-soft)",
+              border: "1px solid var(--danger)",
+              color: "var(--danger-fg)",
               fontSize: "0.82rem",
               marginBottom: 16,
               display: "flex",
@@ -382,15 +382,15 @@ export function QuoteEditorModal({
             style={{
               padding: "12px 14px",
               borderRadius: 10,
-              background: "rgba(212, 175, 55, 0.05)",
-              border: "1px dashed rgba(212, 175, 55, 0.35)",
+              background: "var(--gold-soft)",
+              border: "1px dashed var(--gold)",
               display: "flex",
               flexDirection: "column",
               gap: 10,
             }}
           >
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-              <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--gold, #d4af37)" }}>
+              <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--gold-fg)" }}>
                 {copy.editor.pickStock}
               </span>
               {!isGarageScope && (
@@ -438,7 +438,7 @@ export function QuoteEditorModal({
             {stagedItem && (
               <div
                 style={{
-                  background: "rgba(10, 24, 34, 0.95)",
+                  background: "var(--surface)",
                   border: "1px solid var(--gold)",
                   borderRadius: 8,
                   padding: "0.85rem 1rem",
@@ -453,7 +453,7 @@ export function QuoteEditorModal({
                       style={{
                         fontSize: "0.72rem",
                         background: "var(--gold)",
-                        color: "#000",
+                        color: "var(--text-on-accent)",
                         fontWeight: 750,
                         padding: "2px 8px",
                         borderRadius: 4,
@@ -488,7 +488,7 @@ export function QuoteEditorModal({
                         alignItems: "center",
                         border: "1px solid var(--ice-border)",
                         borderRadius: 6,
-                        background: "rgba(0,0,0,0.3)",
+                        background: "var(--surface-soft)",
                       }}
                     >
                       <button
@@ -564,7 +564,7 @@ export function QuoteEditorModal({
                   <div style={{ display: "flex", alignItems: "flex-end", gap: 10, marginLeft: "auto" }}>
                     <div style={{ textAlign: "right" }}>
                       <div style={{ fontSize: "0.68rem", opacity: 0.65 }}>{copy.editor.staged.lineCalc}</div>
-                      <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gold)" }}>
+                      <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gold-fg)" }}>
                         {formatXof(stagedItem.quantity * stagedItem.unitPriceXof)}
                       </div>
                     </div>
@@ -582,8 +582,8 @@ export function QuoteEditorModal({
                       }}
                       className="ox-btn"
                       style={{
-                        background: "linear-gradient(135deg, var(--gold) 0%, #b89130 100%)",
-                        color: "#0a1622",
+                        background: "linear-gradient(135deg, var(--gold) 0%, var(--gold-solid) 100%)",
+                        color: "var(--text-strong)",
                         fontWeight: 700,
                         padding: "0.5rem 1rem",
                         fontSize: "0.8rem",
@@ -603,10 +603,10 @@ export function QuoteEditorModal({
             <div
               style={{
                 padding: "8px 12px",
-                background: "rgba(16, 185, 129, 0.15)",
-                border: "1px solid rgba(16, 185, 129, 0.4)",
+                background: "var(--success-soft)",
+                border: "1px solid var(--success)",
                 borderRadius: 8,
-                color: "#6ee7b7",
+                color: "var(--success-fg)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
@@ -621,7 +621,7 @@ export function QuoteEditorModal({
               <button
                 type="button"
                 onClick={() => setFeedbackMessage(null)}
-                style={{ background: "none", border: "none", color: "#6ee7b7", cursor: "pointer" }}
+                style={{ background: "none", border: "none", color: "var(--success-solid)", cursor: "pointer" }}
               >
                 <X size={12} />
               </button>
@@ -659,8 +659,8 @@ export function QuoteEditorModal({
                       gridTemplateColumns: "1fr 105px 150px 120px 38px",
                       gap: 8,
                       alignItems: "center",
-                      background: isHighlighted ? "rgba(212, 175, 55, 0.15)" : "rgba(255, 255, 255, 0.03)",
-                      border: isHighlighted ? "1px solid var(--gold)" : "1px solid rgba(255, 255, 255, 0.07)",
+                      background: isHighlighted ? "var(--gold-soft)" : "var(--surface-soft)",
+                      border: isHighlighted ? "1px solid var(--gold)" : "1px solid var(--border)",
                       borderRadius: 8,
                       padding: "6px 10px",
                       transition: "background 0.3s ease, border 0.3s ease",
@@ -682,7 +682,7 @@ export function QuoteEditorModal({
                         alignItems: "center",
                         border: "1px solid var(--ice-border)",
                         borderRadius: 6,
-                        background: "rgba(0,0,0,0.25)",
+                        background: "var(--surface-soft)",
                       }}
                     >
                       <button
@@ -774,7 +774,7 @@ export function QuoteEditorModal({
                       style={{
                         background: "none",
                         border: "none",
-                        color: "#f87171",
+                        color: "var(--danger-fg)",
                         cursor: "pointer",
                         padding: 4,
                         display: "flex",
@@ -796,8 +796,8 @@ export function QuoteEditorModal({
             style={{
               padding: "10px 14px",
               borderRadius: 10,
-              background: "linear-gradient(135deg, rgba(212, 175, 55, 0.08), rgba(0, 120, 212, 0.05))",
-              border: "1px solid rgba(212, 175, 55, 0.35)",
+              background: "linear-gradient(135deg, var(--gold-soft), var(--info-soft))",
+              border: "1px solid var(--gold)",
               display: "flex",
               flexDirection: "column",
               gap: 8,
@@ -805,8 +805,8 @@ export function QuoteEditorModal({
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <Tag size={15} color="var(--gold)" />
-                <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--gold)" }}>
+                <Tag size={15} color="var(--gold-fg)" />
+                <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--gold-fg)" }}>
                   {copy.editor.discount.title}
                 </span>
               </div>
@@ -832,8 +832,8 @@ export function QuoteEditorModal({
                     fontWeight: 650,
                     border: "none",
                     cursor: "pointer",
-                    background: discountType === "NONE" ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.25)",
-                    color: discountType === "NONE" ? "#fff" : "var(--ice-text-muted)",
+                    background: discountType === "NONE" ? "var(--surface-soft)" : "var(--surface-soft)",
+                    color: discountType === "NONE" ? "var(--text-on-accent)" : "var(--ice-text-muted)",
                   }}
                 >
                   {copy.editor.discount.none}
@@ -850,8 +850,8 @@ export function QuoteEditorModal({
                     fontWeight: 650,
                     border: "none",
                     cursor: "pointer",
-                    background: discountType === "PERCENT" ? "var(--brand)" : "rgba(0,0,0,0.25)",
-                    color: discountType === "PERCENT" ? "#fff" : "var(--ice-text-muted)",
+                    background: discountType === "PERCENT" ? "var(--brand)" : "var(--surface-soft)",
+                    color: discountType === "PERCENT" ? "var(--text-on-accent)" : "var(--ice-text-muted)",
                   }}
                 >
                   {copy.editor.discount.percent}
@@ -868,8 +868,8 @@ export function QuoteEditorModal({
                     fontWeight: 650,
                     border: "none",
                     cursor: "pointer",
-                    background: discountType === "AMOUNT" ? "var(--gold)" : "rgba(0,0,0,0.25)",
-                    color: discountType === "AMOUNT" ? "#0a1622" : "var(--ice-text-muted)",
+                    background: discountType === "AMOUNT" ? "var(--gold)" : "var(--surface-soft)",
+                    color: discountType === "AMOUNT" ? "var(--text-on-accent)" : "var(--ice-text-muted)",
                   }}
                 >
                   {copy.editor.discount.fixed}
@@ -889,9 +889,9 @@ export function QuoteEditorModal({
                       fontSize: "0.74rem",
                       fontWeight: 700,
                       borderRadius: 5,
-                      border: discountValue === pct ? "1px solid var(--gold)" : "1px solid rgba(255,255,255,0.1)",
-                      background: discountValue === pct ? "rgba(212, 175, 55, 0.25)" : "rgba(255,255,255,0.04)",
-                      color: discountValue === pct ? "var(--gold)" : "var(--ice-text)",
+                      border: discountValue === pct ? "1px solid var(--gold)" : "1px solid var(--border)",
+                      background: discountValue === pct ? "var(--gold-soft)" : "var(--surface-soft)",
+                      color: discountValue === pct ? "var(--gold-fg)" : "var(--ice-text)",
                       cursor: "pointer",
                     }}
                   >
@@ -913,7 +913,7 @@ export function QuoteEditorModal({
                   <span style={{ fontSize: "0.74rem", opacity: 0.7 }}>%</span>
                 </div>
 
-                <div style={{ width: "100%", fontSize: "0.76rem", color: "var(--gold)", fontWeight: 650 }}>
+                <div style={{ width: "100%", fontSize: "0.76rem", color: "var(--gold-fg)", fontWeight: 650 }}>
                   ✨ {copy.editor.discount.granted(formatXof(discountAmount))}
                 </div>
               </div>
@@ -931,7 +931,7 @@ export function QuoteEditorModal({
                   style={{ width: 180, fontSize: "0.82rem", textAlign: "right", fontWeight: 700 }}
                 />
                 <span style={{ fontSize: "0.74rem", opacity: 0.7 }}>FCFA</span>
-                <div style={{ fontSize: "0.76rem", color: "var(--gold)", fontWeight: 650, marginLeft: "auto" }}>
+                <div style={{ fontSize: "0.76rem", color: "var(--gold-fg)", fontWeight: 650, marginLeft: "auto" }}>
                   ✨ {copy.editor.discount.deduction(formatXof(discountAmount))}
                 </div>
               </div>
@@ -943,8 +943,8 @@ export function QuoteEditorModal({
             style={{
               padding: "14px 18px",
               borderRadius: 10,
-              background: "linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(212, 175, 55, 0.04))",
-              border: "1px solid rgba(212, 175, 55, 0.3)",
+              background: "var(--gold-soft)",
+              border: "1px solid var(--gold)",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
@@ -957,7 +957,7 @@ export function QuoteEditorModal({
                 {copy.editor.totals.gross} : <strong>{formatXof(totals.grossHtXof)}</strong>
               </div>
               {totals.discountXof > 0 && (
-                <div style={{ fontSize: "0.78rem", color: "var(--gold)", marginTop: 2 }}>
+                <div style={{ fontSize: "0.78rem", color: "var(--gold-fg)", marginTop: 2 }}>
                   {copy.editor.totals.commercialDiscount} : <strong>-{formatXof(totals.discountXof)}</strong>
                 </div>
               )}
@@ -972,10 +972,10 @@ export function QuoteEditorModal({
             </div>
 
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", color: "var(--gold, #d4af37)" }}>
+              <div style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", color: "var(--gold-fg)" }}>
                 {copy.editor.totals.totalTtc(taxMode)}
               </div>
-              <div style={{ fontSize: "1.35rem", fontWeight: 800, color: "var(--gold, #d4af37)" }}>
+              <div style={{ fontSize: "1.35rem", fontWeight: 800, color: "var(--gold-fg)" }}>
                 {formatXof(totals.totalXof)}
               </div>
             </div>
@@ -985,9 +985,9 @@ export function QuoteEditorModal({
                 width: "100%",
                 marginTop: 6,
                 paddingTop: 8,
-                borderTop: "1px dashed rgba(255,255,255,0.1)",
+                borderTop: "1px dashed var(--border)",
                 fontSize: "0.78rem",
-                color: "rgba(255,255,255,0.7)",
+                color: "var(--text-muted)",
                 fontStyle: "italic",
                 lineHeight: 1.4,
               }}
@@ -1030,7 +1030,7 @@ export function QuoteEditorModal({
               style={{
                 padding: "9px 18px",
                 borderRadius: 8,
-                border: "1px solid rgba(255, 255, 255, 0.15)",
+                border: "1px solid var(--border)",
                 background: "transparent",
                 color: "var(--ice-text)",
                 fontSize: "0.85rem",
@@ -1046,8 +1046,8 @@ export function QuoteEditorModal({
                 padding: "9px 24px",
                 borderRadius: 8,
                 border: "none",
-                background: "linear-gradient(135deg, #d4af37, #b48c1e)",
-                color: "#000",
+                background: "linear-gradient(135deg, var(--gold-solid), var(--gold-soft))",
+                color: "var(--text-strong)",
                 fontSize: "0.85rem",
                 fontWeight: 750,
                 cursor: "pointer",

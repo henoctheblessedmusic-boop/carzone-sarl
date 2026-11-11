@@ -365,7 +365,7 @@ export function ClientsView({
             <span style={{ fontSize: "0.85rem", color: "var(--ice-text-muted)", fontWeight: 550 }}>
               {copy.stats.totalTitle}
             </span>
-            <User size={18} style={{ color: "var(--brand)" }} />
+            <User size={18} style={{ color: "var(--accent-fg)" }} />
           </div>
           <div className="ox-metric-val" style={{ fontSize: "1.85rem", marginTop: 4 }}>{totalCount}</div>
           <div style={{ fontSize: "0.8rem", color: "var(--ice-text-muted)", marginTop: 2 }}>
@@ -393,9 +393,9 @@ export function ClientsView({
             <span style={{ fontSize: "0.85rem", opacity: 0.7, fontWeight: 550 }}>
               {copy.stats.companiesTitle}
             </span>
-            <Building2 size={18} style={{ color: "var(--gold)" }} />
+            <Building2 size={18} style={{ color: "var(--gold-fg)" }} />
           </div>
-          <div style={{ fontSize: "1.85rem", fontWeight: 750, marginTop: 4, color: "var(--gold)" }}>
+          <div style={{ fontSize: "1.85rem", fontWeight: 750, marginTop: 4, color: "var(--gold-fg)" }}>
             {companyCount}
           </div>
           <div style={{ fontSize: "0.8rem", opacity: 0.65, marginTop: 2 }}>
@@ -599,7 +599,7 @@ export function ClientsView({
                             height: 34,
                             borderRadius: "50%",
                             background: "linear-gradient(135deg, var(--brand), var(--brand-deep))",
-                            color: "#fff",
+                            color: "var(--text-strong)",
                             display: "grid",
                             placeItems: "center",
                             fontSize: "0.78rem",
@@ -626,7 +626,7 @@ export function ClientsView({
                               {copy.table.ifuPrefix}{customer.ifu}
                             </div>
                           ) : (
-                            <div style={{ fontSize: "0.7rem", color: "#f59e0b", opacity: 0.85 }}>
+                            <div style={{ fontSize: "0.7rem", color: "var(--warning-fg)", opacity: 0.85 }}>
                               {copy.table.missingIfu}
                             </div>
                           )}
@@ -638,15 +638,15 @@ export function ClientsView({
                               title={customer.showroomNotes}
                               style={{
                                 fontSize: "0.7rem",
-                                background: "rgba(212, 175, 55, 0.15)",
-                                color: "var(--gold)",
+                                background: "var(--gold-soft)",
+                                color: "var(--gold-fg)",
                                 padding: "1px 6px",
                                 borderRadius: 4,
                                 display: "inline-flex",
                                 alignItems: "center",
                                 gap: 3,
                                 marginTop: 3,
-                                border: "1px solid rgba(212, 175, 55, 0.25)",
+                                border: "1px solid var(--gold)",
                               }}
                             >
                               {copy.table.showroomVisit}
@@ -659,7 +659,7 @@ export function ClientsView({
                     <td>
                       {customer.companyName ? (
                         <div style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 550 }}>
-                          <Building2 size={14} style={{ opacity: 0.6, color: "var(--gold)" }} />
+                          <Building2 size={14} style={{ opacity: 0.6, color: "var(--gold-fg)" }} />
                           <span>{customer.companyName}</span>
                         </div>
                       ) : (
@@ -718,16 +718,16 @@ export function ClientsView({
                         style={{
                           background:
                             customer.category === "Entreprise"
-                              ? "rgba(196, 163, 90, 0.15)"
-                              : "rgba(126, 200, 227, 0.12)",
+                              ? "var(--gold-soft)"
+                              : "var(--info-soft)",
                           color:
                             customer.category === "Entreprise"
                               ? "var(--gold)"
                               : "var(--ice-highlight)",
                           borderColor:
                             customer.category === "Entreprise"
-                              ? "rgba(196, 163, 90, 0.3)"
-                              : "rgba(126, 200, 227, 0.25)",
+                              ? "var(--gold)"
+                              : "var(--info)",
                         }}
                       >
                         {customer.category
@@ -742,9 +742,9 @@ export function ClientsView({
                             className="ox-badge"
                             style={{
                               fontSize: "0.68rem",
-                              background: "rgba(126, 200, 227, 0.12)",
+                              background: "var(--info-soft)",
                               color: "var(--ice-highlight)",
-                              borderColor: "rgba(126, 200, 227, 0.25)",
+                              borderColor: "var(--info)",
                             }}
                           >
                             Showroom
@@ -755,9 +755,9 @@ export function ClientsView({
                             className="ox-badge"
                             style={{
                               fontSize: "0.68rem",
-                              background: "rgba(16, 185, 129, 0.12)",
+                              background: "var(--success-soft)",
                               color: "var(--ok)",
-                              borderColor: "rgba(16, 185, 129, 0.3)",
+                              borderColor: "var(--success)",
                             }}
                           >
                             Garage
@@ -768,9 +768,9 @@ export function ClientsView({
                             className="ox-badge"
                             style={{
                               fontSize: "0.68rem",
-                              background: "rgba(196, 163, 90, 0.15)",
-                              color: "var(--gold)",
-                              borderColor: "rgba(196, 163, 90, 0.3)",
+                              background: "var(--gold-soft)",
+                              color: "var(--gold-fg)",
+                              borderColor: "var(--gold)",
                             }}
                           >
                             Partenaire
@@ -795,7 +795,7 @@ export function ClientsView({
                             title={copy.table.invoicesTooltip(customer._count.invoices)}
                             style={{ display: "inline-flex", alignItems: "center", gap: 3, opacity: 0.85 }}
                           >
-                            <Receipt size={12} style={{ color: "var(--brand)" }} />
+                            <Receipt size={12} style={{ color: "var(--accent-fg)" }} />
                             {customer._count.invoices}
                           </span>
                         )}
@@ -854,7 +854,7 @@ export function ClientsView({
                             alignItems: "center",
                             gap: 4,
                             color: customer.documents && customer.documents.length > 0 ? "var(--ice-highlight)" : "inherit",
-                            border: customer.documents && customer.documents.length > 0 ? "1px solid rgba(0, 120, 212, 0.3)" : undefined,
+                            border: customer.documents && customer.documents.length > 0 ? "1px solid var(--info)" : undefined,
                           }}
                         >
                           <FolderCheck size={14} />
@@ -902,7 +902,7 @@ export function ClientsView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.72)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "grid",
             placeItems: "center",
@@ -920,7 +920,7 @@ export function ClientsView({
               maxWidth: 520,
               borderRadius: 20,
               padding: "1.75rem",
-              background: "rgba(10, 24, 34, 0.95)",
+              background: "var(--surface)",
               border: "1px solid var(--ice-border)",
               boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
             }}
@@ -977,7 +977,7 @@ export function ClientsView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  {copy.createModal.ifuLabel} <span style={{ color: "var(--gold)", fontSize: "0.75rem" }}>{copy.createModal.ifuHint}</span>
+                  {copy.createModal.ifuLabel} <span style={{ color: "var(--gold-fg)", fontSize: "0.75rem" }}>{copy.createModal.ifuHint}</span>
                 </label>
                 <input
                   name="ifu"
@@ -1123,7 +1123,7 @@ export function ClientsView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.72)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(6px)",
             display: "grid",
             placeItems: "center",
@@ -1141,7 +1141,7 @@ export function ClientsView({
               maxWidth: 520,
               borderRadius: 20,
               padding: "1.75rem",
-              background: "rgba(10, 24, 34, 0.95)",
+              background: "var(--surface)",
               border: "1px solid var(--ice-border)",
               boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
             }}
@@ -1199,7 +1199,7 @@ export function ClientsView({
 
               <div>
                 <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, marginBottom: 5 }}>
-                  {copy.editModal.ifuLabel} <span style={{ color: "var(--gold)", fontSize: "0.75rem" }}>{copy.editModal.ifuHint}</span>
+                  {copy.editModal.ifuLabel} <span style={{ color: "var(--gold-fg)", fontSize: "0.75rem" }}>{copy.editModal.ifuHint}</span>
                 </label>
                 <input
                   name="ifu"
@@ -1382,7 +1382,7 @@ export function ClientsView({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0, 0, 0, 0.78)",
+            background: "var(--surface-sunken)",
             backdropFilter: "blur(8px)",
             display: "grid",
             placeItems: "center",
@@ -1405,7 +1405,7 @@ export function ClientsView({
               overflowY: "auto",
               borderRadius: 20,
               padding: "1.75rem",
-              background: "rgba(10, 24, 34, 0.98)",
+              background: "var(--surface)",
               border: "1px solid var(--ice-border)",
               boxShadow: "0 24px 64px rgba(0,0,0,0.7)",
               display: "flex",
@@ -1416,7 +1416,7 @@ export function ClientsView({
             {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--ice-border)", paddingBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <FolderCheck size={24} color="var(--gold)" />
+                <FolderCheck size={24} color="var(--gold-fg)" />
                 <div>
                   <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700 }}>
                     {copy.docsModal.title}
@@ -1444,14 +1444,14 @@ export function ClientsView({
                 gap: 10,
                 padding: "0.75rem 1rem",
                 borderRadius: 10,
-                background: "rgba(255, 255, 255, 0.03)",
-                border: "1px solid rgba(255, 255, 255, 0.07)",
+                background: "var(--surface-soft)",
+                border: "1px solid var(--border)",
                 fontSize: "0.82rem",
               }}
             >
               <div>
                 <span style={{ opacity: 0.65 }}>{copy.docsModal.ifuLabel}</span>
-                <strong style={{ color: selectedDocCustomer.ifu ? "var(--ice-highlight)" : "#f59e0b" }}>
+                <strong style={{ color: selectedDocCustomer.ifu ? "var(--ice-highlight)" : "var(--warning-fg)" }}>
                   {selectedDocCustomer.ifu || copy.docsModal.ifuMissing}
                 </strong>
               </div>
@@ -1474,9 +1474,9 @@ export function ClientsView({
                 style={{
                   padding: "0.75rem 1rem",
                   borderRadius: 8,
-                  background: "rgba(74, 222, 128, 0.15)",
-                  border: "1px solid rgba(74, 222, 128, 0.3)",
-                  color: "#4ade80",
+                  background: "var(--success-soft)",
+                  border: "1px solid var(--success)",
+                  color: "var(--success-fg)",
                   fontSize: "0.85rem",
                   display: "flex",
                   alignItems: "center",
@@ -1505,8 +1505,8 @@ export function ClientsView({
                     padding: "1.5rem",
                     textAlign: "center",
                     borderRadius: 10,
-                    background: "rgba(255, 255, 255, 0.02)",
-                    border: "1px dashed rgba(255, 255, 255, 0.1)",
+                    background: "var(--surface-soft)",
+                    border: "1px dashed var(--border)",
                     opacity: 0.65,
                     fontSize: "0.85rem",
                   }}
@@ -1521,8 +1521,8 @@ export function ClientsView({
                       style={{
                         padding: "0.75rem 1rem",
                         borderRadius: 10,
-                        background: "rgba(255, 255, 255, 0.03)",
-                        border: "1px solid rgba(255, 255, 255, 0.08)",
+                        background: "var(--surface-soft)",
+                        border: "1px solid var(--border)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
@@ -1530,7 +1530,7 @@ export function ClientsView({
                       }}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
-                        <Paperclip size={18} style={{ color: "var(--brand)", flexShrink: 0 }} />
+                        <Paperclip size={18} style={{ color: "var(--accent-fg)", flexShrink: 0 }} />
                         <div style={{ minWidth: 0, flex: 1 }}>
                           <div style={{ fontWeight: 650, fontSize: "0.88rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {doc.title}
@@ -1541,7 +1541,7 @@ export function ClientsView({
                             <span>· {copy.docsModal.addedOn(copy.formatDate(doc.uploadedAt))}</span>
                           </div>
                           {doc.notes && (
-                            <div style={{ fontSize: "0.73rem", opacity: 0.8, color: "var(--gold)", marginTop: 2 }}>
+                            <div style={{ fontSize: "0.73rem", opacity: 0.8, color: "var(--gold-fg)", marginTop: 2 }}>
                               {copy.docsModal.notePrefix}{doc.notes}
                             </div>
                           )}
@@ -1553,9 +1553,9 @@ export function ClientsView({
                           className="ox-badge"
                           style={{
                             fontSize: "0.72rem",
-                            background: doc.status === "TRANSMIS_ANATT" ? "rgba(56, 189, 248, 0.15)" : "rgba(74, 222, 128, 0.15)",
-                            color: doc.status === "TRANSMIS_ANATT" ? "#38bdf8" : "#4ade80",
-                            borderColor: doc.status === "TRANSMIS_ANATT" ? "rgba(56, 189, 248, 0.3)" : "rgba(74, 222, 128, 0.3)",
+                            background: doc.status === "TRANSMIS_ANATT" ? "var(--info-soft)" : "var(--success-soft)",
+                            color: doc.status === "TRANSMIS_ANATT" ? "var(--info-fg)" : "var(--success-fg)",
+                            borderColor: doc.status === "TRANSMIS_ANATT" ? "var(--info)" : "var(--success)",
                           }}
                         >
                           {doc.status === "TRANSMIS_ANATT" ? copy.documentStatus.transmitted : copy.documentStatus.validated}
@@ -1598,8 +1598,8 @@ export function ClientsView({
                 marginTop: 4,
                 padding: "1rem",
                 borderRadius: 12,
-                background: "rgba(0, 120, 212, 0.04)",
-                border: "1px dashed rgba(0, 120, 212, 0.3)",
+                background: "var(--info-soft)",
+                border: "1px dashed var(--info)",
                 display: "flex",
                 flexDirection: "column",
                 gap: 12,
@@ -1705,8 +1705,8 @@ export function ClientsView({
                   disabled={isUploadingDoc || !selectedDocCustomer.documents || selectedDocCustomer.documents.length === 0}
                   className="ox-btn"
                   style={{
-                    background: "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)",
-                    color: "#fff",
+                    background: "var(--info-solid)",
+                    color: "var(--text-strong)",
                     fontWeight: 650,
                     display: "inline-flex",
                     alignItems: "center",

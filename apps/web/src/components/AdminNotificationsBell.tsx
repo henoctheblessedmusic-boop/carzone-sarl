@@ -155,11 +155,11 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
           width: 36,
           height: 36,
           borderRadius: 8,
-          border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+          border: "1px solid var(--ice-border)",
           background: isOpen
-            ? "rgba(212, 175, 55, 0.2)"
-            : "var(--ice-card-bg, rgba(255, 255, 255, 0.05))",
-          color: unreadCount > 0 ? "var(--gold, #d4af37)" : "var(--ice-text)",
+            ? "var(--gold-soft)"
+            : "var(--ice-card-bg)",
+          color: unreadCount > 0 ? "var(--gold-fg)" : "var(--ice-text)",
           cursor: "pointer",
           transition: "all 0.2s ease",
         }}
@@ -175,8 +175,8 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
               height: 18,
               padding: "0 4px",
               borderRadius: 9,
-              background: "#ef4444",
-              color: "#fff",
+              background: "var(--danger-solid)",
+              color: "var(--text-on-accent)",
               fontSize: "0.7rem",
               fontWeight: 750,
               display: "flex",
@@ -200,8 +200,8 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
             right: 0,
             width: 360,
             maxWidth: "90vw",
-            background: "var(--ice-card-bg, #161a20)",
-            border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+            background: "var(--ice-card-bg)",
+            border: "1px solid var(--ice-border)",
             borderRadius: 14,
             boxShadow: "0 16px 40px rgba(0, 0, 0, 0.5)",
             zIndex: 1000,
@@ -217,12 +217,12 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
               alignItems: "center",
               justifyContent: "space-between",
               padding: "12px 16px",
-              borderBottom: "1px solid var(--ice-border, rgba(255, 255, 255, 0.1))",
-              background: "rgba(255, 255, 255, 0.03)",
+              borderBottom: "1px solid var(--ice-border)",
+              background: "var(--surface-soft)",
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <Bell size={16} color="var(--gold, #d4af37)" />
+              <Bell size={16} color="var(--gold-fg)" />
               <strong style={{ fontSize: "0.875rem", color: "var(--ice-text)" }}>
                 Notifications &amp; activités
               </strong>
@@ -232,8 +232,8 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
                     fontSize: "0.7rem",
                     padding: "2px 6px",
                     borderRadius: 10,
-                    background: "rgba(239, 68, 68, 0.15)",
-                    color: "#f87171",
+                    background: "var(--danger-soft)",
+                    color: "var(--danger-fg)",
                     fontWeight: 700,
                   }}
                 >
@@ -251,7 +251,7 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
                   style={{
                     background: "none",
                     border: "none",
-                    color: "var(--gold, #d4af37)",
+                    color: "var(--gold-fg)",
                     cursor: "pointer",
                     fontSize: "0.75rem",
                     display: "flex",
@@ -306,10 +306,10 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
                   onClick={() => !n.isRead && handleMarkOneRead(n.id)}
                   style={{
                     padding: "12px 16px",
-                    borderBottom: "1px solid var(--ice-border, rgba(255, 255, 255, 0.06))",
+                    borderBottom: "1px solid var(--ice-border)",
                     background: n.isRead
                       ? "transparent"
-                      : "rgba(212, 175, 55, 0.06)",
+                      : "var(--gold-soft)",
                     cursor: n.isRead ? "default" : "pointer",
                     display: "flex",
                     gap: 12,
@@ -323,23 +323,23 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
                       borderRadius: 8,
                       background:
                         n.type === "LOGIN_ALERT"
-                          ? "rgba(34, 197, 94, 0.15)"
+                          ? "var(--success-soft)"
                           : n.type === "RATE_LIMIT_ALERT"
-                          ? "rgba(239, 68, 68, 0.18)"
+                          ? "var(--danger-soft)"
                           : n.type === "PASSWORD_CHANGED"
-                          ? "rgba(212, 175, 55, 0.15)"
+                          ? "var(--gold-soft)"
                           : n.type === "ACTIVITY_GARAGE"
-                          ? "rgba(245, 158, 11, 0.15)"
+                          ? "var(--warning-soft)"
                           : "rgba(59, 130, 246, 0.15)",
                       color:
                         n.type === "LOGIN_ALERT"
-                          ? "#4ade80"
+                          ? "var(--success-fg)"
                           : n.type === "RATE_LIMIT_ALERT"
-                          ? "#f87171"
+                          ? "var(--danger-fg)"
                           : n.type === "PASSWORD_CHANGED"
-                          ? "var(--gold, #d4af37)"
+                          ? "var(--gold)"
                           : n.type === "ACTIVITY_GARAGE"
-                          ? "#f59e0b"
+                          ? "var(--warning-fg)"
                           : "#60a5fa",
                       marginTop: 2,
                       flexShrink: 0,
@@ -380,7 +380,7 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
                             width: 7,
                             height: 7,
                             borderRadius: "50%",
-                            background: "#ef4444",
+                            background: "var(--danger-solid)",
                           }}
                         />
                       )}
@@ -416,10 +416,10 @@ export function AdminNotificationsBell({ userRole }: { userRole: string }) {
                             borderRadius: 6,
                             background:
                               n.type === "RATE_LIMIT_ALERT"
-                                ? "rgba(239, 68, 68, 0.15)"
-                                : "rgba(34, 197, 94, 0.12)",
+                                ? "var(--danger-soft)"
+                                : "var(--success-soft)",
                             color:
-                              n.type === "RATE_LIMIT_ALERT" ? "#f87171" : "#4ade80",
+                              n.type === "RATE_LIMIT_ALERT" ? "var(--danger-fg)" : "var(--success-fg)",
                             fontSize: "0.72rem",
                             fontWeight: 700,
                             fontFamily: "monospace",

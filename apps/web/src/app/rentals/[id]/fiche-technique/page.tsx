@@ -25,7 +25,7 @@ export default async function RentalVehicleTechSheetPage({
   const sheet = resolveVehicleTechSheet(vehicle);
 
   return (
-    <div className="ox-tech-sheet-page-root" style={{ minHeight: "100vh", background: "#f1f5f9" }}>
+    <div className="ox-tech-sheet-page-root" style={{ minHeight: "100vh", background: "var(--surface-soft)" }}>
       <RentalTechSheetActions
         vehicleId={vehicle.id}
         vehicleTitle={`${vehicle.brand} ${vehicle.model}${vehicle.variant ? ` ${vehicle.variant}` : ""}`}

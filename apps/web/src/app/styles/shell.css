@@ -1,0 +1,577 @@
+/* =========================================================================
+   CARZONE Ops - Coque applicative
+   Grille, barre laterale, navigation, en-tete, logo, preferences, onboarding,
+   page de connexion et comportement responsive (tiroir mobile).
+   Depend de styles/tokens.css.
+   ========================================================================= */
+
+/* =========================================================================
+   1. Grille generale
+   ========================================================================= */
+.ox-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 268px 1fr;
+  background: var(--layout-bg);
+  color: var(--text);
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+.ox-content {
+  padding: 1.5rem 1.75rem 2.5rem;
+  overflow: auto;
+}
+
+/* =========================================================================
+   2. Barre laterale
+   ========================================================================= */
+.ox-aside {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  border-right: 1px solid var(--border);
+  padding: 1.25rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: var(--aside-bg);
+  color: var(--text);
+  z-index: 20;
+}
+
+.ox-aside-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.ox-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-start;
+  padding: 0.15rem 0.35rem 0.35rem;
+}
+
+.ox-nav {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 4px;
+  overscroll-behavior: contain;
+}
+
+/* Liste interne qui rebondit au bord (logo et pied de barre restent fixes). */
+.ox-nav-stretch {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transform-origin: center top;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ox-nav-stretch {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+.ox-nav-link {
+  position: relative;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 0.55rem 0.8rem 0.55rem 0.95rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  border: 1px solid transparent;
+  background: transparent;
+  font-weight: 450;
+  transition:
+    color var(--dur) var(--ease),
+    background var(--dur) var(--ease);
+}
+
+/* Survol : simple elevation, jamais l'apparence d'un element selectionne. */
+.ox-nav-link:hover:not(.is-active) {
+  color: var(--text);
+  background: var(--surface-soft);
+}
+
+.ox-nav-link:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Actif : pilote par le pathname seul, barre d'accent de marque + surface pleine. */
+.ox-nav-link.is-active {
+  color: var(--accent-fg);
+  background: var(--accent-soft);
+  border-color: var(--border);
+  font-weight: 600;
+}
+
+.ox-nav-link.is-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent);
+}
+
+.ox-nav-link.is-active:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+/* =========================================================================
+   3. Logo CARZONE
+   Le signe officiel est blanc et or sur noir : il garde son support sombre
+   dans les deux themes pour rester fidele a la charte.
+   ========================================================================= */
+.carzone-logo,
+.oxcar-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  overflow: hidden;
+  line-height: 0;
+  flex-shrink: 0;
+  background: #0a0a0a;
+  padding: 6px 8px;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur-slow) var(--ease), box-shadow var(--dur-slow) var(--ease);
+}
+
+.carzone-logo:hover,
+.oxcar-logo:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px var(--brand-glow);
+}
+
+.carzone-logo__img,
+.oxcar-logo__img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+}
+
+.carzone-logo--sm,
+.oxcar-logo--sm {
+  max-width: 132px;
+}
+
+.carzone-logo--md,
+.oxcar-logo--md {
+  max-width: 168px;
+}
+
+.carzone-logo--lg,
+.oxcar-logo--lg {
+  max-width: 228px;
+}
+
+/* =========================================================================
+   4. En-tete
+   ========================================================================= */
+.ox-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--header-bg);
+  color: var(--text);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  overflow: visible;
+  position: relative;
+  z-index: 30;
+}
+
+.ox-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.ox-header-title {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 650;
+  color: var(--text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ox-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Bouton standard de l'en-tete (messagerie, cloche, aide, materiel). */
+.ox-header-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 0.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: none;
+  transition:
+    background var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+
+.ox-header-btn:hover:not(:disabled) {
+  background: var(--surface-soft);
+  border-color: var(--border-strong);
+  filter: none;
+}
+
+.ox-header-btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.ox-header-btn--accent {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-fg);
+}
+
+.ox-header-btn--accent:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--text-on-accent);
+  border-color: var(--accent);
+}
+
+/* Pastille de compteur (messages non lus, alertes). */
+.ox-count-dot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 999px;
+  background: var(--danger-solid);
+  color: var(--text-on-accent);
+  font-size: 0.62rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--surface);
+}
+
+.ox-user-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  color: var(--text);
+}
+
+/* =========================================================================
+   5. Preferences (theme et langue)
+   ========================================================================= */
+.ox-prefs-menu {
+  position: relative;
+}
+
+.ox-prefs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 0.45rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: none;
+}
+
+.ox-prefs-btn:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  background: var(--surface-soft);
+  filter: none;
+}
+
+.ox-prefs-btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.ox-prefs-lang-code {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.ox-prefs-dropdown {
+  position: fixed;
+  min-width: 176px;
+  padding: 0.4rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-lg);
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ox-prefs-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 36px;
+  padding: 0.5rem 0.7rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.85rem;
+  text-align: left;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.ox-prefs-item:hover {
+  background: var(--surface-soft);
+  filter: none;
+}
+
+.ox-prefs-item:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+.ox-prefs-item.is-active {
+  background: var(--accent-soft);
+  color: var(--accent-fg);
+  font-weight: 600;
+}
+
+/* =========================================================================
+   6. Onboarding
+   ========================================================================= */
+.ox-onboarding {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  width: min(360px, calc(100vw - 2rem));
+  z-index: 50;
+  padding: 1rem 1.1rem;
+  max-height: min(70vh, 480px);
+  overflow-y: auto;
+}
+
+.ox-onboarding-fab {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 50;
+  border-radius: 999px;
+  padding: 0.7rem 1.1rem;
+}
+
+.ox-check-item {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  padding: 0.45rem 0.35rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text);
+  transition: background var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.ox-check-item:hover {
+  background: var(--surface-soft);
+  transform: translateX(2px);
+}
+
+.ox-check-item.done {
+  color: var(--text-disabled);
+}
+
+/* =========================================================================
+   7. Page de connexion
+   ========================================================================= */
+.ox-login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  position: relative;
+  background: var(--login-bg);
+  color: var(--text);
+  font-family: "Segoe UI", sans-serif;
+  padding: 24px;
+}
+
+.ox-login-prefs {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+}
+
+/* =========================================================================
+   8. Responsive : tiroir de navigation
+   ========================================================================= */
+.ox-mobile-header-bar,
+.ox-menu-btn,
+.ox-drawer-backdrop,
+.ox-aside-close-btn {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .ox-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .ox-header {
+    padding: 0.75rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 80;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+  }
+
+  .ox-header-title {
+    font-size: 1.15rem;
+  }
+
+  .ox-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  }
+
+  .ox-menu-btn:hover {
+    background: var(--surface-soft);
+    border-color: var(--border-strong);
+  }
+
+  .ox-aside {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(320px, 86vw);
+    height: 100vh;
+    z-index: 1000;
+    transform: translateX(-105%);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease;
+    box-shadow: none;
+    overflow-y: auto;
+    background: var(--aside-bg);
+    border-right: 1px solid var(--border);
+  }
+
+  .ox-aside.is-open {
+    transform: translateX(0);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .ox-aside-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .ox-drawer-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: var(--surface-overlay);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 990;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .ox-drawer-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .ox-content {
+    padding: 1rem 0.85rem 2rem;
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+}
+
+@media (max-width: 900px) {
+  .ox-content {
+    padding-bottom: calc(1rem + var(--carzone-safe-bottom));
+  }
+
+  .ox-aside {
+    padding-bottom: calc(0.5rem + var(--carzone-safe-bottom));
+  }
+}
+
+@media (max-width: 640px) {
+  .ox-user-meta {
+    display: none;
+  }
+}

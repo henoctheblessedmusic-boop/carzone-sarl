@@ -217,8 +217,8 @@ function SignaturePad({
         display: "flex",
         flexDirection: "column",
         gap: 8,
-        background: "rgba(15, 23, 42, 0.6)",
-        border: "1px solid rgba(255, 255, 255, 0.12)",
+        background: "var(--surface-sunken)",
+        border: "1px solid var(--border)",
         borderRadius: 12,
         padding: 14,
       }}
@@ -231,9 +231,9 @@ function SignaturePad({
             onClick={clearSignature}
             style={{
               fontSize: "0.72rem",
-              background: "rgba(225, 29, 72, 0.15)",
-              color: "#fb7185",
-              border: "1px solid rgba(225, 29, 72, 0.3)",
+              background: "var(--accent-soft)",
+              color: "var(--danger-fg)",
+              border: "1px solid var(--accent)",
               padding: "2px 8px",
               borderRadius: 4,
               cursor: "pointer",
@@ -246,9 +246,9 @@ function SignaturePad({
 
       <div
         style={{
-          border: "2px dashed rgba(245, 158, 11, 0.4)",
+          border: "2px dashed var(--warning)",
           borderRadius: 8,
-          background: "#ffffff",
+          background: "var(--surface)",
           overflow: "hidden",
           touchAction: "none",
         }}
@@ -265,7 +265,7 @@ function SignaturePad({
           onTouchEnd={stopDrawing}
         />
       </div>
-      <span style={{ fontSize: "0.72rem", color: "#94a3b8", textAlign: "center" }}>
+      <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", textAlign: "center" }}>
         {copy.signHint}
       </span>
     </div>
@@ -432,7 +432,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
         position: "fixed",
         inset: 0,
         zIndex: 9999,
-        backgroundColor: "rgba(5, 10, 20, 0.85)",
+        backgroundColor: "var(--surface)",
         backdropFilter: "blur(8px)",
         display: "flex",
         alignItems: "center",
@@ -443,8 +443,8 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
     >
       <div
         style={{
-          backgroundColor: "#0d1624",
-          border: "1px solid rgba(245, 158, 11, 0.35)",
+          backgroundColor: "var(--surface)",
+          border: "1px solid var(--warning)",
           width: "100%",
           maxWidth: "1020px",
           borderRadius: "16px",
@@ -459,9 +459,9 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
         {/* EN-TÊTE MODAL TABLETTE */}
         <div
           style={{
-            backgroundColor: "#111c2e",
+            backgroundColor: "var(--surface)",
             padding: "16px 24px",
-            borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+            borderBottom: "1px solid var(--border)",
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
@@ -475,29 +475,29 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 width: 44,
                 height: 44,
                 borderRadius: 12,
-                backgroundColor: "rgba(245, 158, 11, 0.15)",
-                border: "1px solid rgba(245, 158, 11, 0.35)",
+                backgroundColor: "var(--warning-soft)",
+                border: "1px solid var(--warning)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#fbbf24",
+                color: "var(--warning-fg)",
               }}
             >
               <Wrench size={22} />
             </div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <h2 style={{ fontSize: "1.15rem", fontWeight: 800, margin: 0, color: "#ffffff" }}>
+                <h2 style={{ fontSize: "1.15rem", fontWeight: 800, margin: 0, color: "var(--text-on-accent)" }}>
                   {copy.title(entry.orNumber || "-")}
                 </h2>
                 <span
                   style={{
-                    backgroundColor: "rgba(225, 29, 72, 0.2)",
-                    color: "#fb7185",
+                    backgroundColor: "var(--accent-soft)",
+                    color: "var(--danger-fg)",
                     fontSize: "0.82rem",
                     padding: "2px 8px",
                     borderRadius: 6,
-                    border: "1px solid rgba(225, 29, 72, 0.35)",
+                    border: "1px solid var(--accent)",
                     fontFamily: "monospace",
                     fontWeight: 800,
                   }}
@@ -506,7 +506,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 </span>
               </div>
               <p style={{ margin: "2px 0 0", fontSize: "0.82rem", opacity: 0.75 }}>
-                {entry.brand} {entry.model} · {copy.client} <strong style={{ color: "#ffffff" }}>{entry.clientName}</strong> · {copy.mileage} <strong style={{ color: "#ffffff" }}>{entry.mileage ? `${entry.mileage.toLocaleString()} KM` : "-"}</strong>
+                {entry.brand} {entry.model} · {copy.client} <strong style={{ color: "var(--text-on-accent)" }}>{entry.clientName}</strong> · {copy.mileage} <strong style={{ color: "var(--text-on-accent)" }}>{entry.mileage ? `${entry.mileage.toLocaleString()} KM` : "-"}</strong>
               </p>
             </div>
           </div>
@@ -522,11 +522,11 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 gap: 6,
                 padding: "6px 12px",
                 borderRadius: 8,
-                backgroundColor: "rgba(56, 189, 248, 0.15)",
-                color: "#7dd3fc",
+                backgroundColor: "var(--info-soft)",
+                color: "var(--info-fg)",
                 fontSize: "0.8rem",
                 fontWeight: 700,
-                border: "1px solid rgba(56, 189, 248, 0.3)",
+                border: "1px solid var(--info)",
                 textDecoration: "none",
               }}
               title={copy.fiche1Title}
@@ -543,11 +543,11 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 gap: 6,
                 padding: "6px 12px",
                 borderRadius: 8,
-                backgroundColor: "rgba(168, 85, 247, 0.15)",
-                color: "#d8b4fe",
+                backgroundColor: "var(--purple-soft)",
+                color: "var(--purple-fg)",
                 fontSize: "0.8rem",
                 fontWeight: 700,
-                border: "1px solid rgba(168, 85, 247, 0.3)",
+                border: "1px solid var(--purple)",
                 textDecoration: "none",
               }}
               title={copy.fiche2Title}
@@ -561,9 +561,9 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 width: 36,
                 height: 36,
                 borderRadius: 8,
-                backgroundColor: "rgba(255, 255, 255, 0.08)",
+                backgroundColor: "var(--surface-soft)",
                 border: 0,
-                color: "#94a3b8",
+                color: "var(--text-muted)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -578,9 +578,9 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
         {/* 3 ONGLETS TACTILES */}
         <div
           style={{
-            backgroundColor: "#0a121d",
+            backgroundColor: "var(--surface)",
             padding: "8px 24px 0 24px",
-            borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+            borderBottom: "1px solid var(--border)",
             display: "flex",
             gap: 10,
           }}
@@ -599,9 +599,9 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
               cursor: "pointer",
               border: "1px solid transparent",
               borderBottom: 0,
-              backgroundColor: activeTab === "CHECKLIST" ? "#0d1624" : "transparent",
-              color: activeTab === "CHECKLIST" ? "#fbbf24" : "#94a3b8",
-              borderColor: activeTab === "CHECKLIST" ? "rgba(245, 158, 11, 0.4)" : "transparent",
+              backgroundColor: activeTab === "CHECKLIST" ? "var(--surface)" : "transparent",
+              color: activeTab === "CHECKLIST" ? "var(--warning-fg)" : "var(--text-muted)",
+              borderColor: activeTab === "CHECKLIST" ? "var(--warning)" : "transparent",
             }}
           >
             <CheckCircle2 size={16} />
@@ -621,9 +621,9 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
               cursor: "pointer",
               border: "1px solid transparent",
               borderBottom: 0,
-              backgroundColor: activeTab === "INTERVENTION" ? "#0d1624" : "transparent",
-              color: activeTab === "INTERVENTION" ? "#fbbf24" : "#94a3b8",
-              borderColor: activeTab === "INTERVENTION" ? "rgba(245, 158, 11, 0.4)" : "transparent",
+              backgroundColor: activeTab === "INTERVENTION" ? "var(--surface)" : "transparent",
+              color: activeTab === "INTERVENTION" ? "var(--warning-fg)" : "var(--text-muted)",
+              borderColor: activeTab === "INTERVENTION" ? "var(--warning)" : "transparent",
             }}
           >
             <Wrench size={16} />
@@ -643,9 +643,9 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
               cursor: "pointer",
               border: "1px solid transparent",
               borderBottom: 0,
-              backgroundColor: activeTab === "SIGNATURES" ? "#0d1624" : "transparent",
-              color: activeTab === "SIGNATURES" ? "#fbbf24" : "#94a3b8",
-              borderColor: activeTab === "SIGNATURES" ? "rgba(245, 158, 11, 0.4)" : "transparent",
+              backgroundColor: activeTab === "SIGNATURES" ? "var(--surface)" : "transparent",
+              color: activeTab === "SIGNATURES" ? "var(--warning-fg)" : "var(--text-muted)",
+              borderColor: activeTab === "SIGNATURES" ? "var(--warning)" : "transparent",
             }}
           >
             <PenTool size={16} />
@@ -661,14 +661,14 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
               {/* SÉLECTEUR DE PALIER */}
               <div
                 style={{
-                  backgroundColor: "rgba(15, 23, 42, 0.7)",
+                  backgroundColor: "var(--surface-sunken)",
                   padding: "16px",
                   borderRadius: 12,
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  border: "1px solid var(--border)",
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
-                  <span style={{ fontSize: "0.8rem", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                  <span style={{ fontSize: "0.8rem", fontWeight: 800, color: "var(--warning-fg)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                     {copy.tierTitle}
                   </span>
                   <div style={{ display: "flex", gap: 8 }}>
@@ -678,9 +678,9 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                       style={{
                         fontSize: "0.75rem",
                         fontWeight: 700,
-                        backgroundColor: "rgba(16, 185, 129, 0.15)",
-                        color: "#34d399",
-                        border: "1px solid rgba(16, 185, 129, 0.3)",
+                        backgroundColor: "var(--success-soft)",
+                        color: "var(--success-fg)",
+                        border: "1px solid var(--success)",
                         padding: "6px 12px",
                         borderRadius: 6,
                         cursor: "pointer",
@@ -694,9 +694,9 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                       style={{
                         fontSize: "0.75rem",
                         fontWeight: 700,
-                        backgroundColor: "rgba(244, 63, 94, 0.15)",
-                        color: "#fb7185",
-                        border: "1px solid rgba(244, 63, 94, 0.3)",
+                        backgroundColor: "var(--danger-soft)",
+                        color: "var(--danger-fg)",
+                        border: "1px solid var(--danger)",
                         padding: "6px 12px",
                         borderRadius: 6,
                         cursor: "pointer",
@@ -718,9 +718,9 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                         style={{
                           padding: "10px",
                           borderRadius: 10,
-                          border: isSelected ? "2px solid #fbbf24" : "1px solid rgba(255, 255, 255, 0.1)",
-                          background: isSelected ? "linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.4))" : "rgba(15, 23, 42, 0.5)",
-                          color: isSelected ? "#ffffff" : "#94a3b8",
+                          border: isSelected ? "2px solid var(--warning)" : "1px solid var(--border)",
+                          background: isSelected ? "var(--warning-soft)" : "var(--surface-sunken)",
+                          color: isSelected ? "var(--text-strong)" : "var(--text-muted)",
                           fontWeight: 750,
                           cursor: "pointer",
                           textAlign: "center",
@@ -742,17 +742,17 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
               {/* LISTE DES 22 TÂCHES */}
               <div
                 style={{
-                  backgroundColor: "rgba(15, 23, 42, 0.7)",
+                  backgroundColor: "var(--surface-sunken)",
                   borderRadius: 12,
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  border: "1px solid var(--border)",
                   overflow: "hidden",
                 }}
               >
                 <div
                   style={{
-                    backgroundColor: "#111c2e",
+                    backgroundColor: "var(--surface)",
                     padding: "10px 16px",
-                    borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderBottom: "1px solid var(--border)",
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
@@ -762,7 +762,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                   }}
                 >
                   <span>{copy.matrixTitle(WORKSHOP_CHECKLIST_TEMPLATE.length)}</span>
-                  <span style={{ color: "#fbbf24" }}>{copy.activeTier(selectedTier.toLocaleString())}</span>
+                  <span style={{ color: "var(--warning-fg)" }}>{copy.activeTier(selectedTier.toLocaleString())}</span>
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column" }}>
@@ -775,13 +775,13 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                         key={task.id}
                         style={{
                           padding: "12px 16px",
-                          borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+                          borderBottom: "1px solid var(--border)",
                           display: "flex",
                           flexDirection: "row",
                           alignItems: "center",
                           justifyContent: "space-between",
                           gap: 16,
-                          backgroundColor: isPartOfTier ? (idx % 2 === 0 ? "rgba(255, 255, 255, 0.02)" : "transparent") : "rgba(0, 0, 0, 0.2)",
+                          backgroundColor: isPartOfTier ? (idx % 2 === 0 ? "var(--surface-soft)" : "transparent") : "var(--surface-soft)",
                           opacity: isPartOfTier ? 1 : 0.65,
                         }}
                       >
@@ -793,8 +793,8 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                                 fontWeight: 800,
                                 padding: "2px 6px",
                                 borderRadius: 4,
-                                backgroundColor: "rgba(245, 158, 11, 0.15)",
-                                color: "#fbbf24",
+                                backgroundColor: "var(--warning-soft)",
+                                color: "var(--warning-fg)",
                               }}
                             >
                               {task.mileageTier.toLocaleString()} KM
@@ -805,7 +805,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                               </span>
                             )}
                           </div>
-                          <div style={{ fontSize: "0.9rem", fontWeight: 650, color: "#ffffff" }}>
+                          <div style={{ fontSize: "0.9rem", fontWeight: 650, color: "var(--text-on-accent)" }}>
                             {checklistTaskLabel(dict, task.taskLabel)}
                           </div>
                           <input
@@ -818,11 +818,11 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                               width: "100%",
                               maxWidth: 500,
                               fontSize: "0.8rem",
-                              backgroundColor: "rgba(0, 0, 0, 0.4)",
-                              border: "1px solid rgba(255, 255, 255, 0.12)",
+                              backgroundColor: "var(--surface-sunken)",
+                              border: "1px solid var(--border)",
                               borderRadius: 6,
                               padding: "6px 10px",
-                              color: "#ffffff",
+                              color: "var(--text-on-accent)",
                               outline: "none",
                             }}
                           />
@@ -843,8 +843,8 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                               display: "inline-flex",
                               alignItems: "center",
                               gap: 4,
-                              backgroundColor: state.status === "EFFECTUE" ? "#16a34a" : "rgba(255, 255, 255, 0.08)",
-                              color: state.status === "EFFECTUE" ? "#ffffff" : "#94a3b8",
+                              backgroundColor: state.status === "EFFECTUE" ? "var(--success-solid)" : "var(--surface-soft)",
+                              color: state.status === "EFFECTUE" ? "var(--text-on-accent)" : "var(--text-muted)",
                             }}
                           >
                             <CheckCircle2 size={14} /> {copy.done}
@@ -863,8 +863,8 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                               display: "inline-flex",
                               alignItems: "center",
                               gap: 4,
-                              backgroundColor: state.status === "NON_EFFECTUE" ? "#dc2626" : "rgba(255, 255, 255, 0.08)",
-                              color: state.status === "NON_EFFECTUE" ? "#ffffff" : "#94a3b8",
+                              backgroundColor: state.status === "NON_EFFECTUE" ? "var(--danger-solid)" : "var(--surface-soft)",
+                              color: state.status === "NON_EFFECTUE" ? "var(--text-on-accent)" : "var(--text-muted)",
                             }}
                           >
                             <XCircle size={14} /> {copy.notDone}
@@ -879,8 +879,8 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                               fontSize: "0.75rem",
                               cursor: "pointer",
                               border: 0,
-                              backgroundColor: state.status === "NON_APPLICABLE" ? "#475569" : "rgba(255, 255, 255, 0.05)",
-                              color: state.status === "NON_APPLICABLE" ? "#ffffff" : "#64748b",
+                              backgroundColor: state.status === "NON_APPLICABLE" ? "var(--surface-sunken)" : "var(--surface-soft)",
+                              color: state.status === "NON_APPLICABLE" ? "var(--text-on-accent)" : "var(--text-subtle)",
                             }}
                           >
                             {copy.notApplicable}
@@ -900,13 +900,13 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
               {/* PANNE SIGNALÉE */}
               <div
                 style={{
-                  backgroundColor: "rgba(15, 23, 42, 0.7)",
+                  backgroundColor: "var(--surface-sunken)",
                   padding: "16px",
                   borderRadius: 12,
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  border: "1px solid var(--border)",
                 }}
               >
-                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", marginBottom: 6 }}>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 800, color: "var(--warning-fg)", textTransform: "uppercase", marginBottom: 6 }}>
                   {copy.faultLabel}
                 </label>
                 <textarea
@@ -916,12 +916,12 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                   placeholder={copy.faultPlaceholder}
                   style={{
                     width: "100%",
-                    backgroundColor: "rgba(0, 0, 0, 0.4)",
-                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    backgroundColor: "var(--surface-sunken)",
+                    border: "1px solid var(--border)",
                     borderRadius: 8,
                     padding: "10px",
                     fontSize: "0.85rem",
-                    color: "#ffffff",
+                    color: "var(--text-on-accent)",
                     outline: "none",
                     boxSizing: "border-box",
                   }}
@@ -933,7 +933,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 <div style={poleBoxStyle}>
                   <label style={poleLabelStyle}>
                     <span>{copy.pole1Title}</span>
-                    <span style={{ color: "#fbbf24", fontSize: "0.72rem" }}>{copy.pole1Tag}</span>
+                    <span style={{ color: "var(--warning-fg)", fontSize: "0.72rem" }}>{copy.pole1Tag}</span>
                   </label>
                   <textarea
                     rows={2}
@@ -947,7 +947,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 <div style={poleBoxStyle}>
                   <label style={poleLabelStyle}>
                     <span>{copy.pole2Title}</span>
-                    <span style={{ color: "#fbbf24", fontSize: "0.72rem" }}>{copy.pole2Tag}</span>
+                    <span style={{ color: "var(--warning-fg)", fontSize: "0.72rem" }}>{copy.pole2Tag}</span>
                   </label>
                   <textarea
                     rows={2}
@@ -961,7 +961,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 <div style={poleBoxStyle}>
                   <label style={poleLabelStyle}>
                     <span>{copy.pole3Title}</span>
-                    <span style={{ color: "#fbbf24", fontSize: "0.72rem" }}>{copy.pole3Tag}</span>
+                    <span style={{ color: "var(--warning-fg)", fontSize: "0.72rem" }}>{copy.pole3Tag}</span>
                   </label>
                   <textarea
                     rows={2}
@@ -975,7 +975,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 <div style={poleBoxStyle}>
                   <label style={poleLabelStyle}>
                     <span>{copy.pole4Title}</span>
-                    <span style={{ color: "#fbbf24", fontSize: "0.72rem" }}>{copy.pole4Tag}</span>
+                    <span style={{ color: "var(--warning-fg)", fontSize: "0.72rem" }}>{copy.pole4Tag}</span>
                   </label>
                   <textarea
                     rows={2}
@@ -990,7 +990,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
               {/* TRAVAUX EFFECTUÉS & PIÈCES */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div style={poleBoxStyle}>
-                  <label style={{ ...poleLabelStyle, color: "#34d399" }}>
+                  <label style={{ ...poleLabelStyle, color: "var(--success-fg)" }}>
                     {copy.worksLabel}
                   </label>
                   <textarea
@@ -1003,7 +1003,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 </div>
 
                 <div style={poleBoxStyle}>
-                  <label style={{ ...poleLabelStyle, color: "#fbbf24" }}>
+                  <label style={{ ...poleLabelStyle, color: "var(--warning-fg)" }}>
                     {copy.partsLabel}
                   </label>
                   <textarea
@@ -1019,17 +1019,17 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
               {/* HORODATAGE & TECHNICIEN */}
               <div
                 style={{
-                  backgroundColor: "rgba(15, 23, 42, 0.7)",
+                  backgroundColor: "var(--surface-sunken)",
                   padding: "16px",
                   borderRadius: 12,
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  border: "1px solid var(--border)",
                   display: "grid",
                   gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
                   gap: 12,
                 }}
               >
                 <div>
-                  <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "#94a3b8", marginBottom: 4 }}>
+                  <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", marginBottom: 4 }}>
                     {copy.startLabel}
                   </label>
                   <input
@@ -1041,7 +1041,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 </div>
 
                 <div>
-                  <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "#94a3b8", marginBottom: 4 }}>
+                  <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", marginBottom: 4 }}>
                     {copy.endLabel}
                   </label>
                   <input
@@ -1053,7 +1053,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 </div>
 
                 <div>
-                  <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "#94a3b8", marginBottom: 4 }}>
+                  <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", marginBottom: 4 }}>
                     {copy.technicianLabel}
                   </label>
                   <input
@@ -1066,7 +1066,7 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
                 </div>
 
                 <div>
-                  <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "#94a3b8", marginBottom: 4 }}>
+                  <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", marginBottom: 4 }}>
                     {copy.managerLabel}
                   </label>
                   <input
@@ -1086,14 +1086,14 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div
                 style={{
-                  backgroundColor: "rgba(245, 158, 11, 0.12)",
-                  border: "1px solid rgba(245, 158, 11, 0.3)",
+                  backgroundColor: "var(--warning-soft)",
+                  border: "1px solid var(--warning)",
                   borderRadius: 12,
                   padding: "12px 16px",
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
-                  color: "#fbbf24",
+                  color: "var(--warning-fg)",
                   fontSize: "0.82rem",
                 }}
               >
@@ -1133,9 +1133,9 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
         {/* PIED DE MODAL & BOUTONS D'ACTION */}
         <div
           style={{
-            backgroundColor: "#111c2e",
+            backgroundColor: "var(--surface)",
             padding: "16px 24px",
-            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+            borderTop: "1px solid var(--border)",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
@@ -1149,8 +1149,8 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
             style={{
               padding: "10px 18px",
               borderRadius: 8,
-              backgroundColor: "rgba(255, 255, 255, 0.08)",
-              color: "#94a3b8",
+              backgroundColor: "var(--surface-soft)",
+              color: "var(--text-muted)",
               fontSize: "0.85rem",
               fontWeight: 650,
               border: 0,
@@ -1168,8 +1168,8 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
               display: "inline-flex",
               alignItems: "center",
               gap: 8,
-              background: "linear-gradient(135deg, #f59e0b, #d97706)",
-              color: "#111827",
+              background: "var(--warning-solid)",
+              color: "var(--text-strong)",
               border: 0,
               padding: "10px 24px",
               borderRadius: 10,
@@ -1190,10 +1190,10 @@ export function WorkshopTabletModal({ isOpen, onClose, entry, onSave }: Workshop
 }
 
 const poleBoxStyle: React.CSSProperties = {
-  backgroundColor: "rgba(15, 23, 42, 0.7)",
+  backgroundColor: "var(--surface-sunken)",
   padding: "14px",
   borderRadius: 12,
-  border: "1px solid rgba(255, 255, 255, 0.1)",
+  border: "1px solid var(--border)",
 };
 
 const poleLabelStyle: React.CSSProperties = {
@@ -1202,30 +1202,30 @@ const poleLabelStyle: React.CSSProperties = {
   alignItems: "center",
   fontSize: "0.8rem",
   fontWeight: 750,
-  color: "#ffffff",
+  color: "var(--text-on-accent)",
   marginBottom: 8,
 };
 
 const poleTextareaStyle: React.CSSProperties = {
   width: "100%",
-  backgroundColor: "rgba(0, 0, 0, 0.4)",
-  border: "1px solid rgba(255, 255, 255, 0.12)",
+  backgroundColor: "var(--surface-sunken)",
+  border: "1px solid var(--border)",
   borderRadius: 8,
   padding: "8px 10px",
   fontSize: "0.82rem",
-  color: "#ffffff",
+  color: "var(--text-on-accent)",
   outline: "none",
   boxSizing: "border-box",
 };
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
-  backgroundColor: "rgba(0, 0, 0, 0.4)",
-  border: "1px solid rgba(255, 255, 255, 0.12)",
+  backgroundColor: "var(--surface-sunken)",
+  border: "1px solid var(--border)",
   borderRadius: 8,
   padding: "8px 10px",
   fontSize: "0.82rem",
-  color: "#ffffff",
+  color: "var(--text-on-accent)",
   outline: "none",
   boxSizing: "border-box",
 };

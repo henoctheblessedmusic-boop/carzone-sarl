@@ -62,9 +62,9 @@ export function LoginFeedback({
           style={{
             padding: "0.85rem 1rem",
             borderRadius: 10,
-            background: "rgba(34, 197, 94, 0.15)",
-            border: "1px solid rgba(34, 197, 94, 0.35)",
-            color: "#4ade80",
+            background: "var(--success-soft)",
+            border: "1px solid var(--success)",
+            color: "var(--success-fg)",
             fontSize: "0.85rem",
             display: "flex",
             alignItems: "flex-start",
@@ -88,9 +88,9 @@ export function LoginFeedback({
         style={{
           padding: "0.85rem 1rem",
           borderRadius: 10,
-          background: "rgba(239, 68, 68, 0.15)",
-          border: "1px solid rgba(239, 68, 68, 0.4)",
-          color: "#f87171",
+          background: "var(--danger-soft)",
+          border: "1px solid var(--danger)",
+          color: "var(--danger-fg)",
           fontSize: "0.85rem",
           display: "flex",
           flexDirection: "column",
@@ -112,13 +112,13 @@ export function LoginFeedback({
           style={{
             marginTop: 4,
             padding: "6px 10px",
-            background: "rgba(0, 0, 0, 0.25)",
+            background: "var(--surface-soft)",
             borderRadius: 6,
             display: "flex",
             alignItems: "center",
             gap: 8,
             fontWeight: 700,
-            color: "#fca5a5",
+            color: "var(--danger-fg)",
           }}
         >
           <Clock size={16} />
@@ -140,9 +140,9 @@ export function LoginFeedback({
         style={{
           padding: "0.75rem 0.9rem",
           borderRadius: 10,
-          background: "rgba(245, 158, 11, 0.15)",
-          border: "1px solid rgba(245, 158, 11, 0.35)",
-          color: "#fbbf24",
+          background: "var(--warning-soft)",
+          border: "1px solid var(--warning)",
+          color: "var(--warning-fg)",
           fontSize: "0.85rem",
           display: "flex",
           alignItems: "flex-start",
@@ -172,9 +172,9 @@ export function LoginFeedback({
         style={{
           padding: "0.75rem 0.9rem",
           borderRadius: 10,
-          background: "rgba(239, 68, 68, 0.15)",
-          border: "1px solid rgba(239, 68, 68, 0.35)",
-          color: "#f87171",
+          background: "var(--danger-soft)",
+          border: "1px solid var(--danger)",
+          color: "var(--danger-fg)",
           fontSize: "0.85rem",
           display: "flex",
           alignItems: "center",

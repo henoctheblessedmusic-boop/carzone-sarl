@@ -143,7 +143,7 @@ export function AppShellClient({
             }}
             title={helpAria}
           >
-            <HelpCircle size={16} style={{ color: "#f43f5e" }} />
+            <HelpCircle size={16} style={{ color: "var(--danger-fg)" }} />
             <span>{helpButton}</span>
           </button>
 
@@ -192,9 +192,9 @@ export function AppShellClient({
                   width: 36,
                   height: 36,
                   borderRadius: 8,
-                  border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                  background: "var(--ice-card-bg, rgba(255, 255, 255, 0.05))",
-                  color: "var(--gold, #d4af37)",
+                  border: "1px solid var(--ice-border)",
+                  background: "var(--ice-card-bg)",
+                  color: "var(--gold-fg)",
                   transition: "all 0.2s ease",
                 }}
               >
@@ -208,8 +208,8 @@ export function AppShellClient({
                       minWidth: 16,
                       height: 16,
                       borderRadius: 8,
-                      background: "#ef4444",
-                      color: "#fff",
+                      background: "var(--danger-solid)",
+                      color: "var(--text-on-accent)",
                       fontSize: "0.62rem",
                       fontWeight: 800,
                       display: "flex",
@@ -250,16 +250,16 @@ export function AppShellClient({
                 gap: 6,
                 padding: "6px 12px",
                 borderRadius: 8,
-                border: "1px solid rgba(225, 29, 72, 0.4)",
-                background: "linear-gradient(135deg, rgba(225, 29, 72, 0.15) 0%, rgba(15, 23, 42, 0.6) 100%)",
-                color: "#fda4af",
+                border: "1px solid var(--accent)",
+                background: "linear-gradient(135deg, var(--accent-soft) 0%, var(--surface-sunken) 100%)",
+                color: "var(--danger-fg)",
                 fontSize: "0.82rem",
                 fontWeight: 700,
                 cursor: "pointer",
                 transition: "all 0.15s ease",
               }}
             >
-              <HelpCircle size={15} style={{ color: "#f43f5e" }} />
+              <HelpCircle size={15} style={{ color: "var(--danger-fg)" }} />
               <span>{helpButton}</span>
             </button>
 

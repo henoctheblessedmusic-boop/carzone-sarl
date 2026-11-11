@@ -87,8 +87,8 @@ export function DashboardActivityChart({
       style={{
         padding: "1.25rem 1.4rem",
         borderRadius: 14,
-        border: "1px solid rgba(225, 29, 72, 0.22)",
-        background: "linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(10, 15, 29, 0.9) 100%)",
+        border: "1px solid var(--accent)",
+        background: "linear-gradient(135deg, var(--surface-sunken) 0%, var(--surface) 100%)",
         display: "flex",
         flexDirection: "column",
         gap: "1rem",
@@ -106,15 +106,15 @@ export function DashboardActivityChart({
               width: 32,
               height: 32,
               borderRadius: "8px",
-              background: "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)",
-              color: "#fff",
+              background: "var(--accent)",
+              color: "var(--text-strong)",
               boxShadow: "0 3px 10px rgba(225, 29, 72, 0.35)",
             }}
           >
             <TrendingUp size={17} />
           </span>
           <div>
-            <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 750, color: "#f8fafc" }}>
+            <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 750, color: "var(--text)" }}>
               Évolution des Activités &amp; Performance Commerciale (2026)
             </h3>
             <p style={{ margin: "2px 0 0", fontSize: "0.78rem", color: "var(--ice-text-muted)" }}>
@@ -128,23 +128,23 @@ export function DashboardActivityChart({
           <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", fontSize: "0.78rem", marginRight: 6 }}>
             {activeTab === "finance" ? (
               <>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#fb7185" }}>
-                  <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#f43f5e" }} />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "var(--danger-fg)" }}>
+                  <span style={{ width: 9, height: 9, borderRadius: "50%", background: "var(--danger-solid)" }} />
                   Facturé TTC
                 </span>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#34d399" }}>
-                  <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#10b981" }} />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "var(--success-fg)" }}>
+                  <span style={{ width: 9, height: 9, borderRadius: "50%", background: "var(--success-solid)" }} />
                   Encaissé
                 </span>
               </>
             ) : (
               <>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#38bdf8" }}>
-                  <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#38bdf8" }} />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "var(--info-fg)" }}>
+                  <span style={{ width: 9, height: 9, borderRadius: "50%", background: "var(--info-solid)" }} />
                   Véhicules en Mouvement
                 </span>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#fbbf24" }}>
-                  <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#f59e0b" }} />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "var(--warning-fg)" }}>
+                  <span style={{ width: 9, height: 9, borderRadius: "50%", background: "var(--warning-solid)" }} />
                   Devis Émis
                 </span>
               </>
@@ -155,10 +155,10 @@ export function DashboardActivityChart({
           <div
             style={{
               display: "inline-flex",
-              background: "rgba(0,0,0,0.4)",
+              background: "var(--surface-sunken)",
               padding: "2px",
               borderRadius: "8px",
-              border: "1px solid rgba(255,255,255,0.08)",
+              border: "1px solid var(--border)",
             }}
           >
             <button
@@ -168,8 +168,8 @@ export function DashboardActivityChart({
                 padding: "0.35rem 0.75rem",
                 borderRadius: "6px",
                 border: "none",
-                background: activeTab === "finance" ? "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)" : "transparent",
-                color: activeTab === "finance" ? "#fff" : "var(--ice-text-muted)",
+                background: activeTab === "finance" ? "var(--accent)" : "transparent",
+                color: activeTab === "finance" ? "var(--text-on-accent)" : "var(--ice-text-muted)",
                 fontSize: "0.76rem",
                 fontWeight: 650,
                 cursor: "pointer",
@@ -185,8 +185,8 @@ export function DashboardActivityChart({
                 padding: "0.35rem 0.75rem",
                 borderRadius: "6px",
                 border: "none",
-                background: activeTab === "logistics" ? "linear-gradient(135deg, #E11D48 0%, #BE123C 100%)" : "transparent",
-                color: activeTab === "logistics" ? "#fff" : "var(--ice-text-muted)",
+                background: activeTab === "logistics" ? "var(--accent)" : "transparent",
+                color: activeTab === "logistics" ? "var(--text-strong)" : "var(--ice-text-muted)",
                 fontSize: "0.76rem",
                 fontWeight: 650,
                 cursor: "pointer",
@@ -226,7 +226,7 @@ export function DashboardActivityChart({
                   y1={y}
                   x2={paddingX + graphWidth}
                   y2={y}
-                  stroke="rgba(255, 255, 255, 0.07)"
+                  stroke="var(--border)"
                   strokeDasharray="4 4"
                   strokeWidth="1"
                 />
@@ -235,7 +235,7 @@ export function DashboardActivityChart({
                   y={y + 3}
                   textAnchor="end"
                   fontSize="9"
-                  fill="rgba(148, 163, 184, 0.6)"
+                  fill="var(--text-muted)"
                 >
                   {activeTab === "finance"
                     ? `${Math.round((r * maxFinance) / 1000000)}M`
@@ -252,7 +252,7 @@ export function DashboardActivityChart({
               <path
                 d={financeInvoicedPath}
                 fill="none"
-                stroke="#f43f5e"
+                stroke="var(--danger)"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -263,7 +263,7 @@ export function DashboardActivityChart({
               <path
                 d={financeCollectedPath}
                 fill="none"
-                stroke="#10b981"
+                stroke="var(--success)"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -284,13 +284,13 @@ export function DashboardActivityChart({
                         y1={paddingY}
                         x2={cInv.x}
                         y2={height - paddingY}
-                        stroke="rgba(255,255,255,0.25)"
+                        stroke="var(--border)"
                         strokeDasharray="2 2"
                         strokeWidth="1"
                       />
                     )}
-                    <circle cx={cInv.x} cy={cInv.y} r={isHovered ? 5.5 : 3.5} fill="#f43f5e" stroke="#fff" strokeWidth="1.5" />
-                    <circle cx={cCol.x} cy={cCol.y} r={isHovered ? 5.5 : 3.5} fill="#10b981" stroke="#fff" strokeWidth="1.5" />
+                    <circle cx={cInv.x} cy={cInv.y} r={isHovered ? 5.5 : 3.5} fill="var(--danger-fg)" stroke="var(--text-strong)" strokeWidth="1.5" />
+                    <circle cx={cCol.x} cy={cCol.y} r={isHovered ? 5.5 : 3.5} fill="var(--success-fg)" stroke="var(--text-strong)" strokeWidth="1.5" />
                   </g>
                 );
               })}
@@ -312,8 +312,8 @@ export function DashboardActivityChart({
                       width={barWidth}
                       height={barH}
                       rx="4"
-                      fill={isHovered ? "#38bdf8" : "rgba(56, 189, 248, 0.65)"}
-                      stroke="rgba(56, 189, 248, 0.9)"
+                      fill={isHovered ? "var(--info-fg)" : "var(--info-fg)"}
+                      stroke="var(--info)"
                       strokeWidth="1"
                     />
                     <text
@@ -322,7 +322,7 @@ export function DashboardActivityChart({
                       textAnchor="middle"
                       fontSize="10"
                       fontWeight="bold"
-                      fill="#38bdf8"
+                      fill="var(--info-fg)"
                     >
                       {p.vehiclesCount}
                     </text>
@@ -344,7 +344,7 @@ export function DashboardActivityChart({
                 textAnchor="middle"
                 fontSize="10"
                 fontWeight={isHovered ? 700 : 500}
-                fill={isHovered ? "#fff" : "rgba(148, 163, 184, 0.75)"}
+                fill={isHovered ? "var(--text-strong)" : "var(--text-muted)"}
               >
                 {p.month} 26
               </text>
@@ -359,8 +359,8 @@ export function DashboardActivityChart({
               position: "absolute",
               top: 10,
               right: 15,
-              background: "rgba(15, 23, 42, 0.92)",
-              border: "1px solid rgba(225, 29, 72, 0.4)",
+              background: "var(--surface)",
+              border: "1px solid var(--accent)",
               borderRadius: 8,
               padding: "0.5rem 0.8rem",
               fontSize: "0.78rem",
@@ -371,24 +371,24 @@ export function DashboardActivityChart({
               gap: 3,
             }}
           >
-            <div style={{ fontWeight: 700, color: "#fff", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: 2 }}>
+            <div style={{ fontWeight: 700, color: "var(--text-on-accent)", borderBottom: "1px solid var(--text-disabled)", paddingBottom: 2 }}>
               {points[hoveredIndex].month} 2026
             </div>
             {activeTab === "finance" ? (
               <>
-                <div style={{ color: "#fb7185" }}>
+                <div style={{ color: "var(--danger-fg)" }}>
                   Facturé : <strong>{formatXof(points[hoveredIndex].invoicedXof)}</strong>
                 </div>
-                <div style={{ color: "#34d399" }}>
+                <div style={{ color: "var(--success-fg)" }}>
                   Encaissé : <strong>{formatXof(points[hoveredIndex].collectedXof)}</strong>
                 </div>
               </>
             ) : (
               <>
-                <div style={{ color: "#38bdf8" }}>
+                <div style={{ color: "var(--info-fg)" }}>
                   Véhicules : <strong>{points[hoveredIndex].vehiclesCount} unités</strong>
                 </div>
-                <div style={{ color: "#fbbf24" }}>
+                <div style={{ color: "var(--warning-fg)" }}>
                   Devis émis : <strong>{points[hoveredIndex].quotesCount} dossiers</strong>
                 </div>
               </>

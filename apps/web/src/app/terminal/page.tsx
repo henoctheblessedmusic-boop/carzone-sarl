@@ -155,8 +155,8 @@ export default function TerminalPage() {
     <div
       style={{
         minHeight: "100vh",
-        background: "radial-gradient(ellipse at top, #0d2822 0%, #061118 60%, #020609 100%)",
-        color: "#e2e8f0",
+        background: "radial-gradient(ellipse at top, var(--success-soft) 0%, var(--surface) 60%, var(--surface) 100%)",
+        color: "var(--text-muted)",
         fontFamily: "'Segoe UI', Roboto, sans-serif",
         padding: "1.5rem",
         display: "flex",
@@ -182,7 +182,7 @@ export default function TerminalPage() {
             display: "inline-flex",
             alignItems: "center",
             gap: 6,
-            color: "rgba(255,255,255,0.7)",
+            color: "var(--text-muted)",
             textDecoration: "none",
             fontSize: "0.85rem",
           }}
@@ -190,8 +190,8 @@ export default function TerminalPage() {
           <ArrowLeft size={16} />
           {t.backLink}
         </Link>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.85rem", color: "#10b981" }}>
-          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", display: "inline-block", boxShadow: "0 0 10px #10b981" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.85rem", color: "var(--success-fg)" }}>
+          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--success-solid)", display: "inline-block", boxShadow: "0 0 10px var(--success-solid)" }} />
           {t.networkOn}
         </div>
       </div>
@@ -201,9 +201,9 @@ export default function TerminalPage() {
         style={{
           width: "100%",
           maxWidth: 620,
-          background: "rgba(15, 31, 46, 0.75)",
+          background: "var(--surface-sunken)",
           backdropFilter: "blur(20px)",
-          border: "1px solid rgba(16, 185, 129, 0.25)",
+          border: "1px solid var(--success)",
           borderRadius: 24,
           padding: "2rem",
           boxShadow: "0 25px 80px rgba(0, 0, 0, 0.7), 0 0 40px rgba(16, 185, 129, 0.1)",
@@ -218,7 +218,7 @@ export default function TerminalPage() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            borderBottom: "1px solid rgba(255,255,255,0.08)",
+            borderBottom: "1px solid var(--border)",
             paddingBottom: "1.25rem",
           }}
         >
@@ -228,21 +228,21 @@ export default function TerminalPage() {
                 width: 44,
                 height: 44,
                 borderRadius: 12,
-                background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                background: "var(--success-solid)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#fff",
+                color: "var(--text-strong)",
                 boxShadow: "0 4px 15px rgba(16, 185, 129, 0.4)",
               }}
             >
               <Zap size={24} />
             </div>
             <div>
-              <div style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.08em", color: "#10b981", fontWeight: 700 }}>
+              <div style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--success-fg)", fontWeight: 700 }}>
                 {t.brandKicker}
               </div>
-              <h1 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 800, color: "#fff" }}>
+              <h1 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 800, color: "var(--text-strong)" }}>
                 {t.title}
               </h1>
             </div>
@@ -250,7 +250,7 @@ export default function TerminalPage() {
 
           {selectedStation && (
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--gold)" }}>
+              <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--gold-fg)" }}>
                 {selectedStation.code}
               </div>
               <div style={{ fontSize: "0.75rem", opacity: 0.65 }}>
@@ -264,10 +264,10 @@ export default function TerminalPage() {
           <div
             style={{
               padding: "0.85rem 1rem",
-              background: "rgba(239, 68, 68, 0.15)",
-              border: "1px solid rgba(239, 68, 68, 0.3)",
+              background: "var(--danger-soft)",
+              border: "1px solid var(--danger)",
               borderRadius: 10,
-              color: "#fca5a5",
+              color: "var(--danger-fg)",
               fontSize: "0.85rem",
             }}
           >
@@ -292,19 +292,19 @@ export default function TerminalPage() {
                 width: 70,
                 height: 70,
                 borderRadius: "50%",
-                background: "rgba(16, 185, 129, 0.2)",
-                border: "2px solid #10b981",
+                background: "var(--success-soft)",
+                border: "2px solid var(--success)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#10b981",
+                color: "var(--success-fg)",
               }}
             >
               <CheckCircle size={38} />
             </div>
 
             <div>
-              <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, color: "#fff" }}>
+              <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, color: "var(--text-on-accent)" }}>
                 {t.successTitle}
               </h2>
               <div style={{ fontSize: "0.85rem", opacity: 0.7, marginTop: 4 }}>
@@ -315,8 +315,8 @@ export default function TerminalPage() {
             <div
               style={{
                 width: "100%",
-                background: "rgba(0, 0, 0, 0.3)",
-                border: "1px solid rgba(255, 255, 255, 0.08)",
+                background: "var(--surface-soft)",
+                border: "1px solid var(--border)",
                 borderRadius: 14,
                 padding: "1.25rem",
                 display: "grid",
@@ -336,14 +336,14 @@ export default function TerminalPage() {
               </div>
               <div>
                 <span style={{ opacity: 0.65, fontSize: "0.8rem" }}>{t.amountPaid} :</span>
-                <div style={{ fontWeight: 800, fontSize: "1.3rem", color: "#10b981" }}>
+                <div style={{ fontWeight: 800, fontSize: "1.3rem", color: "var(--success-fg)" }}>
                   {formatXof(resultData.totalXof)}
                 </div>
               </div>
               {resultData.savingsXof > 0 && (
                 <div>
                   <span style={{ opacity: 0.65, fontSize: "0.8rem" }}>{t.savings} :</span>
-                  <div style={{ fontWeight: 800, fontSize: "1.1rem", color: "var(--gold)" }}>
+                  <div style={{ fontWeight: 800, fontSize: "1.1rem", color: "var(--gold-fg)" }}>
                     {formatXof(resultData.savingsXof)}
                   </div>
                 </div>
@@ -361,7 +361,7 @@ export default function TerminalPage() {
                   alignItems: "center",
                   justifyContent: "center",
                   gap: 8,
-                  background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                  background: "var(--success-solid)",
                   fontWeight: 700,
                   padding: "0.85rem",
                   borderRadius: 12,
@@ -389,12 +389,12 @@ export default function TerminalPage() {
                 width: 60,
                 height: 60,
                 borderRadius: "50%",
-                background: "rgba(245, 158, 11, 0.15)",
-                border: "2px solid #f59e0b",
+                background: "var(--warning-soft)",
+                border: "2px solid var(--warning)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#f59e0b",
+                color: "var(--warning-fg)",
                 animation: "pulse 1.5s infinite",
               }}
             >
@@ -402,7 +402,7 @@ export default function TerminalPage() {
             </div>
 
             <div>
-              <h2 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 800, color: "#fff" }}>
+              <h2 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 800, color: "var(--text-on-accent)" }}>
                 {ussdStep === "PUSH_SENT" ? t.pushTitle : t.pinTitle}
               </h2>
               <p style={{ margin: "6px 0 0", fontSize: "0.88rem", opacity: 0.8 }}>
@@ -414,9 +414,9 @@ export default function TerminalPage() {
               style={{
                 padding: "0.75rem 1.25rem",
                 borderRadius: 20,
-                background: "rgba(255,255,255,0.05)",
+                background: "var(--surface-soft)",
                 fontSize: "0.8rem",
-                color: "rgba(255,255,255,0.7)",
+                color: "var(--text-muted)",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 8,
@@ -477,19 +477,19 @@ export default function TerminalPage() {
                     marginTop: 8,
                     padding: "0.6rem 0.9rem",
                     borderRadius: 8,
-                    background: "rgba(212, 175, 55, 0.12)",
-                    border: "1px solid rgba(212, 175, 55, 0.3)",
+                    background: "var(--gold-soft)",
+                    border: "1px solid var(--gold)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
                     fontSize: "0.82rem",
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--gold)", fontWeight: 650 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--gold-fg)", fontWeight: 650 }}>
                     <Sparkles size={15} />
                     <span>{t.activePlan(selectedCustomer.planName ?? "")}</span>
                   </div>
-                  <strong style={{ color: "#fff" }}>{t.memberRate}</strong>
+                  <strong style={{ color: "var(--text-on-accent)" }}>{t.memberRate}</strong>
                 </div>
               )}
             </div>
@@ -500,7 +500,7 @@ export default function TerminalPage() {
                 <label style={{ fontSize: "0.82rem", opacity: 0.8 }}>
                   {t.energyLabel} :
                 </label>
-                <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "#10b981" }}>
+                <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--success-fg)" }}>
                   {kwh} kWh <span style={{ opacity: 0.6, fontSize: "0.75rem", fontWeight: 400 }}>({t.rangeHint(Math.round(kwh * 6.5))})</span>
                 </span>
               </div>
@@ -515,9 +515,9 @@ export default function TerminalPage() {
                     style={{
                       padding: "0.65rem 0.4rem",
                       borderRadius: 10,
-                      background: kwh === p.value ? "rgba(16, 185, 129, 0.25)" : "rgba(255, 255, 255, 0.05)",
-                      border: kwh === p.value ? "1px solid #10b981" : "1px solid rgba(255, 255, 255, 0.1)",
-                      color: kwh === p.value ? "#fff" : "rgba(255, 255, 255, 0.7)",
+                      background: kwh === p.value ? "var(--success-soft)" : "var(--surface-soft)",
+                      border: kwh === p.value ? "1px solid var(--success)" : "1px solid var(--border)",
+                      color: kwh === p.value ? "var(--text-on-accent)" : "var(--text-muted)",
                       cursor: "pointer",
                       textAlign: "center",
                     }}
@@ -551,9 +551,9 @@ export default function TerminalPage() {
                   style={{
                     padding: "0.75rem",
                     borderRadius: 10,
-                    background: method === "MTN_MOMO" ? "rgba(245, 158, 11, 0.25)" : "rgba(255,255,255,0.04)",
-                    border: method === "MTN_MOMO" ? "1px solid #f59e0b" : "1px solid rgba(255,255,255,0.1)",
-                    color: method === "MTN_MOMO" ? "#f59e0b" : "#fff",
+                    background: method === "MTN_MOMO" ? "var(--warning-soft)" : "var(--surface-soft)",
+                    border: method === "MTN_MOMO" ? "1px solid var(--warning)" : "1px solid var(--border)",
+                    color: method === "MTN_MOMO" ? "var(--warning-fg)" : "var(--text-on-accent)",
                     fontWeight: 650,
                     cursor: "pointer",
                     display: "flex",
@@ -572,9 +572,9 @@ export default function TerminalPage() {
                   style={{
                     padding: "0.75rem",
                     borderRadius: 10,
-                    background: method === "MOOV_MONEY" ? "rgba(59, 130, 246, 0.25)" : "rgba(255,255,255,0.04)",
-                    border: method === "MOOV_MONEY" ? "1px solid #3b82f6" : "1px solid rgba(255,255,255,0.1)",
-                    color: method === "MOOV_MONEY" ? "#60a5fa" : "#fff",
+                    background: method === "MOOV_MONEY" ? "var(--info-soft)" : "var(--surface-soft)",
+                    border: method === "MOOV_MONEY" ? "1px solid var(--info)" : "1px solid var(--border)",
+                    color: method === "MOOV_MONEY" ? "var(--info-fg)" : "var(--text-on-accent)",
                     fontWeight: 650,
                     cursor: "pointer",
                     display: "flex",
@@ -593,9 +593,9 @@ export default function TerminalPage() {
                   style={{
                     padding: "0.75rem",
                     borderRadius: 10,
-                    background: method === "CARTE" ? "rgba(236, 72, 153, 0.25)" : "rgba(255,255,255,0.04)",
-                    border: method === "CARTE" ? "1px solid #ec4899" : "1px solid rgba(255,255,255,0.1)",
-                    color: method === "CARTE" ? "#f472b6" : "#fff",
+                    background: method === "CARTE" ? "var(--purple-soft)" : "var(--surface-soft)",
+                    border: method === "CARTE" ? "1px solid var(--purple)" : "1px solid var(--border)",
+                    color: method === "CARTE" ? "var(--purple-fg)" : "var(--text-on-accent)",
                     fontWeight: 650,
                     cursor: "pointer",
                     display: "flex",
@@ -626,8 +626,8 @@ export default function TerminalPage() {
             {/* Récapitulatif Tarif & Bouton de lancement */}
             <div
               style={{
-                background: "rgba(0,0,0,0.35)",
-                border: "1px solid rgba(255,255,255,0.08)",
+                background: "var(--surface-sunken)",
+                border: "1px solid var(--border)",
                 borderRadius: 14,
                 padding: "1.25rem",
                 display: "flex",
@@ -641,7 +641,7 @@ export default function TerminalPage() {
               </div>
 
               {savingsXof > 0 && (
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.88rem", color: "var(--gold)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.88rem", color: "var(--gold-fg)" }}>
                   <span>{t.memberSaving} :</span>
                   <span style={{ fontWeight: 700 }}>- {t.saved(formatXof(savingsXof))}</span>
                 </div>
@@ -652,15 +652,15 @@ export default function TerminalPage() {
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "baseline",
-                  borderTop: "1px solid rgba(255,255,255,0.12)",
+                  borderTop: "1px solid var(--border)",
                   paddingTop: 8,
                   marginTop: 4,
                 }}
               >
-                <span style={{ fontWeight: 700, fontSize: "1.05rem", color: "#fff" }}>
+                <span style={{ fontWeight: 700, fontSize: "1.05rem", color: "var(--text-strong)" }}>
                   {t.totalLabel} :
                 </span>
-                <span style={{ fontWeight: 800, fontSize: "1.5rem", color: "#10b981" }}>
+                <span style={{ fontWeight: 800, fontSize: "1.5rem", color: "var(--success-fg)" }}>
                   {formatXof(totalXof)}
                 </span>
               </div>
@@ -675,8 +675,8 @@ export default function TerminalPage() {
                 padding: "1rem",
                 borderRadius: 14,
                 border: "none",
-                background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                color: "#fff",
+                background: "var(--success-solid)",
+                color: "var(--text-strong)",
                 fontWeight: 750,
                 fontSize: "1.1rem",
                 cursor: "pointer",

@@ -312,7 +312,7 @@ export function PartsCatalogView({
               const isSelected = selected.has(part.id);
               const selectedOffer = part.supplierOffers.find((offer) => offer.supplierId === supplierId);
               return (
-                <tr key={part.id} style={{ background: isSelected ? "rgba(56,189,248,0.07)" : undefined }}>
+                <tr key={part.id} style={{ background: isSelected ? "var(--info-soft)" : undefined }}>
                   <td>
                     <input type="checkbox" checked={isSelected} onChange={() => togglePart(part)} aria-label={`Sélectionner ${part.name}`} />
                   </td>
@@ -349,7 +349,7 @@ export function PartsCatalogView({
                     </div>
                   </td>
                   <td>
-                    <span style={{ color: part.stockQuantity === 0 ? "#f87171" : part.stockQuantity <= part.minStockAlert ? "#fbbf24" : "#4ade80", fontWeight: 700 }}>
+                    <span style={{ color: part.stockQuantity === 0 ? "var(--danger-fg)" : part.stockQuantity <= part.minStockAlert ? "var(--warning-fg)" : "var(--success-fg)", fontWeight: 700 }}>
                       {part.stockQuantity}
                     </span>
                   </td>
@@ -380,7 +380,7 @@ export function PartsCatalogView({
         <div className="ox-glass" style={{ padding: "1rem 1.2rem", display: "grid", gap: 10 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
             <strong>Commande groupée · {selectedLines.length} ligne(s)</strong>
-            <span style={{ fontWeight: 800, color: "var(--gold)" }}>{formatXof(orderTotal)}</span>
+            <span style={{ fontWeight: 800, color: "var(--gold-fg)" }}>{formatXof(orderTotal)}</span>
           </div>
           {selectedLines.length === 0 ? (
             <div style={{ opacity: 0.65, fontSize: "0.84rem" }}>Cochez des pièces dans le catalogue pour préparer une commande auprès d&apos;un seul fournisseur.</div>
@@ -398,8 +398,8 @@ export function PartsCatalogView({
             </div>
           )}
           <textarea value={notes} onChange={(event) => setNotes(event.target.value)} className="ox-input" style={{ minHeight: 56 }} placeholder="Note de commande (délai, véhicule concerné, urgence...)" />
-          {error && <p style={{ color: "#f87171", margin: 0, fontSize: "0.82rem" }}>{error}</p>}
-          {message && <p style={{ color: "#4ade80", margin: 0, fontSize: "0.82rem" }}>{message}</p>}
+          {error && <p style={{ color: "var(--danger-fg)", margin: 0, fontSize: "0.82rem" }}>{error}</p>}
+          {message && <p style={{ color: "var(--success-fg)", margin: 0, fontSize: "0.82rem" }}>{message}</p>}
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <button type="button" className="ox-btn ox-btn-primary" onClick={submitOrder} disabled={isSubmitting || selectedLines.length === 0}>
               {isSubmitting ? "Création..." : "Créer la commande groupée"}

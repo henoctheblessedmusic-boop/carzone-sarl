@@ -273,9 +273,9 @@ export function InvoicesView({
       {invoices.some((i) => i.isDemo) ? (
         <div
           style={{
-            border: "1px solid #b45309",
-            background: "rgba(180, 83, 9, 0.12)",
-            color: "#fbbf24",
+            border: "1px solid var(--warning)",
+            background: "var(--warning-soft)",
+            color: "var(--warning-fg)",
             borderRadius: 8,
             padding: "0.85rem 1.1rem",
             fontSize: "0.86rem",
@@ -325,16 +325,16 @@ export function InvoicesView({
             flexDirection: "column",
             gap: 6,
             borderRadius: 12,
-            borderLeft: "4px solid #10b981",
+            borderLeft: "4px solid var(--success)",
           }}
         >
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
             {copy.kpi.collectedLabel}
           </div>
-          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#10b981" }}>
+          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--success-fg)" }}>
             {formatXof(totalCollected)}
           </div>
-          <div style={{ fontSize: "0.75rem", color: "#10b981", fontWeight: 600 }}>
+          <div style={{ fontSize: "0.75rem", color: "var(--success-fg)", fontWeight: 600 }}>
             {copy.kpi.collectedHint(fullyPaidCount)}
           </div>
         </div>
@@ -353,7 +353,7 @@ export function InvoicesView({
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
             {copy.kpi.outstandingLabel}
           </div>
-          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: totalOutstanding > 0 ? "var(--gold)" : "#10b981" }}>
+          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: totalOutstanding > 0 ? "var(--gold-fg)" : "var(--success-fg)" }}>
             {formatXof(totalOutstanding)}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65 }}>
@@ -369,13 +369,13 @@ export function InvoicesView({
             flexDirection: "column",
             gap: 6,
             borderRadius: 12,
-            borderLeft: "4px solid #ef4444",
+            borderLeft: "4px solid var(--danger)",
           }}
         >
           <div style={{ fontSize: "0.8rem", opacity: 0.7, textTransform: "uppercase" }}>
             {copy.kpi.overdueLabel}
           </div>
-          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: overdueCount > 0 ? "#ef4444" : "#4ade80" }}>
+          <div style={{ fontSize: "1.6rem", fontWeight: 800, color: overdueCount > 0 ? "var(--danger-fg)" : "var(--success-fg)" }}>
             {overdueCount}
           </div>
           <div style={{ fontSize: "0.75rem", opacity: 0.65 }}>
@@ -392,7 +392,7 @@ export function InvoicesView({
           borderRadius: 12,
           display: "flex",
           gap: 6,
-          background: "rgba(255, 255, 255, 0.02)",
+          background: "var(--surface-soft)",
         }}
       >
         <button
@@ -410,10 +410,10 @@ export function InvoicesView({
             fontWeight: 650,
             background:
               activeTab === "INVOICES"
-                ? "linear-gradient(135deg, rgba(197, 216, 228, 0.25) 0%, rgba(197, 216, 228, 0.1) 100%)"
+                ? "var(--info-soft)"
                 : "transparent",
-            color: activeTab === "INVOICES" ? "#fff" : "rgba(255, 255, 255, 0.6)",
-            border: activeTab === "INVOICES" ? "1px solid rgba(197, 216, 228, 0.3)" : "none",
+            color: activeTab === "INVOICES" ? "var(--text-strong)" : "var(--text-muted)",
+            border: activeTab === "INVOICES" ? "1px solid var(--info)" : "none",
           }}
         >
           <FileText size={18} />
@@ -435,10 +435,10 @@ export function InvoicesView({
             fontWeight: 650,
             background:
               activeTab === "PAYMENTS"
-                ? "linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0.1) 100%)"
+                ? "var(--success-soft)"
                 : "transparent",
-            color: activeTab === "PAYMENTS" ? "#10b981" : "rgba(255, 255, 255, 0.6)",
-            border: activeTab === "PAYMENTS" ? "1px solid rgba(16, 185, 129, 0.3)" : "none",
+            color: activeTab === "PAYMENTS" ? "var(--success-fg)" : "var(--text-muted)",
+            border: activeTab === "PAYMENTS" ? "1px solid var(--success)" : "none",
           }}
         >
           <CreditCard size={18} />
@@ -460,10 +460,10 @@ export function InvoicesView({
             fontWeight: 650,
             background:
               activeTab === "BILAN"
-                ? "linear-gradient(135deg, rgba(0, 120, 212, 0.25) 0%, rgba(16, 185, 129, 0.15) 100%)"
+                ? "linear-gradient(135deg, var(--info-soft) 0%, var(--success-soft) 100%)"
                 : "transparent",
-            color: activeTab === "BILAN" ? "#38bdf8" : "rgba(255, 255, 255, 0.6)",
-            border: activeTab === "BILAN" ? "1px solid rgba(56, 189, 248, 0.3)" : "none",
+            color: activeTab === "BILAN" ? "var(--info-fg)" : "var(--text-muted)",
+            border: activeTab === "BILAN" ? "1px solid var(--info)" : "none",
           }}
         >
           <TrendingUp size={18} />
@@ -529,12 +529,12 @@ export function InvoicesView({
                   style={{
                     background:
                       statusFilter === tab.id
-                        ? "rgba(197, 216, 228, 0.25)"
+                        ? "var(--info-soft)"
                         : "transparent",
-                    color: statusFilter === tab.id ? "#fff" : "rgba(255, 255, 255, 0.65)",
+                    color: statusFilter === tab.id ? "var(--text-strong)" : "var(--text-muted)",
                     border:
                       statusFilter === tab.id
-                        ? "1px solid rgba(197, 216, 228, 0.4)"
+                        ? "1px solid var(--info)"
                         : "1px solid transparent",
                   }}
                 >
@@ -557,11 +557,11 @@ export function InvoicesView({
                   className="ox-btn ox-btn-sm"
                   style={{
                     background:
-                      activityFilter === tab.id ? "rgba(197, 216, 228, 0.25)" : "transparent",
-                    color: activityFilter === tab.id ? "#fff" : "rgba(255, 255, 255, 0.65)",
+                      activityFilter === tab.id ? "var(--info-soft)" : "transparent",
+                    color: activityFilter === tab.id ? "var(--text-strong)" : "var(--text-muted)",
                     border:
                       activityFilter === tab.id
-                        ? "1px solid rgba(197, 216, 228, 0.4)"
+                        ? "1px solid var(--info)"
                         : "1px solid transparent",
                   }}
                 >
@@ -589,12 +589,12 @@ export function InvoicesView({
                   style={{
                     background:
                       methodFilter === tab.id
-                        ? "rgba(16, 185, 129, 0.25)"
+                        ? "var(--success-soft)"
                         : "transparent",
-                    color: methodFilter === tab.id ? "#10b981" : "rgba(255, 255, 255, 0.65)",
+                    color: methodFilter === tab.id ? "var(--success-fg)" : "var(--text-muted)",
                     border:
                       methodFilter === tab.id
-                        ? "1px solid rgba(16, 185, 129, 0.4)"
+                        ? "1px solid var(--success)"
                         : "1px solid transparent",
                   }}
                 >
@@ -616,9 +616,9 @@ export function InvoicesView({
                 gap: 8,
                 padding: "0.65rem 1.15rem",
                 borderRadius: 8,
-                background: "linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(180, 140, 40, 0.35))",
-                border: "1px solid rgba(212, 175, 55, 0.5)",
-                color: "var(--gold, #d4af37)",
+                background: "var(--gold-soft)",
+                border: "1px solid var(--gold)",
+                color: "var(--gold-fg)",
                 fontWeight: 650,
                 fontSize: "0.85rem",
                 textDecoration: "none",
@@ -644,8 +644,8 @@ export function InvoicesView({
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 8,
-                background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                color: "#fff",
+                background: "var(--success-solid)",
+                color: "var(--text-strong)",
                 fontWeight: 650,
                 padding: "0.65rem 1.25rem",
                 borderRadius: 8,
@@ -669,8 +669,8 @@ export function InvoicesView({
               <thead>
                 <tr
                   style={{
-                    background: "rgba(255, 255, 255, 0.03)",
-                    borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                    background: "var(--surface-soft)",
+                    borderBottom: "1px solid var(--border)",
                     textAlign: "left",
                     opacity: 0.75,
                   }}
@@ -701,14 +701,14 @@ export function InvoicesView({
                       <tr
                         key={inv.id}
                         style={{
-                          borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
+                          borderBottom: "1px solid var(--border)",
                           transition: "background 0.15s ease",
                         }}
                       >
                         {/* N° & Proforma */}
                         <td style={{ padding: "0.85rem 1rem" }}>
                           <div style={{ fontWeight: 700, color: "var(--ice-text-strong)", display: "flex", alignItems: "center", gap: 6 }}>
-                            <FileText size={15} color="var(--brand)" />
+                            <FileText size={15} color="var(--accent-fg)" />
                             {inv.number}
                           </div>
                           {inv.quote && (
@@ -753,7 +753,7 @@ export function InvoicesView({
 
                         {/* Encaissé */}
                         <td style={{ padding: "0.85rem 1rem", textAlign: "right" }}>
-                          <div style={{ fontWeight: 700, color: "#4ade80", fontSize: "0.92rem" }}>
+                          <div style={{ fontWeight: 700, color: "var(--success-fg)", fontSize: "0.92rem" }}>
                             {formatXof(inv.paidXof)}
                           </div>
                           <div style={{ fontSize: "0.72rem", opacity: 0.6 }}>
@@ -767,7 +767,7 @@ export function InvoicesView({
                             style={{
                               fontWeight: 800,
                               fontSize: "0.95rem",
-                              color: balanceDue > 0 ? "var(--gold)" : "#4ade80",
+                              color: balanceDue > 0 ? "var(--gold-fg)" : "var(--success-fg)",
                             }}
                           >
                             {formatXof(balanceDue)}
@@ -788,28 +788,28 @@ export function InvoicesView({
                               fontWeight: 650,
                               background:
                                 inv.status === "PAYEE"
-                                  ? "rgba(74, 222, 128, 0.15)"
+                                  ? "var(--success-soft)"
                                   : inv.status === "ANNULEE" || inv.status === "EN_RETARD"
-                                    ? "rgba(239, 68, 68, 0.15)"
+                                    ? "var(--danger-soft)"
                                     : inv.status === "PAYEE_PARTIEL"
-                                      ? "rgba(56, 189, 248, 0.15)"
-                                      : "rgba(234, 179, 8, 0.15)",
+                                      ? "var(--info-soft)"
+                                      : "var(--warning-soft)",
                               color:
                                 inv.status === "PAYEE"
-                                  ? "#4ade80"
+                                  ? "var(--success-fg)"
                                   : inv.status === "ANNULEE" || inv.status === "EN_RETARD"
-                                    ? "#ef4444"
+                                    ? "var(--danger-fg)"
                                     : inv.status === "PAYEE_PARTIEL"
-                                      ? "#38bdf8"
-                                      : "#eab308",
+                                      ? "var(--info-fg)"
+                                      : "var(--warning-fg)",
                               border: `1px solid ${
                                 inv.status === "PAYEE"
-                                  ? "rgba(74, 222, 128, 0.3)"
+                                  ? "var(--success)"
                                   : inv.status === "ANNULEE" || inv.status === "EN_RETARD"
-                                    ? "rgba(239, 68, 68, 0.3)"
+                                    ? "var(--danger)"
                                     : inv.status === "PAYEE_PARTIEL"
-                                      ? "rgba(56, 189, 248, 0.3)"
-                                      : "rgba(234, 179, 8, 0.3)"
+                                      ? "var(--info)"
+                                      : "var(--warning)"
                               }`,
                             }}
                           >
@@ -878,9 +878,9 @@ export function InvoicesView({
                                   fontWeight: 700,
                                   padding: "0.2rem 0.5rem",
                                   borderRadius: 4,
-                                  background: "rgba(16, 185, 129, 0.15)",
-                                  color: "#10b981",
-                                  border: "1px solid rgba(16, 185, 129, 0.3)",
+                                  background: "var(--success-soft)",
+                                  color: "var(--success-fg)",
+                                  border: "1px solid var(--success)",
                                 }}
                                 title={copy.invoiceTable.rowActions.certifiedTitle(inv.mecefCode ?? "")}
                               >
@@ -897,9 +897,9 @@ export function InvoicesView({
                                     display: "inline-flex",
                                     alignItems: "center",
                                     gap: 4,
-                                    background: "rgba(56, 189, 248, 0.15)",
-                                    color: "#38bdf8",
-                                    border: "1px solid rgba(56, 189, 248, 0.3)",
+                                    background: "var(--info-soft)",
+                                    color: "var(--info-fg)",
+                                    border: "1px solid var(--info)",
                                   }}
                                   title={copy.invoiceTable.rowActions.dgiTitle}
                                 >
@@ -919,9 +919,9 @@ export function InvoicesView({
                                   display: "inline-flex",
                                   alignItems: "center",
                                   gap: 4,
-                                  background: "rgba(16, 185, 129, 0.2)",
-                                  color: "#10b981",
-                                  border: "1px solid rgba(16, 185, 129, 0.4)",
+                                  background: "var(--success-soft)",
+                                  color: "var(--success-fg)",
+                                  border: "1px solid var(--success)",
                                 }}
                                 title={copy.invoiceTable.rowActions.collectTitle}
                               >
@@ -965,8 +965,8 @@ export function InvoicesView({
               <thead>
                 <tr
                   style={{
-                    background: "rgba(255, 255, 255, 0.03)",
-                    borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                    background: "var(--surface-soft)",
+                    borderBottom: "1px solid var(--border)",
                     textAlign: "left",
                     opacity: 0.75,
                   }}
@@ -998,14 +998,14 @@ export function InvoicesView({
                       <tr
                         key={p.id}
                         style={{
-                          borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
+                          borderBottom: "1px solid var(--border)",
                           transition: "background 0.15s ease",
                         }}
                       >
                         {/* Réf Règlement */}
                         <td style={{ padding: "0.85rem 1rem" }}>
                           <div style={{ fontWeight: 700, color: "var(--ice-text-strong)", display: "flex", alignItems: "center", gap: 6 }}>
-                            <FileCheck size={15} color="#10b981" />
+                            <FileCheck size={15} color="var(--success-fg)" />
                             {regNumber}
                           </div>
                           {p.notes && (
@@ -1071,7 +1071,7 @@ export function InvoicesView({
 
                         {/* Montant */}
                         <td style={{ padding: "0.85rem 1rem", textAlign: "right" }}>
-                          <div style={{ fontWeight: 800, color: "#10b981", fontSize: "0.95rem" }}>
+                          <div style={{ fontWeight: 800, color: "var(--success-fg)", fontSize: "0.95rem" }}>
                             {formatXof(p.amountXof)}
                           </div>
                         </td>
@@ -1086,8 +1086,8 @@ export function InvoicesView({
                               display: "inline-flex",
                               alignItems: "center",
                               gap: 4,
-                              color: "var(--gold)",
-                              borderColor: "rgba(212, 175, 55, 0.3)",
+                              color: "var(--gold-fg)",
+                              borderColor: "var(--gold)",
                             }}
                             title={copy.paymentsTable.receiptTitle}
                           >
@@ -1140,7 +1140,7 @@ export function InvoicesView({
           style={{
             position: "fixed",
             inset: 0,
-            backgroundColor: "rgba(5, 12, 20, 0.8)",
+            backgroundColor: "var(--surface)",
             backdropFilter: "blur(6px)",
             display: "flex",
             alignItems: "center",
@@ -1154,8 +1154,8 @@ export function InvoicesView({
             style={{
               width: "100%",
               maxWidth: 480,
-              background: "#161b22",
-              border: "1px solid rgba(239, 68, 68, 0.3)",
+              background: "var(--surface)",
+              border: "1px solid var(--danger)",
               borderRadius: 14,
               padding: "1.5rem",
               display: "flex",
@@ -1164,13 +1164,13 @@ export function InvoicesView({
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#ef4444" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--danger-fg)" }}>
                 <AlertTriangle size={20} />
                 <h3 style={{ margin: 0, fontSize: "1.1rem" }}>{copy.voidModal.title}</h3>
               </div>
               <button
                 onClick={() => setVoidModalInvoiceId(null)}
-                style={{ background: "transparent", border: "none", color: "#fff", opacity: 0.6, cursor: "pointer" }}
+                style={{ background: "transparent", border: "none", color: "var(--surface)", opacity: 0.6, cursor: "pointer" }}
               >
                 <X size={18} />
               </button>

@@ -359,8 +359,8 @@ export function DevicePermissionsSetup() {
             zIndex: 9999,
             width: 360,
             maxWidth: "calc(100vw - 32px)",
-            background: "linear-gradient(145deg, #0d1b28 0%, #071018 100%)",
-            border: "1px solid rgba(160, 210, 230, 0.25)",
+            background: "var(--surface)",
+            border: "1px solid var(--info)",
             borderRadius: 14,
             boxShadow: "0 16px 40px rgba(0, 0, 0, 0.65), 0 0 20px rgba(0, 120, 212, 0.2)",
             padding: "14px 16px",
@@ -373,7 +373,7 @@ export function DevicePermissionsSetup() {
           }}
         >
           {toastSuccess ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 10, color: "#4ade80", padding: "6px 0" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--success-fg)", padding: "6px 0" }}>
               <CheckCircle size={20} />
               <span style={{ fontSize: "0.85rem", fontWeight: 650 }}>
                 Microphone et audio configurés avec succès !
@@ -388,8 +388,8 @@ export function DevicePermissionsSetup() {
                       width: 34,
                       height: 34,
                       borderRadius: 9,
-                      background: "rgba(0, 120, 212, 0.15)",
-                      color: "#38bdf8",
+                      background: "var(--info-soft)",
+                      color: "var(--info-fg)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -399,10 +399,10 @@ export function DevicePermissionsSetup() {
                     <Mic size={17} />
                   </div>
                   <div>
-                    <div style={{ fontWeight: 650, fontSize: "0.86rem", color: "#ffffff" }}>
+                    <div style={{ fontWeight: 650, fontSize: "0.86rem", color: "var(--text-on-accent)" }}>
                       Appels vocaux & Alertes sonores
                     </div>
-                    <div style={{ fontSize: "0.74rem", color: "rgba(255, 255, 255, 0.68)", marginTop: 2 }}>
+                    <div style={{ fontSize: "0.74rem", color: "var(--text-muted)", marginTop: 2 }}>
                       Activez le micro en 1 clic pour échanger avec l&apos;équipe.
                     </div>
                   </div>
@@ -415,7 +415,7 @@ export function DevicePermissionsSetup() {
                   style={{
                     background: "transparent",
                     border: "none",
-                    color: "rgba(255, 255, 255, 0.5)",
+                    color: "var(--text-subtle)",
                     cursor: "pointer",
                     padding: 3,
                     borderRadius: 4,
@@ -432,9 +432,9 @@ export function DevicePermissionsSetup() {
                   style={{
                     padding: "6px 12px",
                     borderRadius: 8,
-                    border: "1px solid rgba(255, 255, 255, 0.15)",
+                    border: "1px solid var(--border)",
                     background: "transparent",
-                    color: "rgba(255, 255, 255, 0.75)",
+                    color: "var(--text-muted)",
                     fontSize: "0.78rem",
                     fontWeight: 500,
                     cursor: "pointer",
@@ -450,8 +450,8 @@ export function DevicePermissionsSetup() {
                     padding: "6px 14px",
                     borderRadius: 8,
                     border: "none",
-                    background: "linear-gradient(135deg, #0078d4, #005a9e)",
-                    color: "#ffffff",
+                    background: "var(--info-solid)",
+                    color: "var(--text-strong)",
                     fontSize: "0.78rem",
                     fontWeight: 650,
                     cursor: "pointer",
@@ -485,7 +485,7 @@ export function DevicePermissionsSetup() {
             alignItems: "center",
             justifyContent: "center",
             padding: 16,
-            background: "rgba(8, 10, 14, 0.82)",
+            background: "var(--surface)",
             backdropFilter: "blur(10px)",
             WebkitBackdropFilter: "blur(10px)",
             animation: "fadeIn 0.2s ease-out",
@@ -496,8 +496,8 @@ export function DevicePermissionsSetup() {
               position: "relative",
               width: "100%",
               maxWidth: 540,
-              background: "linear-gradient(180deg, #181d24 0%, #101317 100%)",
-              border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+              background: "var(--surface)",
+              border: "1px solid var(--ice-border)",
               borderRadius: 18,
               boxShadow: "0 25px 70px rgba(0, 0, 0, 0.75), 0 0 40px rgba(212, 175, 55, 0.1)",
               overflow: "hidden",
@@ -510,8 +510,8 @@ export function DevicePermissionsSetup() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 padding: "16px 20px",
-                borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-                background: "rgba(255, 255, 255, 0.02)",
+                borderBottom: "1px solid var(--border)",
+                background: "var(--surface-soft)",
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -520,8 +520,8 @@ export function DevicePermissionsSetup() {
                     width: 34,
                     height: 34,
                     borderRadius: 8,
-                    background: "rgba(212, 175, 55, 0.15)",
-                    color: "var(--gold, #d4af37)",
+                    background: "var(--gold-soft)",
+                    color: "var(--gold-fg)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -564,12 +564,12 @@ export function DevicePermissionsSetup() {
                     display: "flex",
                     alignItems: "center",
                     gap: 12,
-                    background: "rgba(34, 197, 94, 0.15)",
-                    border: "1px solid rgba(34, 197, 94, 0.4)",
+                    background: "var(--success-soft)",
+                    border: "1px solid var(--success)",
                     borderRadius: 12,
                     padding: "14px 16px",
                     marginBottom: 16,
-                    color: "#4ade80",
+                    color: "var(--success-fg)",
                   }}
                 >
                   <CheckCircle size={24} />
@@ -598,13 +598,13 @@ export function DevicePermissionsSetup() {
                     justifyContent: "space-between",
                     padding: "12px 14px",
                     borderRadius: 12,
-                    background: "rgba(255, 255, 255, 0.03)",
+                    background: "var(--surface-soft)",
                     border: `1px solid ${
                       micState === "granted"
-                        ? "rgba(34, 197, 94, 0.3)"
+                        ? "var(--success)"
                         : micState === "denied"
-                        ? "rgba(239, 68, 68, 0.3)"
-                        : "rgba(255, 255, 255, 0.1)"
+                        ? "var(--danger)"
+                        : "var(--border)"
                     }`,
                   }}
                 >
@@ -616,16 +616,16 @@ export function DevicePermissionsSetup() {
                         borderRadius: 8,
                         background:
                           micState === "granted"
-                            ? "rgba(34, 197, 94, 0.15)"
+                            ? "var(--success-soft)"
                             : micState === "denied"
-                            ? "rgba(239, 68, 68, 0.15)"
-                            : "rgba(212, 175, 55, 0.15)",
+                            ? "var(--danger-soft)"
+                            : "var(--gold-soft)",
                         color:
                           micState === "granted"
-                            ? "#4ade80"
+                            ? "var(--success-fg)"
                             : micState === "denied"
-                            ? "#f87171"
-                            : "var(--gold, #d4af37)",
+                            ? "var(--danger-fg)"
+                            : "var(--gold)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -637,15 +637,15 @@ export function DevicePermissionsSetup() {
                       <div style={{ fontWeight: 650, fontSize: "0.88rem", display: "flex", alignItems: "center", gap: 8 }}>
                         Microphone Audio
                         {micState === "granted" ? (
-                          <span style={{ fontSize: "0.72rem", color: "#4ade80", background: "rgba(34, 197, 94, 0.15)", padding: "2px 8px", borderRadius: 999 }}>
+                          <span style={{ fontSize: "0.72rem", color: "var(--success-fg)", background: "var(--success-soft)", padding: "2px 8px", borderRadius: 999 }}>
                             Activé : OUI ✅
                           </span>
                         ) : micState === "denied" ? (
-                          <span style={{ fontSize: "0.72rem", color: "#f87171", background: "rgba(239, 68, 68, 0.15)", padding: "2px 8px", borderRadius: 999 }}>
+                          <span style={{ fontSize: "0.72rem", color: "var(--danger-fg)", background: "var(--danger-soft)", padding: "2px 8px", borderRadius: 999 }}>
                             Bloqué 🔒
                           </span>
                         ) : (
-                          <span style={{ fontSize: "0.72rem", color: "#eab308", background: "rgba(234, 179, 8, 0.15)", padding: "2px 8px", borderRadius: 999 }}>
+                          <span style={{ fontSize: "0.72rem", color: "var(--warning-fg)", background: "var(--warning-soft)", padding: "2px 8px", borderRadius: 999 }}>
                             En attente ⏳
                           </span>
                         )}
@@ -662,9 +662,9 @@ export function DevicePermissionsSetup() {
                     style={{
                       padding: "6px 12px",
                       borderRadius: 8,
-                      border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                      background: micState === "granted" ? "rgba(34, 197, 94, 0.1)" : "rgba(255, 255, 255, 0.05)",
-                      color: micState === "granted" ? "#4ade80" : "var(--ice-text)",
+                      border: "1px solid var(--ice-border)",
+                      background: micState === "granted" ? "var(--success-soft)" : "var(--surface-soft)",
+                      color: micState === "granted" ? "var(--success-fg)" : "var(--ice-text)",
                       fontSize: "0.78rem",
                       fontWeight: 600,
                       cursor: "pointer",
@@ -678,22 +678,22 @@ export function DevicePermissionsSetup() {
                 {isTestingMic && (
                   <div
                     style={{
-                      background: "rgba(0,0,0,0.4)",
+                      background: "var(--surface-sunken)",
                       padding: "8px 12px",
                       borderRadius: 8,
-                      border: "1px solid rgba(34, 197, 94, 0.3)",
+                      border: "1px solid var(--success)",
                     }}
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.74rem", marginBottom: 4 }}>
-                      <span style={{ color: "#4ade80" }}>🎙️ Parlez dans votre micro pour tester :</span>
-                      <span style={{ fontWeight: 700, color: "#4ade80" }}>{testAudioLevel > 2 ? "Voix détectée !" : "Écoute..."}</span>
+                      <span style={{ color: "var(--success-fg)" }}>🎙️ Parlez dans votre micro pour tester :</span>
+                      <span style={{ fontWeight: 700, color: "var(--success-fg)" }}>{testAudioLevel > 2 ? "Voix détectée !" : "Écoute..."}</span>
                     </div>
-                    <div style={{ width: "100%", height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 3, overflow: "hidden" }}>
+                    <div style={{ width: "100%", height: 6, background: "var(--surface-soft)", borderRadius: 3, overflow: "hidden" }}>
                       <div
                         style={{
                           height: "100%",
                           width: `${Math.max(6, testAudioLevel)}%`,
-                          background: "#22c55e",
+                          background: "var(--success-solid)",
                           transition: "width 0.1s ease",
                         }}
                       />
@@ -709,13 +709,13 @@ export function DevicePermissionsSetup() {
                     justifyContent: "space-between",
                     padding: "12px 14px",
                     borderRadius: 12,
-                    background: "rgba(255, 255, 255, 0.03)",
+                    background: "var(--surface-soft)",
                     border: `1px solid ${
                       notifState === "granted"
-                        ? "rgba(34, 197, 94, 0.3)"
+                        ? "var(--success)"
                         : notifState === "denied"
-                        ? "rgba(239, 68, 68, 0.3)"
-                        : "rgba(255, 255, 255, 0.1)"
+                        ? "var(--danger)"
+                        : "var(--border)"
                     }`,
                   }}
                 >
@@ -727,16 +727,16 @@ export function DevicePermissionsSetup() {
                         borderRadius: 8,
                         background:
                           notifState === "granted"
-                            ? "rgba(34, 197, 94, 0.15)"
+                            ? "var(--success-soft)"
                             : notifState === "denied"
-                            ? "rgba(239, 68, 68, 0.15)"
-                            : "rgba(212, 175, 55, 0.15)",
+                            ? "var(--danger-soft)"
+                            : "var(--gold-soft)",
                         color:
                           notifState === "granted"
-                            ? "#4ade80"
+                            ? "var(--success-fg)"
                             : notifState === "denied"
-                            ? "#60a5fa"
-                            : "var(--gold, #d4af37)",
+                            ? "var(--info-fg)"
+                            : "var(--gold)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -748,15 +748,15 @@ export function DevicePermissionsSetup() {
                       <div style={{ fontWeight: 650, fontSize: "0.88rem", display: "flex", alignItems: "center", gap: 8 }}>
                         Notifications du Navigateur
                         {notifState === "granted" ? (
-                          <span style={{ fontSize: "0.72rem", color: "#4ade80", background: "rgba(34, 197, 94, 0.15)", padding: "2px 8px", borderRadius: 999 }}>
+                          <span style={{ fontSize: "0.72rem", color: "var(--success-fg)", background: "var(--success-soft)", padding: "2px 8px", borderRadius: 999 }}>
                             Activé : OUI ✅
                           </span>
                         ) : notifState === "denied" ? (
-                          <span style={{ fontSize: "0.72rem", color: "#60a5fa", background: "rgba(96, 165, 250, 0.15)", padding: "2px 8px", borderRadius: 999 }}>
+                          <span style={{ fontSize: "0.72rem", color: "var(--info-fg)", background: "var(--info-soft)", padding: "2px 8px", borderRadius: 999 }}>
                             Alertes In-App : Actives 🔔
                           </span>
                         ) : (
-                          <span style={{ fontSize: "0.72rem", color: "#eab308", background: "rgba(234, 179, 8, 0.15)", padding: "2px 8px", borderRadius: 999 }}>
+                          <span style={{ fontSize: "0.72rem", color: "var(--warning-fg)", background: "var(--warning-soft)", padding: "2px 8px", borderRadius: 999 }}>
                             En attente ⏳
                           </span>
                         )}
@@ -776,18 +776,18 @@ export function DevicePermissionsSetup() {
                     style={{
                       padding: "6px 12px",
                       borderRadius: 8,
-                      border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+                      border: "1px solid var(--ice-border)",
                       background:
                         notifState === "granted"
-                          ? "rgba(34, 197, 94, 0.1)"
+                          ? "var(--success-soft)"
                           : notifState === "denied"
-                          ? "rgba(96, 165, 250, 0.1)"
-                          : "rgba(255, 255, 255, 0.05)",
+                          ? "var(--info-soft)"
+                          : "var(--surface-soft)",
                       color:
                         notifState === "granted"
-                          ? "#4ade80"
+                          ? "var(--success-fg)"
                           : notifState === "denied"
-                          ? "#60a5fa"
+                          ? "var(--info-fg)"
                           : "var(--ice-text)",
                       fontSize: "0.78rem",
                       fontWeight: 600,
@@ -811,8 +811,8 @@ export function DevicePermissionsSetup() {
                     justifyContent: "space-between",
                     padding: "12px 14px",
                     borderRadius: 12,
-                    background: "rgba(255, 255, 255, 0.03)",
-                    border: "1px solid rgba(34, 197, 94, 0.3)",
+                    background: "var(--surface-soft)",
+                    border: "1px solid var(--success)",
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -821,8 +821,8 @@ export function DevicePermissionsSetup() {
                         width: 36,
                         height: 36,
                         borderRadius: 8,
-                        background: "rgba(34, 197, 94, 0.15)",
-                        color: "#4ade80",
+                        background: "var(--success-soft)",
+                        color: "var(--success-fg)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -833,7 +833,7 @@ export function DevicePermissionsSetup() {
                     <div>
                       <div style={{ fontWeight: 650, fontSize: "0.88rem", display: "flex", alignItems: "center", gap: 8 }}>
                         Rendu Sonore & Sonneries
-                        <span style={{ fontSize: "0.72rem", color: "#4ade80", background: "rgba(34, 197, 94, 0.15)", padding: "2px 8px", borderRadius: 999 }}>
+                        <span style={{ fontSize: "0.72rem", color: "var(--success-fg)", background: "var(--success-soft)", padding: "2px 8px", borderRadius: 999 }}>
                           {audioUnlocked ? "Son Débloqué 🔊" : "Prêt ✅"}
                         </span>
                       </div>
@@ -852,8 +852,8 @@ export function DevicePermissionsSetup() {
                     style={{
                       padding: "6px 12px",
                       borderRadius: 8,
-                      border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
-                      background: "rgba(255, 255, 255, 0.05)",
+                      border: "1px solid var(--ice-border)",
+                      background: "var(--surface-soft)",
                       color: "var(--ice-text)",
                       fontSize: "0.78rem",
                       fontWeight: 600,
@@ -869,8 +869,8 @@ export function DevicePermissionsSetup() {
               {isMicDenied && (
                 <div
                   style={{
-                    background: "rgba(239, 68, 68, 0.1)",
-                    border: "1px solid rgba(239, 68, 68, 0.35)",
+                    background: "var(--danger-soft)",
+                    border: "1px solid var(--danger)",
                     borderRadius: 12,
                     padding: "14px 16px",
                     marginBottom: 20,
@@ -878,7 +878,7 @@ export function DevicePermissionsSetup() {
                     lineHeight: 1.5,
                   }}
                 >
-                  <div style={{ fontWeight: 700, color: "#fca5a5", display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                  <div style={{ fontWeight: 700, color: "var(--danger-fg)", display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
                     <Lock size={15} />
                     Accès bloqué dans le navigateur (Brave / Chrome) :
                   </div>
@@ -903,8 +903,8 @@ export function DevicePermissionsSetup() {
                         padding: "8px 16px",
                         borderRadius: 8,
                         border: "none",
-                        background: "linear-gradient(135deg, #22c55e, #16a34a)",
-                        color: "#fff",
+                        background: "var(--success-solid)",
+                        color: "var(--text-strong)",
                         fontWeight: 700,
                         fontSize: "0.82rem",
                         cursor: "pointer",
@@ -918,14 +918,14 @@ export function DevicePermissionsSetup() {
               )}
 
               {/* Bottom Buttons */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 12, borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 16 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 12, borderTop: "1px solid var(--border)", paddingTop: 16 }}>
                 <button
                   type="button"
                   onClick={handleDismiss}
                   style={{
                     padding: "9px 18px",
                     borderRadius: 10,
-                    border: "1px solid var(--ice-border, rgba(255, 255, 255, 0.15))",
+                    border: "1px solid var(--ice-border)",
                     background: "transparent",
                     color: "var(--ice-text-muted)",
                     fontSize: "0.84rem",
@@ -947,8 +947,8 @@ export function DevicePermissionsSetup() {
                       padding: "9px 22px",
                       borderRadius: 10,
                       border: "none",
-                      background: "linear-gradient(135deg, #d4af37, #b48c1e)",
-                      color: "#000",
+                      background: "linear-gradient(135deg, var(--gold-solid), var(--gold-soft))",
+                      color: "var(--text-strong)",
                       fontWeight: 750,
                       fontSize: "0.88rem",
                       cursor: "pointer",

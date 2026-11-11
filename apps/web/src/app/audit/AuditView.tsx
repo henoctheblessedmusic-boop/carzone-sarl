@@ -45,7 +45,7 @@ export function AuditView({
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-        <p style={{ margin: 0, fontSize: 13, color: "#9ca3af" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)" }}>
           Journal consolidé des activités. Le rapport journalier regroupe les actions par journée.
         </p>
         <a href="/audit/journalier" style={{ fontWeight: 700 }}>
@@ -54,7 +54,7 @@ export function AuditView({
       </div>
 
       {isGarageScoped && (
-        <p style={{ fontSize: 13, color: "#9ca3af" }}>
+        <p style={{ fontSize: 13, color: "var(--text-muted)" }}>
           Périmètre garage : seules les actions liées à l'atelier (GARAGE) sont affichées.
         </p>
       )}
@@ -105,7 +105,7 @@ export function AuditView({
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
-            <tr style={{ textAlign: "left", borderBottom: "1px solid #374151" }}>
+            <tr style={{ textAlign: "left", borderBottom: "1px solid var(--border)" }}>
               <th style={{ padding: "8px 12px" }}>Date</th>
               <th style={{ padding: "8px 12px" }}>Acteur</th>
               <th style={{ padding: "8px 12px" }}>Action</th>
@@ -116,12 +116,12 @@ export function AuditView({
           </thead>
           <tbody>
             {logs.map((log) => (
-              <tr key={log.id} style={{ borderBottom: "1px solid #1f2937" }}>
+              <tr key={log.id} style={{ borderBottom: "1px solid var(--border)" }}>
                 <td style={{ padding: "8px 12px", whiteSpace: "nowrap" }}>
                   {formatDateTime(log.createdAt)}
                 </td>
                 <td style={{ padding: "8px 12px" }}>
-                  {log.actorName} <span style={{ color: "#9ca3af" }}>({log.actorRole})</span>
+                  {log.actorName} <span style={{ color: "var(--text-muted)" }}>({log.actorRole})</span>
                 </td>
                 <td style={{ padding: "8px 12px" }}>{log.action}</td>
                 <td style={{ padding: "8px 12px" }}>
@@ -129,12 +129,12 @@ export function AuditView({
                   {log.entityLabel ? ` · ${log.entityLabel}` : ""}
                 </td>
                 <td style={{ padding: "8px 12px" }}>{log.activity || "-"}</td>
-                <td style={{ padding: "8px 12px", color: "#9ca3af" }}>{log.details || "-"}</td>
+                <td style={{ padding: "8px 12px", color: "var(--text-muted)" }}>{log.details || "-"}</td>
               </tr>
             ))}
             {logs.length === 0 && (
               <tr>
-                <td colSpan={6} style={{ padding: "16px 12px", textAlign: "center", color: "#9ca3af" }}>
+                <td colSpan={6} style={{ padding: "16px 12px", textAlign: "center", color: "var(--text-muted)" }}>
                   Aucune entrée de journal pour ces filtres.
                 </td>
               </tr>
@@ -144,7 +144,7 @@ export function AuditView({
       </div>
 
       {logs.length === pageSize && (
-        <p style={{ fontSize: 12, color: "#9ca3af" }}>
+        <p style={{ fontSize: 12, color: "var(--text-muted)" }}>
           Affichage limité aux {pageSize} entrées les plus récentes. Affinez les filtres pour voir
           un sous-ensemble précis.
         </p>

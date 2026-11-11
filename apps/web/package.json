@@ -15,7 +15,8 @@
     "db:reset": "prisma db push --force-reset && tsx prisma/seed.ts",
     "audit:navigation": "node ../../scripts/audit-navigation.mjs",
     "check:no-em-dash": "node ../../scripts/check-no-em-dash.mjs",
-    "db:assign-configurations": "tsx scripts/assign-vehicle-configurations.ts"
+    "db:assign-configurations": "tsx scripts/assign-vehicle-configurations.ts",
+    "check:contrast": "node ../../scripts/check-contrast.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

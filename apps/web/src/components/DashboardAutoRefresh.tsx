@@ -37,7 +37,7 @@ export function DashboardAutoRefresh() {
           width: 8,
           height: 8,
           borderRadius: "50%",
-          background: "#34d399",
+          background: "var(--success-solid)",
           boxShadow: "0 0 0 3px rgba(52,211,153,0.15)",
         }}
       />

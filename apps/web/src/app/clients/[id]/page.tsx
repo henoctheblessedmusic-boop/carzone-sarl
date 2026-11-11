@@ -134,7 +134,7 @@ export default async function CustomerDetailPage({
                 height: 58,
                 borderRadius: "50%",
                 background: "linear-gradient(135deg, var(--brand), var(--brand-deep))",
-                color: "#fff",
+                color: "var(--text-strong)",
                 display: "grid",
                 placeItems: "center",
                 fontSize: "1.3rem",
@@ -158,8 +158,8 @@ export default async function CustomerDetailPage({
                       gap: 4,
                       padding: "0.2rem 0.6rem",
                       borderRadius: 8,
-                      background: "rgba(196, 163, 90, 0.15)",
-                      color: "var(--gold)",
+                      background: "var(--gold-soft)",
+                      color: "var(--gold-fg)",
                       fontSize: "0.82rem",
                       fontWeight: 600,
                     }}
@@ -176,11 +176,11 @@ export default async function CustomerDetailPage({
                       gap: 4,
                       padding: "0.2rem 0.6rem",
                       borderRadius: 8,
-                      background: "rgba(0, 120, 212, 0.15)",
+                      background: "var(--info-soft)",
                       color: "var(--ice-highlight)",
                       fontSize: "0.82rem",
                       fontWeight: 650,
-                      border: "1px solid rgba(0, 120, 212, 0.3)",
+                      border: "1px solid var(--info)",
                     }}
                   >
                     {copy.detail.ifuPrefix}{customer.ifu}
@@ -189,7 +189,7 @@ export default async function CustomerDetailPage({
                 <span
                   className="ox-badge"
                   style={{
-                    background: "rgba(126, 200, 227, 0.12)",
+                    background: "var(--info-soft)",
                     color: "var(--ice-highlight)",
                     fontSize: "0.8rem",
                   }}
@@ -269,8 +269,8 @@ export default async function CustomerDetailPage({
             style={{
               padding: "1rem 1.25rem",
               borderRadius: 16,
-              background: "rgba(212, 175, 55, 0.08)",
-              border: "1px solid rgba(212, 175, 55, 0.3)",
+              background: "var(--gold-soft)",
+              border: "1px solid var(--gold)",
               display: "flex",
               alignItems: "flex-start",
               gap: 12,
@@ -278,7 +278,7 @@ export default async function CustomerDetailPage({
           >
             <span style={{ fontSize: "1.2rem", marginTop: 2 }}>🏷️</span>
             <div>
-              <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--gold)" }}>
+              <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--gold-fg)" }}>
                 {copy.detail.showroomNotesTitle}
               </div>
               <div style={{ fontSize: "0.88rem", opacity: 0.9, marginTop: 4, lineHeight: 1.5 }}>
@@ -343,7 +343,7 @@ export default async function CustomerDetailPage({
             <span style={{ fontSize: "0.82rem", opacity: 0.7, fontWeight: 550 }}>
               {copy.detail.kpi.chargingPlan}
             </span>
-            <div style={{ fontSize: "1.2rem", fontWeight: 750, marginTop: 6, color: "var(--brand)" }}>
+            <div style={{ fontSize: "1.2rem", fontWeight: 750, marginTop: 6, color: "var(--accent-fg)" }}>
               {activeSub ? activeSub.plan.name : copy.detail.kpi.noPlan}
             </div>
             <div style={{ fontSize: "0.78rem", opacity: 0.65, marginTop: 2 }}>
@@ -356,7 +356,7 @@ export default async function CustomerDetailPage({
         <div className="ox-glass" style={{ padding: "1.25rem 1.5rem", borderRadius: 16 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
             <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
-              <Receipt size={18} style={{ color: "var(--brand)" }} />
+              <Receipt size={18} style={{ color: "var(--accent-fg)" }} />
               {copy.detail.invoices.title(customer.invoices.length)}
             </h3>
             <Link href="/invoices" className="ox-btn ox-btn-ghost ox-btn-sm">
@@ -462,7 +462,7 @@ export default async function CustomerDetailPage({
         <div className="ox-glass" style={{ padding: "1.25rem 1.5rem", borderRadius: 16 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
             <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
-              <FolderCheck size={18} style={{ color: "var(--gold)" }} />
+              <FolderCheck size={18} style={{ color: "var(--gold-fg)" }} />
               {copy.detail.documents.title(customer.documents.length)}
             </h3>
             <Link href="/clients" className="ox-btn ox-btn-ghost ox-btn-sm">
@@ -482,7 +482,7 @@ export default async function CustomerDetailPage({
                   style={{
                     padding: "0.85rem 1rem",
                     borderRadius: 12,
-                    background: "rgba(255, 255, 255, 0.03)",
+                    background: "var(--surface-soft)",
                     border: "1px solid var(--ice-border)",
                     display: "flex",
                     justifyContent: "space-between",
@@ -499,7 +499,7 @@ export default async function CustomerDetailPage({
                       {copy.detail.documents.addedOn(copy.formatDate(doc.uploadedAt))}
                     </div>
                     {doc.notes && (
-                      <div style={{ fontSize: "0.74rem", color: "var(--gold)", marginTop: 3 }}>
+                      <div style={{ fontSize: "0.74rem", color: "var(--gold-fg)", marginTop: 3 }}>
                         {doc.notes}
                       </div>
                     )}
@@ -548,7 +548,7 @@ export default async function CustomerDetailPage({
                       style={{
                         padding: "0.8rem",
                         borderRadius: 12,
-                        background: "rgba(255,255,255,0.03)",
+                        background: "var(--surface-soft)",
                         border: "1px solid var(--ice-border)",
                       }}
                     >
@@ -586,7 +586,7 @@ export default async function CustomerDetailPage({
                       style={{
                         padding: "0.7rem 0.8rem",
                         borderRadius: 10,
-                        background: "rgba(255,255,255,0.02)",
+                        background: "var(--surface-soft)",
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
@@ -599,7 +599,7 @@ export default async function CustomerDetailPage({
                         </div>
                       </div>
                       <div style={{ textAlign: "right" }}>
-                        <div style={{ fontWeight: 700, color: "var(--brand)" }}>{formatXof(ci.totalXof)}</div>
+                        <div style={{ fontWeight: 700, color: "var(--accent-fg)" }}>{formatXof(ci.totalXof)}</div>
                         <Badge tone="ok">{copy.statusLabel(ci.status)}</Badge>
                       </div>
                     </div>
@@ -614,7 +614,7 @@ export default async function CustomerDetailPage({
         {(customer.rentals.length > 0 || customer.fleetVehicles.length > 0) && (
           <div className="ox-glass" style={{ padding: "1.25rem 1.5rem", borderRadius: 16 }}>
             <h3 style={{ margin: "0 0 14px 0", fontSize: "1.1rem", fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
-              <Car size={18} style={{ color: "var(--gold)" }} />
+              <Car size={18} style={{ color: "var(--gold-fg)" }} />
               {copy.detail.vehicles.title}
             </h3>
 
@@ -625,7 +625,7 @@ export default async function CustomerDetailPage({
                   style={{
                     padding: "0.9rem",
                     borderRadius: 12,
-                    background: "rgba(255,255,255,0.03)",
+                    background: "var(--surface-soft)",
                     border: "1px solid var(--ice-border)",
                   }}
                 >
@@ -652,7 +652,7 @@ export default async function CustomerDetailPage({
                   style={{
                     padding: "0.9rem",
                     borderRadius: 12,
-                    background: "rgba(255,255,255,0.03)",
+                    background: "var(--surface-soft)",
                     border: "1px solid var(--ice-border)",
                   }}
                 >

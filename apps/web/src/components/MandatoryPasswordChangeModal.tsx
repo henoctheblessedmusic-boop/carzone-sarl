@@ -51,7 +51,7 @@ export function MandatoryPasswordChangeModal({ userName }: { userName: string })
         alignItems: "center",
         justifyContent: "center",
         padding: 16,
-        background: "rgba(5, 8, 14, 0.9)",
+        background: "var(--surface)",
         backdropFilter: "blur(10px)",
         WebkitBackdropFilter: "blur(10px)",
       }}
@@ -63,8 +63,8 @@ export function MandatoryPasswordChangeModal({ userName }: { userName: string })
           maxHeight: "calc(100vh - 32px)",
           overflowY: "auto",
           borderRadius: 18,
-          border: "1px solid rgba(212, 175, 55, 0.35)",
-          background: "linear-gradient(180deg, #181d24 0%, #101317 100%)",
+          border: "1px solid var(--gold)",
+          background: "var(--surface)",
           boxShadow: "0 24px 70px rgba(0, 0, 0, 0.7)",
         }}
       >
@@ -77,18 +77,18 @@ export function MandatoryPasswordChangeModal({ userName }: { userName: string })
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              background: "rgba(212, 175, 55, 0.15)",
-              color: "#d4af37",
+              background: "var(--gold-soft)",
+              color: "var(--gold-fg)",
               flexShrink: 0,
             }}
           >
             <ShieldAlert size={22} />
           </div>
           <div>
-            <h2 id="mandatory-password-title" style={{ margin: 0, fontSize: "1.05rem", color: "#fff" }}>
+            <h2 id="mandatory-password-title" style={{ margin: 0, fontSize: "1.05rem", color: "var(--text-on-accent)" }}>
               Changement de mot de passe obligatoire
             </h2>
-            <p style={{ margin: "6px 0 0", fontSize: "0.84rem", color: "rgba(255,255,255,0.7)", lineHeight: 1.5 }}>
+            <p style={{ margin: "6px 0 0", fontSize: "0.84rem", color: "var(--text-muted)", lineHeight: 1.5 }}>
               Bonjour {userName}. Votre compte utilise encore un mot de passe de démonstration.
               Choisissez un mot de passe personnel pour continuer et sécuriser votre accès.
             </p>
@@ -97,12 +97,12 @@ export function MandatoryPasswordChangeModal({ userName }: { userName: string })
 
         <form onSubmit={handleSubmit} style={{ padding: "18px 22px 22px", display: "flex", flexDirection: "column", gap: 12 }}>
           {error && (
-            <div style={{ padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.35)", color: "#fca5a5", fontSize: "0.82rem" }}>
+            <div style={{ padding: "10px 12px", borderRadius: 8, background: "var(--danger-soft)", border: "1px solid var(--danger-soft)", color: "var(--danger-solid)", fontSize: "0.82rem" }}>
               {error}
             </div>
           )}
 
-          <label style={{ display: "grid", gap: 6, fontSize: "0.8rem", color: "rgba(255,255,255,0.8)" }}>
+          <label style={{ display: "grid", gap: 6, fontSize: "0.8rem", color: "var(--text-on-accent)" }}>
             Ancien mot de passe
             <input
               type="password"
@@ -114,7 +114,7 @@ export function MandatoryPasswordChangeModal({ userName }: { userName: string })
             />
           </label>
 
-          <label style={{ display: "grid", gap: 6, fontSize: "0.8rem", color: "rgba(255,255,255,0.8)" }}>
+          <label style={{ display: "grid", gap: 6, fontSize: "0.8rem", color: "var(--text-strong)" }}>
             Nouveau mot de passe
             <input
               type="password"
@@ -127,7 +127,7 @@ export function MandatoryPasswordChangeModal({ userName }: { userName: string })
             />
           </label>
 
-          <label style={{ display: "grid", gap: 6, fontSize: "0.8rem", color: "rgba(255,255,255,0.8)" }}>
+          <label style={{ display: "grid", gap: 6, fontSize: "0.8rem", color: "var(--text-strong)" }}>
             Confirmer le nouveau mot de passe
             <input
               type="password"
@@ -140,7 +140,7 @@ export function MandatoryPasswordChangeModal({ userName }: { userName: string })
             />
           </label>
 
-          <div style={{ fontSize: "0.76rem", color: "rgba(255,255,255,0.55)", lineHeight: 1.45 }}>
+          <div style={{ fontSize: "0.76rem", color: "var(--text-muted)", lineHeight: 1.45 }}>
             8 caractères minimum. Après validation, vous serez redirigé vers la page de connexion pour vous reconnecter avec votre nouveau mot de passe.
           </div>
 

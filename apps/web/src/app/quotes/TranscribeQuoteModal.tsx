@@ -52,7 +52,7 @@ export function TranscribeQuoteModal({
         inset: 0,
         width: "100vw",
         height: "100vh",
-        backgroundColor: "rgba(3, 8, 15, 0.88)",
+        backgroundColor: "var(--surface)",
         backdropFilter: "blur(10px)",
         display: "flex",
         alignItems: "center",
@@ -76,7 +76,7 @@ export function TranscribeQuoteModal({
           flexDirection: "column",
           gap: "1.1rem",
           margin: "auto",
-          background: "rgba(10, 24, 34, 0.98)",
+          background: "var(--surface)",
           border: "1px solid var(--ice-border)",
           borderRadius: 18,
           boxShadow: "0 25px 65px rgba(0, 0, 0, 0.8)",
@@ -84,7 +84,7 @@ export function TranscribeQuoteModal({
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <ArrowRightLeft size={20} color="var(--gold)" />
+            <ArrowRightLeft size={20} color="var(--gold-fg)" />
             <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700 }}>
               Transcrire la proforma {quote.number}
             </h3>
@@ -93,7 +93,7 @@ export function TranscribeQuoteModal({
             type="button"
             onClick={onClose}
             disabled={isPending}
-            style={{ background: "transparent", border: "none", color: "#fff", opacity: 0.7, cursor: "pointer" }}
+            style={{ background: "transparent", border: "none", color: "var(--surface)", opacity: 0.7, cursor: "pointer" }}
           >
             <X size={18} />
           </button>
@@ -114,8 +114,8 @@ export function TranscribeQuoteModal({
                   alignItems: "flex-start",
                   padding: "0.85rem 1rem",
                   borderRadius: 10,
-                  border: `1px solid ${mode === "BL_INTERNE" ? "rgba(56, 189, 248, 0.5)" : "rgba(255,255,255,0.12)"}`,
-                  background: mode === "BL_INTERNE" ? "rgba(56, 189, 248, 0.08)" : "transparent",
+                  border: `1px solid ${mode === "BL_INTERNE" ? "var(--info)" : "var(--border)"}`,
+                  background: mode === "BL_INTERNE" ? "var(--info-soft)" : "transparent",
                   cursor: "pointer",
                 }}
               >
@@ -141,8 +141,8 @@ export function TranscribeQuoteModal({
                   alignItems: "flex-start",
                   padding: "0.85rem 1rem",
                   borderRadius: 10,
-                  border: `1px solid ${mode === "FACTURE_NORMALISEE" ? "rgba(74, 222, 128, 0.5)" : "rgba(255,255,255,0.12)"}`,
-                  background: mode === "FACTURE_NORMALISEE" ? "rgba(74, 222, 128, 0.08)" : "transparent",
+                  border: `1px solid ${mode === "FACTURE_NORMALISEE" ? "var(--success)" : "var(--border)"}`,
+                  background: mode === "FACTURE_NORMALISEE" ? "var(--success-soft)" : "transparent",
                   cursor: "pointer",
                 }}
               >
@@ -182,13 +182,13 @@ export function TranscribeQuoteModal({
                 alignItems: "flex-start",
                 padding: "0.85rem 1rem",
                 borderRadius: 10,
-                border: "1px solid rgba(234, 179, 8, 0.4)",
-                background: "rgba(234, 179, 8, 0.08)",
+                border: "1px solid var(--warning)",
+                background: "var(--warning-soft)",
                 fontSize: "0.85rem",
                 lineHeight: 1.5,
               }}
             >
-              <AlertTriangle size={18} color="#eab308" style={{ flexShrink: 0, marginTop: 2 }} />
+              <AlertTriangle size={18} color="var(--warning-fg)" style={{ flexShrink: 0, marginTop: 2 }} />
               <span>
                 {mode === "FACTURE_NORMALISEE" ? (
                   <>
@@ -212,7 +212,7 @@ export function TranscribeQuoteModal({
               <strong>{mode === "FACTURE_NORMALISEE" ? "facture normalisée" : "BL interne"}</strong>.
             </div>
 
-            {error && <div style={{ color: "#ef4444", fontSize: "0.85rem" }}>{error}</div>}
+            {error && <div style={{ color: "var(--danger-fg)", fontSize: "0.85rem" }}>{error}</div>}
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
               <button
@@ -235,18 +235,18 @@ export function TranscribeQuoteModal({
             <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.88rem" }}>
               {result.mode === "FACTURE_NORMALISEE" ? (
                 <>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#4ade80" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--success-fg)" }}>
                     <FileCheck size={16} />
                     Facture {result.invoiceNumber} créée.
                   </div>
                   <div style={{ opacity: 0.85 }}>{result.certificationMessage}</div>
                   {result.deliveryNoteNumber ? (
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#38bdf8" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--info-fg)" }}>
                       <Truck size={16} />
                       BL interne {result.deliveryNoteNumber} généré.
                     </div>
                   ) : (
-                    <div style={{ color: "#eab308" }}>
+                    <div style={{ color: "var(--warning-fg)" }}>
                       BL interne non généré : {result.deliveryNoteError}
                     </div>
                   )}
@@ -273,7 +273,7 @@ export function TranscribeQuoteModal({
                 </>
               ) : (
                 <>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#38bdf8" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--info-fg)" }}>
                     <Truck size={16} />
                     BL interne {result.deliveryNoteNumber} créé et déstockage effectué.
                   </div>

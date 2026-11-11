@@ -77,7 +77,7 @@ export function CarzoneLogo({
             letterSpacing: "0.14em",
             lineHeight: 1,
             textTransform: "uppercase",
-            color: "#e6edf7",
+            color: "var(--text-strong)",
             whiteSpace: "nowrap",
           }}
         >

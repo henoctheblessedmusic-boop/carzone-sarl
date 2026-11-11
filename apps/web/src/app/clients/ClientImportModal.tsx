@@ -212,7 +212,7 @@ export function ClientImportModal({
       style={{
         position: "fixed",
         inset: 0,
-        background: "rgba(0, 0, 0, 0.72)",
+        background: "var(--surface-sunken)",
         backdropFilter: "blur(6px)",
         display: "grid",
         placeItems: "center",
@@ -292,9 +292,9 @@ export function ClientImportModal({
                   alignItems: "flex-start",
                   padding: "0.7rem 0.9rem",
                   borderRadius: 10,
-                  background: "rgba(239,68,68,0.12)",
-                  border: "1px solid rgba(239,68,68,0.35)",
-                  color: "#fecaca",
+                  background: "var(--danger-soft)",
+                  border: "1px solid var(--danger)",
+                  color: "var(--danger-fg)",
                   fontSize: "0.88rem",
                 }}
               >
@@ -336,7 +336,7 @@ export function ClientImportModal({
                     ))}
                   </div>
                   {!mapping.contactName && (
-                    <p style={{ color: "#fca5a5", fontSize: "0.82rem", margin: "8px 0 0" }}>
+                    <p style={{ color: "var(--danger-fg)", fontSize: "0.82rem", margin: "8px 0 0" }}>
                       La colonne « Nom du contact » doit être associée pour importer.
                     </p>
                   )}
@@ -375,11 +375,11 @@ export function ClientImportModal({
                           <td>{item.row.city || "Cotonou"}</td>
                           <td>
                             {item.errors.length > 0 ? (
-                              <span style={{ color: "#fca5a5" }}>{item.errors[0]}</span>
+                              <span style={{ color: "var(--danger-fg)" }}>{item.errors[0]}</span>
                             ) : item.duplicateInFile ? (
-                              <span style={{ color: "#fbbf24" }}>Doublon fichier</span>
+                              <span style={{ color: "var(--warning-fg)" }}>Doublon fichier</span>
                             ) : (
-                              <span style={{ color: "#34d399" }}>OK</span>
+                              <span style={{ color: "var(--success-fg)" }}>OK</span>
                             )}
                           </td>
                         </tr>
@@ -415,8 +415,8 @@ export function ClientImportModal({
               style={{
                 padding: "0.9rem 1rem",
                 borderRadius: 12,
-                background: "rgba(16,185,129,0.12)",
-                border: "1px solid rgba(16,185,129,0.35)",
+                background: "var(--success-soft)",
+                border: "1px solid var(--success)",
               }}
             >
               <strong>Import terminé.</strong> {result.created} client(s) créé(s),{" "}

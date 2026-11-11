@@ -56,9 +56,9 @@ export default async function LoginPage({
             style={{
               padding: "10px 14px",
               borderRadius: 8,
-              background: "rgba(34, 197, 94, 0.15)",
-              border: "1px solid rgba(34, 197, 94, 0.3)",
-              color: "#4ade80",
+              background: "var(--success-soft)",
+              border: "1px solid var(--success)",
+              color: "var(--success-fg)",
               fontSize: "0.84rem",
             }}
           >

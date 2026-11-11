@@ -35,7 +35,7 @@ export default async function ImportPartsCsvPage({
         </form>
 
         {(params.imported || params.skipped) && (
-          <div className="ox-glass" style={{ padding: "0.8rem 1rem", fontSize: "0.84rem", color: "#4ade80" }}>
+          <div className="ox-glass" style={{ padding: "0.8rem 1rem", fontSize: "0.84rem", color: "var(--success-fg)" }}>
             Import terminé : {params.imported || 0} référence(s) importée(s), {params.skipped || 0} ligne(s) ignorée(s).
           </div>
         )}

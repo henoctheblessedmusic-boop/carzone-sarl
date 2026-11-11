@@ -60,6 +60,7 @@ async function getHighlightVehicles(): Promise<SlideshowVehicle[]> {
       where: {
         status: { in: HIGHLIGHT_STATUSES },
         publishedOnSite: true,
+        fleetType: "SHOWROOM",
         variant: { not: null },
         year: { not: null },
         energy: { not: "NON_RENSEIGNEE" },
@@ -117,6 +118,7 @@ async function getAvailableVehiclesCount(): Promise<number> {
       where: {
         status: { in: SHOWROOM_STATUSES },
         publishedOnSite: true,
+        fleetType: "SHOWROOM",
         variant: { not: null },
         year: { not: null },
         energy: { not: "NON_RENSEIGNEE" },

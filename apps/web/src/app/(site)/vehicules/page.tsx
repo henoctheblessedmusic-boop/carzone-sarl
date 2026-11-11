@@ -51,6 +51,7 @@ async function getCatalogVehicles(): Promise<CatalogVehicle[]> {
       where: {
         status: { in: ["EN_MAGASIN", "EN_STOCK"] },
         publishedOnSite: true,
+        fleetType: "SHOWROOM",
         variant: { not: null },
         year: { not: null },
         energy: { not: "NON_RENSEIGNEE" },

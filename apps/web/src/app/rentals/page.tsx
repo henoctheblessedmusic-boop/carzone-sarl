@@ -10,11 +10,12 @@ import {
   recordRentalPayment,
   returnRental,
   transferVehicleToRental,
-  transferVehicleToShowroom,
   updateRentalMaintenanceStatus,
   updateRentalRequestStatus,
 } from "./actions";
 import { RentalActionModals } from "./RentalActionModals";
+import { RentalFleetActions } from "./RentalFleetActions";
+import { RentalContractActions } from "./RentalContractActions";
 
 const RENTAL_ROLES = ["GESTIONNAIRE_LOCATION", "COMPTA", "DG", "PDG", "SG"] as const;
 const MANAGE_ROLES = ["GESTIONNAIRE_LOCATION", "DG", "PDG", "SG"] as const;
@@ -390,12 +391,22 @@ export default async function RentalsPage() {
                         </a>
                       )}
                       {canManage && (
-                        <form action={transferVehicleToShowroom}>
-                          <input type="hidden" name="vehicleId" value={vehicle.id} />
-                          <button type="submit" className="ox-btn ox-btn-ghost ox-btn-sm" disabled={hasActive} title={hasActive ? "Retournez d'abord le contrat actif." : "Retirer du parc de location"} style={{ whiteSpace: "nowrap" }}>
-                            Retirer du parc
-                          </button>
-                        </form>
+                        <RentalFleetActions
+                          vehicle={{
+                            id: vehicle.id,
+                            brand: vehicle.brand,
+                            model: vehicle.model,
+                            variant: vehicle.variant,
+                            year: vehicle.year,
+                            energy: vehicle.energy,
+                            vin: vehicle.vin,
+                            registrationNumber: vehicle.registrationNumber,
+                            rentalDailyXof: vehicle.rentalDailyXof,
+                            rentalMonthlyXof: vehicle.rentalMonthlyXof,
+                            mileage: vehicle.mileage,
+                          }}
+                          hasActive={hasActive}
+                        />
                       )}
                     </div>,
                   ];
@@ -613,6 +624,23 @@ export default async function RentalsPage() {
                             <span style={{ fontSize: "0.72rem", opacity: 0.65 }}>
                               {rental.payments.length} encaissement(s) enregistré(s)
                             </span>
+                          )}
+                          {canManage && (
+                            <RentalContractActions
+                              rental={{
+                                id: rental.id,
+                                type: rental.type,
+                                status: rental.status,
+                                startDate: rental.startDate.toISOString().slice(0, 10),
+                                endDate: rental.endDate ? rental.endDate.toISOString().slice(0, 10) : null,
+                                dailyXof: rental.dailyXof,
+                                monthlyXof: rental.monthlyXof,
+                                depositXof: rental.depositXof,
+                                departureCondition: rental.departureCondition,
+                                notes: rental.notes,
+                                paymentCount: rental.payments.length,
+                              }}
+                            />
                           )}
                         </div>
                       </td>

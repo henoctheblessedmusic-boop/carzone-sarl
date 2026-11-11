@@ -584,3 +584,158 @@ export async function transferVehicleToShowroom(formData: FormData) {
   revalidatePath("/rentals");
   revalidatePath("/vehicles");
 }
+
+
+/** Modifie les informations d'un véhicule du parc de location. */
+export async function updateRentalVehicle(formData: FormData) {
+  const user = await requireUser([...MANAGE_ROLES]);
+  requireManager(user.role);
+
+  const vehicleId = String(formData.get("vehicleId") || "").trim();
+  if (!vehicleId) throw new Error("Véhicule introuvable.");
+
+  const brand = String(formData.get("brand") || "").trim();
+  const model = String(formData.get("model") || "").trim();
+  const variant = String(formData.get("variant") || "").trim() || null;
+  const yearRaw = Number(formData.get("year") || 0);
+  const year = Number.isFinite(yearRaw) && yearRaw > 1900 ? Math.round(yearRaw) : null;
+  const energy = String(formData.get("energy") || "").trim().toUpperCase();
+  const vin = String(formData.get("vin") || "").trim().toUpperCase() || null;
+  const registrationNumber = String(formData.get("registrationNumber") || "").trim().toUpperCase() || null;
+  const rentalDailyXof = Math.round(Number(formData.get("rentalDailyXof") || 0)) || null;
+  const rentalMonthlyXof = Math.round(Number(formData.get("rentalMonthlyXof") || 0)) || null;
+  const mileage = Math.max(0, Math.round(Number(formData.get("mileage") || 0)));
+
+  if (!brand || !model || !energy) throw new Error("Marque, modèle et énergie sont obligatoires.");
+  if (!vin || vin.length < 5) throw new Error("Le numéro de châssis est obligatoire.");
+  if (!registrationNumber || registrationNumber.length < 4) throw new Error("La plaque d'immatriculation est obligatoire.");
+
+  const duplicate = await prisma.vehicle.findFirst({
+    where: { OR: [{ vin }, { registrationNumber }], id: { not: vehicleId } },
+    select: { id: true },
+  });
+  if (duplicate) throw new Error("Un autre véhicule possède déjà ce châssis ou cette plaque.");
+
+  const vehicle = await prisma.vehicle.findUnique({
+    where: { id: vehicleId },
+    select: { id: true, brand: true, model: true, fleetType: true },
+  });
+  if (!vehicle || vehicle.fleetType !== "RENTAL") throw new Error("Ce véhicule n'appartient pas au parc de location.");
+
+  await prisma.vehicle.update({
+    where: { id: vehicleId },
+    data: { brand, model, variant, year, energy, vin, registrationNumber, rentalDailyXof, rentalMonthlyXof, mileage },
+  });
+
+  await logAudit({
+    user,
+    action: "rental.vehicle_update",
+    entityType: "Vehicle",
+    entityId: vehicleId,
+    entityLabel: `${brand} ${model} - ${registrationNumber}`,
+    details: "Modification d'un véhicule du parc de location",
+  });
+
+  revalidatePath("/rentals");
+  revalidatePath("/vehicles");
+  revalidatePath("/location-vehicule");
+}
+
+/** Modifie les conditions d'un contrat sans changer le client ni le véhicule. */
+export async function updateRentalContract(formData: FormData) {
+  const user = await requireUser([...MANAGE_ROLES]);
+  requireManager(user.role);
+
+  const id = String(formData.get("id") || "").trim();
+  const type = String(formData.get("type") || "LCD").trim();
+  const startRaw = String(formData.get("startDate") || "");
+  const endRaw = String(formData.get("endDate") || "");
+  const dailyXof = Math.round(Number(formData.get("dailyXof") || 0)) || null;
+  const monthlyXof = Math.round(Number(formData.get("monthlyXof") || 0)) || null;
+  const depositXof = Math.round(Number(formData.get("depositXof") || 0)) || null;
+  const departureCondition = String(formData.get("departureCondition") || "").trim() || null;
+  const notes = String(formData.get("notes") || "").trim() || null;
+
+  if (!id) throw new Error("Contrat introuvable.");
+  const startDate = new Date(startRaw);
+  const endDate = new Date(endRaw);
+  if (!startRaw || Number.isNaN(startDate.getTime())) throw new Error("Date de début invalide.");
+  if (!endRaw || Number.isNaN(endDate.getTime())) throw new Error("Date de fin invalide.");
+  if (endDate < startDate) throw new Error("La date de fin doit être postérieure à la date de début.");
+
+  const existing = await prisma.rental.findUnique({
+    where: { id },
+    select: { id: true, status: true, customer: { select: { contactName: true } }, vehicle: { select: { brand: true, model: true } } },
+  });
+  if (!existing) throw new Error("Contrat introuvable.");
+
+  const days = rentalDaysBetween(startDate, endDate);
+  if (days < 1) throw new Error("La durée du contrat doit être d'au moins un jour.");
+  const totalXof = computeRentalTotal({ dailyXof, monthlyXof, days });
+  if (!totalXof) throw new Error("Renseignez un tarif journalier ou mensuel.");
+
+  await prisma.rental.update({
+    where: { id },
+    data: { type, startDate, endDate, days, dailyXof, monthlyXof, depositXof, totalXof, departureCondition, notes },
+  });
+
+  await logAudit({
+    user,
+    action: "rental.contract_update",
+    entityType: "Rental",
+    entityId: id,
+    entityLabel: `${existing.vehicle.brand} ${existing.vehicle.model} - ${existing.customer.contactName}`,
+    details: "Modification des conditions du contrat de location",
+  });
+
+  revalidatePath("/rentals");
+  revalidatePath(`/rentals/${id}/contrat`);
+  revalidatePath("/dashboard");
+}
+
+/** Supprime un contrat sans encaissement. Les paiements existants bloquent la suppression. */
+export async function deleteRentalContract(formData: FormData) {
+  const user = await requireUser([...MANAGE_ROLES]);
+  requireManager(user.role);
+
+  const id = String(formData.get("id") || "").trim();
+  if (!id) throw new Error("Contrat introuvable.");
+
+  const rental = await prisma.rental.findUnique({
+    where: { id },
+    include: {
+      customer: { select: { contactName: true } },
+      vehicle: { select: { id: true, brand: true, model: true } },
+      _count: { select: { payments: true } },
+    },
+  });
+  if (!rental) throw new Error("Contrat introuvable.");
+  if (rental._count.payments > 0) {
+    throw new Error("Ce contrat contient des encaissements. Annulez-le ou conservez-le pour la comptabilité.");
+  }
+
+  await prisma.rental.delete({ where: { id } });
+
+  if (rental.status === "ACTIF") {
+    const otherActive = await prisma.rental.count({
+      where: { vehicleId: rental.vehicle.id, status: "ACTIF", id: { not: id } },
+    });
+    if (otherActive === 0) {
+      await prisma.vehicle.update({ where: { id: rental.vehicle.id }, data: { rentalStatus: "DISPONIBLE" } });
+    }
+  }
+
+  await logAudit({
+    user,
+    action: "rental.contract_delete",
+    entityType: "Rental",
+    entityId: id,
+    entityLabel: `${rental.vehicle.brand} ${rental.vehicle.model} - ${rental.customer.contactName}`,
+    details: "Suppression d'un contrat de location sans encaissement",
+  });
+
+  revalidatePath("/rentals");
+  revalidatePath("/vehicles");
+  revalidatePath("/location-vehicule");
+  revalidatePath("/dashboard");
+}

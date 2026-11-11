@@ -7,6 +7,7 @@ import { normalizeBrandName } from "@/lib/brand-logos";
 import { logAudit } from "@/lib/audit";
 import { ensureVehicleTechSheet } from "@/lib/vehicle-model-tech-sheet";
 import { inheritVehiclePhotos } from "@/lib/vehicle-photos";
+import { ensureVehicleConfiguration } from "@/server/vehicle-configuration-service";
 
 const VEHICLE_MANAGERS = [
   "PDG",
@@ -106,6 +107,13 @@ export async function createVehicle(formData: FormData) {
     });
 
     createdVehicles.push(vehicle);
+
+    // Rattachement a la configuration commercialisable (version + teinte + interieur).
+    // Un echec ne doit pas annuler l'entree en stock : le script de rattachement
+    // le rattrapera, et le vehicule reste visible dans le stock entre-temps.
+    await ensureVehicleConfiguration(vehicle.id).catch((err) => {
+      console.error("Vehicle configuration linking error:", err);
+    });
 
     // Fiche technique générée par l'agent DeepSeek et sauvegardée pour le modèle.
     await inheritVehiclePhotos(vehicle.id).catch((err) => {
@@ -306,6 +314,11 @@ export async function updateVehicle(formData: FormData) {
       rearPhotoUrl,
       photosVerified,
     },
+  });
+
+  // La version ou les teintes ont pu changer : la configuration suit.
+  await ensureVehicleConfiguration(id).catch((err) => {
+    console.error("Vehicle configuration linking error:", err);
   });
 
   // Re-synchronize tech sheet with updated vehicle data

@@ -136,6 +136,26 @@ photos/<VIN>/rear.jpg
 
 Les photos doivent être des photos réelles du véhicule livré, sans plaque civile visible et sans image d'un autre modèle.
 
+## Rattachement aux configurations
+
+Chaque vehicule du showroom porte un `configurationId` renseigne
+automatiquement, a l'import comme a la saisie manuelle, par
+`ensureVehicleConfiguration()` de `src/server/vehicle-configuration-service.ts`.
+
+- Rattachement initial et controle : `npm run db:assign-configurations`
+  (mode essai, aucune ecriture) puis la meme commande avec `--apply`.
+- Le script refuse d'ecrire si un VIN du plan de prise de vue manque en base ou
+  si un vehicule eligible n'a aucun code `CFG-XX`. Pas de rattachement partiel.
+- Sont ecartes, sans que leur rattachement existant soit efface : les vehicules
+  sans VIN, les statuts `VENDU` et `RETIRE`, et tout ce qui n'est pas
+  `fleetType = SHOWROOM`.
+- Une finition non relevee sur la carte grise donne une version de rattachement
+  provisoire, `MARQUE|MODELE|A CONFIRMER` avec `isProvisional = true`. Le code
+  `CFG-XX` est conserve quand la vraie finition est saisie plus tard.
+- Table VIN vers code : `src/lib/data/showroom-configurations.ts`.
+
+Voir aussi `docs/STOCK_COULEURS.md` pour la normalisation des teintes.
+
 ## Vérifications
 
 - `npx tsc --noEmit` : OK ;

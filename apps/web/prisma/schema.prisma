@@ -51,6 +51,7 @@ model User {
   opportunities Opportunity[]  @relation("OppOwner")
   workOrders    WorkOrder[]    @relation("Technician")
   tasks         Task[]
+  verifiedMedia VehicleMedia[]
 }
 
 model Customer {
@@ -154,11 +155,120 @@ model VehicleVersion {
   batteryKwh        Float?
   technologies      String[]  @default([])
   description       String?
+  /// Version de rattachement provisoire : finition non relevée sur la carte grise.
+  /// La vitrine peut l'exclure tant que la finition réelle n'est pas confirmée.
+  isProvisional     Boolean   @default(false)
   vehicles          Vehicle[]
+  configurations    VehicleConfiguration[]
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
   @@index([brand, model])
+}
+
+enum ConfigurationMediaStatus {
+  A_PHOTOGRAPHIER
+  EN_VALIDATION
+  PUBLIE
+}
+
+enum VehicleMediaKind {
+  CANVAS
+  SPIN_EXTERIOR
+  INTERIOR_PANORAMA
+  DETAIL
+}
+
+enum VehicleMediaSource {
+  SHOWROOM
+  CONSTRUCTEUR
+}
+
+enum VehicleHotspotTarget {
+  EXTERIOR_FRAME
+  INTERIOR_PANORAMA
+  CANVAS
+}
+
+/// Configuration commercialisable : une version + une teinte extérieure + une teinte intérieure.
+/// Règle d'or : toutes les images affichées pour une configuration proviennent de cette configuration.
+model VehicleConfiguration {
+  id                 String   @id @default(cuid())
+  /// Code du plan de prise de vue, ex. CFG-12. Stable à vie : les dossiers photo en dépendent.
+  code               String   @unique
+  versionId          String
+  version            VehicleVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  /// Couleur de base, utilisée par les filtres de la vitrine.
+  exteriorColorBase  String
+  /// Teinte exacte affichée, ex. Gris crème.
+  exteriorColorLabel String
+  exteriorHex        String
+  /// "À compléter" tant que l'intérieur n'a pas été relevé sur le véhicule.
+  interiorColorLabel String
+  interiorHex        String
+  /// Configuration montrée en premier pour cette version. Une seule par version.
+  isDefault          Boolean  @default(false)
+  mediaStatus        ConfigurationMediaStatus @default(A_PHOTOGRAPHIER)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  vehicles           Vehicle[]
+  media              VehicleMedia[]
+  hotspots           VehicleHotspot[]
+
+  @@unique([versionId, exteriorColorBase, exteriorColorLabel, interiorColorLabel])
+  @@index([versionId, mediaStatus])
+}
+
+/// Image rattachée à une configuration : canevas C01 à C10, vue 360, panorama intérieur ou détail.
+model VehicleMedia {
+  id              String   @id @default(cuid())
+  configurationId String
+  configuration   VehicleConfiguration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
+  kind            VehicleMediaKind
+  /// C01 à C10 pour CANVAS, "NA" sinon. Sentinelle non nulle : sans elle l'unicité ne protège rien.
+  slot            String   @default("NA")
+  /// 0 à 35 pour SPIN_EXTERIOR, -1 sinon. Sentinelle non nulle, même raison.
+  frameIndex      Int      @default(-1)
+  url             String
+  urlMobile       String?
+  width           Int
+  height          Int
+  blurDataUrl     String?
+  source          VehicleMediaSource @default(SHOWROOM)
+  verifiedById    String?
+  verifiedBy      User?    @relation(fields: [verifiedById], references: [id], onDelete: SetNull)
+  verifiedAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  hotspots        VehicleHotspot[]
+
+  @@unique([configurationId, kind, slot, frameIndex])
+  @@index([configurationId, kind])
+}
+
+/// Point clé cliquable posé sur une vue 360, sur le panorama intérieur ou sur une photo du canevas.
+model VehicleHotspot {
+  id              String   @id @default(cuid())
+  configurationId String
+  configuration   VehicleConfiguration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
+  target          VehicleHotspotTarget
+  /// Vue 360 concernée, 0 à 35.
+  frameIndex      Int?
+  /// Panorama intérieur, en degrés.
+  yaw             Float?
+  pitch           Float?
+  /// Photo du canevas, en pourcentage de la largeur et de la hauteur.
+  x               Float?
+  y               Float?
+  title           String
+  text            String
+  detailMediaId   String?
+  detailMedia     VehicleMedia? @relation(fields: [detailMediaId], references: [id], onDelete: SetNull)
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([configurationId, target])
 }
 
 model VehicleModel {
@@ -229,6 +339,10 @@ model Vehicle {
   status        String         @default("EN_STOCK")
   versionId     String?
   version       VehicleVersion? @relation(fields: [versionId], references: [id], onDelete: SetNull)
+  /// Configuration commercialisable (version + teinte extérieure + intérieur).
+  /// Renseignée automatiquement par ensureVehicleConfiguration().
+  configurationId String?
+  configuration VehicleConfiguration? @relation(fields: [configurationId], references: [id], onDelete: SetNull)
   /// SHOWROOM = stock de vente ; RENTAL = parc de location distinct.
   fleetType     String         @default("SHOWROOM")
   /// DISPONIBLE | LOUE | MAINTENANCE | HORS_SERVICE (pertinent si fleetType = RENTAL)
@@ -272,6 +386,8 @@ model Vehicle {
   workshopEntries WorkshopEntry[]
   deliveryNotes       DeliveryNote[]
   deliveryNoteLines   DeliveryNoteLine[]
+
+  @@index([configurationId])
 }
 
 model Opportunity {

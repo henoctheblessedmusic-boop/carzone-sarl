@@ -15,6 +15,7 @@ import {
   validateStockRow,
   type StockImportRowPayload,
 } from "@/lib/stock-import";
+import { ensureVehicleConfiguration } from "@/server/vehicle-configuration-service";
 
 const IMPORT_ROLES = ["DEVELOPER", "PDG"] as const;
 
@@ -191,11 +192,16 @@ export async function importStockVehicles(rows: StockImportRowPayload[]) {
       isIncompleteSheet: incomplete,
     };
 
+    let vehicleId: string;
     if (existing) {
-      await prisma.vehicle.update({ where: { id: existing.id }, data: sharedData });
+      const vehicle = await prisma.vehicle.update({
+        where: { id: existing.id },
+        data: sharedData,
+      });
+      vehicleId = vehicle.id;
       updated += 1;
     } else {
-      await prisma.vehicle.create({
+      const vehicle = await prisma.vehicle.create({
         data: {
           ...sharedData,
           vin: row.vin,
@@ -205,8 +211,15 @@ export async function importStockVehicles(rows: StockImportRowPayload[]) {
           fleetType: "SHOWROOM",
         },
       });
+      vehicleId = vehicle.id;
       created += 1;
     }
+
+    // Rattachement a la configuration commercialisable. Un echec ne doit pas
+    // interrompre l'import : le script de rattachement rattrape les manquants.
+    await ensureVehicleConfiguration(vehicleId).catch((err) => {
+      console.error("Vehicle configuration linking error:", row.vin, err);
+    });
   }
 
   const fileVins = rows.map((row) => String(row.vin ?? "").trim().toUpperCase()).filter(Boolean);

@@ -24,17 +24,22 @@ export const VEHICLE_COLOR_HEX: Record<string, string> = {
   violet: "#7e22ce",
 };
 
-function normalizeColor(value: string): string {
+/**
+ * Clé de comparaison d'une couleur : accents retirés, minuscules, espaces repliés.
+ * Exportée parce que la configuration véhicule compare les mêmes libellés.
+ */
+export function normalizeColorToken(value: string): string {
   return value
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
+    .replace(/\s+/g, " ")
     .trim();
 }
 
 export function vehicleColorHex(value?: string | null): string {
   if (!value) return "#64748b";
-  return VEHICLE_COLOR_HEX[normalizeColor(value)] ?? "#64748b";
+  return VEHICLE_COLOR_HEX[normalizeColorToken(value)] ?? "#64748b";
 }
 
 export function vehicleColorLabel(value?: string | null): string {

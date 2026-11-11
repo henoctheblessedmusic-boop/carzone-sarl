@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { prisma as appPrisma } from "@/lib/prisma";
+import { ensureVehicleConfiguration } from "@/server/vehicle-configuration-service";
 
 const Role = {
   DG: "DG",
@@ -332,6 +334,9 @@ async function main() {
       vehicleType: "SUV",
       transmission: "Automatique",
       color: "Blanc",
+      exteriorColorBase: "Blanc",
+      exteriorColorShade: "Blanc",
+      interiorColor: "Noir",
       priceXof: 18900000,
       costXof: 15200000,
       status: "EN_STOCK",
@@ -350,6 +355,9 @@ async function main() {
       vehicleType: "PICKUP",
       transmission: "Manuelle",
       color: "Gris",
+      exteriorColorBase: "Gris",
+      exteriorColorShade: "Gris",
+      interiorColor: "Noir",
       priceXof: 22500000,
       status: "EN_STOCK",
       siteId: maroMilitaire.id,
@@ -667,7 +675,21 @@ async function main() {
     },
   });
 
+  // Configurations commercialisables : le meme service qu'en production, pour que
+  // db:reset donne une base coherente sans dupliquer la logique de rattachement.
+  const seededVehicles = await prisma.vehicle.findMany({
+    where: { fleetType: "SHOWROOM", vin: { not: null } },
+    select: { id: true, vin: true },
+    orderBy: { vin: "asc" },
+  });
+  let seededConfigurations = 0;
+  for (const vehicle of seededVehicles) {
+    const outcome = await ensureVehicleConfiguration(vehicle.id);
+    if (outcome.status === "LINKED") seededConfigurations += 1;
+  }
+
   console.log("Seed OK");
+  console.log("Configurations vehicule:", seededConfigurations);
   console.log("Login: igor@carzone.bj / carzone2026");
   console.log("Install request:", installReq.id);
   console.log("Public plan id:", planPub.id);
@@ -678,4 +700,10 @@ main()
     console.error(e);
     process.exit(1);
   })
-  .finally(() => prisma.$disconnect());
+  .finally(async () => {
+    // Deux clients Prisma sont ouverts : celui du seed et celui partage par le
+    // service de configuration. Les deux doivent etre fermes sinon le processus
+    // reste suspendu.
+    await prisma.$disconnect();
+    await appPrisma.$disconnect();
+  });

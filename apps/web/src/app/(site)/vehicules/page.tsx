@@ -6,9 +6,10 @@ import type { SiteLocale } from "@/lib/site-prefs";
 import { Container } from "@/components/site/Container";
 import { VehiclesCatalog } from "@/components/site/VehiclesCatalog";
 import { QuoteRequestProvider } from "@/components/site/QuoteRequestProvider";
-import type { CatalogVehicle } from "@/components/site/VehicleDetailModal";
+import type { CatalogColorOption, CatalogVehicle } from "@/components/site/VehicleDetailModal";
 import { SITE_WEBSITE } from "@/lib/site-constants";
 import { resolveVehicleDisplayPhoto } from "@/lib/vehicle-display-photo";
+import { vehicleColorHex, vehicleColorLabel } from "@/lib/vehicle-colors";
 
 const OG_LOCALE: Record<SiteLocale, string> = {
   fr: "fr_FR",
@@ -66,6 +67,7 @@ async function getCatalogVehicles(): Promise<CatalogVehicle[]> {
         color: true,
         exteriorColorShade: true,
         exteriorColorBase: true,
+        interiorColor: true,
         versionId: true,
         mileage: true,
         priceXof: true,
@@ -83,32 +85,56 @@ async function getCatalogVehicles(): Promise<CatalogVehicle[]> {
       orderBy: [{ createdAt: "desc" }],
     });
 
-    const grouped = new Map<string, CatalogVehicle & { colorSet: Set<string> }>();
+    const grouped = new Map<string, CatalogVehicle & { colorOptions: CatalogColorOption[] }>();
     for (const vehicle of vehicles) {
       const key =
         vehicle.versionId ||
         [vehicle.brand, vehicle.model, vehicle.variant, vehicle.year, vehicle.energy].join("|");
-      const shade = vehicle.exteriorColorShade || vehicle.exteriorColorBase || vehicle.color;
+      const label = vehicleColorLabel(vehicle.exteriorColorShade || vehicle.exteriorColorBase || vehicle.color);
+      const hex = vehicleColorHex(vehicle.exteriorColorShade || vehicle.exteriorColorBase || vehicle.color);
+      const displayPhoto = resolveVehicleDisplayPhoto(vehicle);
+      const option: CatalogColorOption = {
+        id: vehicle.id,
+        label,
+        base: vehicle.exteriorColorBase || null,
+        hex,
+        available: 1,
+        mainPhotoUrl: displayPhoto,
+        interiorPhotoUrl: vehicle.interiorPhotoUrl,
+        exteriorPhotoUrl: vehicle.exteriorPhotoUrl,
+        rearPhotoUrl: vehicle.rearPhotoUrl,
+        seatsPhotoUrl: toSeatsPhotoUrl(vehicle.interiorPhotoUrl),
+        photosVerified: Boolean(vehicle.photosVerified),
+      };
       const current = grouped.get(key);
       if (current) {
         current.availableCount = (current.availableCount ?? 1) + 1;
-        if (shade) current.colorSet.add(shade);
+        const existing = current.colorOptions.find((color) => color.label === label);
+        if (existing) {
+          existing.available += 1;
+          if (!existing.mainPhotoUrl && option.mainPhotoUrl) existing.mainPhotoUrl = option.mainPhotoUrl;
+          if (!existing.exteriorPhotoUrl && option.exteriorPhotoUrl) existing.exteriorPhotoUrl = option.exteriorPhotoUrl;
+          if (!existing.interiorPhotoUrl && option.interiorPhotoUrl) existing.interiorPhotoUrl = option.interiorPhotoUrl;
+          if (!existing.rearPhotoUrl && option.rearPhotoUrl) existing.rearPhotoUrl = option.rearPhotoUrl;
+        } else {
+          current.colorOptions.push(option);
+        }
         if ((vehicle.priceXof || 0) > 0 && (current.priceXof || 0) === 0) current.priceXof = vehicle.priceXof;
       } else {
         grouped.set(key, {
           ...vehicle,
-          mainPhotoUrl: resolveVehicleDisplayPhoto(vehicle),
+          mainPhotoUrl: displayPhoto,
           seatsPhotoUrl: toSeatsPhotoUrl(vehicle.interiorPhotoUrl),
           availableCount: 1,
-          colors: shade ? [shade] : [],
-          colorSet: new Set(shade ? [shade] : []),
+          colors: [label],
+          colorOptions: [option],
         });
       }
     }
 
-    return Array.from(grouped.values()).map(({ colorSet, ...vehicle }) => ({
+    return Array.from(grouped.values()).map((vehicle) => ({
       ...vehicle,
-      colors: Array.from(colorSet),
+      colors: vehicle.colorOptions.map((option) => option.label),
     }));
   } catch (error) {
     console.error("Erreur chargement du catalogue véhicules (vitrine) :", error);

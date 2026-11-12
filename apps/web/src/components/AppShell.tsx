@@ -1,17 +1,33 @@
 import type { ReactNode } from "react";
 import type { SessionUser } from "@/lib/auth";
 import { AppShellClient } from "@/components/AppShellClient";
-import { NAV_KEYS_BY_HREF, roleLabel, type PageKey } from "@/lib/i18n";
+import { NAV_KEYS_BY_HREF, roleLabel, type NavKey, type PageKey } from "@/lib/i18n";
 import { getServerMessages } from "@/lib/i18n/server";
 import { RoleService } from "@/lib/role-service";
 
 export type { PageKey };
 
-const navDefs = [
+/** Groupes de menu affichant leurs entrées comme sous-menus sous un intitulé commun. */
+type NavGroupKey = "rentals";
+
+const NAV_GROUP_LABEL_KEYS: Record<NavGroupKey, Exclude<NavKey, "aria">> = {
+  rentals: "rentals",
+};
+
+const RENTAL_NAV_ROLES = ["PDG", "SG", "DG", "COMMERCIAL", "COMPTA", "GESTIONNAIRE_LOCATION"];
+
+type NavDef = {
+  href: string;
+  roles: string[] | null;
+  /** Clé de regroupement : les entrées d'un même groupe sont affichées comme sous-menus. */
+  group?: NavGroupKey;
+};
+
+const navDefs: NavDef[] = [
   { href: "/dashboard", roles: null as string[] | null },
   { href: "/clients", roles: null },
   { href: "/workshop", roles: ["PDG", "SG", "DG", "ADV", "RF", "RTA", "DC", "CHEF_ATELIER", "ASSISTANTE_COMPTABLE", "ATELIER", "STOCK_GARAGE", "COMPTA", "COMPTA_GARAGE", "ADMIN"] },
-  { href: "/catalogue-pieces", roles: ["PDG", "DG", "COMPTA", "STOCK_GARAGE", "GESTIONNAIRE_LOCATION", "DC", "COMMERCIAL"] },
+  { href: "/catalogue-pieces", roles: ["PDG", "DG", "COMPTA", "STOCK_GARAGE", "DC", "COMMERCIAL"] },
   { href: "/garage-supervision", roles: ["PDG", "SG", "DG", "CHEF_ATELIER", "COMPTA", "COMPTA_GARAGE"] },
   { href: "/parts", roles: ["PDG", "SG", "DG", "ADV", "RF", "RTA", "DC", "CHEF_ATELIER", "ATELIER", "STOCK_GARAGE", "COMPTA", "COMPTA_GARAGE", "ADMIN", "COMMERCIAL"] },
   { href: "/vehicles", roles: ["PDG", "SG", "DG", "ADV", "RF", "RTA", "DC", "COMMERCIAL", "HOTESSE", "CHEF_ATELIER", "ASSISTANTE_COMPTABLE", "ATELIER", "STOCK", "COMPTA", "ADMIN"] },
@@ -28,7 +44,12 @@ const navDefs = [
   { href: "/catalog", roles: ["PDG", "SG", "DG", "STOCK"] },
   { href: "/mailbox", roles: ["PDG", "SG", "DG", "ADV", "RF", "COMMERCIAL", "HOTESSE", "CHEF_ATELIER", "ASSISTANTE_COMPTABLE", "COMPTA", "BORNES_OPS", "ADMIN"] },
   { href: "/chat", roles: null as string[] | null },
-  { href: "/rentals", roles: ["PDG", "SG", "DG", "COMMERCIAL", "COMPTA", "GESTIONNAIRE_LOCATION"] },
+  // Location : trois sous-menus distincts (parc, contrats, entretiens) sous un seul
+  // intitulé "Location". Les trois routes partagent les mêmes rôles et le même
+  // moteur de permissions que l'ancienne page /rentals.
+  { href: "/rentals/fleet", roles: RENTAL_NAV_ROLES, group: "rentals" },
+  { href: "/rentals/contracts", roles: RENTAL_NAV_ROLES, group: "rentals" },
+  { href: "/rentals/maintenance", roles: RENTAL_NAV_ROLES, group: "rentals" },
   { href: "/fleet", roles: ["PDG", "SG", "DG", "COMMERCIAL", "BORNES_OPS", "ADMIN"] },
   { href: "/imports", roles: ["PDG", "SG", "DG", "STOCK", "COMPTA"] },
   { href: "/installers", roles: ["PDG", "SG", "DG", "BORNES_OPS", "COMMERCIAL", "INSTALLATEUR"] },
@@ -68,10 +89,13 @@ export async function AppShell({
     })
     .map((n) => {
       const key = NAV_KEYS_BY_HREF[n.href];
+      const groupKey = n.group ? NAV_GROUP_LABEL_KEYS[n.group] : undefined;
       return {
         href: n.href,
         label: (key && messages.nav[key]) ? messages.nav[key] : n.href,
         roles: n.roles,
+        group: n.group,
+        groupLabel: groupKey ? messages.nav[groupKey] : undefined,
       };
     });
 

@@ -18,6 +18,9 @@ export type Messages = {
     quotes: string;
     invoices: string;
     rentals: string;
+    rentalsFleet?: string;
+    rentalsContracts?: string;
+    rentalsMaintenance?: string;
     fleet: string;
     workshop: string;
     garageSupervision?: string;

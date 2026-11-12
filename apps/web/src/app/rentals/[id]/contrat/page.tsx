@@ -48,7 +48,7 @@ export default async function RentalContractPage({ params }: { params: Promise<{
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <a href="/rentals" className="ox-btn ox-btn-ghost ox-btn-sm">Retour au parc</a>
+            <a href="/rentals/fleet" className="ox-btn ox-btn-ghost ox-btn-sm">Retour au parc</a>
             <RentalContractActions
               publicUrl={publicUrl}
               customerEmail={rental.customer.email}

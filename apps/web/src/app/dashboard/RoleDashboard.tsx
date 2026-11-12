@@ -141,7 +141,7 @@ const QUICK_ACTIONS: Partial<Record<Role, QuickAction[]>> = {
     { href: "/installers", label: "Mon profil installateur", icon: Users },
   ],
   GESTIONNAIRE_LOCATION: [
-    { href: "/rentals", label: "Parc de location & contrats", icon: Car },
+    { href: "/rentals/fleet", label: "Parc de location & contrats", icon: Car },
     { href: "/clients", label: "Clients location", icon: Users },
   ],
 };

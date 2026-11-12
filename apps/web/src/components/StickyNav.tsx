@@ -4,7 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef } from "react";
 
-type NavItem = { href: string; label: string; roles: string[] | null };
+type NavItem = {
+  href: string;
+  label: string;
+  roles: string[] | null;
+  /** Entrées partageant un groupe : affichées comme sous-menus sous un intitulé. */
+  group?: string;
+  groupLabel?: string;
+};
 
 const MAX_STRETCH = 52;
 const RESISTANCE = 0.42;
@@ -30,6 +37,50 @@ function atTop(el: HTMLElement): boolean {
 
 function atBottom(el: HTMLElement): boolean {
   return el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+}
+
+type NavBlock =
+  | { kind: "link"; item: NavItem }
+  | { kind: "group"; group: string; label: string; items: NavItem[] };
+
+/** Regroupe les entrées consécutives partageant un `group` en un seul bloc de sous-menus. */
+function groupItems(items: NavItem[]): NavBlock[] {
+  const blocks: NavBlock[] = [];
+  for (const item of items) {
+    if (!item.group) {
+      blocks.push({ kind: "link", item });
+      continue;
+    }
+    const last = blocks[blocks.length - 1];
+    if (last && last.kind === "group" && last.group === item.group) {
+      last.items.push(item);
+      continue;
+    }
+    blocks.push({
+      kind: "group",
+      group: item.group,
+      label: item.groupLabel ?? item.group,
+      items: [item],
+    });
+  }
+  return blocks;
+}
+
+function renderLink(item: NavItem, pathname: string, onNavigate?: () => void) {
+  const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+  return (
+    <Link
+      key={item.href}
+      href={item.href}
+      className={`ox-nav-link${item.group ? " is-child" : ""}${active ? " is-active" : ""}`}
+      aria-current={active ? "page" : undefined}
+      onClick={() => {
+        if (onNavigate) onNavigate();
+      }}
+    >
+      {item.label}
+    </Link>
+  );
 }
 
 export function StickyNav({
@@ -179,20 +230,13 @@ export function StickyNav({
   return (
     <nav ref={scrollRef} className="ox-nav" aria-label={ariaLabel ?? "Navigation"}>
       <div ref={stretchRef} className="ox-nav-stretch">
-        {items.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+        {groupItems(items).map((block) => {
+          if (block.kind === "link") return renderLink(block.item, pathname, onNavigate);
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`ox-nav-link${active ? " is-active" : ""}`}
-              aria-current={active ? "page" : undefined}
-              onClick={() => {
-                if (onNavigate) onNavigate();
-              }}
-            >
-              {item.label}
-            </Link>
+            <div key={`group-${block.group}`} className="ox-nav-group">
+              <span className="ox-nav-group-label">{block.label}</span>
+              {block.items.map((item) => renderLink(item, pathname, onNavigate))}
+            </div>
           );
         })}
       </div>

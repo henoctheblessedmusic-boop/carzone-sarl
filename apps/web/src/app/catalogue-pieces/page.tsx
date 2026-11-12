@@ -8,12 +8,14 @@ import {
   type GeneralSupplierView,
 } from "./GeneralPartsCatalogView";
 
+// Le Gestionnaire de la location est volontairement absent : son périmètre
+// s'arrête au parc locatif, aux contrats et aux entretiens (voir
+// RENTAL_MANAGER_ALLOWED_PREFIXES dans src/lib/role-service.ts).
 const CATALOG_ROLES = [
   "PDG",
   "DG",
   "COMPTA",
   "STOCK_GARAGE",
-  "GESTIONNAIRE_LOCATION",
   "DC",
   "COMMERCIAL",
   "COMPTA_GARAGE",

@@ -20,6 +20,8 @@ type NavItem = {
   href: string;
   label: string;
   roles: string[] | null;
+  group?: string;
+  groupLabel?: string;
 };
 
 export function AppShellClient({

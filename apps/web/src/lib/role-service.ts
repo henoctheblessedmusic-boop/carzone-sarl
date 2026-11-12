@@ -327,6 +327,31 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
 };
 
 /**
+ * Préfixes de routes ouverts au Gestionnaire de la location.
+ * Source unique utilisée par `isRouteAllowed` (middleware) ET
+ * `isRouteAllowedForUser` (menu + gardes de page) : sans elle, les deux listes
+ * divergeaient et une route retirée d'un côté restait ouverte de l'autre.
+ * Le catalogue des pièces détachées en est volontairement absent : ce rôle
+ * n'a aucune capacité atelier ni stock de pièces.
+ */
+export const RENTAL_MANAGER_ALLOWED_PREFIXES: readonly string[] = [
+  "/rentals",
+  "/contrat",
+  "/clients",
+  "/chat",
+  "/api/chat",
+  "/api/calls",
+  "/api/auth",
+  "/api/notifications",
+  "/dashboard",
+  "/login",
+];
+
+function isRentalManagerPathAllowed(pathname: string): boolean {
+  return RENTAL_MANAGER_ALLOWED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
+
+/**
  * Service de contrôle d'accès aux données (Service Role / RLS)
  */
 export class RoleService {
@@ -427,21 +452,9 @@ export class RoleService {
     if (role === "DEVELOPER" || role === "DG" || role === "PDG" || role === "SG" || role === "ADV" || role === "RF") return true;
 
     // Gestionnaire de la location : uniquement son tableau de bord, le parc de location,
-    // les contrats et les clients nécessaires à la location.
+    // les contrats, les entretiens et les clients nécessaires à la location.
     if (role === "GESTIONNAIRE_LOCATION") {
-      return (
-        pathname.startsWith("/rentals") ||
-        pathname.startsWith("/contrat") ||
-        pathname.startsWith("/catalogue-pieces") ||
-        pathname.startsWith("/clients") ||
-        pathname.startsWith("/chat") ||
-        pathname.startsWith("/api/chat") ||
-        pathname.startsWith("/api/calls") ||
-        pathname.startsWith("/api/auth") ||
-        pathname.startsWith("/api/notifications") ||
-        pathname.startsWith("/dashboard") ||
-        pathname.startsWith("/login")
-      );
+      return isRentalManagerPathAllowed(pathname);
     }
 
     if (pathname.startsWith("/users")) {
@@ -520,19 +533,7 @@ export class RoleService {
     }
 
     if (user.role === "GESTIONNAIRE_LOCATION") {
-      return (
-        pathname.startsWith("/rentals") ||
-        pathname.startsWith("/contrat") ||
-        pathname.startsWith("/catalogue-pieces") ||
-        pathname.startsWith("/clients") ||
-        pathname.startsWith("/chat") ||
-        pathname.startsWith("/api/chat") ||
-        pathname.startsWith("/api/calls") ||
-        pathname.startsWith("/api/auth") ||
-        pathname.startsWith("/api/notifications") ||
-        pathname.startsWith("/dashboard") ||
-        pathname.startsWith("/login")
-      );
+      return isRentalManagerPathAllowed(pathname);
     }
 
     if (

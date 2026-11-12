@@ -106,7 +106,7 @@ export const ONBOARDING_STEPS: Record<Role, OnboardingStep[]> = {
     { id: "clients", label: "Comptes clients & relances d'impayés", href: "/clients", hint: "Solde des créances et justificatifs" },
   ],
   GESTIONNAIRE_LOCATION: [
-    { id: "rentals", label: "Parc de location & contrats", href: "/rentals", hint: "Véhicules à louer, clients, dates, tarifs, caution et retours" },
+    { id: "rentals", label: "Parc de location & contrats", href: "/rentals/fleet", hint: "Véhicules à louer, clients, dates, tarifs, caution et retours" },
     { id: "clients", label: "Clients de la location", href: "/clients", hint: "Créer et consulter les clients des contrats de location" },
   ],
   ADMIN: [

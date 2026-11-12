@@ -384,7 +384,7 @@ export default async function DashboardPage() {
                   <Ship size={16} color="var(--info-fg)" />
                   Imports & logistique
                 </Link>
-                <Link href="/rentals" className="ox-btn ox-btn-ghost ox-quick-btn">
+                <Link href="/rentals/fleet" className="ox-btn ox-btn-ghost ox-quick-btn">
                   <Car size={16} color="var(--purple-fg)" />
                   Location
                 </Link>

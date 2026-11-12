@@ -42,7 +42,9 @@ type ActiveRentalOption = {
   customerName: string;
 };
 
-type ModalKind = "vehicle" | "contract" | "maintenance" | null;
+export type RentalActionKey = "vehicle" | "contract" | "maintenance";
+
+type ModalKind = RentalActionKey | null;
 
 const FIELD = { height: 40, fontSize: "0.88rem" } as const;
 
@@ -52,7 +54,14 @@ const GARAGE_ROLE_LABELS: Record<string, string> = {
   RTA: "Responsable technique atelier",
 };
 
-const ACTIONS = [
+const ACTIONS: {
+  key: RentalActionKey;
+  label: string;
+  description: string;
+  color: string;
+  background: string;
+  icon: typeof Car;
+}[] = [
   {
     key: "vehicle" as const,
     label: "Enregistrer nouveau véhicule",
@@ -86,6 +95,9 @@ export function RentalActionModals({
   brands,
   garageUsers,
   activeRentals,
+  allowed,
+  title = "Actions rapides",
+  description = "Gérez le parc, les contrats et l'entretien depuis un seul endroit.",
 }: {
   rentalVehicles: VehicleOption[];
   availableVehicles: VehicleOption[];
@@ -93,6 +105,10 @@ export function RentalActionModals({
   brands: BrandOption[];
   garageUsers: GarageUser[];
   activeRentals: ActiveRentalOption[];
+  /** Actions rapides affichées. Par défaut, les trois actions historiques. */
+  allowed?: readonly RentalActionKey[];
+  title?: string;
+  description?: string;
 }) {
   const [modal, setModal] = useState<ModalKind>(null);
   const [brandName, setBrandName] = useState("");
@@ -116,6 +132,10 @@ export function RentalActionModals({
     days: contractDays,
   });
 
+  const visibleActions = allowed
+    ? ACTIONS.filter((action) => allowed.includes(action.key))
+    : ACTIONS;
+
   function close() {
     setModal(null);
   }
@@ -134,13 +154,13 @@ export function RentalActionModals({
         }}
       >
         <div>
-          <div style={{ fontWeight: 800, fontSize: "1.02rem" }}>Actions rapides</div>
+          <div style={{ fontWeight: 800, fontSize: "1.02rem" }}>{title}</div>
           <div style={{ opacity: 0.68, fontSize: "0.82rem", marginTop: 2 }}>
-            Gérez le parc, les contrats et l'entretien depuis un seul endroit.
+            {description}
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {ACTIONS.map(({ key, label, description, background, icon: Icon }) => (
+          {visibleActions.map(({ key, label, description, background, icon: Icon }) => (
             <button
               key={key}
               type="button"

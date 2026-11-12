@@ -61,7 +61,7 @@ export async function recordRentalPayment(formData: FormData) {
     details: `${amountXof.toLocaleString("fr-BJ")} FCFA (${method})`,
   });
 
-  revalidatePath("/rentals");
+  revalidatePath("/rentals", "layout");
   revalidatePath("/dashboard");
 }
 
@@ -126,7 +126,7 @@ export async function createRentalMaintenance(formData: FormData) {
     details: `${type} - ${description} - ${costXof.toLocaleString("fr-BJ")} FCFA`,
   });
 
-  revalidatePath("/rentals");
+  revalidatePath("/rentals", "layout");
   revalidatePath("/dashboard");
 }
 
@@ -167,7 +167,7 @@ export async function updateRentalMaintenanceStatus(formData: FormData) {
     details: `Statut ${status}`,
   });
 
-  revalidatePath("/rentals");
+  revalidatePath("/rentals", "layout");
   revalidatePath("/dashboard");
 }
 
@@ -199,7 +199,7 @@ export async function generateRentalVehicleTechSheet(formData: FormData) {
   });
 
   revalidatePath(`/rentals/${vehicleId}/fiche-technique`);
-  revalidatePath("/rentals");
+  revalidatePath("/rentals", "layout");
 }
 
 export async function approveRentalVehicleTechSheet(formData: FormData) {
@@ -226,7 +226,7 @@ export async function approveRentalVehicleTechSheet(formData: FormData) {
   });
 
   revalidatePath(`/rentals/${vehicleId}/fiche-technique`);
-  revalidatePath("/rentals");
+  revalidatePath("/rentals", "layout");
 }
 
 export async function updateRentalRequestStatus(formData: FormData) {
@@ -252,7 +252,7 @@ export async function updateRentalRequestStatus(formData: FormData) {
     details: `Statut ${status}`,
   });
 
-  revalidatePath("/rentals");
+  revalidatePath("/rentals", "layout");
 }
 
 export async function createRentalVehicle(formData: FormData) {
@@ -343,7 +343,7 @@ export async function createRentalVehicle(formData: FormData) {
     });
   }
 
-  revalidatePath("/rentals");
+  revalidatePath("/rentals", "layout");
   revalidatePath("/vehicles");
   revalidatePath("/location-vehicule");
   revalidatePath("/dashboard");
@@ -438,7 +438,7 @@ export async function createRental(formData: FormData) {
     details: `Contrat ${type} - ${days} jour(s) - ${totalXof.toLocaleString("fr-BJ")} FCFA`,
   });
 
-  revalidatePath("/rentals");
+  revalidatePath("/rentals", "layout");
   revalidatePath("/vehicles");
   revalidatePath("/location-vehicule");
   revalidatePath("/dashboard");
@@ -470,7 +470,7 @@ export async function markRentalContractSigned(formData: FormData) {
     details: `Contrat signé par ${signedByClient} et ${signedByCompany}`,
   });
 
-  revalidatePath("/rentals");
+  revalidatePath("/rentals", "layout");
   revalidatePath(`/rentals/${id}/contrat`);
 }
 
@@ -507,7 +507,7 @@ export async function returnRental(formData: FormData) {
     details: "Retour du véhicule et remise à disposition",
   });
 
-  revalidatePath("/rentals");
+  revalidatePath("/rentals", "layout");
   revalidatePath("/vehicles");
   revalidatePath("/location-vehicule");
   revalidatePath("/dashboard");
@@ -556,7 +556,7 @@ export async function transferVehicleToRental(formData: FormData) {
     entityLabel: `${vehicle.brand} ${vehicle.model}`,
     details: "Transfert du stock showroom vers le parc de location",
   });
-  revalidatePath("/rentals");
+  revalidatePath("/rentals", "layout");
   revalidatePath("/vehicles");
 }
 
@@ -616,7 +616,7 @@ export async function transferVehicleToShowroom(
     entityLabel: `${vehicle.brand} ${vehicle.model}`,
     details: "Retour du parc de location vers le stock showroom",
   });
-  revalidatePath("/rentals");
+  revalidatePath("/rentals", "layout");
   revalidatePath("/vehicles");
   return { ok: true };
 }
@@ -672,7 +672,7 @@ export async function updateRentalVehicle(formData: FormData) {
     details: "Modification d'un véhicule du parc de location",
   });
 
-  revalidatePath("/rentals");
+  revalidatePath("/rentals", "layout");
   revalidatePath("/vehicles");
   revalidatePath("/location-vehicule");
 }
@@ -724,7 +724,7 @@ export async function updateRentalContract(formData: FormData) {
     details: "Modification des conditions du contrat de location",
   });
 
-  revalidatePath("/rentals");
+  revalidatePath("/rentals", "layout");
   revalidatePath(`/rentals/${id}/contrat`);
   revalidatePath("/dashboard");
 }
@@ -770,7 +770,7 @@ export async function deleteRentalContract(formData: FormData) {
     details: "Suppression d'un contrat de location sans encaissement",
   });
 
-  revalidatePath("/rentals");
+  revalidatePath("/rentals", "layout");
   revalidatePath("/vehicles");
   revalidatePath("/location-vehicule");
   revalidatePath("/dashboard");

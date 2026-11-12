@@ -16,7 +16,8 @@ export default async function PublicRentalContractPage({ params }: { params: Pro
     where: { contractToken: token },
     include: {
       customer: true,
-      vehicle: true,
+      // Même chargement que la vue interne : les deux exemplaires doivent être identiques.
+      vehicle: { include: { version: { select: { trim: true, seats: true } } } },
       payments: { orderBy: { paidAt: "desc" } },
     },
   });

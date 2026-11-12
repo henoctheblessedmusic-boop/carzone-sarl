@@ -5,6 +5,7 @@ import { RentalContractActions } from "@/components/RentalContractActions";
 import { RentalContractDocument } from "@/components/RentalContractDocument";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
+import { rentalContractReference, rentalVehicleLabel } from "@/lib/rental-contract";
 import { SITE_WEBSITE } from "@/lib/site-constants";
 import { markRentalContractSigned } from "../../actions";
 
@@ -19,7 +20,8 @@ export default async function RentalContractPage({ params }: { params: Promise<{
     where: { id },
     include: {
       customer: true,
-      vehicle: true,
+      // La version catalogue porte le nombre de places affiché à l'article 2 du contrat.
+      vehicle: { include: { version: { select: { trim: true, seats: true } } } },
       payments: { orderBy: { paidAt: "desc" } },
     },
   });
@@ -33,7 +35,7 @@ export default async function RentalContractPage({ params }: { params: Promise<{
 
   const canManage = (MANAGE_ROLES as readonly string[]).includes(user.role);
   const publicUrl = `${SITE_WEBSITE.replace(/\/$/, "")}/contrat/${contractToken}`;
-  const vehicleLabel = [rental.vehicle.brand, rental.vehicle.model, rental.vehicle.variant].filter(Boolean).join(" ");
+  const vehicleLabel = rentalVehicleLabel(rental.vehicle);
 
   return (
     <AppShell user={user} title="Contrat de location">
@@ -51,7 +53,7 @@ export default async function RentalContractPage({ params }: { params: Promise<{
               publicUrl={publicUrl}
               customerEmail={rental.customer.email}
               customerPhone={rental.customer.phone}
-              reference={`LOC-${rental.id.slice(-8).toUpperCase()}`}
+              reference={rentalContractReference(rental.id)}
               vehicleLabel={vehicleLabel}
             />
           </div>

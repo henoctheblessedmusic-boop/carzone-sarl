@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { userHasCapability } from "@/lib/permissions-config";
 import { logAudit } from "@/lib/audit";
 import {
-  CLIENT_IMPORT_MAX_ROWS,
+  CLIENT_IMPORT_BATCH_SIZE,
   EMAIL_REGEX,
   normalizeEmail,
   normalizePhone,
@@ -308,8 +308,10 @@ const importRowSchema = z.object({
   notes: z.string().max(2000).optional().default(""),
 });
 
+// Un appel = un lot. Les fichiers volumineux sont découpés côté navigateur pour
+// rester sous la limite de corps des server actions.
 const importPayloadSchema = z.object({
-  rows: z.array(importRowSchema).min(1).max(CLIENT_IMPORT_MAX_ROWS),
+  rows: z.array(importRowSchema).min(1).max(CLIENT_IMPORT_BATCH_SIZE),
 });
 
 export async function importClients(input: {

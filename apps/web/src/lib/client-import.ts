@@ -6,7 +6,19 @@
  * à la server action `importClients`.
  */
 
-export const CLIENT_IMPORT_MAX_ROWS = 2000;
+/**
+ * Nombre maximal de lignes acceptees par appel a `importClients`. Les gros
+ * fichiers sont decoupes en lots de cette taille cote navigateur : un envoi
+ * unique de plusieurs milliers de lignes depassait la limite de corps des
+ * server actions et faisait echouer l'import avec une erreur opaque.
+ */
+export const CLIENT_IMPORT_BATCH_SIZE = 400;
+
+/** Nombre maximal de lignes lues dans un fichier (toutes feuilles confondues). */
+export const CLIENT_IMPORT_MAX_ROWS = 20000;
+
+/** Nombre de lignes inspectees pour retrouver la ligne d'en-tetes. */
+export const CLIENT_IMPORT_HEADER_SCAN_ROWS = 15;
 
 export type ClientImportFieldKey =
   | "contactName"
@@ -104,6 +116,63 @@ export function normalizeHeader(value: string): string {
     .trim();
 }
 
+/**
+ * Nombre de colonnes reconnues dans une ligne candidate aux en-têtes.
+ * Sert à distinguer la vraie ligne d'en-têtes d'un titre de classeur placé
+ * au-dessus (cas courant : « LISTE CLIENTS CARZONE » en première ligne).
+ */
+export function headerScore(cells: string[]): number {
+  const normalized = cells
+    .map((cell) => normalizeHeader(String(cell ?? "")))
+    .filter((cell) => cell !== "");
+  if (normalized.length < 2) return 0;
+
+  let score = 0;
+  for (const field of CLIENT_IMPORT_FIELDS) {
+    const candidates = [field.label, ...field.aliases].map(normalizeHeader);
+    if (normalized.some((cell) => candidates.includes(cell))) score += 1;
+  }
+  return score;
+}
+
+/**
+ * Index de la ligne d'en-têtes dans une matrice de cellules.
+ * On retient la ligne qui reconnaît le plus de colonnes ; à défaut, la première
+ * ligne non vide, comme avant.
+ */
+export function detectHeaderRowIndex(matrix: string[][]): number {
+  let bestIndex = -1;
+  let bestScore = 0;
+  const limit = Math.min(matrix.length, CLIENT_IMPORT_HEADER_SCAN_ROWS);
+
+  for (let index = 0; index < limit; index += 1) {
+    const score = headerScore(matrix[index] ?? []);
+    if (score > bestScore) {
+      bestScore = score;
+      bestIndex = index;
+    }
+  }
+  if (bestIndex >= 0) return bestIndex;
+
+  return matrix.findIndex((row) => (row ?? []).some((cell) => String(cell ?? "").trim() !== ""));
+}
+
+/** Rend uniques des en-têtes dupliqués ou vides, en conservant leur ordre. */
+export function buildUniqueHeaders(cells: string[]): string[] {
+  const unique: string[] = [];
+  cells.forEach((cell, index) => {
+    const label = String(cell ?? "").trim() || `Colonne ${index + 1}`;
+    let candidate = label;
+    let suffix = 2;
+    while (unique.includes(candidate)) {
+      candidate = `${label} (${suffix})`;
+      suffix += 1;
+    }
+    unique.push(candidate);
+  });
+  return unique;
+}
+
 export function autoMapHeaders(headers: string[]): Partial<Record<ClientImportFieldKey, string>> {
   const mapping: Partial<Record<ClientImportFieldKey, string>> = {};
   const normalized = headers.map((h) => ({ raw: h, norm: normalizeHeader(h) }));
@@ -140,8 +209,13 @@ export function normalizePhone(value: string | null | undefined): string | null 
 
   // Bénin : les numéros locaux sont désormais à 10 chiffres et commencent par 01.
   // Les anciens numéros à 8 chiffres sont automatiquement préfixés par 01.
+  // Un numéro déjà saisi au format local (0197112233) doit être reconnu au même
+  // titre qu'un numéro indicatif compris (+229 01 97 11 22 33), faute de quoi le
+  // même abonné était enregistré deux fois sous deux écritures différentes.
   let local: string | null = digits.startsWith("229") ? digits.slice(3) : null;
-  if (local === null && digits.length === 8) local = digits;
+  if (local === null && (digits.length === 8 || (digits.length === 10 && digits.startsWith("01")))) {
+    local = digits;
+  }
   if (local !== null) {
     if (local.length === 8) local = `01${local}`;
     if (local.length === 10 && local.startsWith("01")) {

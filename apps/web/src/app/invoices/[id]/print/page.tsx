@@ -20,7 +20,7 @@ export default async function InvoicePrintPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const user = await requireUser(["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE", "ADMIN"]);
+  const user = await requireUser(["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE", "ADMIN", "GESTIONNAIRE_LOCATION"]);
   const { locale } = await getServerMessages();
   const copy = invoicesCopy[locale];
   const { id } = await params;
@@ -37,11 +37,14 @@ export default async function InvoicePrintPage({
           },
         },
       },
+      rental: { include: { vehicle: true } },
     },
   });
 
   if (!invoice) notFound();
   if (user.role === "COMPTA_GARAGE" && invoice.activity !== ACTIVITY.GARAGE) notFound();
+  // Le gestionnaire de location ne peut ouvrir que les factures issues d'un de ses contrats.
+  if (user.role === "GESTIONNAIRE_LOCATION" && !invoice.rental) notFound();
 
   const totalPaid = invoice.payments.reduce((s, p) => s + p.amountXof, 0);
   const balanceDue = Math.max(0, invoice.totalXof - totalPaid);
@@ -50,7 +53,8 @@ export default async function InvoicePrintPage({
   // personnalisé (customCgv) saisi côté devis/facture, on le réutilise tel quel ; sinon on
   // structure un contrat générique sans durée ni couverture chiffrée (voir lib/cgv.ts).
   const warrantyContent = invoice.customCgv || invoice.quote?.customCgv || getDefaultWarrantyContract(cgvType);
-  const warrantyVehicle = invoice.quote?.lines.find((l) => l.vehicle)?.vehicle || null;
+  const warrantyVehicle =
+    invoice.quote?.lines.find((l) => l.vehicle)?.vehicle || invoice.rental?.vehicle || null;
 
   return (
     <div
@@ -248,6 +252,29 @@ export default async function InvoicePrintPage({
                   </td>
                 </tr>
               ))
+            ) : invoice.rental ? (
+              <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
+                <td style={{ padding: "0.75rem 0.6rem", fontSize: "0.9rem" }}>
+                  <div style={{ fontWeight: 600 }}>
+                    Location de véhicule {invoice.rental.vehicle.brand} {invoice.rental.vehicle.model}
+                  </div>
+                  <div style={{ fontSize: "0.75rem", opacity: 0.7, marginTop: 2 }}>
+                    {invoice.rental.vehicle.vin ? `VIN ${invoice.rental.vehicle.vin} · ` : ""}
+                    {invoice.rental.vehicle.registrationNumber || "Sans plaque"} · du{" "}
+                    {formatInvoiceDate(copy, invoice.rental.startDate)} au{" "}
+                    {formatInvoiceDate(copy, invoice.rental.endDate)}
+                  </div>
+                </td>
+                <td style={{ padding: "0.75rem 0.6rem", textAlign: "center", fontSize: "0.9rem" }}>
+                  {invoice.rental.days || 1}
+                </td>
+                <td style={{ padding: "0.75rem 0.6rem", textAlign: "right", fontSize: "0.9rem" }}>
+                  {formatXof(invoice.rental.dailyXof || invoice.subtotalHtXof)}
+                </td>
+                <td style={{ padding: "0.75rem 0.6rem", textAlign: "right", fontSize: "0.9rem", fontWeight: 600 }}>
+                  {formatXof(invoice.subtotalHtXof)}
+                </td>
+              </tr>
             ) : (
               <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
                 <td style={{ padding: "0.75rem 0.6rem", fontSize: "0.9rem" }}>

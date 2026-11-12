@@ -2,6 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "node:crypto";
+import { nextDocNumber, nextDeliveryNoteNumber } from "@/lib/format";
+import { certifyInvoiceWithMecef } from "@/lib/dgi-emecef";
+import { rentalContractReference } from "@/lib/rental-contract";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
@@ -774,4 +777,176 @@ export async function deleteRentalContract(formData: FormData) {
   revalidatePath("/vehicles");
   revalidatePath("/location-vehicule");
   revalidatePath("/dashboard");
+}
+
+
+export type RentalTranscriptionResult = {
+  mode: "BL_INTERNE" | "FACTURE_NORMALISEE";
+  invoiceId?: string;
+  invoiceNumber?: string;
+  deliveryNoteId: string;
+  deliveryNoteNumber: string;
+  certificationMessage: string;
+};
+
+/**
+ * Transcrit un contrat de location en BL interne ou en facture normalisée.
+ * La facture de location utilise la même identité fiscale CARZONE et la même
+ * certification e-MECeF que les autres factures. En attendant le branchement
+ * live, cette première version force le mode démonstration.
+ */
+export async function transcribeRentalContract(formData: FormData): Promise<RentalTranscriptionResult> {
+  const user = await requireUser(["GESTIONNAIRE_LOCATION", "COMPTA", "DG", "PDG", "SG"]);
+  requireManager(user.role);
+
+  const rentalId = String(formData.get("rentalId") || "").trim();
+  const mode = String(formData.get("mode") || "").trim();
+  if (mode !== "BL_INTERNE" && mode !== "FACTURE_NORMALISEE") {
+    throw new Error("Mode de transcription invalide.");
+  }
+
+  const rental = await prisma.rental.findUnique({
+    where: { id: rentalId },
+    include: { vehicle: true, customer: true, invoice: true },
+  });
+  if (!rental) throw new Error("Contrat de location introuvable.");
+  if (rental.invoiceId) throw new Error("Ce contrat possède déjà une facture.");
+  const existingDeliveryNote = await prisma.deliveryNote.findFirst({ where: { rentalId } });
+  if (existingDeliveryNote) throw new Error("Ce contrat possède déjà un BL interne.");
+
+  const total = rental.totalXof || computeRentalTotal({
+    dailyXof: rental.dailyXof || rental.vehicle.rentalDailyXof,
+    monthlyXof: rental.monthlyXof,
+    days: rental.days || rentalDaysBetween(rental.startDate, rental.endDate),
+  });
+  if (!total || total <= 0) throw new Error("Le montant du contrat est introuvable.");
+
+  const days = rental.days || rentalDaysBetween(rental.startDate, rental.endDate) || 1;
+  const reference = rentalContractReference(rental.id);
+  const vehicleLabel = [rental.vehicle.brand, rental.vehicle.model].filter(Boolean).join(" ");
+  const lineDescription = `Location de véhicule ${vehicleLabel} - ${reference} - ${days} jour(s)`;
+  const taxRatePct = 18;
+  const subtotalHtXof = Math.round(total / (1 + taxRatePct / 100));
+  const taxXof = total - subtotalHtXof;
+  const now = new Date();
+
+  if (mode === "BL_INTERNE") {
+    const count = await prisma.deliveryNote.count({ where: { activity: "SHOWROOM" } });
+    const note = await prisma.deliveryNote.create({
+      data: {
+        number: nextDeliveryNoteNumber("SHOWROOM", count),
+        activity: "SHOWROOM",
+        status: "EMIS",
+        customerId: rental.customerId,
+        rentalId: rental.id,
+        vehicleId: null,
+        notes: `BL interne du contrat de location ${reference}`,
+        createdByName: user.fullName,
+        lines: {
+          create: [{
+            description: lineDescription,
+            quantity: 1,
+            unitPriceXof: total,
+          }],
+        },
+      },
+      select: { id: true, number: true },
+    });
+
+    await logAudit({
+      user,
+      action: "rental.transcribe_bl",
+      entityType: "Rental",
+      entityId: rental.id,
+      entityLabel: reference,
+      details: `BL interne ${note.number}`,
+    });
+    revalidatePath("/rentals/contracts");
+    revalidatePath(`/rentals/${rental.id}/contrat`);
+    revalidatePath("/delivery-notes");
+    return {
+      mode,
+      deliveryNoteId: note.id,
+      deliveryNoteNumber: note.number,
+      certificationMessage: "BL interne créé.",
+    };
+  }
+
+  const invoiceCount = await prisma.invoice.count();
+  const invoice = await prisma.invoice.create({
+    data: {
+      number: nextDocNumber("FAC", invoiceCount),
+      status: "ENVOYEE",
+      kind: "NORMALISEE",
+      activity: "SHOWROOM",
+      customerId: rental.customerId,
+      taxMode: "TTC",
+      taxRatePct,
+      subtotalHtXof,
+      taxXof,
+      totalXof: total,
+      dueDate: new Date(Date.now() + 7 * 86400000),
+      notes: `Facture du contrat de location ${reference}`,
+      isDemo: true,
+      certificationMode: "DEMO",
+      cgvType: "VEHICULE",
+    },
+    select: { id: true, number: true },
+  });
+
+  await prisma.rental.update({ where: { id: rental.id }, data: { invoiceId: invoice.id } });
+
+  let deliveryNoteId: string | null = null;
+  let deliveryNoteNumber: string | null = null;
+  try {
+    const count = await prisma.deliveryNote.count({ where: { activity: "SHOWROOM" } });
+    const note = await prisma.deliveryNote.create({
+      data: {
+        number: nextDeliveryNoteNumber("SHOWROOM", count),
+        activity: "SHOWROOM",
+        status: "EMIS",
+        customerId: rental.customerId,
+        invoiceId: invoice.id,
+        rentalId: rental.id,
+        notes: `BL interne de la facture ${invoice.number} - contrat ${reference}`,
+        createdByName: user.fullName,
+        lines: { create: [{ description: lineDescription, quantity: 1, unitPriceXof: total }] },
+      },
+      select: { id: true, number: true },
+    });
+    deliveryNoteId = note.id;
+    deliveryNoteNumber = note.number;
+  } catch (error) {
+    console.error("BL de facture location non créé:", error);
+  }
+
+  let certificationMessage = "Facture normalisée créée.";
+  try {
+    const certification = await certifyInvoiceWithMecef(invoice.id, { forceDemo: true });
+    certificationMessage = certification.message;
+  } catch (error) {
+    certificationMessage = error instanceof Error ? error.message : "Certification DGI non aboutie.";
+  }
+
+  await logAudit({
+    user,
+    action: "rental.transcribe_invoice",
+    entityType: "Rental",
+    entityId: rental.id,
+    entityLabel: reference,
+    details: `Facture normalisée ${invoice.number} en mode démonstration`,
+  });
+  revalidatePath("/rentals/contracts");
+  revalidatePath(`/rentals/${rental.id}/contrat`);
+  revalidatePath("/invoices");
+  revalidatePath("/delivery-notes");
+
+  return {
+    mode,
+    invoiceId: invoice.id,
+    invoiceNumber: invoice.number,
+    deliveryNoteId: deliveryNoteId || "",
+    deliveryNoteNumber: deliveryNoteNumber || "",
+    certificationMessage,
+  };
 }

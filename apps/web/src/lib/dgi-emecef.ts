@@ -63,7 +63,10 @@ function buildInvoicePayload(invoice: {
  * - DEMO : simulation réservée aux démonstrations. Le document est marqué
  *   isDemo = true, exclu de la comptabilité et imprimé avec un avertissement.
  */
-export async function certifyInvoiceWithMecef(invoiceId: string): Promise<MecefCertificationResult> {
+export async function certifyInvoiceWithMecef(
+  invoiceId: string,
+  options: { forceDemo?: boolean } = {},
+): Promise<MecefCertificationResult> {
   const invoice = await prisma.invoice.findUniqueOrThrow({
     where: { id: invoiceId },
     include: {
@@ -87,7 +90,7 @@ export async function certifyInvoiceWithMecef(invoiceId: string): Promise<MecefC
     };
   }
 
-  const mode = getCertificationMode();
+  const mode = options.forceDemo ? "DEMO" : getCertificationMode();
   const nim = process.env.DGI_EMECEF_NIM || "";
   const ifu = process.env.DGI_EMECEF_IFU || "";
   const jwt = process.env.DGI_EMECEF_JWT || "";

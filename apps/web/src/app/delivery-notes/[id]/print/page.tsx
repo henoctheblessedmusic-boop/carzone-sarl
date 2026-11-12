@@ -13,7 +13,7 @@ export default async function DeliveryNotePrintPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const user = await requireUser(["PDG", "SG", "DG", "ADV", "RF", "COMPTA", "COMPTA_GARAGE", "ADMIN"]);
+  const user = await requireUser(["PDG", "SG", "DG", "ADV", "RF", "COMPTA", "COMPTA_GARAGE", "ADMIN", "GESTIONNAIRE_LOCATION"]);
   const { locale } = await getServerMessages();
   const copy = deliveryNotesCopy[locale];
   const { id } = await params;
@@ -22,12 +22,14 @@ export default async function DeliveryNotePrintPage({
     where: { id },
     include: {
       customer: true,
+      rental: true,
       lines: { include: { vehicle: true, partItem: true } },
     },
   });
 
   if (!note) notFound();
   if (user.role === "COMPTA_GARAGE" && note.activity !== ACTIVITY.GARAGE) notFound();
+  if (user.role === "GESTIONNAIRE_LOCATION" && !note.rentalId) notFound();
 
   return (
     <div

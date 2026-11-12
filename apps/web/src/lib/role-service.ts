@@ -338,6 +338,8 @@ export const RENTAL_MANAGER_ALLOWED_PREFIXES: readonly string[] = [
   "/rentals",
   "/contrat",
   "/clients",
+  "/invoices",
+  "/delivery-notes",
   "/chat",
   "/api/chat",
   "/api/calls",

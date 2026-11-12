@@ -585,6 +585,7 @@ model Rental {
   depositXof Int?
   invoiceId  String?   @unique
   invoice    Invoice?  @relation(fields: [invoiceId], references: [id])
+  deliveryNotes DeliveryNote[]
   notes      String?
   departureCondition String?
   returnCondition    String?
@@ -1561,6 +1562,9 @@ model DeliveryNote {
   quote           Quote?             @relation(fields: [quoteId], references: [id])
   invoiceId       String?
   invoice         Invoice?           @relation(fields: [invoiceId], references: [id])
+  /// Contrat de location à l'origine du BL interne, si applicable.
+  rentalId        String?
+  rental          Rental?            @relation(fields: [rentalId], references: [id], onDelete: SetNull)
   vehicleId       String?
   vehicle         Vehicle?           @relation(fields: [vehicleId], references: [id])
   notes           String?
@@ -1571,6 +1575,8 @@ model DeliveryNote {
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
   lines           DeliveryNoteLine[]
+
+  @@index([rentalId])
 }
 
 /// Ligne de bon de livraison interne (véhicule et/ou pièce détachée).

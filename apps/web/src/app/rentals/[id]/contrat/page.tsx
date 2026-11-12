@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import { AppShell } from "@/components/AppShell";
 import { RentalContractActions } from "@/components/RentalContractActions";
+import { RentalBillingActions } from "../../RentalBillingActions";
 import { RentalContractDocument } from "@/components/RentalContractDocument";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
@@ -22,6 +23,8 @@ export default async function RentalContractPage({ params }: { params: Promise<{
       customer: true,
       // La version catalogue porte le nombre de places affiché à l'article 2 du contrat.
       vehicle: { include: { version: { select: { trim: true, seats: true } } } },
+      invoice: { select: { id: true, number: true } },
+      deliveryNotes: { select: { id: true, number: true }, orderBy: { createdAt: "desc" } },
       payments: { orderBy: { paidAt: "desc" } },
     },
   });
@@ -92,7 +95,15 @@ export default async function RentalContractPage({ params }: { params: Promise<{
         )}
 
         <div style={{ overflowX: "auto", padding: "0.5rem 0" }}>
-          <RentalContractDocument rental={rental} />
+          {canManage && (
+          <RentalBillingActions
+            rentalId={rental.id}
+            existingInvoice={rental.invoice}
+            existingDeliveryNote={rental.deliveryNotes[0] || null}
+          />
+        )}
+
+        <RentalContractDocument rental={rental} />
         </div>
       </div>
     </AppShell>

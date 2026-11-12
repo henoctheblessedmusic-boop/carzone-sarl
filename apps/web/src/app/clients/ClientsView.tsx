@@ -38,6 +38,7 @@ import {
   updateCustomerDocumentStatus,
 } from "./actions";
 import { ClientImportModal } from "./ClientImportModal";
+import { RentalModal } from "../rentals/RentalModal";
 
 export type CustomerDocumentItem = {
   id: string;
@@ -108,6 +109,9 @@ export function ClientsView({
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<CustomerItem | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [deleteTarget, setDeleteTarget] = useState<CustomerItem | null>(null);
+  const [deleteWord, setDeleteWord] = useState("");
+  const [deleteError, setDeleteError] = useState("");
 
   useEffect(() => {
     setCustomers(initialCustomers);
@@ -332,7 +336,24 @@ export function ClientsView({
     });
   }
 
+  function applyDeletedCustomer(customer: CustomerItem, hasHistory: boolean) {
+    if (hasHistory) {
+      setCustomers((prev) =>
+        prev.map((c) => (c.id === customer.id ? { ...c, active: false } : c))
+      );
+    } else {
+      setCustomers((prev) => prev.filter((c) => c.id !== customer.id));
+    }
+  }
+
   function handleDelete(customer: CustomerItem) {
+    if (rentalScope) {
+      setDeleteTarget(customer);
+      setDeleteWord("");
+      setDeleteError("");
+      return;
+    }
+
     const hasHistory =
       customer._count.quotes > 0 || customer._count.invoices > 0 || customer._count.rentals > 0;
     const msg = hasHistory
@@ -343,12 +364,29 @@ export function ClientsView({
 
     startTransition(async () => {
       await deleteCustomer(customer.id);
-      if (hasHistory) {
-        setCustomers((prev) =>
-          prev.map((c) => (c.id === customer.id ? { ...c, active: false } : c))
-        );
-      } else {
-        setCustomers((prev) => prev.filter((c) => c.id !== customer.id));
+      applyDeletedCustomer(customer, hasHistory);
+    });
+  }
+
+  function confirmDeleteClient() {
+    if (!deleteTarget) return;
+    if (deleteWord.trim().toLowerCase() !== "supprimer") {
+      setDeleteError("Saisissez exactement supprimer pour confirmer.");
+      return;
+    }
+    const target = deleteTarget;
+    const hasHistory =
+      target._count.quotes > 0 || target._count.invoices > 0 || target._count.rentals > 0;
+    setDeleteError("");
+    startTransition(async () => {
+      try {
+        await deleteCustomer(target.id, deleteWord);
+        applyDeletedCustomer(target, hasHistory);
+        setDeleteTarget(null);
+        setDeleteWord("");
+        router.refresh();
+      } catch (error) {
+        setDeleteError(error instanceof Error ? error.message : "La suppression a echoue.");
       }
     });
   }
@@ -1746,6 +1784,41 @@ export function ClientsView({
             </div>
           </div>
         </div>
+      )}
+
+      {deleteTarget && (
+        <RentalModal title="Supprimer ce client ?" onClose={() => setDeleteTarget(null)} busy={isPending}>
+          <p style={{ margin: "0 0 12px", color: "var(--text-muted)", lineHeight: 1.5 }}>
+            {deleteTarget.contactName} sera supprimé de la base clients location.
+            {deleteTarget._count.quotes + deleteTarget._count.invoices + deleteTarget._count.rentals > 0
+              ? " Ce client possede un historique : il sera desactive et conserve pour la comptabilite."
+              : " Cette action est definitive."}
+          </p>
+          <label style={{ display: "grid", gap: 5, marginBottom: 14, fontSize: "0.82rem", color: "var(--text-muted)" }}>
+            Saisissez <strong style={{ color: "var(--danger-fg)" }}>supprimer</strong> pour confirmer
+            <input
+              value={deleteWord}
+              onChange={(event) => { setDeleteWord(event.target.value); setDeleteError(""); }}
+              className="ox-input"
+              autoComplete="off"
+              autoFocus
+              disabled={isPending}
+              placeholder="supprimer"
+              style={{ maxWidth: 260, height: 38 }}
+            />
+          </label>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+            <button type="button" className="ox-btn ox-btn-ghost" onClick={() => setDeleteTarget(null)} disabled={isPending}>Annuler</button>
+            <button type="button" className="ox-btn ox-btn-primary" onClick={confirmDeleteClient} disabled={isPending || deleteWord.trim().toLowerCase() !== "supprimer"}>
+              {isPending ? "Suppression..." : "Confirmer la suppression"}
+            </button>
+          </div>
+          {deleteError ? (
+            <div role="alert" style={{ marginTop: 10, padding: "8px 10px", borderRadius: 8, background: "var(--danger-soft)", color: "var(--danger-fg)", fontSize: "0.8rem" }}>
+              {deleteError}
+            </div>
+          ) : null}
+        </RentalModal>
       )}
 
       {isImportModalOpen && canImport && (

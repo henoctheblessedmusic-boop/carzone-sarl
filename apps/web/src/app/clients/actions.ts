@@ -179,8 +179,11 @@ export async function toggleCustomerActive(id: string, active: boolean) {
   revalidatePath("/clients");
 }
 
-export async function deleteCustomer(id: string) {
-  const user = await requireUser(["PDG", "SG", "DG", "ADV", "RF", "COMPTA", "ADMIN"]);
+export async function deleteCustomer(id: string, confirmation = "") {
+  const user = await requireUser(["PDG", "SG", "DG", "ADV", "RF", "COMPTA", "GESTIONNAIRE_LOCATION", "ADMIN"]);
+  if (user.role === "GESTIONNAIRE_LOCATION" && confirmation.trim().toLowerCase() !== "supprimer") {
+    throw new Error("Saisissez exactement supprimer pour confirmer la suppression du client.");
+  }
 
   const customer = await prisma.customer.findUnique({
     where: { id },

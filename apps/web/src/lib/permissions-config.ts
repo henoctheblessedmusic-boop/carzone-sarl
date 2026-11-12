@@ -142,6 +142,33 @@ export const ALL_CAPABILITY_IDS: string[] = FEATURE_GROUPS.flatMap((g) =>
 );
 
 /**
+ * Valeur technique persistée lorsqu'un administrateur décoche toutes les
+ * capacités. Sans cette sentinelle, un tableau vide serait interprété comme
+ * "aucune personnalisation" et les droits du rôle reviendraient.
+ */
+export const NO_CAPABILITIES_SENTINEL = "__NO_CAPABILITIES__";
+/** Rôles autorisés à consulter le répertoire clients. Les partenaires externes
+ * et les rôles purement techniques en sont exclus. */
+export const CLIENT_ACCESS_ROLES = [
+  "PDG",
+  "SG",
+  "DG",
+  "ADV",
+  "RF",
+  "RTA",
+  "DC",
+  "COMMERCIAL",
+  "HOTESSE",
+  "CHEF_ATELIER",
+  "ASSISTANTE_COMPTABLE",
+  "COMPTA",
+  "COMPTA_GARAGE",
+  "GESTIONNAIRE_LOCATION",
+  "ADMIN",
+] as const;
+
+
+/**
  * Profils de permissions par défaut pour chaque rôle
  */
 export const DEFAULT_ROLE_CAPABILITIES: Record<Role, string[]> = {
@@ -334,7 +361,8 @@ export function getEffectiveCapabilities(role: Role, customPermissions?: string[
     return [...ALL_CAPABILITY_IDS];
   }
   if (customPermissions && customPermissions.length > 0) {
-    return customPermissions;
+    if (customPermissions.includes(NO_CAPABILITIES_SENTINEL)) return [];
+    return customPermissions.filter((permission) => permission !== NO_CAPABILITIES_SENTINEL);
   }
   return DEFAULT_ROLE_CAPABILITIES[role] || [];
 }

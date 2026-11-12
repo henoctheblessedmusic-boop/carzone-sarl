@@ -1,4 +1,5 @@
 import type { Role } from "./roles";
+import { CLIENT_ACCESS_ROLES, getEffectiveCapabilities } from "./permissions-config";
 
 export type RoleUser = {
   id: string;
@@ -344,9 +345,14 @@ export class RoleService {
   static userHasPermission(user: RoleUser, permission: Permission): boolean {
     if (user.role === "DEVELOPER" || user.role === "DG" || user.role === "PDG" || user.role === "SG") return true;
 
-    // Si des capacités personnalisées sont configurées sur l'utilisateur
+    // Si des capacités personnalisées sont configurées sur l'utilisateur,
+    // elles remplacent intégralement les capacités du rôle. Une liste vide
+    // volontaire est représentée par une sentinelle et ne redonne aucun droit.
     if (user.customPermissions && user.customPermissions.length > 0) {
-      if (user.customPermissions.includes(permission)) return true;
+      const effective = getEffectiveCapabilities(user.role, user.customPermissions);
+      if (effective.length === 0) return false;
+      if (effective.includes("admin:all")) return true;
+      if (effective.includes(permission)) return true;
       if (permission === "financial_report:export" && user.customPermissions.includes("invoices:financial_export")) return true;
       if (permission === "quotes:delete" && user.customPermissions.includes("estimates:delete")) return true;
       if (permission === "roles:manage" && user.customPermissions.includes("users:assign_role")) return true;
@@ -364,6 +370,7 @@ export class RoleService {
       if (permission === "clients:write" && (user.customPermissions.includes("customers:create") || user.customPermissions.includes("customers:edit"))) return true;
       if (permission === "hr:read" && (user.customPermissions.includes("hr:view") || user.customPermissions.includes("hr:manage_employees") || user.customPermissions.includes("hr:manage_leaves"))) return true;
       if (permission === "hr:write" && (user.customPermissions.includes("hr:manage_employees") || user.customPermissions.includes("hr:manage_leaves") || user.customPermissions.includes("hr:setup"))) return true;
+      return false;
     }
 
     return this.hasPermission(user.role, permission);
@@ -449,7 +456,7 @@ export class RoleService {
     if (pathname.startsWith("/parts")) {
       return this.hasPermission(role, "workshop:read") || this.hasPermission(role, "vehicles:read");
     }
-    if (pathname.startsWith("/vehicles") || pathname.startsWith("/catalog") || pathname.startsWith("/imports")) {
+    if (pathname.startsWith("/vehicles") || pathname === "/catalog" || pathname.startsWith("/catalog/") || pathname.startsWith("/imports")) {
       return this.hasPermission(role, "vehicles:read");
     }
     if (pathname.startsWith("/workshop")) {
@@ -459,7 +466,7 @@ export class RoleService {
       return this.hasPermission(role, "services:manage");
     }
     if (pathname.startsWith("/clients")) {
-      return true; // Tous les rôles connectés ont accès aux clients
+      return (CLIENT_ACCESS_ROLES as readonly string[]).includes(role);
     }
     if (pathname.startsWith("/charging") || pathname.startsWith("/terminal")) {
       return this.hasPermission(role, "charging:read");
@@ -531,10 +538,15 @@ export class RoleService {
     if (
       pathname === "/dashboard" ||
       pathname.startsWith("/dashboard") ||
-      pathname.startsWith("/clients") ||
       pathname.startsWith("/chat")
     ) {
       return true;
+    }
+    if (pathname.startsWith("/clients")) {
+      return (
+        (CLIENT_ACCESS_ROLES as readonly string[]).includes(user.role) ||
+        this.userHasPermission(user, "clients:read")
+      );
     }
 
     if (pathname.startsWith("/workshop")) {
@@ -545,7 +557,7 @@ export class RoleService {
     }
     if (
       pathname.startsWith("/vehicles") ||
-      pathname.startsWith("/catalog") ||
+      (pathname === "/catalog" || pathname.startsWith("/catalog/")) ||
       pathname.startsWith("/imports")
     ) {
       return this.userHasPermission(user, "vehicles:read");

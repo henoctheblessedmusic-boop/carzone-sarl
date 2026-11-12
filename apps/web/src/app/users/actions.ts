@@ -7,7 +7,7 @@ import { destroySession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
 import type { Role } from "@/lib/roles";
-import { DEFAULT_ROLE_CAPABILITIES } from "@/lib/permissions-config";
+import { DEFAULT_ROLE_CAPABILITIES, NO_CAPABILITIES_SENTINEL } from "@/lib/permissions-config";
 import {
   assertCanAssignPermissions,
   assertCanAssignRole,
@@ -130,12 +130,17 @@ export async function updateUser(formData: FormData) {
     }
   }
 
+  const normalizedPermissions =
+    customPermissions !== undefined && customPermissions.length === 0
+      ? [NO_CAPABILITIES_SENTINEL]
+      : customPermissions;
   await prisma.user.update({
     where: { id },
     data: {
       fullName,
       role,
-      ...(customPermissions !== undefined ? { customPermissions } : {}),
+      ...(normalizedPermissions !== undefined ? { customPermissions: normalizedPermissions } : {}),
+      ...(normalizedPermissions !== undefined || role !== targetUser.role ? { sessionVersion: { increment: 1 } } : {}),
     },
   });
 
@@ -296,10 +301,12 @@ export async function updateUserPermissions(id: string, permissions: string[]) {
   }
   assertCanManageTargetUser(currentUser.role, targetUser.role);
   assertCanAssignPermissions(currentUser.role, targetUser.role, permissions);
+  const persistedPermissions = permissions.length > 0 ? permissions : [NO_CAPABILITIES_SENTINEL];
   await prisma.user.update({
     where: { id },
     data: {
-      customPermissions: permissions,
+      customPermissions: persistedPermissions,
+      sessionVersion: { increment: 1 },
     },
   });
 
@@ -324,12 +331,11 @@ export async function resetUserPermissions(id: string) {
 
   assertCanManageTargetUser(currentUser.role, user.role);
 
-  const defaultPerms = DEFAULT_ROLE_CAPABILITIES[user.role as Role] || [];
-
   await prisma.user.update({
     where: { id },
     data: {
-      customPermissions: defaultPerms,
+      customPermissions: [],
+      sessionVersion: { increment: 1 },
     },
   });
 
@@ -343,7 +349,7 @@ export async function resetUserPermissions(id: string) {
   });
 
   revalidatePath("/users");
-  return { success: true, count: defaultPerms.length };
+  return { success: true, count: 0 };
 }
 
 export async function updateUserRole(formData: FormData) {
@@ -373,13 +379,12 @@ export async function updateUserRole(formData: FormData) {
     throw new Error("Vous ne pouvez pas modifier votre propre rôle.");
   }
 
-  const defaultPerms = DEFAULT_ROLE_CAPABILITIES[role] || [];
-
   await prisma.user.update({
     where: { id },
     data: {
       role,
-      customPermissions: defaultPerms,
+      customPermissions: [],
+      sessionVersion: { increment: 1 },
     },
   });
 

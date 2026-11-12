@@ -15,6 +15,7 @@ import {
 
 import { formatLegalAmountNotice } from "@/lib/number-to-words-fr";
 import { VehicleTechSheetPrint } from "@/components/VehicleTechSheetPrint";
+import { GarageProformaPrint } from "@/components/GarageProformaPrint";
 import { resolveVehicleTechSheet } from "@/lib/tech-sheet-generator";
 
 export default async function QuotePrintPage({
@@ -32,6 +33,11 @@ export default async function QuotePrintPage({
   });
   if (!quote) notFound();
   if (user.role === "COMPTA_GARAGE" && quote.activity !== ACTIVITY.GARAGE) notFound();
+
+  // Le canevas proforma garage est distinct du devis showroom.
+  if (quote.activity === ACTIVITY.GARAGE) {
+    return <GarageProformaPrint quote={quote} />;
+  }
 
   const { discount, cleanNotes } = decodeDiscountFromNotes(quote.notes);
   const grossTotal = quote.lines.reduce((s, l) => s + l.quantity * l.unitPriceXof, 0);

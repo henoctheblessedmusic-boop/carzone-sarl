@@ -1,5 +1,5 @@
 import { AppShell } from "@/components/AppShell";
-import { DashboardAutoRefresh } from "@/components/DashboardAutoRefresh";
+import { RentalAccountingCard } from "@/components/RentalAccountingCard";
 import { requireUser } from "@/lib/require-user";
 import { formatXof } from "@/lib/format";
 import { rentalContractReference, rentalDaysBetween } from "@/lib/rental-contract";
@@ -118,45 +118,9 @@ export default async function RentalContractsPage() {
           </div>
         </div>
 
-        <div className="ox-glass" style={{ padding: "1rem 1.2rem", display: "grid", gap: 12 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
-            <div>
-              <strong>Comptabilité de la location en temps réel</strong>
-              <p style={{ margin: "4px 0 0", opacity: 0.7, fontSize: "0.84rem" }}>
-                Recettes réellement encaissées, reste à recouvrer et coût d&apos;entretien du parc de location.
-              </p>
-            </div>
-            <span style={{ fontSize: "0.75rem", opacity: 0.65 }}>Hors cautions - données à jour à chaque encaissement</span>
-            <DashboardAutoRefresh />
-          </div>
-          <div className="ox-kpi-grid">
-            <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--success)" }}>
-              <div className="ox-kpi-label">Recettes encaissées</div>
-              <div className="ox-kpi-value">{formatXof(totalReceived)}</div>
-              <div className="ox-kpi-hint">Total réel des loyers encaissés</div>
-            </div>
-            <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--info)" }}>
-              <div className="ox-kpi-label">Encaissé ce mois</div>
-              <div className="ox-kpi-value">{formatXof(receivedThisMonth)}</div>
-              <div className="ox-kpi-hint">Mois en cours</div>
-            </div>
-            <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--warning)" }}>
-              <div className="ox-kpi-label">Reste à encaisser</div>
-              <div className="ox-kpi-value">{formatXof(totalBalance)}</div>
-              <div className="ox-kpi-hint">Sur les contrats en cours</div>
-            </div>
-            <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--warning)" }}>
-              <div className="ox-kpi-label">Entretien & garage</div>
-              <div className="ox-kpi-value">{formatXof(maintenanceCost)}</div>
-              <div className="ox-kpi-hint">Charges d&apos;entretien du parc</div>
-            </div>
-            <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--purple)" }}>
-              <div className="ox-kpi-label">Bénéfice net location</div>
-              <div className="ox-kpi-value">{formatXof(netRentalRevenue)}</div>
-              <div className="ox-kpi-hint">Recettes moins entretien</div>
-            </div>
-          </div>
-        </div>
+        <RentalAccountingCard
+          values={{ totalReceived, receivedThisMonth, totalBalance, maintenanceCost, netRentalRevenue }}
+        />
 
         {(canManage || canFinance) && rentalRequests.length > 0 && (
           <div className="ox-glass" style={{ padding: "1rem 1.2rem", display: "grid", gap: 12 }}>

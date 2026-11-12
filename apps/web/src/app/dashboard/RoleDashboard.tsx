@@ -19,6 +19,8 @@ import {
   Zap,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { RentalAccountingCard } from "@/components/RentalAccountingCard";
+import { getRentalAccountingSnapshot } from "@/app/rentals/_shared/accounting";
 import { prisma } from "@/lib/prisma";
 import { formatXof } from "@/lib/format";
 import { ROLE_LABELS, type Role } from "@/lib/roles";
@@ -338,9 +340,10 @@ async function buildMetrics(role: Role): Promise<Metric[]> {
 
 export async function RoleDashboard({ user }: { user: SessionUser }) {
   const role = user.role as Role;
-  const [metrics, actions] = await Promise.all([
+  const [metrics, actions, rentalAccounting] = await Promise.all([
     buildMetrics(role),
     Promise.resolve(QUICK_ACTIONS[role] ?? DEFAULT_ACTIONS),
+    role === "GESTIONNAIRE_LOCATION" ? getRentalAccountingSnapshot() : Promise.resolve(null),
   ]);
   const roleLabel = ROLE_LABELS[role] ?? role;
 
@@ -383,6 +386,18 @@ export async function RoleDashboard({ user }: { user: SessionUser }) {
             </div>
           ))}
         </div>
+
+        {rentalAccounting ? (
+          <RentalAccountingCard
+            values={{
+              totalReceived: rentalAccounting.totalReceived,
+              receivedThisMonth: rentalAccounting.receivedThisMonth,
+              totalBalance: rentalAccounting.totalBalance,
+              maintenanceCost: rentalAccounting.maintenanceCost,
+              netRentalRevenue: rentalAccounting.netRentalRevenue,
+            }}
+          />
+        ) : null}
 
         <div className="ox-glass" style={{ padding: "1.1rem 1.2rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>

@@ -31,6 +31,8 @@ import { buildRealDashboardAnalytics } from "@/lib/dashboard-analytics";
 import { ACTIVITY } from "@/lib/permissions";
 import { RoleDashboard } from "./RoleDashboard";
 import { DashboardAutoRefresh } from "@/components/DashboardAutoRefresh";
+import { RentalAccountingCard } from "@/components/RentalAccountingCard";
+import { getRentalAccountingSnapshot } from "@/app/rentals/_shared/accounting";
 
 const DIRECTION_ROLES: Role[] = ["DEVELOPER", "PDG", "SG", "DG", "COMPTA"];
 
@@ -73,9 +75,7 @@ export default async function DashboardPage() {
     allPayments,
     allWorkshopEntries,
     allCustomers,
-    rentalPaymentsAggregate,
-    rentalMaintenancesAggregate,
-    activeRentalsAggregate,
+    rentalAccounting,
   ] = await Promise.all([
     prisma.customer.count({ where: { active: true } }),
     prisma.lead.count(),
@@ -164,20 +164,8 @@ export default async function DashboardPage() {
       },
       orderBy: { createdAt: "asc" },
     }),
-    prisma.rentalPayment.aggregate({
-      _sum: { amountXof: true },
-    }),
-    prisma.rentalMaintenance.aggregate({
-      where: { status: { not: "ANNULE" } },
-      _sum: { costXof: true },
-    }),
-    prisma.rental.count({ where: { status: "ACTIF" } }),
+    getRentalAccountingSnapshot(),
   ]);
-
-  const rentalRevenue = rentalPaymentsAggregate._sum.amountXof || 0;
-  const rentalMaintenanceCost = rentalMaintenancesAggregate._sum.costXof || 0;
-  const rentalNetRevenue = rentalRevenue - rentalMaintenanceCost;
-  const activeRentalsCount = activeRentalsAggregate;
 
   // Financial aggregates
   const activeInvoices = invoices.filter((i) => i.status !== "ANNULEE");
@@ -469,21 +457,18 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <div
-            className="ox-glass ox-kpi-card"
-            style={cssVars({
-              "--kpi-accent": "var(--success)",
-              "--kpi-value-color": rentalNetRevenue >= 0 ? "var(--success-fg)" : "var(--danger-fg)",
-              "--kpi-hint-color": "var(--text-muted)",
-            })}
-          >
-            <div className="ox-kpi-label">LOCATION - RECETTES ENCAISSÉES</div>
-            <div className="ox-kpi-value">{formatXof(rentalRevenue)}</div>
-            <div className="ox-kpi-hint">
-              {activeRentalsCount} contrat(s) actif(s) · net après entretien : {formatXof(rentalNetRevenue)}
-            </div>
-          </div>
         </div>
+
+        <RentalAccountingCard
+          title="Comptabilité de la location en temps réel - supervision"
+          values={{
+            totalReceived: rentalAccounting.totalReceived,
+            receivedThisMonth: rentalAccounting.receivedThisMonth,
+            totalBalance: rentalAccounting.totalBalance,
+            maintenanceCost: rentalAccounting.maintenanceCost,
+            netRentalRevenue: rentalAccounting.netRentalRevenue,
+          }}
+        />
 
         {/* Stock Général CARZONE - Pipeline Logistique & Magasin */}
         <div className="ox-glass ox-stock-card">

@@ -107,7 +107,7 @@ export default async function DeliveryNotePrintPage({
               <br />
               +229 01 92 61 61 61 · contact@topcarzone.com
               <br />
-              IFU 0202314589201 · RCCM RB/COT/23 B 34567
+              IFU 3202496111617 · RCCM RB/ABC/24 B 38665
             </div>
           </div>
           <div style={{ textAlign: "right" }}>

@@ -69,7 +69,7 @@ export const CLIENT_IMPORT_FIELDS: ClientImportField[] = [
     key: "ifu",
     label: "IFU",
     aliases: ["ifu", "numero ifu", "numéro ifu", "nif", "identifiant fiscal"],
-    placeholder: "Ex. 0202314589201",
+    placeholder: "Ex. 3202496111617",
   },
   {
     key: "category",
@@ -166,7 +166,7 @@ export function buildTemplateRows(): string[][] {
       "+229 01 97 00 00 00",
       "Cotonou",
       "Zone Maro-Militaire",
-      "0202314589201",
+      "3202496111617",
       "Entreprise",
       "Client existant importé depuis Excel",
     ],

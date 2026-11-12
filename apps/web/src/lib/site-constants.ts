@@ -51,8 +51,8 @@ export const SITE_SOCIAL = {
 export type SiteSocialNetwork = keyof typeof SITE_SOCIAL;
 
 export const SITE_FISCAL = {
-  ifu: "0202314589201",
-  rccm: "RB/COT/23 B 34567",
+  ifu: "3202496111617",
+  rccm: "RB/ABC/24 B 38665",
 } as const;
 
 export const SITE_LEGAL_LINE = `IFU ${SITE_FISCAL.ifu} · RCCM ${SITE_FISCAL.rccm}`;

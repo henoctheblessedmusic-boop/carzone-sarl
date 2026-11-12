@@ -313,6 +313,12 @@ export function RentalActionModals({
                 <Field label="Tarif location / mois (FCFA)" hint="Optionnel, pour les contrats longue durée">
                   <input name="rentalMonthlyXof" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 750000" />
                 </Field>
+                <Field label="Tarif / jour avec chauffeur" hint="Tarif de référence pour les contrats avec chauffeur">
+                  <input name="rentalDailyWithDriverXof" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 50000" />
+                </Field>
+                <Field label="Tarif / jour sans chauffeur" hint="Tarif de référence pour les contrats sans chauffeur">
+                  <input name="rentalDailyWithoutDriverXof" type="number" min="0" className="ox-input" style={FIELD} placeholder="Ex. 40000" />
+                </Field>
                 <Field label="Numéro de châssis (VIN) *" hint="17 caractères en général">
                   <input name="vin" className="ox-input" style={FIELD} required placeholder="Ex. JTDBR32E720123456" autoComplete="off" />
                 </Field>

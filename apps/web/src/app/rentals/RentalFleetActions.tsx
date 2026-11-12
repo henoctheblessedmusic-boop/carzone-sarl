@@ -18,6 +18,8 @@ type FleetVehicle = {
   registrationNumber: string | null;
   rentalDailyXof: number | null;
   rentalMonthlyXof: number | null;
+  rentalDailyWithDriverXof: number | null;
+  rentalDailyWithoutDriverXof: number | null;
   mileage: number;
 };
 
@@ -170,6 +172,8 @@ export function RentalFleetActions({ vehicle, hasActive }: { vehicle: FleetVehic
               <Field label="Kilométrage"><input name="mileage" type="number" min="0" defaultValue={vehicle.mileage} className="ox-input" style={FIELD} /></Field>
               <Field label="Tarif / jour (FCFA)"><input name="rentalDailyXof" type="number" min="0" defaultValue={vehicle.rentalDailyXof || ""} className="ox-input" style={FIELD} /></Field>
               <Field label="Tarif / mois (FCFA)"><input name="rentalMonthlyXof" type="number" min="0" defaultValue={vehicle.rentalMonthlyXof || ""} className="ox-input" style={FIELD} /></Field>
+              <Field label="Tarif / jour avec chauffeur"><input name="rentalDailyWithDriverXof" type="number" min="0" defaultValue={vehicle.rentalDailyWithDriverXof || ""} className="ox-input" style={FIELD} /></Field>
+              <Field label="Tarif / jour sans chauffeur"><input name="rentalDailyWithoutDriverXof" type="number" min="0" defaultValue={vehicle.rentalDailyWithoutDriverXof || ""} className="ox-input" style={FIELD} /></Field>
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 6 }}>
               <button type="button" className="ox-btn ox-btn-ghost" onClick={() => setEditing(false)}>Annuler</button>

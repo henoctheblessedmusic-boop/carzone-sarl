@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { Badge, DataTable } from "@/components/ui";
 import { BrandLogoSvg } from "@/lib/brand-logos";
@@ -71,6 +72,14 @@ export default async function RentalFleetPage() {
         </div>
 
         <RentalSectionNav current="fleet" />
+
+        {canManage && (
+          <div className="ox-glass" style={{ padding: "0.8rem 1rem", display: "flex", justifyContent: "flex-end" }}>
+            <Link href="/rentals/import" className="ox-btn ox-btn-ghost ox-btn-sm">
+              Importer la base clients et le parc locatif
+            </Link>
+          </div>
+        )}
 
         {canManage && (
           <RentalActionModals
@@ -255,6 +264,8 @@ export default async function RentalFleetPage() {
                             registrationNumber: vehicle.registrationNumber,
                             rentalDailyXof: vehicle.rentalDailyXof,
                             rentalMonthlyXof: vehicle.rentalMonthlyXof,
+                            rentalDailyWithDriverXof: vehicle.rentalDailyWithDriverXof,
+                            rentalDailyWithoutDriverXof: vehicle.rentalDailyWithoutDriverXof,
                             mileage: vehicle.mileage,
                           }}
                           hasActive={hasActive}

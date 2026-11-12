@@ -271,6 +271,8 @@ export async function createRentalVehicle(formData: FormData) {
   const priceXof = Math.round(Number(formData.get("priceXof") || 0));
   const rentalDailyXof = Math.round(Number(formData.get("rentalDailyXof") || 0)) || null;
   const rentalMonthlyXof = Math.round(Number(formData.get("rentalMonthlyXof") || 0)) || null;
+  const rentalDailyWithDriverXof = Math.round(Number(formData.get("rentalDailyWithDriverXof") || 0)) || null;
+  const rentalDailyWithoutDriverXof = Math.round(Number(formData.get("rentalDailyWithoutDriverXof") || 0)) || null;
   const yearRaw = Number(formData.get("year") || 0);
   const mileage = Math.max(0, Math.round(Number(formData.get("mileage") || 0)));
   const vehicleType = String(formData.get("vehicleType") || "").trim().toUpperCase() || null;
@@ -305,6 +307,8 @@ export async function createRentalVehicle(formData: FormData) {
       priceXof,
       rentalDailyXof,
       rentalMonthlyXof,
+      rentalDailyWithDriverXof,
+      rentalDailyWithoutDriverXof,
       status: "EN_STOCK",
       fleetType: "RENTAL",
       rentalStatus: "DISPONIBLE",
@@ -643,6 +647,8 @@ export async function updateRentalVehicle(formData: FormData) {
   const registrationNumber = String(formData.get("registrationNumber") || "").trim().toUpperCase() || null;
   const rentalDailyXof = Math.round(Number(formData.get("rentalDailyXof") || 0)) || null;
   const rentalMonthlyXof = Math.round(Number(formData.get("rentalMonthlyXof") || 0)) || null;
+  const rentalDailyWithDriverXof = Math.round(Number(formData.get("rentalDailyWithDriverXof") || 0)) || null;
+  const rentalDailyWithoutDriverXof = Math.round(Number(formData.get("rentalDailyWithoutDriverXof") || 0)) || null;
   const mileage = Math.max(0, Math.round(Number(formData.get("mileage") || 0)));
 
   if (!brand || !model || !energy) throw new Error("Marque, modèle et énergie sont obligatoires.");
@@ -663,7 +669,7 @@ export async function updateRentalVehicle(formData: FormData) {
 
   await prisma.vehicle.update({
     where: { id: vehicleId },
-    data: { brand, model, variant, year, energy, vin, registrationNumber, rentalDailyXof, rentalMonthlyXof, mileage },
+    data: { brand, model, variant, year, energy, vin, registrationNumber, rentalDailyXof, rentalMonthlyXof, rentalDailyWithDriverXof, rentalDailyWithoutDriverXof, mileage },
   });
 
   await logAudit({

@@ -75,6 +75,14 @@ model Customer {
   scopeRental      Boolean                @default(false)
   /// Entreprise partenaire (peut cumuler les deux périmètres).
   isPartner        Boolean                @default(false)
+  /// Type de pièce d'identité du client location : CIP, CNI, Passeport...
+  identityDocumentType String?
+  /// Numéro de pièce d'identité, unique lorsqu'il est renseigné.
+  identityNumber   String?                @unique
+  /// Contact à joindre en cas d'urgence.
+  secondaryContact String?
+  /// Origine de la fiche : IMPORT_BASE_CLIENTS_LOCATION, saisie manuelle...
+  source           String?
   createdAt        DateTime               @default(now())
   updatedAt        DateTime               @updatedAt
   documents        CustomerDocument[]
@@ -352,6 +360,16 @@ model Vehicle {
   /// Tarifs publics du parc de location (FCFA)
   rentalDailyXof   Int?
   rentalMonthlyXof Int?
+  /// Nombre de places du véhicule, utile pour le parc locatif.
+  seats            Int?
+  /// Code interne stable du véhicule locatif, faute de VIN ou d'immatriculation.
+  fleetCode        String?      @unique
+  /// Tarif journalier avec chauffeur.
+  rentalDailyWithDriverXof    Int?
+  /// Tarif journalier sans chauffeur.
+  rentalDailyWithoutDriverXof Int?
+  /// Origine de la fiche véhicule : IMPORT_BASE_CLIENTS_LOCATION...
+  source           String?
   siteId        String?
   site          Site?          @relation(fields: [siteId], references: [id])
   supplierId    String?
@@ -577,6 +595,18 @@ model Rental {
   days       Int?
   /// Montant total convenu du contrat (hors caution).
   totalXof   Int?
+  /// Le contrat est-il conclu avec chauffeur ? null si non renseigné.
+  withDriver Boolean?
+  /// Date de saisie ou d'opération d'origine, utile pour les imports historiques.
+  operationDate DateTime?
+  /// Moyen de paiement déclaré : ESPECES, MOBILE_MONEY, VIREMENT, CHEQUE...
+  paymentMethod String?
+  /// Statut déclaré à l'import : PAYE, NON_PAYE, A_CONFIRMER.
+  paymentStatus String?
+  /// Référence de la ligne source, pour éviter tout doublon lors d'un import.
+  sourceReference String? @unique
+  /// Identifiant du lot d'import.
+  importBatchId String?
   /// Jeton public sécurisé permettant au client de consulter et imprimer son contrat.
   contractToken String? @unique
   signedAt   DateTime?

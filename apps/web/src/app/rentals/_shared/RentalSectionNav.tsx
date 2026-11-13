@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export type RentalSection = "fleet" | "contracts" | "maintenance";
+export type RentalSection = "fleet" | "contracts" | "maintenance" | "drivers";
 
 const SECTIONS: { key: RentalSection; href: string; label: string; hint: string }[] = [
   {
@@ -21,19 +21,26 @@ const SECTIONS: { key: RentalSection; href: string; label: string; hint: string 
     label: "Entretiens",
     hint: "Entretien, réparations, garage",
   },
+  {
+    key: "drivers",
+    href: "/rentals/drivers",
+    label: "Chauffeurs",
+    hint: "Paiement des chauffeurs et lien avec les RH",
+  },
 ];
 
 /**
  * Barre de sous-navigation commune aux trois pages Location. Elle double le menu
  * latéral pour rester utilisable sur mobile, où la barre latérale est repliée.
  */
-export function RentalSectionNav({ current }: { current: RentalSection }) {
+export function RentalSectionNav({ current, showDrivers = false }: { current: RentalSection; showDrivers?: boolean }) {
+  const sections = showDrivers ? SECTIONS : SECTIONS.filter((section) => section.key !== "drivers");
   return (
     <nav
       aria-label="Sections de la location"
       style={{ display: "flex", gap: 8, flexWrap: "wrap" }}
     >
-      {SECTIONS.map((section) => {
+      {sections.map((section) => {
         const isActive = section.key === current;
         return (
           <Link

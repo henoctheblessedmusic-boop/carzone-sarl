@@ -67,6 +67,44 @@ export function findMaintenances() {
   });
 }
 
+export function findRentalExpenses() {
+  return prisma.rentalExpense.findMany({
+    include: { vehicle: { select: { id: true, brand: true, model: true, registrationNumber: true } } },
+    orderBy: [{ expenseDate: "desc" }, { createdAt: "desc" }],
+  });
+}
+
+/** Salariés pouvant être sélectionnés comme chauffeurs location. */
+export function findRentalDrivers() {
+  return prisma.employee.findMany({
+    where: {
+      status: "ACTIF",
+      OR: [{ isDriver: true }, { jobTitle: { contains: "chauffeur", mode: "insensitive" } }],
+    },
+    orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      employeeNumber: true,
+      phone: true,
+      jobTitle: true,
+      isDriver: true,
+    },
+  });
+}
+
+export function findDriverPayments() {
+  return prisma.driverPayment.findMany({
+    include: {
+      employee: { select: { id: true, firstName: true, lastName: true, employeeNumber: true, jobTitle: true } },
+      rental: { select: { id: true, startDate: true, endDate: true } },
+      expense: { select: { id: true, expenseNumber: true, amountTtcXof: true } },
+    },
+    orderBy: [{ paidAt: "desc" }, { createdAt: "desc" }],
+  });
+}
+
 export function findRentalRequests() {
   return prisma.rentalRequest.findMany({
     include: { vehicle: { select: { id: true, brand: true, model: true, registrationNumber: true } } },
@@ -102,6 +140,9 @@ export type RentalVehicle = Awaited<ReturnType<typeof findRentalVehicles>>[numbe
 export type ShowroomVehicle = Awaited<ReturnType<typeof findShowroomVehicles>>[number];
 export type RentalCustomer = Awaited<ReturnType<typeof findRentalCustomers>>[number];
 export type RentalMaintenanceRow = Awaited<ReturnType<typeof findMaintenances>>[number];
+export type RentalExpenseRow = Awaited<ReturnType<typeof findRentalExpenses>>[number];
+export type RentalDriverRow = Awaited<ReturnType<typeof findRentalDrivers>>[number];
+export type DriverPaymentRow = Awaited<ReturnType<typeof findDriverPayments>>[number];
 export type RentalRequestRow = Awaited<ReturnType<typeof findRentalRequests>>[number];
 export type VehicleBrandOption = Awaited<ReturnType<typeof findVehicleBrands>>[number];
 export type GarageUserOption = Awaited<ReturnType<typeof findGarageUsers>>[number];
@@ -136,7 +177,9 @@ export type RentalFinancials = {
 export function computeRentalFinancials(
   rentals: RentalWithRelations[],
   maintenances: RentalMaintenanceRow[],
-  now: Date
+  now: Date,
+  rentalExpenses: RentalExpenseRow[] = [],
+  driverPayments: DriverPaymentRow[] = []
 ): RentalFinancials {
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const paidByRental = new Map(
@@ -155,7 +198,10 @@ export function computeRentalFinancials(
     (sum, rental) => sum + Math.max(0, expectedContractValue(rental) - (paidByRental.get(rental.id) || 0)),
     0
   );
-  const maintenanceCost = maintenances.reduce((sum, item) => sum + item.costXof, 0);
+  const maintenanceCost =
+    maintenances.reduce((sum, item) => sum + item.costXof, 0) +
+    rentalExpenses.reduce((sum, item) => sum + item.amountXof, 0) +
+    driverPayments.reduce((sum, item) => sum + item.amountXof, 0);
 
   return {
     paidByRental,

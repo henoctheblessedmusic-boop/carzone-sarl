@@ -23,8 +23,7 @@ export default async function RentalContractPage({ params }: { params: Promise<{
       customer: true,
       // La version catalogue porte le nombre de places affiché à l'article 2 du contrat.
       vehicle: { include: { version: { select: { trim: true, seats: true } } } },
-      invoice: { select: { id: true, number: true } },
-      deliveryNotes: { select: { id: true, number: true }, orderBy: { createdAt: "desc" } },
+      deliveryNotes: { select: { id: true, number: true, kind: true }, orderBy: { createdAt: "desc" } },
       payments: { orderBy: { paidAt: "desc" } },
     },
   });
@@ -98,8 +97,8 @@ export default async function RentalContractPage({ params }: { params: Promise<{
           {canManage && (
           <RentalBillingActions
             rentalId={rental.id}
-            existingInvoice={rental.invoice}
-            existingDeliveryNote={rental.deliveryNotes[0] || null}
+            existingInternal={rental.deliveryNotes.find((note) => note.kind !== "CLIENT") || null}
+            existingClient={rental.deliveryNotes.find((note) => note.kind === "CLIENT") || null}
           />
         )}
 

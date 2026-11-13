@@ -31,6 +31,71 @@ async function generateEmployeeNumber(): Promise<string> {
 }
 
 /**
+ * Paiement chauffeur partagé avec la location. Les RH et la location
+ * utilisent la même période (AAAA-MM) pour empêcher un double paiement.
+ */
+async function assertDriverPayable(employeeId: string, month: number, year: number) {
+  const employee = await prisma.employee.findUnique({
+    where: { id: employeeId },
+    select: { id: true, firstName: true, lastName: true, jobTitle: true, isDriver: true },
+  });
+  if (!employee) return null;
+  const isDriver = employee.isDriver || employee.jobTitle.toLowerCase().includes("chauffeur");
+  if (!isDriver) return null;
+  const period = `${year}-${String(month).padStart(2, "0")}`;
+  const existing = await prisma.driverPayment.findUnique({
+    where: { employeeId_period: { employeeId, period } },
+    select: { id: true, source: true, amountXof: true },
+  });
+  if (existing?.source === "LOCATION") {
+    throw new Error(`Ce chauffeur a déjà été payé par la location pour ${period} (${existing.amountXof.toLocaleString("fr-BJ")} FCFA).`);
+  }
+  return { employee, period, existing };
+}
+
+async function syncDriverSalaryPayment(input: {
+  employeeId: string;
+  month: number;
+  year: number;
+  amountXof: number;
+  paymentMethod: string;
+  reference?: string;
+  paidByName: string;
+}) {
+  const driver = await assertDriverPayable(input.employeeId, input.month, input.year);
+  if (!driver) return;
+  const data = {
+    amountXof: input.amountXof,
+    method: input.paymentMethod,
+    reference: input.reference?.trim() || null,
+    notes: "Paiement saisi depuis les RH",
+    source: "RH",
+    paidAt: new Date(),
+    createdByName: input.paidByName,
+  };
+  if (driver.existing) {
+    await prisma.driverPayment.update({ where: { id: driver.existing.id }, data });
+    return;
+  }
+  await prisma.driverPayment.create({
+    data: {
+      employeeId: input.employeeId,
+      period: driver.period,
+      ...data,
+    },
+  });
+  await prisma.adminNotification.create({
+    data: {
+      type: "DRIVER_PAYMENT",
+      title: "Chauffeur payé par les RH",
+      message: `${driver.employee.firstName} ${driver.employee.lastName} a été payé pour ${driver.period} : ${input.amountXof.toLocaleString("fr-BJ")} FCFA.`,
+      userName: input.paidByName,
+      newValue: `${input.amountXof} FCFA`,
+    },
+  });
+}
+
+/**
  * -------------------------------------------------------------
  * SALARIÉS / PERSONNEL
  * -------------------------------------------------------------
@@ -710,6 +775,8 @@ export async function recordSalaryPayment(data: {
     throw new Error(adminCopy[await getLocale()].server.hr.invalidPaymentInfo);
   }
 
+  await assertDriverPayable(data.employeeId, data.month, data.year);
+
   const payment = await prisma.salaryPayment.upsert({
     where: {
       employeeId_year_month: {
@@ -741,8 +808,19 @@ export async function recordSalaryPayment(data: {
     },
   });
 
+  await syncDriverSalaryPayment({
+    employeeId: data.employeeId,
+    month: data.month,
+    year: data.year,
+    amountXof: data.amountXof,
+    paymentMethod: data.paymentMethod || "VIREMENT",
+    reference: data.reference,
+    paidByName: user.fullName,
+  });
+
   revalidatePath("/hr");
   revalidatePath("/invoices");
+  revalidatePath("/rentals/drivers");
   return payment;
 }
 
@@ -772,6 +850,11 @@ export async function markAllMonthlySalariesPaid(data: {
 
   for (const emp of activeEmployees) {
     if (!emp.baseSalaryXof) continue;
+    try {
+      await assertDriverPayable(emp.id, data.month, data.year);
+    } catch {
+      continue;
+    }
     await prisma.salaryPayment.upsert({
       where: {
         employeeId_year_month: {
@@ -800,9 +883,19 @@ export async function markAllMonthlySalariesPaid(data: {
         paymentDate: new Date(),
       },
     });
+    await syncDriverSalaryPayment({
+      employeeId: emp.id,
+      month: data.month,
+      year: data.year,
+      amountXof: emp.baseSalaryXof,
+      paymentMethod: data.paymentMethod,
+      reference: data.reference,
+      paidByName: user.fullName,
+    });
   }
 
   revalidatePath("/hr");
   revalidatePath("/invoices");
+  revalidatePath("/rentals/drivers");
   return { success: true, count: activeEmployees.length };
 }

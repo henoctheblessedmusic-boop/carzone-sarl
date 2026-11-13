@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
+  isDriverActivityNotificationRole,
   isFullActivityNotificationRole,
   isGarageActivityNotificationRole,
 } from "@/lib/notification-policy";
@@ -9,12 +10,16 @@ import {
 function visibilityFilter(session: { id: string; role: string }) {
   const fullScope = isFullActivityNotificationRole(session.role);
   const garageScope = isGarageActivityNotificationRole(session.role);
-  if (!fullScope && !garageScope) return null;
+  const driverScope = isDriverActivityNotificationRole(session.role);
+  if (!fullScope && !garageScope && !driverScope) return null;
 
+  const scope = fullScope
+    ? { type: { notIn: ["LOGIN_ALERT", "RATE_LIMIT_ALERT"] } }
+    : driverScope
+      ? { type: "DRIVER_PAYMENT" }
+      : { type: "ACTIVITY_GARAGE" };
   return {
-    ...(fullScope
-      ? { type: { notIn: ["LOGIN_ALERT", "RATE_LIMIT_ALERT"] } }
-      : { type: "ACTIVITY_GARAGE" }),
+    ...scope,
     OR: [{ userId: null }, { userId: { not: session.id } }],
   };
 }

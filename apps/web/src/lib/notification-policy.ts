@@ -11,6 +11,12 @@ export const FULL_ACTIVITY_NOTIFICATION_ROLES: readonly Role[] = [
   "ADMIN",
 ];
 
+/** Rôles qui reçoivent les notifications de paiement des chauffeurs. */
+export const DRIVER_ACTIVITY_NOTIFICATION_ROLES: readonly Role[] = [
+  "GESTIONNAIRE_LOCATION",
+  "RH",
+];
+
 /** Rôles qui reçoivent uniquement les notifications du périmètre atelier/GARAGE. */
 export const GARAGE_ACTIVITY_NOTIFICATION_ROLES: readonly Role[] = [
   "COMPTA_GARAGE",
@@ -30,6 +36,10 @@ export function isFullActivityNotificationRole(role: string): boolean {
 
 export function isGarageActivityNotificationRole(role: string): boolean {
   return (GARAGE_ACTIVITY_NOTIFICATION_ROLES as readonly string[]).includes(role);
+}
+
+export function isDriverActivityNotificationRole(role: string): boolean {
+  return (DRIVER_ACTIVITY_NOTIFICATION_ROLES as readonly string[]).includes(role);
 }
 
 export function isGarageScopedRole(role: string): boolean {

@@ -13,7 +13,9 @@ import {
   computeRentalFinancials,
   expectedContractValue,
   findGarageUsers,
+  findDriverPayments,
   findMaintenances,
+  findRentalExpenses,
   findRentalCustomers,
   findRentalRequests,
   findRentalVehicles,
@@ -27,12 +29,14 @@ export default async function RentalContractsPage() {
   const { canManage, canFinance } = rentalAccess(user.role);
   const now = new Date();
 
-  const [rentals, rentalVehicles, customers, maintenances, rentalRequests, vehicleBrands, garageUsers] =
+  const [rentals, rentalVehicles, customers, maintenances, rentalExpenses, driverPayments, rentalRequests, vehicleBrands, garageUsers] =
     await Promise.all([
       findRentals(),
       findRentalVehicles(),
       findRentalCustomers(user.role),
       findMaintenances(),
+      findRentalExpenses(),
+      findDriverPayments(),
       findRentalRequests(),
       findVehicleBrands(),
       findGarageUsers(),
@@ -47,7 +51,7 @@ export default async function RentalContractsPage() {
     totalBalance,
     maintenanceCost,
     netRentalRevenue,
-  } = computeRentalFinancials(rentals, maintenances, now);
+  } = computeRentalFinancials(rentals, maintenances, now, rentalExpenses, driverPayments);
 
   return (
     <AppShell user={user} title="Location - Contrats & proformas">
@@ -75,7 +79,7 @@ export default async function RentalContractsPage() {
           )}
         </div>
 
-        <RentalSectionNav current="contracts" />
+        <RentalSectionNav current="contracts" showDrivers={user.role === "GESTIONNAIRE_LOCATION"} />
 
         {canManage && (
           <RentalActionModals

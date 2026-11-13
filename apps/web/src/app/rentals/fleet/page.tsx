@@ -71,7 +71,7 @@ export default async function RentalFleetPage() {
           )}
         </div>
 
-        <RentalSectionNav current="fleet" />
+        <RentalSectionNav current="fleet" showDrivers={user.role === "GESTIONNAIRE_LOCATION"} />
 
         {canManage && (
           <div className="ox-glass" style={{ padding: "0.8rem 1rem", display: "flex", justifyContent: "flex-end" }}>

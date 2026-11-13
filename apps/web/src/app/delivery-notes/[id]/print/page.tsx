@@ -7,6 +7,7 @@ import { formatXof, formatDate } from "@/lib/format";
 import { getServerMessages } from "@/lib/i18n/server";
 import { deliveryNotesCopy } from "@/lib/i18n/messages/delivery-notes";
 import { PrintButton } from "@/components/PrintButton";
+import { RentalClientDeliveryNote } from "@/components/RentalClientDeliveryNote";
 
 export default async function DeliveryNotePrintPage({
   params,
@@ -22,7 +23,13 @@ export default async function DeliveryNotePrintPage({
     where: { id },
     include: {
       customer: true,
-      rental: true,
+      rental: {
+        include: {
+          vehicle: true,
+          customer: true,
+          payments: { orderBy: { paidAt: "asc" } },
+        },
+      },
       lines: { include: { vehicle: true, partItem: true } },
     },
   });
@@ -30,6 +37,10 @@ export default async function DeliveryNotePrintPage({
   if (!note) notFound();
   if (user.role === "COMPTA_GARAGE" && note.activity !== ACTIVITY.GARAGE) notFound();
   if (user.role === "GESTIONNAIRE_LOCATION" && !note.rentalId) notFound();
+
+  if (note.kind === "CLIENT") {
+    return <RentalClientDeliveryNote note={note} />;
+  }
 
   return (
     <div

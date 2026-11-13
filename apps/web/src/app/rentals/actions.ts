@@ -2,8 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "node:crypto";
-import { nextDocNumber, nextDeliveryNoteNumber } from "@/lib/format";
-import { certifyInvoiceWithMecef } from "@/lib/dgi-emecef";
+import { nextDeliveryNoteNumber } from "@/lib/format";
 import { rentalContractReference } from "@/lib/rental-contract";
 import { requireUser } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
@@ -787,19 +786,16 @@ export async function deleteRentalContract(formData: FormData) {
 
 
 export type RentalTranscriptionResult = {
-  mode: "BL_INTERNE" | "FACTURE_NORMALISEE";
-  invoiceId?: string;
-  invoiceNumber?: string;
+  mode: "BL_INTERNE" | "BL_CLIENT";
   deliveryNoteId: string;
   deliveryNoteNumber: string;
-  certificationMessage: string;
+  message: string;
 };
 
 /**
- * Transcrit un contrat de location en BL interne ou en facture normalisée.
- * La facture de location utilise la même identité fiscale CARZONE et la même
- * certification e-MECeF que les autres factures. En attendant le branchement
- * live, cette première version force le mode démonstration.
+ * Transcrit un contrat de location en BL interne (gestion CARZONE) ou en BL
+ * client (preuve de paiement sans en-tête ni identité fiscale).
+ * Aucune facture normalisée n'est créée depuis la location.
  */
 export async function transcribeRentalContract(formData: FormData): Promise<RentalTranscriptionResult> {
   const user = await requireUser(["GESTIONNAIRE_LOCATION", "COMPTA", "DG", "PDG", "SG"]);
@@ -807,18 +803,23 @@ export async function transcribeRentalContract(formData: FormData): Promise<Rent
 
   const rentalId = String(formData.get("rentalId") || "").trim();
   const mode = String(formData.get("mode") || "").trim();
-  if (mode !== "BL_INTERNE" && mode !== "FACTURE_NORMALISEE") {
-    throw new Error("Mode de transcription invalide.");
+  if (mode !== "BL_INTERNE" && mode !== "BL_CLIENT") {
+    throw new Error("Type de BL invalide.");
   }
 
   const rental = await prisma.rental.findUnique({
     where: { id: rentalId },
-    include: { vehicle: true, customer: true, invoice: true },
+    include: { vehicle: true, customer: true },
   });
   if (!rental) throw new Error("Contrat de location introuvable.");
-  if (rental.invoiceId) throw new Error("Ce contrat possède déjà une facture.");
-  const existingDeliveryNote = await prisma.deliveryNote.findFirst({ where: { rentalId } });
-  if (existingDeliveryNote) throw new Error("Ce contrat possède déjà un BL interne.");
+
+  const existingSameKind = await prisma.deliveryNote.findFirst({
+    where: { rentalId, kind: mode === "BL_CLIENT" ? "CLIENT" : "INTERNE" },
+    select: { id: true },
+  });
+  if (existingSameKind) {
+    throw new Error(mode === "BL_CLIENT" ? "Ce contrat possède déjà un BL client." : "Ce contrat possède déjà un BL interne.");
+  }
 
   const total = rental.totalXof || computeRentalTotal({
     dailyXof: rental.dailyXof || rental.vehicle.rentalDailyXof,
@@ -831,128 +832,264 @@ export async function transcribeRentalContract(formData: FormData): Promise<Rent
   const reference = rentalContractReference(rental.id);
   const vehicleLabel = [rental.vehicle.brand, rental.vehicle.model].filter(Boolean).join(" ");
   const lineDescription = `Location de véhicule ${vehicleLabel} - ${reference} - ${days} jour(s)`;
-  const taxRatePct = 18;
-  const subtotalHtXof = Math.round(total / (1 + taxRatePct / 100));
-  const taxXof = total - subtotalHtXof;
-  const now = new Date();
-
-  if (mode === "BL_INTERNE") {
-    const count = await prisma.deliveryNote.count({ where: { activity: "SHOWROOM" } });
-    const note = await prisma.deliveryNote.create({
-      data: {
-        number: nextDeliveryNoteNumber("SHOWROOM", count),
-        activity: "SHOWROOM",
-        status: "EMIS",
-        customerId: rental.customerId,
-        rentalId: rental.id,
-        vehicleId: null,
-        notes: `BL interne du contrat de location ${reference}`,
-        createdByName: user.fullName,
-        lines: {
-          create: [{
-            description: lineDescription,
-            quantity: 1,
-            unitPriceXof: total,
-          }],
-        },
-      },
-      select: { id: true, number: true },
-    });
-
-    await logAudit({
-      user,
-      action: "rental.transcribe_bl",
-      entityType: "Rental",
-      entityId: rental.id,
-      entityLabel: reference,
-      details: `BL interne ${note.number}`,
-    });
-    revalidatePath("/rentals/contracts");
-    revalidatePath(`/rentals/${rental.id}/contrat`);
-    revalidatePath("/delivery-notes");
-    return {
-      mode,
-      deliveryNoteId: note.id,
-      deliveryNoteNumber: note.number,
-      certificationMessage: "BL interne créé.",
-    };
-  }
-
-  const invoiceCount = await prisma.invoice.count();
-  const invoice = await prisma.invoice.create({
+  const kind = mode === "BL_CLIENT" ? "CLIENT" : "INTERNE";
+  const count = await prisma.deliveryNote.count({ where: { activity: "SHOWROOM" } });
+  const note = await prisma.deliveryNote.create({
     data: {
-      number: nextDocNumber("FAC", invoiceCount),
-      status: "ENVOYEE",
-      kind: "NORMALISEE",
+      number: nextDeliveryNoteNumber("SHOWROOM", count),
+      kind,
       activity: "SHOWROOM",
+      status: "EMIS",
       customerId: rental.customerId,
-      taxMode: "TTC",
-      taxRatePct,
-      subtotalHtXof,
-      taxXof,
-      totalXof: total,
-      dueDate: new Date(Date.now() + 7 * 86400000),
-      notes: `Facture du contrat de location ${reference}`,
-      isDemo: true,
-      certificationMode: "DEMO",
-      cgvType: "VEHICULE",
+      rentalId: rental.id,
+      vehicleId: null,
+      notes: kind === "CLIENT"
+        ? `BL client du contrat de location ${reference}`
+        : `BL interne du contrat de location ${reference}`,
+      createdByName: user.fullName,
+      lines: {
+        create: [{
+          description: lineDescription,
+          quantity: 1,
+          unitPriceXof: total,
+        }],
+      },
     },
     select: { id: true, number: true },
   });
 
-  await prisma.rental.update({ where: { id: rental.id }, data: { invoiceId: invoice.id } });
-
-  let deliveryNoteId: string | null = null;
-  let deliveryNoteNumber: string | null = null;
-  try {
-    const count = await prisma.deliveryNote.count({ where: { activity: "SHOWROOM" } });
-    const note = await prisma.deliveryNote.create({
-      data: {
-        number: nextDeliveryNoteNumber("SHOWROOM", count),
-        activity: "SHOWROOM",
-        status: "EMIS",
-        customerId: rental.customerId,
-        invoiceId: invoice.id,
-        rentalId: rental.id,
-        notes: `BL interne de la facture ${invoice.number} - contrat ${reference}`,
-        createdByName: user.fullName,
-        lines: { create: [{ description: lineDescription, quantity: 1, unitPriceXof: total }] },
-      },
-      select: { id: true, number: true },
-    });
-    deliveryNoteId = note.id;
-    deliveryNoteNumber = note.number;
-  } catch (error) {
-    console.error("BL de facture location non créé:", error);
-  }
-
-  let certificationMessage = "Facture normalisée créée.";
-  try {
-    const certification = await certifyInvoiceWithMecef(invoice.id, { forceDemo: true });
-    certificationMessage = certification.message;
-  } catch (error) {
-    certificationMessage = error instanceof Error ? error.message : "Certification DGI non aboutie.";
-  }
-
   await logAudit({
     user,
-    action: "rental.transcribe_invoice",
+    action: kind === "CLIENT" ? "rental.transcribe_bl_client" : "rental.transcribe_bl_interne",
     entityType: "Rental",
     entityId: rental.id,
     entityLabel: reference,
-    details: `Facture normalisée ${invoice.number} en mode démonstration`,
+    details: `${kind === "CLIENT" ? "BL client" : "BL interne"} ${note.number}`,
   });
   revalidatePath("/rentals/contracts");
   revalidatePath(`/rentals/${rental.id}/contrat`);
-  revalidatePath("/invoices");
   revalidatePath("/delivery-notes");
 
   return {
     mode,
-    invoiceId: invoice.id,
-    invoiceNumber: invoice.number,
-    deliveryNoteId: deliveryNoteId || "",
-    deliveryNoteNumber: deliveryNoteNumber || "",
-    certificationMessage,
+    deliveryNoteId: note.id,
+    deliveryNoteNumber: note.number,
+    message: kind === "CLIENT" ? "BL client créé." : "BL interne créé.",
   };
+}
+
+
+const RECEIPT_MAX_BYTES = 4 * 1024 * 1024;
+const RECEIPT_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+
+async function nextGeneralExpenseNumber(): Promise<string> {
+  const year = new Date().getFullYear();
+  const count = await prisma.expense.count();
+  return `DEP-${year}-${String(count + 1).padStart(3, "0")}`;
+}
+
+function periodFromMonth(value: string): { period: string; month: number; year: number } | null {
+  const match = value.trim().match(/^(\d{4})-(\d{2})$/);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  if (month < 1 || month > 12) return null;
+  return { period: `${match[1]}-${match[2]}`, month, year };
+}
+
+/** Dépense simple du parc locatif : carburant ou autre frais, avec reçu optionnel. */
+export async function recordRentalExpense(formData: FormData): Promise<void> {
+  const user = await requireUser(["GESTIONNAIRE_LOCATION", "COMPTA", "DG", "PDG", "SG"]);
+  requireManager(user.role);
+
+  const vehicleId = String(formData.get("vehicleId") || "").trim();
+  const type = String(formData.get("type") || "CARBURANT").trim().toUpperCase();
+  const amountXof = Math.round(Number(formData.get("amountXof") || 0));
+  const description = String(formData.get("description") || "").trim() || null;
+  const dateRaw = String(formData.get("expenseDate") || "").trim();
+  const expenseDate = dateRaw ? new Date(`${dateRaw}T12:00:00.000Z`) : new Date();
+  if (!vehicleId) throw new Error("Sélectionnez le véhicule concerné.");
+  if (!["CARBURANT", "AUTRE"].includes(type)) throw new Error("Type de dépense invalide.");
+  if (!Number.isFinite(amountXof) || amountXof <= 0) throw new Error("Le montant de la dépense doit être supérieur à zéro.");
+  if (Number.isNaN(expenseDate.getTime())) throw new Error("Date de dépense invalide.");
+
+  const vehicle = await prisma.vehicle.findUnique({
+    where: { id: vehicleId },
+    select: { id: true, brand: true, model: true, fleetType: true },
+  });
+  if (!vehicle || vehicle.fleetType !== "RENTAL") throw new Error("Ce véhicule n'appartient pas au parc locatif.");
+
+  let receiptBytes: Buffer | null = null;
+  let receiptFileName: string | null = null;
+  let receiptMimeType: string | null = null;
+  const receipt = formData.get("receipt");
+  if (receipt instanceof File && receipt.size > 0) {
+    if (receipt.size > RECEIPT_MAX_BYTES) throw new Error("Le reçu dépasse la taille maximale de 4 Mo.");
+    if (!RECEIPT_MIME_TYPES.includes(receipt.type)) throw new Error("Le reçu doit être une image ou un PDF.");
+    receiptBytes = Buffer.from(await receipt.arrayBuffer());
+    receiptFileName = receipt.name.slice(0, 180);
+    receiptMimeType = receipt.type;
+  }
+
+  const label = type === "CARBURANT" ? "Carburant" : "Dépense location";
+  const expenseNumber = await nextGeneralExpenseNumber();
+  const expense = await prisma.expense.create({
+    data: {
+      expenseNumber,
+      category: type === "CARBURANT" ? "CARBURANT" : "AUTRE",
+      title: `${label} - ${vehicle.brand} ${vehicle.model}`,
+      description,
+      supplierName: "Parc de location CARZONE",
+      amountHtXof: amountXof,
+      amountTtcXof: amountXof,
+      status: "PAYE",
+      paymentMethod: "ESPECES",
+      paymentDate: expenseDate,
+      serviceDate: expenseDate,
+      registeredBy: user.fullName,
+    },
+    select: { id: true },
+  });
+
+  await prisma.rentalExpense.create({
+    data: {
+      vehicleId,
+      type,
+      description,
+      amountXof,
+      expenseDate,
+      receiptBytes,
+      receiptFileName,
+      receiptMimeType,
+      expenseId: expense.id,
+      createdByName: user.fullName,
+    },
+  });
+
+  await logAudit({
+    user,
+    action: "rental.expense_create",
+    entityType: "Vehicle",
+    entityId: vehicleId,
+    entityLabel: `${vehicle.brand} ${vehicle.model}`,
+    details: `${label} ${amountXof.toLocaleString("fr-BJ")} FCFA`,
+  });
+  revalidatePath("/rentals/maintenance");
+  revalidatePath("/rentals/contracts");
+  revalidatePath("/dashboard");
+}
+
+export async function deleteRentalExpense(formData: FormData): Promise<void> {
+  const user = await requireUser(["GESTIONNAIRE_LOCATION", "DG", "PDG", "SG"]);
+  requireManager(user.role);
+  const id = String(formData.get("id") || "").trim();
+  if (!id) throw new Error("Dépense introuvable.");
+  const expense = await prisma.rentalExpense.findUnique({ where: { id }, select: { id: true, expenseId: true } });
+  if (!expense) throw new Error("Dépense introuvable.");
+  await prisma.$transaction(async (tx) => {
+    await tx.rentalExpense.delete({ where: { id } });
+    if (expense.expenseId) await tx.expense.delete({ where: { id: expense.expenseId } }).catch(() => undefined);
+  });
+  await logAudit({
+    user,
+    action: "rental.expense_delete",
+    entityType: "RentalExpense",
+    entityId: id,
+    details: "Suppression d'une dépense location",
+  });
+  revalidatePath("/rentals/maintenance");
+  revalidatePath("/dashboard");
+}
+
+/** Paiement d'un chauffeur, visible dans la location et dans les RH. */
+export async function recordDriverPayment(formData: FormData): Promise<void> {
+  const user = await requireUser(["GESTIONNAIRE_LOCATION", "COMPTA", "DG", "PDG", "SG"]);
+  requireManager(user.role);
+  const employeeId = String(formData.get("employeeId") || "").trim();
+  const periodInput = String(formData.get("period") || "").trim();
+  const period = periodFromMonth(periodInput);
+  const amountXof = Math.round(Number(formData.get("amountXof") || 0));
+  const method = String(formData.get("method") || "ESPECES").trim().toUpperCase();
+  const reference = String(formData.get("reference") || "").trim() || null;
+  const notes = String(formData.get("notes") || "").trim() || null;
+  if (!employeeId || !period) throw new Error("Sélectionnez un chauffeur et une période valides.");
+  if (!Number.isFinite(amountXof) || amountXof <= 0) throw new Error("Le montant payé doit être supérieur à zéro.");
+
+  const employee = await prisma.employee.findFirst({
+    where: {
+      id: employeeId,
+      status: "ACTIF",
+      OR: [{ isDriver: true }, { jobTitle: { contains: "chauffeur", mode: "insensitive" } }],
+    },
+    select: { id: true, firstName: true, lastName: true, employeeNumber: true },
+  });
+  if (!employee) throw new Error("Ce salarié n'est pas déclaré comme chauffeur.");
+  const existing = await prisma.driverPayment.findUnique({
+    where: { employeeId_period: { employeeId, period: period.period } },
+    select: { id: true, amountXof: true, source: true },
+  });
+  if (existing) {
+    throw new Error(`Ce chauffeur est déjà payé pour ${period.period} (${existing.source}, ${existing.amountXof.toLocaleString("fr-BJ")} FCFA).`);
+  }
+
+  const expenseNumber = await nextGeneralExpenseNumber();
+  const employeeName = `${employee.firstName} ${employee.lastName}`;
+  const result = await prisma.$transaction(async (tx) => {
+    const expense = await tx.expense.create({
+      data: {
+        expenseNumber,
+        category: "PAIEMENT_CHAUFFEUR",
+        title: `Paiement chauffeur ${employeeName} - ${period.period}`,
+        description: notes,
+        supplierName: employeeName,
+        amountHtXof: amountXof,
+        amountTtcXof: amountXof,
+        status: "PAYE",
+        paymentMethod: method,
+        paymentReference: reference,
+        paymentDate: new Date(),
+        serviceDate: new Date(),
+        registeredBy: user.fullName,
+      },
+      select: { id: true },
+    });
+    const payment = await tx.driverPayment.create({
+      data: {
+        employeeId,
+        period: period.period,
+        amountXof,
+        method,
+        reference,
+        notes,
+        source: "LOCATION",
+        createdByName: user.fullName,
+        expenseId: expense.id,
+      },
+      select: { id: true },
+    });
+    await tx.adminNotification.create({
+      data: {
+        type: "DRIVER_PAYMENT",
+        title: "Chauffeur payé par la location",
+        message: `${employeeName} (${employee.employeeNumber}) a été payé pour ${period.period} : ${amountXof.toLocaleString("fr-BJ")} FCFA.`,
+        userName: user.fullName,
+        newValue: `${amountXof} FCFA`,
+      },
+    });
+    return { expenseId: expense.id, paymentId: payment.id };
+  });
+
+  await logAudit({
+    user,
+    action: "rental.driver_payment",
+    entityType: "Employee",
+    entityId: employeeId,
+    entityLabel: employeeName,
+    details: `Paiement ${period.period} : ${amountXof.toLocaleString("fr-BJ")} FCFA`,
+  });
+  revalidatePath("/rentals/drivers");
+  revalidatePath("/rentals/contracts");
+  revalidatePath("/rentals/maintenance");
+  revalidatePath("/hr");
+  revalidatePath("/dashboard");
 }

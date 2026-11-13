@@ -2,25 +2,25 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { FileText, Loader2, Truck } from "lucide-react";
+import { FileText, Loader2, Receipt, Truck } from "lucide-react";
 import { transcribeRentalContract, type RentalTranscriptionResult } from "./actions";
 
 type ExistingDocument = { id: string; number: string };
 
 export function RentalBillingActions({
   rentalId,
-  existingInvoice,
-  existingDeliveryNote,
+  existingInternal,
+  existingClient,
 }: {
   rentalId: string;
-  existingInvoice: ExistingDocument | null;
-  existingDeliveryNote: ExistingDocument | null;
+  existingInternal: ExistingDocument | null;
+  existingClient: ExistingDocument | null;
 }) {
   const [result, setResult] = useState<RentalTranscriptionResult | null>(null);
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
 
-  function transcribe(mode: "BL_INTERNE" | "FACTURE_NORMALISEE") {
+  function transcribe(mode: "BL_INTERNE" | "BL_CLIENT") {
     setError("");
     startTransition(async () => {
       try {
@@ -29,53 +29,48 @@ export function RentalBillingActions({
         formData.set("mode", mode);
         setResult(await transcribeRentalContract(formData));
       } catch (err) {
-        setError(err instanceof Error ? err.message : "La transcription a échoué.");
+        setError(err instanceof Error ? err.message : "La création du BL a échoué.");
       }
     });
   }
 
-  const invoice = result?.invoiceId
-    ? { id: result.invoiceId, number: result.invoiceNumber || "" }
-    : existingInvoice;
-  const deliveryNote = result?.deliveryNoteId
-    ? { id: result.deliveryNoteId, number: result.deliveryNoteNumber || "" }
-    : existingDeliveryNote;
+  const createdInternal = result?.mode === "BL_INTERNE" ? { id: result.deliveryNoteId, number: result.deliveryNoteNumber } : null;
+  const createdClient = result?.mode === "BL_CLIENT" ? { id: result.deliveryNoteId, number: result.deliveryNoteNumber } : null;
+  const internal = createdInternal || existingInternal;
+  const client = createdClient || existingClient;
 
   return (
     <section className="ox-glass" style={{ padding: "1rem 1.2rem", display: "grid", gap: 10 }}>
       <div>
-        <strong>Facturation du contrat</strong>
+        <strong>Documents du contrat</strong>
         <div style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: 2 }}>
-          Le BL interne et la facture normalisée utilisent les mêmes informations CARZONE. La facture est générée en mode démonstration e-MECeF.
+          Le BL interne sert au suivi CARZONE. Le BL client est une preuve de paiement professionnelle, sans en-tête ni identité fiscale CARZONE.
         </div>
       </div>
 
-      {invoice || deliveryNote ? (
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {invoice && (
-            <Link href={`/invoices/${invoice.id}/print`} className="ox-btn ox-btn-primary ox-btn-sm" target="_blank">
-              <FileText size={15} /> Facture normalisée {invoice.number}
-            </Link>
-          )}
-          {deliveryNote && (
-            <Link href={`/delivery-notes/${deliveryNote.id}/print`} className="ox-btn ox-btn-ghost ox-btn-sm" target="_blank">
-              <Truck size={15} /> BL interne {deliveryNote.number}
-            </Link>
-          )}
-        </div>
-      ) : (
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button type="button" className="ox-btn ox-btn-primary ox-btn-sm" onClick={() => transcribe("FACTURE_NORMALISEE")} disabled={isPending}>
-            {isPending ? <Loader2 size={15} className="ox-spin" /> : <FileText size={15} />} Facture normalisée démo
-          </button>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {internal ? (
+          <Link href={`/delivery-notes/${internal.id}/print`} className="ox-btn ox-btn-ghost ox-btn-sm" target="_blank">
+            <Truck size={15} /> BL interne {internal.number}
+          </Link>
+        ) : (
           <button type="button" className="ox-btn ox-btn-ghost ox-btn-sm" onClick={() => transcribe("BL_INTERNE")} disabled={isPending}>
-            {isPending ? <Loader2 size={15} className="ox-spin" /> : <Truck size={15} />} BL interne
+            {isPending ? <Loader2 size={15} className="ox-spin" /> : <Truck size={15} />} Créer le BL interne
           </button>
-        </div>
-      )}
+        )}
+        {client ? (
+          <Link href={`/delivery-notes/${client.id}/print`} className="ox-btn ox-btn-primary ox-btn-sm" target="_blank">
+            <Receipt size={15} /> BL client {client.number}
+          </Link>
+        ) : (
+          <button type="button" className="ox-btn ox-btn-primary ox-btn-sm" onClick={() => transcribe("BL_CLIENT")} disabled={isPending}>
+            {isPending ? <Loader2 size={15} className="ox-spin" /> : <FileText size={15} />} Créer le BL client
+          </button>
+        )}
+      </div>
 
-      {result?.certificationMessage ? (
-        <div style={{ fontSize: "0.78rem", color: "var(--success-fg)" }}>{result.certificationMessage}</div>
+      {result?.message ? (
+        <div style={{ fontSize: "0.78rem", color: "var(--success-fg)" }}>{result.message}</div>
       ) : null}
       {error ? (
         <div role="alert" style={{ padding: "8px 10px", borderRadius: 8, background: "var(--danger-soft)", color: "var(--danger-fg)", fontSize: "0.8rem" }}>

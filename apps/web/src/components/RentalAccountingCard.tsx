@@ -49,9 +49,9 @@ export function RentalAccountingCard({
           <div className="ox-kpi-hint">Sur les contrats en cours</div>
         </div>
         <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--warning)" }}>
-          <div className="ox-kpi-label">Entretien &amp; garage</div>
+          <div className="ox-kpi-label">Dépenses location</div>
           <div className="ox-kpi-value">{formatXof(values.maintenanceCost)}</div>
-          <div className="ox-kpi-hint">Charges d&apos;entretien du parc</div>
+          <div className="ox-kpi-hint">Entretien, carburant et chauffeurs</div>
         </div>
         <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--purple)" }}>
           <div className="ox-kpi-label">Bénéfice net location</div>

@@ -1,7 +1,7 @@
 import { AppShell } from "@/components/AppShell";
 import { requireUser } from "@/lib/require-user";
 import { formatXof } from "@/lib/format";
-import { updateRentalMaintenanceStatus } from "../actions";
+import { deleteRentalExpense, recordRentalExpense, updateRentalMaintenanceStatus } from "../actions";
 import { RentalActionModals } from "../RentalActionModals";
 import { RentalSectionNav } from "../_shared/RentalSectionNav";
 import { STATUS_LABEL } from "../_shared/labels";
@@ -10,6 +10,7 @@ import {
   findGarageUsers,
   findMaintenances,
   findRentalCustomers,
+  findRentalExpenses,
   findRentalVehicles,
   findRentals,
   findVehicleBrands,
@@ -20,11 +21,12 @@ export default async function RentalMaintenancePage() {
   const user = await requireUser([...RENTAL_ROLES]);
   const { canManage } = rentalAccess(user.role);
 
-  const [rentals, rentalVehicles, customers, maintenances, vehicleBrands, garageUsers] = await Promise.all([
+  const [rentals, rentalVehicles, customers, maintenances, rentalExpenses, vehicleBrands, garageUsers] = await Promise.all([
     findRentals(),
     findRentalVehicles(),
     findRentalCustomers(user.role),
     findMaintenances(),
+    findRentalExpenses(),
     findVehicleBrands(),
     findGarageUsers(),
   ]);
@@ -32,6 +34,8 @@ export default async function RentalMaintenancePage() {
   const activeRentals = rentals.filter((rental) => rental.status === "ACTIF");
   const availableVehicles = rentalVehicles.filter((vehicle) => vehicle.rentalStatus === "DISPONIBLE");
   const maintenanceCost = maintenances.reduce((sum, item) => sum + item.costXof, 0);
+  const expenseCost = rentalExpenses.reduce((sum, item) => sum + item.amountXof, 0);
+  const totalExpenseCost = maintenanceCost + expenseCost;
   const ongoingCount = maintenances.filter((item) => item.status === "EN_COURS").length;
   const plannedCount = maintenances.filter((item) => item.status === "PLANIFIE").length;
   const immobilizedCount = rentalVehicles.filter((vehicle) => vehicle.rentalStatus === "MAINTENANCE").length;
@@ -62,7 +66,7 @@ export default async function RentalMaintenancePage() {
           )}
         </div>
 
-        <RentalSectionNav current="maintenance" />
+        <RentalSectionNav current="maintenance" showDrivers={user.role === "GESTIONNAIRE_LOCATION"} />
 
         {canManage && (
           <RentalActionModals
@@ -84,9 +88,9 @@ export default async function RentalMaintenancePage() {
 
         <div className="ox-kpi-grid">
           <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--warning)" }}>
-            <div className="ox-kpi-label">Coût d&apos;entretien</div>
-            <div className="ox-kpi-value">{formatXof(maintenanceCost)}</div>
-            <div className="ox-kpi-hint">Charges cumulées du parc</div>
+            <div className="ox-kpi-label">Dépenses du parc</div>
+            <div className="ox-kpi-value">{formatXof(totalExpenseCost)}</div>
+            <div className="ox-kpi-hint">Entretien, carburant et frais simples</div>
           </div>
           <div className="ox-kpi-card" style={{ borderLeft: "4px solid var(--info)" }}>
             <div className="ox-kpi-label">Interventions</div>
@@ -154,6 +158,99 @@ export default async function RentalMaintenancePage() {
                           <span style={{ opacity: 0.65, fontSize: "0.78rem" }}>Consultation comptable</span>
                         )}
                       </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        <div className="ox-glass" style={{ padding: "1rem 1.2rem", display: "grid", gap: 12 }}>
+          <div>
+            <strong>Dépenses simples du parc</strong>
+            <p style={{ margin: "4px 0 0", opacity: 0.7, fontSize: "0.84rem" }}>
+              Carburant, petits frais et justificatifs. Ces dépenses entrent dans la comptabilité location et dans les dépenses générales.
+            </p>
+          </div>
+          {canManage && (
+            <form action={recordRentalExpense} encType="multipart/form-data" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 8, alignItems: "end" }}>
+              <label style={{ display: "grid", gap: 4, fontSize: "0.78rem" }}>
+                Véhicule
+                <select name="vehicleId" className="ox-select" required defaultValue="">
+                  <option value="" disabled>Sélectionner</option>
+                  {rentalVehicles.map((vehicle) => (
+                    <option key={vehicle.id} value={vehicle.id}>{vehicle.brand} {vehicle.model}{vehicle.registrationNumber ? ` (${vehicle.registrationNumber})` : ""}</option>
+                  ))}
+                </select>
+              </label>
+              <label style={{ display: "grid", gap: 4, fontSize: "0.78rem" }}>
+                Type
+                <select name="type" className="ox-select" defaultValue="CARBURANT">
+                  <option value="CARBURANT">Carburant</option>
+                  <option value="AUTRE">Autre dépense</option>
+                </select>
+              </label>
+              <label style={{ display: "grid", gap: 4, fontSize: "0.78rem" }}>
+                Montant (FCFA)
+                <input name="amountXof" type="number" min="1" className="ox-input" required placeholder="Ex. 25000" />
+              </label>
+              <label style={{ display: "grid", gap: 4, fontSize: "0.78rem" }}>
+                Date
+                <input name="expenseDate" type="date" className="ox-input" defaultValue={new Date().toISOString().slice(0, 10)} required />
+              </label>
+              <label style={{ display: "grid", gap: 4, fontSize: "0.78rem" }}>
+                Description
+                <input name="description" className="ox-input" placeholder="Ex. Plein du véhicule" />
+              </label>
+              <label style={{ display: "grid", gap: 4, fontSize: "0.78rem" }}>
+                Reçu (image ou PDF)
+                <input name="receipt" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="ox-input" />
+              </label>
+              <button type="submit" className="ox-btn ox-btn-primary">Enregistrer la dépense</button>
+            </form>
+          )}
+          {rentalExpenses.length === 0 ? (
+            <div style={{ padding: "1rem", textAlign: "center", opacity: 0.65, fontSize: "0.86rem" }}>
+              Aucune dépense simple enregistrée.
+            </div>
+          ) : (
+            <div className="ox-table-wrap">
+              <table className="ox-table" style={{ fontSize: "0.82rem" }}>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Véhicule</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Reçu</th>
+                    <th>Montant</th>
+                    {canManage ? <th /> : null}
+                  </tr>
+                </thead>
+                <tbody>
+                  {rentalExpenses.map((expense) => (
+                    <tr key={expense.id}>
+                      <td>{expense.expenseDate.toLocaleDateString("fr-BJ")}</td>
+                      <td>{expense.vehicle.brand} {expense.vehicle.model}{expense.vehicle.registrationNumber ? ` (${expense.vehicle.registrationNumber})` : ""}</td>
+                      <td>{expense.type === "CARBURANT" ? "Carburant" : "Autre"}</td>
+                      <td>{expense.description || "-"}</td>
+                      <td>
+                        {expense.receiptFileName ? (
+                          <a href={`/api/rental-expenses/${expense.id}/receipt`} target="_blank" rel="noopener noreferrer" style={{ color: "var(--info-fg)", textDecoration: "underline" }}>
+                            Voir le reçu
+                          </a>
+                        ) : "-"}
+                      </td>
+                      <td>{formatXof(expense.amountXof)}</td>
+                      {canManage ? (
+                        <td>
+                          <form action={deleteRentalExpense}>
+                            <input type="hidden" name="id" value={expense.id} />
+                            <button type="submit" className="ox-btn ox-btn-ghost ox-btn-sm">Supprimer</button>
+                          </form>
+                        </td>
+                      ) : null}
                     </tr>
                   ))}
                 </tbody>

@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "6mb",
+    },
+  },
   outputFileTracingIncludes: {
     "/api/mobile/apk": ["./private/mobile/**/*.apk"],
   },

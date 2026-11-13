@@ -20,7 +20,7 @@ export default async function InvoicePrintPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const user = await requireUser(["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE", "ADMIN", "GESTIONNAIRE_LOCATION"]);
+  const user = await requireUser(["DG", "COMMERCIAL", "COMPTA", "COMPTA_GARAGE", "ADMIN"]);
   const { locale } = await getServerMessages();
   const copy = invoicesCopy[locale];
   const { id } = await params;
@@ -43,8 +43,6 @@ export default async function InvoicePrintPage({
 
   if (!invoice) notFound();
   if (user.role === "COMPTA_GARAGE" && invoice.activity !== ACTIVITY.GARAGE) notFound();
-  // Le gestionnaire de location ne peut ouvrir que les factures issues d'un de ses contrats.
-  if (user.role === "GESTIONNAIRE_LOCATION" && !invoice.rental) notFound();
 
   const totalPaid = invoice.payments.reduce((s, p) => s + p.amountXof, 0);
   const balanceDue = Math.max(0, invoice.totalXof - totalPaid);

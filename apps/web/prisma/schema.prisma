@@ -399,6 +399,7 @@ model Vehicle {
   rentals       Rental[]
   rentalRequests RentalRequest[]
   rentalMaintenances RentalMaintenance[]
+  rentalExpenses RentalExpense[]
   workOrders      WorkOrder[]
   fleetLinks      FleetVehicle[]
   importOrderId   String?
@@ -623,6 +624,8 @@ model Rental {
   createdByName      String?
   payments           RentalPayment[]
   maintenances       RentalMaintenance[]
+  expenses           RentalExpense[]
+  driverPayments     DriverPayment[]
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 }
@@ -1081,7 +1084,11 @@ model Employee {
   bankName          String?            // Banque (BOA, Ecobank, etc.)
   bankAccountNumber String?            // N° compte bancaire
   notes             String?
+  /// Marque un salarié pouvant être sélectionné comme chauffeur location.
+  isDriver          Boolean            @default(false)
   user              User?
+  driverPayments    DriverPayment[]
+  rentalExpenses    RentalExpense[]
   leaveRequests     LeaveRequest[]
   leaveBalances     LeaveBalance[]
   documents         EmployeeDocument[]
@@ -1216,6 +1223,8 @@ model Expense {
   siteId           String?
   site             Site?     @relation(fields: [siteId], references: [id])
   registeredBy     String?   // Utilisateur qui a saisi la dépense
+  driverPayments   DriverPayment[]
+  rentalExpenses   RentalExpense[]
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 }
@@ -1583,6 +1592,8 @@ model LoginAttempt {
 model DeliveryNote {
   id              String             @id @default(cuid())
   number          String             @unique
+  /// INTERNE = document de gestion CARZONE ; CLIENT = preuve de paiement sans en-tête fiscal.
+  kind            String             @default("INTERNE")
   /// SHOWROOM | GARAGE - détermine la séquence de numérotation (BL-SHW- / BL-GAR-)
   activity        String
   status          String             @default("EMIS")
@@ -1625,3 +1636,54 @@ model DeliveryNoteLine {
 }
 
 
+
+
+/// Dépense simple du parc locatif : carburant, paiement chauffeur, autre.
+model RentalExpense {
+  id              String   @id @default(cuid())
+  vehicleId       String
+  vehicle         Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  rentalId        String?
+  rental          Rental?  @relation(fields: [rentalId], references: [id], onDelete: SetNull)
+  driverId        String?
+  driver          Employee? @relation(fields: [driverId], references: [id], onDelete: SetNull)
+  type            String   @default("CARBURANT") // CARBURANT | CHAUFFEUR | AUTRE
+  description     String?
+  amountXof       Int
+  expenseDate     DateTime @default(now())
+  receiptFileName String?
+  receiptMimeType String?
+  receiptBytes    Bytes?
+  expenseId       String?   @unique
+  expense         Expense?  @relation(fields: [expenseId], references: [id], onDelete: SetNull)
+  createdByName   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([vehicleId, expenseDate])
+  @@index([type, expenseDate])
+}
+
+/// Paiement d'un chauffeur, partagé entre la location et les RH.
+model DriverPayment {
+  id            String    @id @default(cuid())
+  employeeId    String
+  employee      Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  rentalId      String?
+  rental        Rental?   @relation(fields: [rentalId], references: [id], onDelete: SetNull)
+  period        String    // AAAA-MM
+  amountXof     Int
+  method        String    @default("ESPECES")
+  reference     String?
+  notes         String?
+  source        String    @default("LOCATION") // LOCATION | RH
+  paidAt        DateTime  @default(now())
+  createdByName String?
+  expenseId     String?   @unique
+  expense       Expense?  @relation(fields: [expenseId], references: [id], onDelete: SetNull)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([employeeId, period])
+  @@index([period, paidAt])
+}

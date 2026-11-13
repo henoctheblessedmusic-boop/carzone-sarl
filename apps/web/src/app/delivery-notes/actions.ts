@@ -16,6 +16,7 @@ const DELIVERY_NOTE_ROLES = [
   "RF",
   "COMPTA",
   "COMPTA_GARAGE",
+  "ASSISTANTE_COMPTABLE",
   "ADMIN",
 ] as const;
 

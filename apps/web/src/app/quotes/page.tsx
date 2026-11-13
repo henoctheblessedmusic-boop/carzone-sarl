@@ -25,7 +25,7 @@ export default async function QuotesPage() {
   const isGarageScope = scope === ACTIVITY.GARAGE;
   const customerScopeFilter = customerScopeFilterForRole(user.role);
 
-  const [rawQuotes, customers, articles, vehicles, opps, parts, vehicleBrands] = await Promise.all([
+  const [rawQuotes, customers, articles, vehicles, opps, parts, vehicleBrands, customArticles] = await Promise.all([
     prisma.quote.findMany({
       where: user.role === "COMPTA_GARAGE" ? { activity: ACTIVITY.GARAGE } : undefined,
       include: {
@@ -130,6 +130,13 @@ export default async function QuotesPage() {
           },
         })
       : Promise.resolve([]),
+    isGarageScope
+      ? prisma.garageCustomArticle.findMany({
+          where: { active: true },
+          orderBy: [{ updatedAt: "desc" }],
+          select: { id: true, designation: true, unitPriceXof: true },
+        })
+      : Promise.resolve([]),
   ]);
 
   // Trier les véhicules pour que le Stock Showroom apparaisse en premier, puis Au Port, En Transit, etc.
@@ -215,6 +222,15 @@ export default async function QuotesPage() {
         opportunities={opps}
         userRole={user.role}
         scope={scope}
+        customArticles={customArticles.map((article) => ({
+          id: article.id,
+          name: article.designation,
+          category: "HISTORIQUE",
+          unitPriceXof: article.unitPriceXof,
+          taxRatePct: 0,
+          unit: "U",
+          description: "Article historisé",
+        }))}
       />
     </AppShell>
   );

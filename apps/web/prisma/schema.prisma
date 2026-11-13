@@ -1687,3 +1687,18 @@ model DriverPayment {
   @@unique([employeeId, period])
   @@index([period, paidAt])
 }
+
+
+/// Article libre historisé par la comptable garage pour les proformas atelier.
+model GarageCustomArticle {
+  id              String   @id @default(cuid())
+  designation     String
+  unitPriceXof    Int
+  defaultQuantity Int      @default(1)
+  active          Boolean  @default(true)
+  createdByName   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([designation])
+}

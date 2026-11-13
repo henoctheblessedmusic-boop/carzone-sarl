@@ -25,7 +25,7 @@ import {
   type DiscountType,
 } from "@/lib/quote-discount";
 import { formatLegalAmountNotice } from "@/lib/number-to-words-fr";
-import { createProformaWithLines } from "./actions";
+import { createGarageCustomArticle, createProformaWithLines } from "./actions";
 
 export type CustomerOption = {
   id: string;
@@ -103,6 +103,7 @@ export function QuoteCreator({
   vehicleBrands = [],
   opportunities,
   scope = "SHOWROOM",
+  customArticles = [],
   onCreated,
 }: {
   customers: CustomerOption[];
@@ -112,6 +113,7 @@ export function QuoteCreator({
   vehicleBrands?: VehicleBrandOption[];
   opportunities: OpportunityOption[];
   scope?: "SHOWROOM" | "GARAGE";
+  customArticles?: ArticleOption[];
   onCreated?: () => void;
 }) {
   const { locale } = usePrefs();
@@ -207,6 +209,15 @@ export function QuoteCreator({
   const [selectedArticleId, setSelectedArticleId] = useState("");
   const [selectedVehicleId, setSelectedVehicleId] = useState("");
 
+  // Articles libres historisés par le garage
+  const [customArticleList, setCustomArticleList] = useState<ArticleOption[]>(customArticles);
+  const [freeDesignation, setFreeDesignation] = useState("");
+  const [freeUnitPrice, setFreeUnitPrice] = useState("");
+  const [freeQuantity, setFreeQuantity] = useState("1");
+  const [isSavingArticle, setIsSavingArticle] = useState(false);
+  const [articleFeedback, setArticleFeedback] = useState("");
+  const articleCatalog = [...articles, ...customArticleList.filter((item) => !articles.some((article) => article.id === item.id))];
+
   // Real-time tax and discount computation
   const grossTotal = lines.reduce((s, l) => s + (l.quantity || 0) * (l.unitPriceXof || 0), 0);
   const discountAmount = calculateDiscountAmount(grossTotal, {
@@ -218,6 +229,12 @@ export function QuoteCreator({
     taxMode,
     taxRatePct,
     discountXof: discountAmount,
+  });
+  const freeGrossTotal = Math.max(0, (Number(freeQuantity) || 0) * (Number(freeUnitPrice) || 0));
+  const freeTotals = computeTaxTotals({
+    lineTotalXof: freeGrossTotal,
+    taxMode,
+    taxRatePct,
   });
 
   function triggerActionFeedback(msg: string, lineId?: string) {
@@ -413,9 +430,44 @@ export function QuoteCreator({
     setError(null);
   }
 
-  function handleSelectArticle(articleId: string) {
+  async function handleSaveCustomArticle() {
+      const designation = freeDesignation.trim();
+      const unitPriceXof = Math.round(Number(freeUnitPrice) || 0);
+      const quantity = Math.max(1, Math.round(Number(freeQuantity) || 1));
+      if (!designation) {
+        setError("Saisissez la désignation du nouvel article.");
+        return;
+      }
+      if (unitPriceXof <= 0) {
+        setError("Saisissez un prix unitaire supérieur à zéro.");
+        return;
+      }
+      setError(null);
+      setIsSavingArticle(true);
+      try {
+        const saved = await createGarageCustomArticle({ designation, unitPriceXof, defaultQuantity: quantity });
+        setCustomArticleList((prev) => [...prev.filter((item) => item.id !== saved.id), saved]);
+        addOrIncrementLine({
+          description: saved.name,
+          quantity,
+          unitPriceXof: saved.unitPriceXof,
+          title: saved.name,
+          lineType: "FREE",
+        });
+        setArticleFeedback(`Article enregistré et ajouté : ${saved.name}`);
+        setFreeDesignation("");
+        setFreeUnitPrice("");
+        setFreeQuantity("1");
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Impossible d'enregistrer l'article.");
+      } finally {
+        setIsSavingArticle(false);
+      }
+    }
+
+    function handleSelectArticle(articleId: string) {
     if (!articleId) return;
-    const art = articles.find((a) => a.id === articleId);
+    const art = articleCatalog.find((a) => a.id === articleId);
     if (!art) return;
     const desc = art.name + (art.description ? ` · ${art.description}` : "");
     const existing = lines.find((l) => l.description.trim().toLowerCase() === desc.trim().toLowerCase());
@@ -615,7 +667,7 @@ export function QuoteCreator({
             className="ox-modal-box"
             style={{
               width: "100%",
-              maxWidth: 960,
+              maxWidth: 1400,
               maxHeight: "92vh",
               overflowY: "auto",
               overflowX: "hidden",
@@ -688,6 +740,9 @@ export function QuoteCreator({
                 <span>{error}</span>
               </div>
             )}
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 380px), 1fr))", gap: "1rem", alignItems: "start" }}>
+              <div style={{ display: "grid", gap: "1rem", minWidth: 0 }}>
 
             {/* En-tête Client & Paramètres fiscaux (Sleek & 100% Responsive) */}
             <div
@@ -958,6 +1013,103 @@ export function QuoteCreator({
               </div>
             </div>
 
+            {isGarageScope && (
+              <div
+                style={{
+                  display: "grid",
+                  gap: 10,
+                  background: "var(--surface-soft)",
+                  border: "1px solid var(--success)",
+                  borderRadius: 10,
+                  padding: "0.85rem 1rem",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
+                  <div>
+                    <strong style={{ fontSize: "0.86rem", color: "var(--success-fg)" }}>Nouvel article en saisie libre</strong>
+                    <div style={{ fontSize: "0.75rem", opacity: 0.7, marginTop: 2 }}>
+                      Créez un article sans passer par le catalogue. Il sera ajouté à la proforma et conservé dans l&apos;historique du garage.
+                    </div>
+                  </div>
+                  <span style={{ fontSize: "0.72rem", padding: "2px 8px", borderRadius: 999, border: "1px solid var(--success)", color: "var(--success-fg)" }}>
+                    Historique atelier
+                  </span>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,150px),1fr))", gap: 8, alignItems: "end" }}>
+                  <label style={{ display: "grid", gap: 4, fontSize: "0.76rem", gridColumn: "span 2" }}>
+                    Désignation
+                    <input
+                      className="ox-input"
+                      value={freeDesignation}
+                      onChange={(event) => setFreeDesignation(event.target.value)}
+                      placeholder="Ex. Diagnostic électronique"
+                      disabled={isSavingArticle || isPending}
+                    />
+                  </label>
+                  <label style={{ display: "grid", gap: 4, fontSize: "0.76rem" }}>
+                    Prix unitaire (FCFA)
+                    <input
+                      type="number"
+                      min={1}
+                      className="ox-input"
+                      value={freeUnitPrice}
+                      onChange={(event) => setFreeUnitPrice(event.target.value)}
+                      placeholder="Ex. 25000"
+                      disabled={isSavingArticle || isPending}
+                    />
+                  </label>
+                  <label style={{ display: "grid", gap: 4, fontSize: "0.76rem" }}>
+                    Quantité
+                    <input
+                      type="number"
+                      min={1}
+                      className="ox-input"
+                      value={freeQuantity}
+                      onChange={(event) => setFreeQuantity(event.target.value)}
+                      disabled={isSavingArticle || isPending}
+                    />
+                  </label>
+                  <div style={{ padding: "6px 10px", borderRadius: 8, background: "var(--surface)", border: "1px solid var(--border)", fontSize: "0.76rem", lineHeight: 1.6 }}>
+                    <div>Total HT : <strong>{formatXof(freeTotals.subtotalHtXof)}</strong></div>
+                    <div>Total TTC : <strong>{formatXof(freeTotals.totalXof)}</strong></div>
+                  </div>
+                  <button
+                    type="button"
+                    className="ox-btn ox-btn-primary"
+                    onClick={() => void handleSaveCustomArticle()}
+                    disabled={isSavingArticle || isPending}
+                  >
+                    {isSavingArticle ? "Enregistrement..." : "Enregistrer et ajouter"}
+                  </button>
+                </div>
+                {customArticleList.length > 0 && (
+                  <label style={{ display: "grid", gap: 4, fontSize: "0.76rem" }}>
+                    Articles déjà enregistrés
+                    <select
+                      className="ox-select"
+                      defaultValue=""
+                      onChange={(event) => {
+                        const article = customArticleList.find((item) => item.id === event.target.value);
+                        if (!article) return;
+                        setFreeDesignation(article.name);
+                        setFreeUnitPrice(String(article.unitPriceXof));
+                        setFreeQuantity("1");
+                        event.target.value = "";
+                      }}
+                    >
+                      <option value="">Choisir un article historique pour le modifier dans la proforma</option>
+                      {customArticleList.map((article) => (
+                        <option key={article.id} value={article.id}>
+                          {article.name} · {formatXof(article.unitPriceXof)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+                {articleFeedback ? <div style={{ fontSize: "0.78rem", color: "var(--success-fg)" }}>{articleFeedback}</div> : null}
+              </div>
+            )}
+
             {/* Sélecteurs rapides Catalogue / Véhicules */}
             <div
               style={{
@@ -997,7 +1149,7 @@ export function QuoteCreator({
                   disabled={isPending}
                 >
                   <option value="">{copy.creator.quickAdd.articleOption}</option>
-                  {articles.map((art) => (
+                  {articleCatalog.map((art) => (
                     <option key={art.id} value={art.id}>
                       [{art.category}] {art.name} · {formatXof(art.unitPriceXof)}
                     </option>
@@ -1977,6 +2129,79 @@ export function QuoteCreator({
                   ✍️ {formatLegalAmountNotice(totals.totalXof, "proforma")}
                 </div>
               </div>
+            </div>
+
+              </div>
+
+              <aside
+                aria-label="Aperçu en direct de la proforma"
+                style={{
+                  position: "sticky",
+                  top: 0,
+                  display: "grid",
+                  gap: 10,
+                  padding: "1rem",
+                  background: "var(--surface-soft)",
+                  border: "1px solid var(--gold)",
+                  borderRadius: 12,
+                  fontSize: "0.82rem",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
+                  <strong style={{ color: "var(--gold-fg)" }}>Aperçu de la proforma</strong>
+                  <span style={{ fontSize: "0.68rem", color: "var(--text-muted)" }}>Temps réel</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 8, paddingBottom: 8, borderBottom: "1px solid var(--border)" }}>
+                  <span style={{ opacity: 0.7 }}>Statut</span>
+                  <span style={{ fontWeight: 700 }}>Brouillon</span>
+                </div>
+                <div>
+                  <div style={{ fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.06em", opacity: 0.6 }}>Client</div>
+                  <div style={{ fontWeight: 700, marginTop: 2 }}>
+                    {selectedCustomer ? selectedCustomer.companyName || selectedCustomer.contactName : "Client non sélectionné"}
+                  </div>
+                </div>
+                {isGarageScope ? (
+                  <div>
+                    <div style={{ fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.06em", opacity: 0.6 }}>Véhicule atelier</div>
+                    <div style={{ fontWeight: 700, marginTop: 2 }}>{vehicleImmatriculation || "Immatriculation à renseigner"}</div>
+                    <div style={{ fontSize: "0.76rem", opacity: 0.7 }}>{[vehicleBrand, vehicleModel].filter(Boolean).join(" ") || "Marque et modèle à renseigner"}</div>
+                  </div>
+                ) : null}
+                <div style={{ display: "grid", gap: 6 }}>
+                  <div style={{ fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.06em", opacity: 0.6 }}>Lignes</div>
+                  {lines.filter((line) => line.description.trim()).length === 0 ? (
+                    <div style={{ fontSize: "0.78rem", opacity: 0.65, fontStyle: "italic" }}>Aucune ligne pour le moment.</div>
+                  ) : (
+                    <div style={{ display: "grid", gap: 5 }}>
+                      {lines.filter((line) => line.description.trim()).map((line) => (
+                        <div key={line.id} style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 6, paddingBottom: 5, borderBottom: "1px dashed var(--border)" }}>
+                          <div>
+                            <div style={{ fontWeight: 600 }}>{line.description}</div>
+                            <div style={{ fontSize: "0.72rem", opacity: 0.65 }}>{line.quantity} × {formatXof(line.unitPriceXof)}</div>
+                          </div>
+                          <div style={{ fontWeight: 700 }}>{formatXof((line.quantity || 0) * (line.unitPriceXof || 0))}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div style={{ display: "grid", gap: 4, paddingTop: 6, borderTop: "1px solid var(--border)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>Total brut</span><span>{formatXof(totals.grossHtXof)}</span></div>
+                  {discountAmount > 0 ? <div style={{ display: "flex", justifyContent: "space-between", color: "var(--gold-fg)" }}><span>Remise</span><span>-{formatXof(discountAmount)}</span></div> : null}
+                  <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>TVA ({taxRatePct} %)</span><span>{formatXof(totals.taxXof)}</span></div>
+                  <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 6, borderTop: "1px solid var(--border)", fontSize: "1rem", fontWeight: 800, color: "var(--gold-fg)" }}>
+                    <span>Total {taxMode}</span><span>{formatXof(totals.totalXof)}</span>
+                  </div>
+                </div>
+                <div style={{ fontSize: "0.72rem", opacity: 0.65 }}>
+                  CGV : {cgvType === "ATELIER" ? "Atelier SAV" : "Véhicule"} · Validité {validDays} jours
+                </div>
+                {notes ? <div style={{ fontSize: "0.72rem", opacity: 0.7 }}>Note : {notes}</div> : null}
+                <div style={{ fontSize: "0.7rem", opacity: 0.55, fontStyle: "italic" }}>
+                  L&apos;aperçu se met à jour à chaque modification. La proforma n&apos;est pas encore enregistrée.
+                </div>
+              </aside>
             </div>
 
             {/* Actions */}

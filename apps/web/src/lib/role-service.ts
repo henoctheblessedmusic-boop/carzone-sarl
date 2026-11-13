@@ -505,6 +505,7 @@ export class RoleService {
       return (
         role === "COMPTA_GARAGE" ||
         role === "COMPTA" ||
+        role === "ASSISTANTE_COMPTABLE" ||
         role === "CHEF_ATELIER" ||
         role === "ADMIN"
       );

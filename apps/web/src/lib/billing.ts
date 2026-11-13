@@ -51,6 +51,7 @@ export const QuoteStatus = {
   BROUILLON: "BROUILLON",
   PROFORMA_ENVOYEE: "PROFORMA_ENVOYEE",
   COMMANDE_CONFIRMEE: "COMMANDE_CONFIRMEE",
+  CONFIRMEE: "CONFIRMEE",
   FACTURE_NORMALISEE: "FACTURE_NORMALISEE",
   ANNULEE_INTERNE: "ANNULEE_INTERNE",
   /** Legacy seed / anciens devis */
@@ -65,6 +66,7 @@ export const QUOTE_STATUS_LABELS: Record<string, string> = {
   BROUILLON: "Brouillon",
   PROFORMA_ENVOYEE: "Proforma envoyée",
   COMMANDE_CONFIRMEE: "Commande confirmée (ferme)",
+  CONFIRMEE: "Proforma confirmée",
   FACTURE_NORMALISEE: "Facture normalisée",
   ANNULEE_INTERNE: "Annulée (interne)",
   ENVOYE: "Envoyé (legacy)",
@@ -77,6 +79,7 @@ export function isClientCancelLocked(status: string): boolean {
   return [
     QuoteStatus.PROFORMA_ENVOYEE,
     QuoteStatus.COMMANDE_CONFIRMEE,
+    QuoteStatus.CONFIRMEE,
     QuoteStatus.FACTURE_NORMALISEE,
     QuoteStatus.ENVOYE,
     QuoteStatus.ACCEPTE,
@@ -95,7 +98,7 @@ export function canConfirmOrder(status: string): boolean {
 }
 
 export function canNormalizeInvoice(status: string): boolean {
-  return [QuoteStatus.COMMANDE_CONFIRMEE, QuoteStatus.ACCEPTE].includes(status as never);
+  return [QuoteStatus.COMMANDE_CONFIRMEE, QuoteStatus.CONFIRMEE, QuoteStatus.ACCEPTE].includes(status as never);
 }
 
 export function canSendProforma(status: string): boolean {

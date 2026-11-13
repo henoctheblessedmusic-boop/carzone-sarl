@@ -34,6 +34,7 @@ import {
   sendProforma,
   confirmOrder,
   normalizeInvoice,
+  confirmGarageProforma,
   voidInternally,
   deleteQuote,
 } from "./actions";
@@ -108,6 +109,7 @@ export function QuotesView({
   opportunities,
   userRole,
   scope,
+  customArticles = [],
 }: {
   quotes: QuoteItem[];
   customers: CustomerOption[];
@@ -118,6 +120,7 @@ export function QuotesView({
   opportunities: OpportunityOption[];
   userRole: string;
   scope: "SHOWROOM" | "GARAGE";
+  customArticles?: ArticleOption[];
 }) {
   const { locale } = usePrefs();
   const copy = quotesCopy[locale];
@@ -213,15 +216,34 @@ export function QuotesView({
     userRole === "PDG" ||
     userRole === "SG" ||
     userRole === "COMPTA" ||
-    userRole === "COMPTA_GARAGE";
+    userRole === "ASSISTANTE_COMPTABLE";
+
+  const canNormalizeRole = [
+    "DEVELOPER",
+    "DG",
+    "PDG",
+    "SG",
+    "COMPTA",
+    "ASSISTANTE_COMPTABLE",
+  ].includes(userRole);
 
   function canTranscribeQuote(q: QuoteItem): boolean {
     if (!canTranscribeRole) return false;
-    if (userRole === "COMPTA_GARAGE" && q.activity !== "GARAGE") return false;
     if (q.status === "ANNULEE_INTERNE" || q.status === "FACTURE_NORMALISEE") return false;
+    if (q.activity === "GARAGE" && q.status !== "CONFIRMEE") return false;
     if (q.invoice || q.transcribedAt) return false;
     return true;
   }
+
+  function canConfirmGarageProforma(status: string): boolean {
+    return (
+      scope === "GARAGE" &&
+      userRole === "COMPTA_GARAGE" &&
+      ["BROUILLON", "PROFORMA_ENVOYEE", "ENVOYE"].includes(status)
+    );
+  }
+
+
 
   // KPIs
   const totalCount = quotes.length;
@@ -229,7 +251,7 @@ export function QuotesView({
     (q) => q.status === "BROUILLON" || q.status === "PROFORMA_ENVOYEE" || q.status === "ENVOYE"
   );
   const confirmedQuotes = quotes.filter(
-    (q) => q.status === "COMMANDE_CONFIRMEE" || q.status === "ACCEPTE"
+    (q) => q.status === "COMMANDE_CONFIRMEE" || q.status === "CONFIRMEE" || q.status === "ACCEPTE"
   );
   const invoicedQuotes = quotes.filter((q) => q.status === "FACTURE_NORMALISEE");
 
@@ -244,7 +266,7 @@ export function QuotesView({
       if (statusFilter === "PENDING") {
         if (!["BROUILLON", "PROFORMA_ENVOYEE", "ENVOYE"].includes(q.status)) return false;
       } else if (statusFilter === "CONFIRMED") {
-        if (!["COMMANDE_CONFIRMEE", "ACCEPTE"].includes(q.status)) return false;
+        if (!["COMMANDE_CONFIRMEE", "CONFIRMEE", "ACCEPTE"].includes(q.status)) return false;
       } else if (statusFilter === "INVOICED") {
         if (q.status !== "FACTURE_NORMALISEE") return false;
       } else if (statusFilter === "VOID") {
@@ -472,6 +494,7 @@ export function QuotesView({
           vehicleBrands={vehicleBrands}
           opportunities={opportunities}
           scope={scope}
+          customArticles={customArticles}
         />
       </div>
 
@@ -632,7 +655,7 @@ export function QuotesView({
                             fontSize: "0.75rem",
                             fontWeight: 650,
                             background:
-                              q.status === "FACTURE_NORMALISEE" || q.status === "COMMANDE_CONFIRMEE"
+                              q.status === "FACTURE_NORMALISEE" || q.status === "COMMANDE_CONFIRMEE" || q.status === "CONFIRMEE"
                                 ? "var(--success-soft)"
                                 : q.status === "ANNULEE_INTERNE"
                                   ? "var(--danger-soft)"
@@ -640,7 +663,7 @@ export function QuotesView({
                                     ? "var(--info-soft)"
                                     : "var(--warning-soft)",
                             color:
-                              q.status === "FACTURE_NORMALISEE" || q.status === "COMMANDE_CONFIRMEE"
+                              q.status === "FACTURE_NORMALISEE" || q.status === "COMMANDE_CONFIRMEE" || q.status === "CONFIRMEE"
                                 ? "var(--success-fg)"
                                 : q.status === "ANNULEE_INTERNE"
                                   ? "var(--danger-fg)"
@@ -648,7 +671,7 @@ export function QuotesView({
                                     ? "var(--info-fg)"
                                     : "var(--warning-fg)",
                             border: `1px solid ${
-                              q.status === "FACTURE_NORMALISEE" || q.status === "COMMANDE_CONFIRMEE"
+                              q.status === "FACTURE_NORMALISEE" || q.status === "COMMANDE_CONFIRMEE" || q.status === "CONFIRMEE"
                                 ? "var(--success)"
                                 : q.status === "ANNULEE_INTERNE"
                                   ? "var(--danger)"
@@ -714,7 +737,7 @@ export function QuotesView({
                           })()}
 
                           {/* Modifier Devis / Proforma (Figé si Commande Confirmée ou Facture Normalisée) */}
-                          {q.status !== "COMMANDE_CONFIRMEE" && q.status !== "FACTURE_NORMALISEE" && q.status !== "ANNULEE_INTERNE" ? (
+                          {q.status !== "COMMANDE_CONFIRMEE" && q.status !== "CONFIRMEE" && q.status !== "FACTURE_NORMALISEE" && q.status !== "ANNULEE_INTERNE" ? (
                             <button
                               type="button"
                               onClick={() => setEditingQuote(q)}
@@ -773,7 +796,7 @@ export function QuotesView({
                           )}
 
                           {/* Confirmer Commande */}
-                          {canConfirmOrder(q.status) && q.status !== "BROUILLON" && (
+                          {scope !== "GARAGE" && canConfirmOrder(q.status) && q.status !== "BROUILLON" && (
                             <form action={confirmOrder} style={{ display: "inline" }}>
                               <input type="hidden" name="id" value={q.id} />
                               <button
@@ -795,8 +818,31 @@ export function QuotesView({
                             </form>
                           )}
 
+                          {/* Confirmation de la proforma garage */}
+                          {canConfirmGarageProforma(q.status) && (
+                            <form action={confirmGarageProforma} style={{ display: "inline" }}>
+                              <input type="hidden" name="id" value={q.id} />
+                              <button
+                                type="submit"
+                                className="ox-btn ox-btn-sm"
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: 4,
+                                  background: "var(--success-soft)",
+                                  color: "var(--success-fg)",
+                                  border: "1px solid var(--success)",
+                                }}
+                                title="Confirmer la proforma pour la transmettre à la facturation"
+                              >
+                                <CheckCircle size={13} />
+                                Confirmer la proforma
+                              </button>
+                            </form>
+                          )}
+
                           {/* Facture normalisée */}
-                          {canNormalizeInvoice(q.status) && !q.invoice && (
+                          {canNormalizeRole && canNormalizeInvoice(q.status) && !q.invoice && (
                             <form action={normalizeInvoice} style={{ display: "inline" }}>
                               <input type="hidden" name="id" value={q.id} />
                               <button

@@ -54,7 +54,7 @@ export function peutVoirDocuments(role: Role, activity: Activity): boolean {
 export function peutGererBL(role: Role, activity: Activity): boolean {
   if (estSuperAdmin(role)) return true;
   if (activity === ACTIVITY.GARAGE) {
-    return role === "COMPTA_GARAGE" || role === "COMPTA";
+    return role === "COMPTA_GARAGE" || role === "COMPTA" || role === "ASSISTANTE_COMPTABLE";
   }
   return role === "COMPTA";
 }

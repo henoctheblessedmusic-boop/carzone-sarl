@@ -346,12 +346,11 @@ export async function normalizeInvoice(formData: FormData) {
     "DG",
     "ASSISTANTE_COMPTABLE",
     "COMPTA",
-    "COMPTA_GARAGE",
   ]);
   const id = String(formData.get("id"));
   const quote = await prisma.quote.findUniqueOrThrow({ where: { id } });
-  if (user.role === "COMPTA_GARAGE" && quote.activity !== ACTIVITY.GARAGE) {
-    throw new Error("La Comptable Garage ne peut normaliser que des proformas du périmètre GARAGE.");
+  if (quote.activity === ACTIVITY.GARAGE && quote.status !== "CONFIRMEE") {
+    throw new Error("La proforma garage doit être confirmée avant sa transformation en facture normalisée.");
   }
   if (!canNormalizeInvoice(quote.status)) return;
   const existing = await prisma.invoice.findUnique({ where: { quoteId: id } });
@@ -577,6 +576,7 @@ export async function updateProformaWithLines(payload: {
   // Non modifiable si le bon de commande a déjà été confirmé ou s'il y a une facture normalisée !
   if (
     existing.status === "COMMANDE_CONFIRMEE" ||
+    existing.status === "CONFIRMEE" ||
     existing.status === "FACTURE_NORMALISEE" ||
     existing.status === "ACCEPTE"
   ) {
@@ -691,8 +691,8 @@ export async function transcribeQuote(formData: FormData): Promise<TranscribeQuo
 
   const activity = quote.activity as Activity;
 
-  if (user.role === "COMPTA_GARAGE" && activity !== ACTIVITY.GARAGE) {
-    throw new Error("La Comptable Garage ne peut transcrire que des proformas du périmètre GARAGE.");
+  if (activity === ACTIVITY.GARAGE && quote.status !== "CONFIRMEE") {
+    throw new Error("La proforma garage doit être confirmée avant sa transcription en facture normalisée.");
   }
   if (!peutGererBL(user.role, activity)) {
     throw new Error(
@@ -864,3 +864,85 @@ export async function transcribeQuote(formData: FormData): Promise<TranscribeQuo
   };
 }
 
+
+
+/** Enregistre un article libre dans l'historique du garage. */
+export async function createGarageCustomArticle(data: {
+  designation: string;
+  unitPriceXof: number;
+  defaultQuantity: number;
+}) {
+  const user = await requireUser(["COMPTA_GARAGE", "DG", "PDG", "SG"]);
+  const designation = data.designation.trim();
+  const unitPriceXof = Math.round(Number(data.unitPriceXof) || 0);
+  const defaultQuantity = Math.max(1, Math.round(Number(data.defaultQuantity) || 1));
+  if (!designation) throw new Error("La désignation de l'article est obligatoire.");
+  if (unitPriceXof <= 0) throw new Error("Le prix unitaire doit être supérieur à zéro.");
+
+  const existing = await prisma.garageCustomArticle.findFirst({
+    where: { designation: { equals: designation, mode: "insensitive" } },
+    select: { id: true },
+  });
+  const article = existing
+    ? await prisma.garageCustomArticle.update({
+        where: { id: existing.id },
+        data: { designation, unitPriceXof, defaultQuantity, active: true, createdByName: user.fullName },
+      })
+    : await prisma.garageCustomArticle.create({
+        data: { designation, unitPriceXof, defaultQuantity, createdByName: user.fullName },
+      });
+
+  await logAudit({
+    user,
+    action: "garage.custom_article_save",
+    entityType: "GarageCustomArticle",
+    entityId: article.id,
+    entityLabel: designation,
+    details: `${unitPriceXof.toLocaleString("fr-BJ")} FCFA`,
+  });
+  revalidatePath("/quotes");
+  return {
+    id: article.id,
+    name: article.designation,
+    category: "HISTORIQUE",
+    unitPriceXof: article.unitPriceXof,
+    taxRatePct: 0,
+    unit: "U",
+    description: "Article historisé",
+  };
+}
+
+/** Confirme une proforma garage et la place dans la file de facturation. */
+export async function confirmGarageProforma(formData: FormData) {
+  const user = await requireUser(["COMPTA_GARAGE", "DG", "PDG", "SG"]);
+  const id = String(formData.get("id") || "").trim();
+  const quote = await prisma.quote.findUnique({
+    where: { id },
+    select: { id: true, activity: true, status: true, invoice: { select: { id: true } }, number: true },
+  });
+  if (!quote) throw new Error("Proforma introuvable.");
+  if (quote.activity !== ACTIVITY.GARAGE) throw new Error("Cette proforma n'est pas une proforma garage.");
+  if (quote.invoice) throw new Error("Cette proforma est déjà facturée.");
+  if (!["BROUILLON", "PROFORMA_ENVOYEE", "ENVOYE"].includes(quote.status)) {
+    throw new Error("Cette proforma ne peut plus être confirmée.");
+  }
+  const now = new Date();
+  await prisma.quote.update({
+    where: { id },
+    data: {
+      status: "CONFIRMEE",
+      approvedAt: now,
+      auditNotes: `${now.toISOString()} · Proforma garage confirmée par ${user.fullName}`,
+    },
+  });
+  await logAudit({
+    user,
+    action: "garage.proforma_confirm",
+    entityType: "Quote",
+    entityId: quote.id,
+    entityLabel: quote.number,
+    details: "Proforma confirmée, en attente de facturation",
+  });
+  revalidatePath("/quotes");
+  revalidatePath("/garage-supervision");
+}

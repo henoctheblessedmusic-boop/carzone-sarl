@@ -123,6 +123,7 @@ export async function createEmployee(data: {
   bankAccountNumber?: string;
   status?: string;
   notes?: string;
+  isDriver?: boolean;
   userId?: string;
 }) {
   await requireUser([...CAN_MANAGE_HR]);
@@ -163,6 +164,7 @@ export async function createEmployee(data: {
       bankAccountNumber: data.bankAccountNumber?.trim() || null,
       status: data.status || "ACTIF",
       notes: data.notes?.trim() || null,
+      isDriver: data.isDriver === true,
     },
   });
 
@@ -226,6 +228,7 @@ export async function updateEmployee(
     bankAccountNumber?: string;
     status?: string;
     notes?: string;
+    isDriver?: boolean;
     userId?: string | null;
   }
 ) {
@@ -260,6 +263,7 @@ export async function updateEmployee(
       bankAccountNumber: data.bankAccountNumber?.trim() || null,
       status: data.status || "ACTIF",
       notes: data.notes?.trim() || null,
+      isDriver: data.isDriver === true,
     },
   });
 

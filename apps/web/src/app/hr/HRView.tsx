@@ -58,6 +58,7 @@ export type EmployeeData = {
   city: string | null;
   emergencyContact: string | null;
   jobTitle: string;
+  isDriver: boolean;
   departmentId: string | null;
   department?: { id: string; name: string; code: string; color: string | null } | null;
   contractType: string;
@@ -185,6 +186,7 @@ export function HRView({
     city: "Cotonou",
     emergencyContact: "",
     jobTitle: "",
+    isDriver: false,
     departmentId: "",
     contractType: "CDI",
     hireDate: new Date().toISOString().split("T")[0],
@@ -241,6 +243,7 @@ export function HRView({
       city: "Cotonou",
       emergencyContact: "",
       jobTitle: "",
+      isDriver: false,
       departmentId: departments[0]?.id || "",
       contractType: "CDI",
       hireDate: new Date().toISOString().split("T")[0],
@@ -271,6 +274,7 @@ export function HRView({
       city: emp.city || "Cotonou",
       emergencyContact: emp.emergencyContact || "",
       jobTitle: emp.jobTitle,
+      isDriver: emp.isDriver === true,
       departmentId: emp.departmentId || "",
       contractType: emp.contractType,
       hireDate: emp.hireDate ? emp.hireDate.split("T")[0] : "",
@@ -1533,6 +1537,16 @@ export function HRView({
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem" }}>
+                <div style={{ display: "flex", alignItems: "flex-end", paddingBottom: 4 }}>
+                  <label style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: "0.85rem" }}>
+                    <input
+                      type="checkbox"
+                      checked={empForm.isDriver}
+                      onChange={(e) => setEmpForm({ ...empForm, isDriver: e.target.checked })}
+                    />
+                    Chauffeur location
+                  </label>
+                </div>
                 <div>
                   <label className="ox-label">{hrCopy.employeeModal.department}</label>
                   <select

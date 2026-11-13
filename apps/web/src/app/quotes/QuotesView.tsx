@@ -202,6 +202,7 @@ export function QuotesView({
     userRole === "RTA" ||
     userRole === "DC" ||
     userRole === "COMPTA" ||
+    userRole === "COMPTA_GARAGE" ||
     userRole === "ASSISTANTE_COMPTABLE" ||
     userRole === "COMMERCIAL" ||
     userRole === "ADMIN";
@@ -916,7 +917,7 @@ export function QuotesView({
                           )}
 
                           {/* Supprimer définitivement pour Directeur, Compta et Commercial (sauf si facture normalisée) */}
-                          {canDelete && q.status !== "FACTURE_NORMALISEE" && !q.invoice && (
+                          {canDelete && q.status !== "FACTURE_NORMALISEE" && q.status !== "CONFIRMEE" && !q.invoice && (
                             <button
                               type="button"
                               onClick={() => handleDeleteQuote(q.id, q.number)}

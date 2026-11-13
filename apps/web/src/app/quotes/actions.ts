@@ -473,6 +473,9 @@ export async function deleteQuote(id: string) {
   if (quote.status === "FACTURE_NORMALISEE" || quote.invoice) {
     throw new Error(quotesCopy[await getLocale()].server.deleteNormalized);
   }
+  if (quote.status === "CONFIRMEE") {
+    throw new Error("Cette proforma est confirmée : elle ne peut plus être supprimée. Annulez-la avec un motif si nécessaire.");
+  }
 
   await prisma.quoteLine.deleteMany({ where: { quoteId: id } });
   await prisma.quote.delete({ where: { id } });
